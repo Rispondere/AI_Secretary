@@ -19,23 +19,24 @@
     <div class="max-w-4xl mx-auto">
         <h1 class="text-3xl font-bold mb-6 text-center">AI秘書ちゃんダッシュボード</h1>
 
-        <!-- 今日のタスク -->
+        <!-- タスク管理 -->
         <div class="bg-white p-4 rounded-lg shadow mb-6">
             <h2 class="text-xl font-semibold mb-2">📅 今日のタスク</h2>
-            <ul id="taskList" class="list-disc ml-6 text-gray-800">
-                <li>面談確認シートの更新</li>
-                <li>出勤状況チェック（各店舗）</li>
-                <li>バナー差し替え指示</li>
-            </ul>
+            <ul id="taskList" class="list-disc ml-6 text-gray-800"></ul>
+            <div class="mt-4">
+                <input id="newTask" type="text" class="border p-2 w-2/3 rounded" placeholder="タスクを追加">
+                <button onclick="addTask()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 ml-2">追加</button>
+            </div>
         </div>
 
-        <!-- よく使うプロンプト -->
+        <!-- プロンプト集 -->
         <div class="bg-white p-4 rounded-lg shadow mb-6">
             <h2 class="text-xl font-semibold mb-2">🧠 よく使うプロンプト集</h2>
-            <div class="space-y-2">
-                <button onclick="copyPrompt('このキャストの紹介文を魅力的に作成してください：〇〇')" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">紹介文生成</button>
-                <button onclick="copyPrompt('面談日程調整用のLINE文を作って')" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">面談連絡文</button>
-                <button onclick="copyPrompt('今日の出勤メッセージをキャストに送る文を考えて')" class="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600">出勤催促文</button>
+            <div id="promptButtons" class="space-y-2"></div>
+            <div class="mt-4">
+                <input id="newPromptLabel" type="text" class="border p-2 w-1/4 rounded" placeholder="ボタン名">
+                <input id="newPromptText" type="text" class="border p-2 w-1/2 rounded ml-2" placeholder="プロンプト内容">
+                <button onclick="addPrompt()" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 ml-2">追加</button>
             </div>
             <p class="mt-2 text-sm text-gray-500">※ コピーしてChatGPTに貼ってください</p>
         </div>
@@ -54,11 +55,84 @@
     </div>
 
     <script>
+        // タスクのローカル保存と表示
+        function loadTasks() {
+            const savedTasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+            const taskList = document.getElementById('taskList');
+            taskList.innerHTML = '';
+            savedTasks.forEach(task => {
+                const li = document.createElement('li');
+                li.innerHTML = `<input type='checkbox' class='mr-2' ${task.done ? 'checked' : ''} onchange='toggleTask(this)'>${task.text}`;
+                taskList.appendChild(li);
+            });
+        }
+
+        function addTask() {
+            const taskInput = document.getElementById('newTask');
+            const taskText = taskInput.value.trim();
+            if (taskText !== '') {
+                const tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+                tasks.push({ text: taskText, done: false });
+                localStorage.setItem('tasks', JSON.stringify(tasks));
+                taskInput.value = '';
+                loadTasks();
+            }
+        }
+
+        function toggleTask(checkbox) {
+            const index = Array.from(document.getElementById('taskList').children).indexOf(checkbox.parentElement);
+            const tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+            tasks[index].done = checkbox.checked;
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+        }
+
+        // メモ保存
+        function loadMemo() {
+            document.getElementById('memoArea').value = localStorage.getItem('memo') || '';
+        }
+        document.getElementById('memoArea').addEventListener('input', (e) => {
+            localStorage.setItem('memo', e.target.value);
+        });
+
+        // プロンプト管理
+        function loadPrompts() {
+            const savedPrompts = JSON.parse(localStorage.getItem('prompts') || '[]');
+            const container = document.getElementById('promptButtons');
+            container.innerHTML = '';
+            savedPrompts.forEach(p => {
+                const button = document.createElement('button');
+                button.innerText = p.label;
+                button.className = 'bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600';
+                button.onclick = () => copyPrompt(p.text);
+                container.appendChild(button);
+            });
+        }
+
+        function addPrompt() {
+            const label = document.getElementById('newPromptLabel').value.trim();
+            const text = document.getElementById('newPromptText').value.trim();
+            if (label && text) {
+                const prompts = JSON.parse(localStorage.getItem('prompts') || '[]');
+                prompts.push({ label, text });
+                localStorage.setItem('prompts', JSON.stringify(prompts));
+                document.getElementById('newPromptLabel').value = '';
+                document.getElementById('newPromptText').value = '';
+                loadPrompts();
+            }
+        }
+
         function copyPrompt(text) {
             navigator.clipboard.writeText(text).then(() => {
                 alert("プロンプトをコピーしました！ChatGPTに貼って使ってください。");
             });
         }
+
+        // 初期読み込み
+        window.onload = () => {
+            loadTasks();
+            loadMemo();
+            loadPrompts();
+        };
     </script>
 </body>
 </html>
