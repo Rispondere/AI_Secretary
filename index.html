@@ -273,6 +273,72 @@
             background-color: #0ea5e9;
         }
         
+        /* ログイン画面スタイル */
+        .login-container {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .login-card {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .login-logo {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        
+        .login-logo i {
+            font-size: 48px;
+            color: #0ea5e9;
+            margin-bottom: 16px;
+        }
+        
+        .login-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1e293b;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+        
+        .login-subtitle {
+            color: #64748b;
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        
+        .security-info {
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 16px;
+            font-size: 14px;
+            color: #0369a1;
+        }
+        
+        .session-timer {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            z-index: 1000;
+        }
+        
         @media (max-width: 768px) {
             .container {
                 padding: 16px;
@@ -293,6 +359,10 @@
                 font-size: 16px;
                 min-height: 52px;
             }
+            
+            .login-card {
+                padding: 32px 24px;
+            }
         }
         
         @media (min-width: 769px) {
@@ -302,240 +372,307 @@
                 gap: 24px;
             }
         }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body>
-    <!-- ヘッダー -->
-    <div class="bg-white border-b border-gray-200">
-        <div class="max-w-6xl mx-auto px-4 py-6">
-            <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-                <div class="text-center md:text-left">
-                    <h1 class="text-2xl md:text-3xl font-bold text-gray-900 flex items-center justify-center md:justify-start">
-                        <i class="fas fa-briefcase mr-3 text-blue-500"></i>
-                        AI秘書ちゃんダッシュボード
-                    </h1>
-                    <p class="text-gray-600 mt-1">有限会社Rispondere 業務管理システム</p>
-                </div>
-                
-                <div class="flex flex-col md:flex-row items-center space-y-3 md:space-y-0 md:space-x-4">
-                    <div class="flex items-center space-x-2">
-                        <i class="fas fa-store text-gray-500"></i>
-                        <select id="storeSelector" class="input-field" style="width: auto; min-width: 180px;" onchange="switchStore()">
-                            <option value="classy_tokyo">CLASSY東京</option>
-                            <option value="classy_nagoya">CLASSY名古屋</option>
-                            <option value="classy_yokkaichi">CLASSY四日市</option>
-                            <option value="grandopera_tokyo">GrandOpera東京</option>
-                            <option value="grandopera_yokohama">GrandOpera横浜</option>
-                            <option value="grandopera_nagoya">GrandOpera名古屋</option>
-                            <option value="grandopera_fukuoka">GrandOpera福岡</option>
-                            <option value="wancarat">ワンカラット</option>
-                            <option value="shabour">シャブール</option>
-                            <option value="opera_nishiki">オペラ錦</option>
-                        </select>
+    <!-- ログイン画面 -->
+    <div id="loginScreen" class="login-container">
+        <div class="login-card fade-in">
+            <div class="login-logo">
+                <i class="fas fa-shield-alt"></i>
+                <div class="login-title">セキュアログイン</div>
+                <div class="login-subtitle">有限会社Rispondere<br>AI秘書ちゃんダッシュボード</div>
+            </div>
+            
+            <form onsubmit="handleLogin(event)">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-key mr-2"></i>パスワード
+                        </label>
+                        <input 
+                            type="password" 
+                            id="passwordInput" 
+                            class="input-field" 
+                            placeholder="パスワードを入力してください"
+                            required
+                            autocomplete="current-password"
+                        >
                     </div>
                     
-                    <div class="text-center md:text-right">
-                        <div class="font-semibold text-gray-900" id="currentStore">CLASSY東京</div>
-                        <div class="text-sm text-gray-500" id="currentDate"></div>
-                    </div>
+                    <button type="submit" class="btn btn-primary w-full">
+                        <i class="fas fa-sign-in-alt mr-2"></i>ログイン
+                    </button>
+                </div>
+            </form>
+            
+            <div class="security-info">
+                <i class="fas fa-info-circle mr-2"></i>
+                セキュリティ機能：自動ログアウト（30分）・ログイン試行制限・セッション管理
+            </div>
+            
+            <div id="loginAttempts" class="hidden mt-4 text-center">
+                <div class="text-red-600 text-sm">
+                    <i class="fas fa-exclamation-triangle mr-2"></i>
+                    ログイン試行回数: <span id="attemptCount">0</span>/5
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 統計情報 -->
-    <div class="max-w-6xl mx-auto px-4 py-6">
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-number" id="totalTasks">0</div>
-                <div class="stat-label">総タスク</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number" id="completedTasks">0</div>
-                <div class="stat-label">完了済み</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number" id="totalPrompts">0</div>
-                <div class="stat-label">プロンプト</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number" id="memoCount">0</div>
-                <div class="stat-label">メモ履歴</div>
-            </div>
-        </div>
+    <!-- セッションタイマー -->
+    <div id="sessionTimer" class="session-timer hidden">
+        <i class="fas fa-clock mr-2"></i>
+        セッション残り時間: <span id="timeRemaining"></span>
     </div>
 
-    <!-- メインコンテンツ -->
-    <div class="max-w-6xl mx-auto px-4 pb-8">
-        <div class="desktop-grid">
-            <!-- 左カラム: タスク・メモ -->
-            <div class="space-y-6">
-                <!-- タスク管理 -->
-                <div class="card p-6">
-                    <div class="flex items-center justify-between mb-6">
-                        <h2 class="section-title">
-                            <i class="fas fa-tasks"></i>
-                            今日のタスク
-                        </h2>
-                        <div class="text-sm text-gray-500">
-                            <span id="taskProgress">0/0</span>
-                        </div>
-                    </div>
-
-                    <!-- 進捗バー -->
-                    <div class="mb-6">
-                        <div class="flex justify-between text-sm text-gray-600 mb-2">
-                            <span>完了率</span>
-                            <span id="progressPercentage">0%</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" id="progressBar" style="width: 0%"></div>
-                        </div>
+    <!-- メインダッシュボード -->
+    <div id="mainDashboard" class="hidden">
+        <!-- ヘッダー -->
+        <div class="bg-white border-b border-gray-200">
+            <div class="max-w-6xl mx-auto px-4 py-6">
+                <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+                    <div class="text-center md:text-left">
+                        <h1 class="text-2xl md:text-3xl font-bold text-gray-900 flex items-center justify-center md:justify-start">
+                            <i class="fas fa-briefcase mr-3 text-blue-500"></i>
+                            AI秘書ちゃんダッシュボード
+                        </h1>
+                        <p class="text-gray-600 mt-1">有限会社Rispondere 業務管理システム</p>
                     </div>
                     
-                    <div id="taskList" class="space-y-3 mb-6"></div>
-                    
-                    <div class="space-y-3">
-                        <input id="newTask" type="text" class="input-field" placeholder="新しいタスクを入力...">
-                        <button onclick="addTask()" class="btn btn-primary w-full">
-                            <i class="fas fa-plus mr-2"></i>タスクを追加
-                        </button>
-                    </div>
-                </div>
-
-                <!-- メモ -->
-                <div class="card p-6">
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 space-y-3 md:space-y-0">
-                        <h2 class="section-title">
-                            <i class="fas fa-sticky-note"></i>
-                            メモ・ふせん
-                        </h2>
-                        <div class="flex space-x-2 w-full md:w-auto">
-                            <select id="memoDateSelector" class="input-field flex-1 md:flex-none" style="min-width: 140px;" onchange="loadSelectedMemo()">
-                                <option value="">過去のメモ</option>
+                    <div class="flex flex-col md:flex-row items-center space-y-3 md:space-y-0 md:space-x-4">
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-store text-gray-500"></i>
+                            <select id="storeSelector" class="input-field" style="width: auto; min-width: 180px;" onchange="switchStore()">
+                                <option value="classy_tokyo">CLASSY東京</option>
+                                <option value="classy_nagoya">CLASSY名古屋</option>
+                                <option value="classy_yokkaichi">CLASSY四日市</option>
+                                <option value="grandopera_tokyo">GrandOpera東京</option>
+                                <option value="grandopera_yokohama">GrandOpera横浜</option>
+                                <option value="grandopera_nagoya">GrandOpera名古屋</option>
+                                <option value="grandopera_fukuoka">GrandOpera福岡</option>
+                                <option value="wancarat">ワンカラット</option>
+                                <option value="shabour">シャブール</option>
+                                <option value="opera_nishiki">オペラ錦</option>
                             </select>
-                            <button onclick="clearMemo()" class="btn btn-warning">
-                                <i class="fas fa-eraser"></i>
-                            </button>
                         </div>
+                        
+                        <div class="text-center md:text-right">
+                            <div class="font-semibold text-gray-900" id="currentStore">CLASSY東京</div>
+                            <div class="text-sm text-gray-500" id="currentDate"></div>
+                        </div>
+                        
+                        <button onclick="logout()" class="btn btn-danger">
+                            <i class="fas fa-sign-out-alt mr-2"></i>ログアウト
+                        </button>
                     </div>
-                    
-                    <div class="mb-3 text-sm text-gray-600">
-                        <i class="fas fa-clock mr-2"></i>
-                        <span id="memoSaveDate"></span>
-                    </div>
-                    
-                    <textarea id="memoArea" class="input-field resize-none" rows="8" placeholder="気づき・指示事項・重要なポイントをメモ..."></textarea>
                 </div>
             </div>
+        </div>
 
-            <!-- 右カラム: プロンプト・CSV -->
-            <div class="space-y-6">
-                <!-- プロンプト集 -->
-                <div class="card p-6">
-                    <h2 class="section-title mb-6">
-                        <i class="fas fa-brain"></i>
-                        プロンプト集
-                    </h2>
-                    
-                    <!-- カテゴリタブ -->
-                    <div class="flex flex-wrap gap-2 mb-6" id="categoryTabs">
-                        <button class="tab active" data-category="all" onclick="switchCategory('all')">
-                            すべて
-                        </button>
-                        <button class="tab" data-category="line" onclick="switchCategory('line')">
-                            LINE用
-                        </button>
-                        <button class="tab" data-category="sns" onclick="switchCategory('sns')">
-                            SNS用
-                        </button>
-                        <button class="tab" data-category="report" onclick="switchCategory('report')">
-                            報告・指導
-                        </button>
-                        <button class="tab" data-category="other" onclick="switchCategory('other')">
-                            その他
-                        </button>
-                    </div>
+        <!-- 統計情報 -->
+        <div class="max-w-6xl mx-auto px-4 py-6">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalTasks">0</div>
+                    <div class="stat-label">総タスク</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="completedTasks">0</div>
+                    <div class="stat-label">完了済み</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalPrompts">0</div>
+                    <div class="stat-label">プロンプト</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="memoCount">0</div>
+                    <div class="stat-label">メモ履歴</div>
+                </div>
+            </div>
+        </div>
 
-                    <!-- プロンプト一覧 -->
-                    <div id="promptButtons" class="space-y-3 mb-6"></div>
-
-                    <!-- プロンプト追加 -->
-                    <div class="border-t pt-6">
-                        <h3 class="font-semibold text-gray-900 mb-4">新しいプロンプトを追加</h3>
-                        <div class="space-y-3">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                <select id="newPromptCategory" class="input-field">
-                                    <option value="line">LINE用</option>
-                                    <option value="sns">SNS用</option>
-                                    <option value="report">報告・指導用</option>
-                                    <option value="other">その他</option>
-                                </select>
-                                <input id="newPromptLabel" type="text" class="input-field" placeholder="ボタン名">
+        <!-- メインコンテンツ -->
+        <div class="max-w-6xl mx-auto px-4 pb-8">
+            <div class="desktop-grid">
+                <!-- 左カラム: タスク・メモ -->
+                <div class="space-y-6">
+                    <!-- タスク管理 -->
+                    <div class="card p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <h2 class="section-title">
+                                <i class="fas fa-tasks"></i>
+                                今日のタスク
+                            </h2>
+                            <div class="text-sm text-gray-500">
+                                <span id="taskProgress">0/0</span>
                             </div>
-                            <textarea id="newPromptText" class="input-field resize-none" rows="3" placeholder="プロンプト内容を入力..."></textarea>
-                            <button onclick="addPrompt()" class="btn btn-primary w-full">
-                                <i class="fas fa-plus mr-2"></i>プロンプトを追加
+                        </div>
+
+                        <!-- 進捗バー -->
+                        <div class="mb-6">
+                            <div class="flex justify-between text-sm text-gray-600 mb-2">
+                                <span>完了率</span>
+                                <span id="progressPercentage">0%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        
+                        <div id="taskList" class="space-y-3 mb-6"></div>
+                        
+                        <div class="space-y-3">
+                            <input id="newTask" type="text" class="input-field" placeholder="新しいタスクを入力...">
+                            <button onclick="addTask()" class="btn btn-primary w-full">
+                                <i class="fas fa-plus mr-2"></i>タスクを追加
                             </button>
                         </div>
-                        <p class="mt-3 text-sm text-gray-500">
-                            <i class="fas fa-info-circle mr-2"></i>
-                            ボタンクリックでコピー → ChatGPTに貼り付け
-                        </p>
+                    </div>
+
+                    <!-- メモ -->
+                    <div class="card p-6">
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 space-y-3 md:space-y-0">
+                            <h2 class="section-title">
+                                <i class="fas fa-sticky-note"></i>
+                                メモ・ふせん
+                            </h2>
+                            <div class="flex space-x-2 w-full md:w-auto">
+                                <select id="memoDateSelector" class="input-field flex-1 md:flex-none" style="min-width: 140px;" onchange="loadSelectedMemo()">
+                                    <option value="">過去のメモ</option>
+                                </select>
+                                <button onclick="clearMemo()" class="btn btn-warning">
+                                    <i class="fas fa-eraser"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3 text-sm text-gray-600">
+                            <i class="fas fa-clock mr-2"></i>
+                            <span id="memoSaveDate"></span>
+                        </div>
+                        
+                        <textarea id="memoArea" class="input-field resize-none" rows="8" placeholder="気づき・指示事項・重要なポイントをメモ..."></textarea>
                     </div>
                 </div>
 
-                <!-- CSV整形 -->
-                <div class="card p-6">
-                    <h2 class="section-title mb-6">
-                        <i class="fas fa-table"></i>
-                        CSVデータ整形
-                    </h2>
-                    
-                    <div class="mb-6">
-                        <input type="file" id="csvFileInput" accept=".csv" class="hidden" onchange="handleCSVUpload(event)">
-                        <button onclick="document.getElementById('csvFileInput').click()" class="w-full border-2 border-dashed border-gray-300 hover:border-blue-400 rounded-lg p-8 text-center transition-all">
-                            <i class="fas fa-upload text-3xl text-gray-400 mb-3"></i>
-                            <p class="text-gray-600">CSVファイルをアップロード</p>
-                            <p class="text-sm text-gray-400 mt-1">クリックまたはドラッグ&ドロップ</p>
-                        </button>
+                <!-- 右カラム: プロンプト・CSV -->
+                <div class="space-y-6">
+                    <!-- プロンプト集 -->
+                    <div class="card p-6">
+                        <h2 class="section-title mb-6">
+                            <i class="fas fa-brain"></i>
+                            プロンプト集
+                        </h2>
+                        
+                        <!-- カテゴリタブ -->
+                        <div class="flex flex-wrap gap-2 mb-6" id="categoryTabs">
+                            <button class="tab active" data-category="all" onclick="switchCategory('all')">
+                                すべて
+                            </button>
+                            <button class="tab" data-category="line" onclick="switchCategory('line')">
+                                LINE用
+                            </button>
+                            <button class="tab" data-category="sns" onclick="switchCategory('sns')">
+                                SNS用
+                            </button>
+                            <button class="tab" data-category="report" onclick="switchCategory('report')">
+                                報告・指導
+                            </button>
+                            <button class="tab" data-category="other" onclick="switchCategory('other')">
+                                その他
+                            </button>
+                        </div>
+
+                        <!-- プロンプト一覧 -->
+                        <div id="promptButtons" class="space-y-3 mb-6"></div>
+
+                        <!-- プロンプト追加 -->
+                        <div class="border-t pt-6">
+                            <h3 class="font-semibold text-gray-900 mb-4">新しいプロンプトを追加</h3>
+                            <div class="space-y-3">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                    <select id="newPromptCategory" class="input-field">
+                                        <option value="line">LINE用</option>
+                                        <option value="sns">SNS用</option>
+                                        <option value="report">報告・指導用</option>
+                                        <option value="other">その他</option>
+                                    </select>
+                                    <input id="newPromptLabel" type="text" class="input-field" placeholder="ボタン名">
+                                </div>
+                                <textarea id="newPromptText" class="input-field resize-none" rows="3" placeholder="プロンプト内容を入力..."></textarea>
+                                <button onclick="addPrompt()" class="btn btn-primary w-full">
+                                    <i class="fas fa-plus mr-2"></i>プロンプトを追加
+                                </button>
+                            </div>
+                            <p class="mt-3 text-sm text-gray-500">
+                                <i class="fas fa-info-circle mr-2"></i>
+                                ボタンクリックでコピー → ChatGPTに貼り付け
+                            </p>
+                        </div>
                     </div>
-                    
-                    <div id="csvPreview" class="hidden">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="font-semibold text-gray-900">プレビュー</h3>
-                            <button onclick="copyCSVFormatted()" class="btn btn-success">
-                                <i class="fas fa-copy mr-2"></i>コピー
+
+                    <!-- CSV整形 -->
+                    <div class="card p-6">
+                        <h2 class="section-title mb-6">
+                            <i class="fas fa-table"></i>
+                            CSVデータ整形
+                        </h2>
+                        
+                        <div class="mb-6">
+                            <input type="file" id="csvFileInput" accept=".csv" class="hidden" onchange="handleCSVUpload(event)">
+                            <button onclick="document.getElementById('csvFileInput').click()" class="w-full border-2 border-dashed border-gray-300 hover:border-blue-400 rounded-lg p-8 text-center transition-all">
+                                <i class="fas fa-upload text-3xl text-gray-400 mb-3"></i>
+                                <p class="text-gray-600">CSVファイルをアップロード</p>
+                                <p class="text-sm text-gray-400 mt-1">クリックまたはドラッグ&ドロップ</p>
                             </button>
                         </div>
                         
-                        <div class="border border-gray-200 rounded-lg mb-4 overflow-auto" style="max-height: 300px;">
-                            <table id="csvTable" class="w-full text-sm"></table>
+                        <div id="csvPreview" class="hidden">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="font-semibold text-gray-900">プレビュー</h3>
+                                <button onclick="copyCSVFormatted()" class="btn btn-success">
+                                    <i class="fas fa-copy mr-2"></i>コピー
+                                </button>
+                            </div>
+                            
+                            <div class="border border-gray-200 rounded-lg mb-4 overflow-auto" style="max-height: 300px;">
+                                <table id="csvTable" class="w-full text-sm"></table>
+                            </div>
+                            
+                            <textarea id="csvFormattedText" class="input-field resize-none" rows="6" readonly placeholder="整形されたテキストがここに表示されます"></textarea>
                         </div>
-                        
-                        <textarea id="csvFormattedText" class="input-field resize-none" rows="6" readonly placeholder="整形されたテキストがここに表示されます"></textarea>
                     </div>
-                </div>
 
-                <!-- クイックアクション -->
-                <div class="card p-6">
-                    <h2 class="section-title mb-4">
-                        <i class="fas fa-tools"></i>
-                        クイックアクション
-                    </h2>
-                    <div class="grid grid-cols-2 gap-3">
-                        <button onclick="exportData()" class="btn btn-secondary">
-                            <i class="fas fa-download mr-2"></i>エクスポート
-                        </button>
-                        <button onclick="importData()" class="btn btn-secondary">
-                            <i class="fas fa-upload mr-2"></i>インポート
-                        </button>
-                        <button onclick="clearAllData()" class="btn btn-danger">
-                            <i class="fas fa-trash mr-2"></i>全削除
-                        </button>
-                        <button onclick="window.print()" class="btn btn-secondary">
-                            <i class="fas fa-print mr-2"></i>印刷
-                        </button>
+                    <!-- クイックアクション -->
+                    <div class="card p-6">
+                        <h2 class="section-title mb-4">
+                            <i class="fas fa-tools"></i>
+                            クイックアクション
+                        </h2>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button onclick="exportData()" class="btn btn-secondary">
+                                <i class="fas fa-download mr-2"></i>エクスポート
+                            </button>
+                            <button onclick="importData()" class="btn btn-secondary">
+                                <i class="fas fa-upload mr-2"></i>インポート
+                            </button>
+                            <button onclick="clearAllData()" class="btn btn-danger">
+                                <i class="fas fa-trash mr-2"></i>全削除
+                            </button>
+                            <button onclick="window.print()" class="btn btn-secondary">
+                                <i class="fas fa-print mr-2"></i>印刷
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -546,19 +683,202 @@
     <input type="file" id="importFileInput" accept=".json" class="hidden" onchange="handleDataImport(event)">
 
     <script>
+        // セキュリティ設定
+        const CORRECT_PASSWORD = 'iam1104JP';
+        const SESSION_DURATION = 30 * 60 * 1000; // 30分
+        const MAX_LOGIN_ATTEMPTS = 5;
+        
         // グローバル変数
         let currentStore = 'classy_tokyo';
         let currentCategory = 'all';
         let csvData = null;
+        let sessionTimer = null;
+        let sessionStartTime = null;
+        let loginAttempts = parseInt(localStorage.getItem('loginAttempts') || '0');
 
         // 初期化
         window.onload = () => {
+            checkAuthentication();
             updateCurrentDate();
+            setInterval(updateCurrentDate, 60000);
+        };
+
+        // 認証チェック
+        function checkAuthentication() {
+            const isLoggedIn = sessionStorage.getItem('isLoggedIn');
+            const loginTime = sessionStorage.getItem('loginTime');
+            
+            if (isLoggedIn && loginTime) {
+                const elapsed = Date.now() - parseInt(loginTime);
+                if (elapsed < SESSION_DURATION) {
+                    // セッション有効
+                    showDashboard();
+                    startSessionTimer(SESSION_DURATION - elapsed);
+                    return;
+                }
+            }
+            
+            // セッション無効またはログイン必要
+            showLoginScreen();
+        }
+
+        // ログイン処理
+        function handleLogin(event) {
+            event.preventDefault();
+            
+            const password = document.getElementById('passwordInput').value;
+            
+            if (password === CORRECT_PASSWORD) {
+                // ログイン成功
+                sessionStorage.setItem('isLoggedIn', 'true');
+                sessionStorage.setItem('loginTime', Date.now().toString());
+                localStorage.removeItem('loginAttempts');
+                loginAttempts = 0;
+                
+                showDashboard();
+                startSessionTimer(SESSION_DURATION);
+                showNotification('ログインしました', 'success');
+                
+                // パスワード入力をクリア
+                document.getElementById('passwordInput').value = '';
+            } else {
+                // ログイン失敗
+                loginAttempts++;
+                localStorage.setItem('loginAttempts', loginAttempts.toString());
+                
+                if (loginAttempts >= MAX_LOGIN_ATTEMPTS) {
+                    showNotification(`セキュリティのため${MAX_LOGIN_ATTEMPTS}分間ロックされました`, 'error');
+                    lockLogin();
+                } else {
+                    showNotification(`パスワードが間違っています (${loginAttempts}/${MAX_LOGIN_ATTEMPTS})`, 'error');
+                    updateLoginAttemptDisplay();
+                }
+                
+                document.getElementById('passwordInput').value = '';
+            }
+        }
+
+        // ログイン試行表示更新
+        function updateLoginAttemptDisplay() {
+            const attemptsDiv = document.getElementById('loginAttempts');
+            const countSpan = document.getElementById('attemptCount');
+            
+            if (loginAttempts > 0) {
+                countSpan.textContent = loginAttempts;
+                attemptsDiv.classList.remove('hidden');
+            }
+        }
+
+        // ログインロック
+        function lockLogin() {
+            const passwordInput = document.getElementById('passwordInput');
+            const submitBtn = document.querySelector('button[type="submit"]');
+            
+            passwordInput.disabled = true;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-lock mr-2"></i>ロック中...';
+            
+            setTimeout(() => {
+                passwordInput.disabled = false;
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-sign-in-alt mr-2"></i>ログイン';
+                localStorage.removeItem('loginAttempts');
+                loginAttempts = 0;
+                document.getElementById('loginAttempts').classList.add('hidden');
+                showNotification('ロックが解除されました', 'info');
+            }, 5 * 60 * 1000); // 5分間ロック
+        }
+
+        // ログアウト処理
+        function logout() {
+            if (confirm('ログアウトしますか？')) {
+                sessionStorage.removeItem('isLoggedIn');
+                sessionStorage.removeItem('loginTime');
+                
+                if (sessionTimer) {
+                    clearInterval(sessionTimer);
+                }
+                
+                showLoginScreen();
+                showNotification('ログアウトしました', 'info');
+            }
+        }
+
+        // セッションタイマー開始
+        function startSessionTimer(duration) {
+            sessionStartTime = Date.now();
+            const timerElement = document.getElementById('timeRemaining');
+            const sessionTimerDiv = document.getElementById('sessionTimer');
+            
+            sessionTimerDiv.classList.remove('hidden');
+            
+            sessionTimer = setInterval(() => {
+                const elapsed = Date.now() - sessionStartTime;
+                const remaining = duration - elapsed;
+                
+                if (remaining <= 0) {
+                    clearInterval(sessionTimer);
+                    showNotification('セッションがタイムアウトしました', 'info');
+                    logout();
+                    return;
+                }
+                
+                const minutes = Math.floor(remaining / 60000);
+                const seconds = Math.floor((remaining % 60000) / 1000);
+                timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                
+                // 5分前から警告色
+                if (remaining < 5 * 60 * 1000) {
+                    sessionTimerDiv.style.backgroundColor = 'rgba(239, 68, 68, 0.8)';
+                }
+                
+                // 1分前から点滅
+                if (remaining < 1 * 60 * 1000) {
+                    sessionTimerDiv.style.animation = 'blink 1s infinite';
+                }
+            }, 1000);
+        }
+
+        // 画面切り替え
+        function showLoginScreen() {
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('mainDashboard').classList.add('hidden');
+            document.getElementById('sessionTimer').classList.add('hidden');
+            updateLoginAttemptDisplay();
+        }
+
+        function showDashboard() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('mainDashboard').classList.remove('hidden');
             loadStoreData();
             updateMemoDateSelector();
             updateAllStats();
-            setInterval(updateCurrentDate, 60000);
-        };
+        }
+
+        // セッション延長（アクティビティ検出）
+        function extendSession() {
+            if (sessionStorage.getItem('isLoggedIn')) {
+                sessionStorage.setItem('loginTime', Date.now().toString());
+                if (sessionTimer) {
+                    clearInterval(sessionTimer);
+                    startSessionTimer(SESSION_DURATION);
+                }
+            }
+        }
+
+        // アクティビティ監視
+        ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'].forEach(event => {
+            document.addEventListener(event, () => {
+                if (sessionStorage.getItem('isLoggedIn')) {
+                    // 10分ごとにセッション延長
+                    const lastActivity = sessionStorage.getItem('lastActivity') || '0';
+                    if (Date.now() - parseInt(lastActivity) > 10 * 60 * 1000) {
+                        sessionStorage.setItem('lastActivity', Date.now().toString());
+                        extendSession();
+                    }
+                }
+            }, { passive: true });
+        });
 
         // 現在の日付時刻を更新
         function updateCurrentDate() {
@@ -573,7 +893,10 @@
                 hour: '2-digit', 
                 minute: '2-digit' 
             });
-            document.getElementById('currentDate').textContent = `${dateStr} ${timeStr}`;
+            const currentDateElement = document.getElementById('currentDate');
+            if (currentDateElement) {
+                currentDateElement.textContent = `${dateStr} ${timeStr}`;
+            }
         }
 
         // 店舗切り替え
@@ -640,6 +963,8 @@
         function loadTasks() {
             const savedTasks = JSON.parse(localStorage.getItem(getTaskKey()) || '[]');
             const taskList = document.getElementById('taskList');
+            if (!taskList) return;
+            
             taskList.innerHTML = '';
             
             if (savedTasks.length === 0) {
@@ -712,29 +1037,40 @@
             const today = new Date().toISOString().split('T')[0];
             const memoKey = getMemoKey(today);
             const savedMemo = localStorage.getItem(memoKey) || '';
-            document.getElementById('memoArea').value = savedMemo;
-            document.getElementById('memoSaveDate').textContent = '今日 ' + new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
+            const memoArea = document.getElementById('memoArea');
+            const memoSaveDate = document.getElementById('memoSaveDate');
+            
+            if (memoArea) memoArea.value = savedMemo;
+            if (memoSaveDate) memoSaveDate.textContent = '今日 ' + new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
         }
 
         function saveMemo() {
             const today = new Date().toISOString().split('T')[0];
             const memoKey = getMemoKey(today);
-            const memoText = document.getElementById('memoArea').value;
-            localStorage.setItem(memoKey, memoText);
-            updateMemoDateSelector();
-            updateMemoStats();
+            const memoArea = document.getElementById('memoArea');
+            if (memoArea) {
+                const memoText = memoArea.value;
+                localStorage.setItem(memoKey, memoText);
+                updateMemoDateSelector();
+                updateMemoStats();
+            }
         }
 
         function clearMemo() {
             if (confirm('現在のメモをクリアしますか？')) {
-                document.getElementById('memoArea').value = '';
-                saveMemo();
-                showNotification('メモをクリアしました', 'info');
+                const memoArea = document.getElementById('memoArea');
+                if (memoArea) {
+                    memoArea.value = '';
+                    saveMemo();
+                    showNotification('メモをクリアしました', 'info');
+                }
             }
         }
 
         function updateMemoDateSelector() {
             const selector = document.getElementById('memoDateSelector');
+            if (!selector) return;
+            
             selector.innerHTML = '<option value="">過去のメモ</option>';
             
             const dates = [];
@@ -765,14 +1101,23 @@
             if (selectedDate) {
                 const memoKey = getMemoKey(selectedDate);
                 const savedMemo = localStorage.getItem(memoKey) || '';
-                document.getElementById('memoArea').value = savedMemo;
-                document.getElementById('memoSaveDate').textContent = new Date(selectedDate).toLocaleDateString('ja-JP', { month: 'numeric', day: 'numeric', weekday: 'short' });
+                const memoArea = document.getElementById('memoArea');
+                const memoSaveDate = document.getElementById('memoSaveDate');
+                
+                if (memoArea) memoArea.value = savedMemo;
+                if (memoSaveDate) memoSaveDate.textContent = new Date(selectedDate).toLocaleDateString('ja-JP', { month: 'numeric', day: 'numeric', weekday: 'short' });
             } else {
                 loadMemo();
             }
         }
 
-        document.getElementById('memoArea').addEventListener('input', saveMemo);
+        // メモの自動保存
+        document.addEventListener('DOMContentLoaded', () => {
+            const memoArea = document.getElementById('memoArea');
+            if (memoArea) {
+                memoArea.addEventListener('input', saveMemo);
+            }
+        });
 
         // プロンプト管理
         function getPromptKey() {
@@ -784,13 +1129,16 @@
             document.querySelectorAll('.tab').forEach(tab => {
                 tab.classList.remove('active');
             });
-            document.querySelector(`[data-category="${category}"]`).classList.add('active');
+            const activeTab = document.querySelector(`[data-category="${category}"]`);
+            if (activeTab) activeTab.classList.add('active');
             loadPrompts();
         }
 
         function loadPrompts() {
             const savedPrompts = JSON.parse(localStorage.getItem(getPromptKey()) || '[]');
             const container = document.getElementById('promptButtons');
+            if (!container) return;
+            
             container.innerHTML = '';
             
             const filteredPrompts = currentCategory === 'all' ? 
@@ -921,6 +1269,8 @@
             const preview = document.getElementById('csvPreview');
             const table = document.getElementById('csvTable');
             
+            if (!preview || !table) return;
+            
             table.innerHTML = '';
             
             if (data.length > 0) {
@@ -959,7 +1309,10 @@
                     formatted += '---\n';
                 }
             });
-            document.getElementById('csvFormattedText').value = formatted;
+            const formattedTextElement = document.getElementById('csvFormattedText');
+            if (formattedTextElement) {
+                formattedTextElement.value = formatted;
+            }
         }
 
         function copyCSVFormatted() {
@@ -1083,45 +1436,68 @@
             }, 3000);
         }
 
-        // エンターキーでタスク追加
-        document.getElementById('newTask').addEventListener('keypress', function(e) {
+        // エンターキーでタスク追加・ログイン
+        document.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
-                addTask();
+                const activeElement = document.activeElement;
+                if (activeElement.id === 'newTask') {
+                    addTask();
+                } else if (activeElement.id === 'passwordInput') {
+                    const form = activeElement.closest('form');
+                    if (form) {
+                        handleLogin(e);
+                    }
+                }
             }
         });
 
         // ドラッグ&ドロップ対応
-        const csvUploadArea = document.querySelector('button[onclick="document.getElementById(\'csvFileInput\').click()"]');
-        
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            csvUploadArea.addEventListener(eventName, preventDefaults, false);
-        });
-
-        function preventDefaults(e) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
-
-        csvUploadArea.addEventListener('dragover', (e) => {
-            csvUploadArea.classList.add('border-blue-400', 'bg-blue-50');
-        });
-        
-        csvUploadArea.addEventListener('dragleave', (e) => {
-            csvUploadArea.classList.remove('border-blue-400', 'bg-blue-50');
-        });
-        
-        csvUploadArea.addEventListener('drop', (e) => {
-            csvUploadArea.classList.remove('border-blue-400', 'bg-blue-50');
+        document.addEventListener('DOMContentLoaded', () => {
+            const csvUploadArea = document.querySelector('button[onclick="document.getElementById(\'csvFileInput\').click()"]');
             
-            const files = e.dataTransfer.files;
-            if (files.length > 0 && files[0].name.endsWith('.csv')) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const csv = e.target.result;
-                    parseCSV(csv);
-                };
-                reader.readAsText(files[0], 'UTF-8');
+            if (csvUploadArea) {
+                ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                    csvUploadArea.addEventListener(eventName, preventDefaults, false);
+                });
+
+                function preventDefaults(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+
+                csvUploadArea.addEventListener('dragover', (e) => {
+                    csvUploadArea.classList.add('border-blue-400', 'bg-blue-50');
+                });
+                
+                csvUploadArea.addEventListener('dragleave', (e) => {
+                    csvUploadArea.classList.remove('border-blue-400', 'bg-blue-50');
+                });
+                
+                csvUploadArea.addEventListener('drop', (e) => {
+                    csvUploadArea.classList.remove('border-blue-400', 'bg-blue-50');
+                    
+                    const files = e.dataTransfer.files;
+                    if (files.length > 0 && files[0].name.endsWith('.csv')) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const csv = e.target.result;
+                            parseCSV(csv);
+                        };
+                        reader.readAsText(files[0], 'UTF-8');
+                    }
+                });
             }
+        });
+
+        // セキュリティイベント
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden && sessionStorage.getItem('isLoggedIn')) {
+                // ページが非表示になった時の処理（必要に応じて）
+            }
+        });
+
+        window.addEventListener('beforeunload', () => {
+            // ページを離れる前の処理（必要に応じて）
         });
     </script>
 </body>
