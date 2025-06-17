@@ -5,159 +5,545 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI秘書ちゃんダッシュボード v3 - 有限会社Rispondere</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'sans': ['Inter', 'Noto Sans JP', 'sans-serif']
+                    },
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
         body {
-            font-family: 'Noto Sans JP', sans-serif;
+            font-family: 'Inter', 'Noto Sans JP', sans-serif;
+            background-color: #f8fafc;
         }
-        textarea {
-            resize: vertical;
+        
+        .card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.2s ease;
         }
-        .store-theme {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        
+        .card:hover {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-        .category-tab {
-            transition: all 0.3s ease;
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 20px;
+            font-weight: 500;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            min-height: 48px;
         }
-        .category-tab.active {
-            background-color: #3b82f6;
+        
+        .btn-primary {
+            background-color: #0ea5e9;
             color: white;
         }
-        .csv-table {
-            max-height: 400px;
-            overflow-y: auto;
+        
+        .btn-primary:hover {
+            background-color: #0284c7;
+        }
+        
+        .btn-secondary {
+            background-color: #f1f5f9;
+            color: #334155;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #e2e8f0;
+        }
+        
+        .btn-success {
+            background-color: #10b981;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #059669;
+        }
+        
+        .btn-warning {
+            background-color: #f59e0b;
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            background-color: #d97706;
+        }
+        
+        .btn-danger {
+            background-color: #ef4444;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #dc2626;
+        }
+        
+        .input-field {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.2s ease;
+            min-height: 48px;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: #0ea5e9;
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+        }
+        
+        .tab {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: 1px solid #e2e8f0;
+            background: white;
+            min-height: 40px;
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        .tab.active {
+            background-color: #0ea5e9;
+            color: white;
+            border-color: #0ea5e9;
+        }
+        
+        .tab:not(.active):hover {
+            background-color: #f1f5f9;
+        }
+        
+        .task-item {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px;
+            transition: all 0.2s ease;
+        }
+        
+        .task-item:hover {
+            border-color: #bae6fd;
+            background-color: #f0f9ff;
+        }
+        
+        .task-item.completed {
+            background-color: #f0fdf4;
+            border-color: #bbf7d0;
+        }
+        
+        .prompt-item {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px;
+            transition: all 0.2s ease;
+        }
+        
+        .prompt-item:hover {
+            border-color: #bae6fd;
+            background-color: #f0f9ff;
+        }
+        
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title i {
+            margin-right: 8px;
+            color: #0ea5e9;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        
+        .stat-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #64748b;
+            margin-top: 4px;
+        }
+        
+        .progress-bar {
+            background-color: #e2e8f0;
+            border-radius: 4px;
+            height: 8px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            background-color: #10b981;
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #64748b;
+        }
+        
+        .empty-state i {
+            font-size: 48px;
+            color: #cbd5e1;
+            margin-bottom: 16px;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 16px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background-color: #10b981;
+        }
+        
+        .notification.error {
+            background-color: #ef4444;
+        }
+        
+        .notification.info {
+            background-color: #0ea5e9;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 16px;
+            }
+            
+            .card {
+                margin-bottom: 20px;
+            }
+            
+            .btn {
+                padding: 14px 20px;
+                font-size: 16px;
+                min-height: 52px;
+            }
+            
+            .input-field {
+                padding: 14px 16px;
+                font-size: 16px;
+                min-height: 52px;
+            }
+        }
+        
+        @media (min-width: 769px) {
+            .desktop-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 24px;
+            }
         }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen">
+<body>
     <!-- ヘッダー -->
-    <div class="store-theme text-white py-4 px-6">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center">
-            <h1 class="text-2xl md:text-3xl font-bold mb-2 md:mb-0">AI秘書ちゃんダッシュボード v3</h1>
-            <div class="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-4">
-                <div>
-                    <label class="text-sm font-medium mr-2">店舗選択:</label>
-                    <select id="storeSelector" class="text-gray-800 px-3 py-1 rounded text-sm" onchange="switchStore()">
-                        <option value="classy_tokyo">CLASSY東京</option>
-                        <option value="classy_nagoya">CLASSY名古屋</option>
-                        <option value="classy_yokkaichi">CLASSY四日市</option>
-                        <option value="grandopera_tokyo">GrandOpera東京</option>
-                        <option value="grandopera_yokohama">GrandOpera横浜</option>
-                        <option value="grandopera_nagoya">GrandOpera名古屋</option>
-                        <option value="grandopera_fukuoka">GrandOpera福岡</option>
-                        <option value="wancarat">ワンカラット</option>
-                        <option value="shabour">シャブール</option>
-                        <option value="opera_nishiki">オペラ錦</option>
-                    </select>
+    <div class="bg-white border-b border-gray-200">
+        <div class="max-w-6xl mx-auto px-4 py-6">
+            <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+                <div class="text-center md:text-left">
+                    <h1 class="text-2xl md:text-3xl font-bold text-gray-900 flex items-center justify-center md:justify-start">
+                        <i class="fas fa-briefcase mr-3 text-blue-500"></i>
+                        AI秘書ちゃんダッシュボード
+                    </h1>
+                    <p class="text-gray-600 mt-1">有限会社Rispondere 業務管理システム</p>
                 </div>
-                <div class="text-sm">
-                    <span id="currentStore" class="font-semibold">CLASSY東京</span> | 
-                    <span id="currentDate"></span>
+                
+                <div class="flex flex-col md:flex-row items-center space-y-3 md:space-y-0 md:space-x-4">
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-store text-gray-500"></i>
+                        <select id="storeSelector" class="input-field" style="width: auto; min-width: 180px;" onchange="switchStore()">
+                            <option value="classy_tokyo">CLASSY東京</option>
+                            <option value="classy_nagoya">CLASSY名古屋</option>
+                            <option value="classy_yokkaichi">CLASSY四日市</option>
+                            <option value="grandopera_tokyo">GrandOpera東京</option>
+                            <option value="grandopera_yokohama">GrandOpera横浜</option>
+                            <option value="grandopera_nagoya">GrandOpera名古屋</option>
+                            <option value="grandopera_fukuoka">GrandOpera福岡</option>
+                            <option value="wancarat">ワンカラット</option>
+                            <option value="shabour">シャブール</option>
+                            <option value="opera_nishiki">オペラ錦</option>
+                        </select>
+                    </div>
+                    
+                    <div class="text-center md:text-right">
+                        <div class="font-semibold text-gray-900" id="currentStore">CLASSY東京</div>
+                        <div class="text-sm text-gray-500" id="currentDate"></div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="max-w-7xl mx-auto p-4">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- 左側: タスク管理・メモ -->
+    <!-- 統計情報 -->
+    <div class="max-w-6xl mx-auto px-4 py-6">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" id="totalTasks">0</div>
+                <div class="stat-label">総タスク</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="completedTasks">0</div>
+                <div class="stat-label">完了済み</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalPrompts">0</div>
+                <div class="stat-label">プロンプト</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="memoCount">0</div>
+                <div class="stat-label">メモ履歴</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- メインコンテンツ -->
+    <div class="max-w-6xl mx-auto px-4 pb-8">
+        <div class="desktop-grid">
+            <!-- 左カラム: タスク・メモ -->
             <div class="space-y-6">
                 <!-- タスク管理 -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h2 class="text-xl font-semibold mb-4 flex items-center">
-                        <span class="mr-2">📅</span>今日のタスク
-                    </h2>
-                    <ul id="taskList" class="space-y-2 mb-4"></ul>
-                    <div class="flex flex-col md:flex-row gap-2">
-                        <input id="newTask" type="text" class="flex-1 border border-gray-300 p-2 rounded-md" placeholder="新しいタスクを追加">
-                        <button onclick="addTask()" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors">追加</button>
+                <div class="card p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="section-title">
+                            <i class="fas fa-tasks"></i>
+                            今日のタスク
+                        </h2>
+                        <div class="text-sm text-gray-500">
+                            <span id="taskProgress">0/0</span>
+                        </div>
+                    </div>
+
+                    <!-- 進捗バー -->
+                    <div class="mb-6">
+                        <div class="flex justify-between text-sm text-gray-600 mb-2">
+                            <span>完了率</span>
+                            <span id="progressPercentage">0%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <div id="taskList" class="space-y-3 mb-6"></div>
+                    
+                    <div class="space-y-3">
+                        <input id="newTask" type="text" class="input-field" placeholder="新しいタスクを入力...">
+                        <button onclick="addTask()" class="btn btn-primary w-full">
+                            <i class="fas fa-plus mr-2"></i>タスクを追加
+                        </button>
                     </div>
                 </div>
 
-                <!-- 日付別メモ -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
-                        <h2 class="text-xl font-semibold flex items-center mb-2 md:mb-0">
-                            <span class="mr-2">📝</span>メモ・ふせん
+                <!-- メモ -->
+                <div class="card p-6">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 space-y-3 md:space-y-0">
+                        <h2 class="section-title">
+                            <i class="fas fa-sticky-note"></i>
+                            メモ・ふせん
                         </h2>
-                        <div class="flex flex-col md:flex-row gap-2">
-                            <select id="memoDateSelector" class="border border-gray-300 p-1 rounded text-sm" onchange="loadSelectedMemo()">
-                                <option value="">過去のメモを選択</option>
+                        <div class="flex space-x-2 w-full md:w-auto">
+                            <select id="memoDateSelector" class="input-field flex-1 md:flex-none" style="min-width: 140px;" onchange="loadSelectedMemo()">
+                                <option value="">過去のメモ</option>
                             </select>
-                            <button onclick="clearMemo()" class="text-sm bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600">クリア</button>
+                            <button onclick="clearMemo()" class="btn btn-warning">
+                                <i class="fas fa-eraser"></i>
+                            </button>
                         </div>
                     </div>
-                    <div class="mb-2 text-sm text-gray-600">
-                        保存日時: <span id="memoSaveDate" class="font-medium"></span>
+                    
+                    <div class="mb-3 text-sm text-gray-600">
+                        <i class="fas fa-clock mr-2"></i>
+                        <span id="memoSaveDate"></span>
                     </div>
-                    <textarea id="memoArea" class="w-full border border-gray-300 rounded-md p-3" rows="6" placeholder="気づき・指示事項などをメモ"></textarea>
+                    
+                    <textarea id="memoArea" class="input-field resize-none" rows="8" placeholder="気づき・指示事項・重要なポイントをメモ..."></textarea>
                 </div>
             </div>
 
-            <!-- 右側: プロンプト集・CSV -->
+            <!-- 右カラム: プロンプト・CSV -->
             <div class="space-y-6">
                 <!-- プロンプト集 -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h2 class="text-xl font-semibold mb-4 flex items-center">
-                        <span class="mr-2">🧠</span>よく使うプロンプト集
+                <div class="card p-6">
+                    <h2 class="section-title mb-6">
+                        <i class="fas fa-brain"></i>
+                        プロンプト集
                     </h2>
                     
                     <!-- カテゴリタブ -->
-                    <div class="flex flex-wrap gap-1 mb-4" id="categoryTabs">
-                        <button class="category-tab px-3 py-1 rounded text-sm border active" data-category="all" onclick="switchCategory('all')">すべて</button>
-                        <button class="category-tab px-3 py-1 rounded text-sm border" data-category="line" onclick="switchCategory('line')">LINE用</button>
-                        <button class="category-tab px-3 py-1 rounded text-sm border" data-category="sns" onclick="switchCategory('sns')">SNS用</button>
-                        <button class="category-tab px-3 py-1 rounded text-sm border" data-category="report" onclick="switchCategory('report')">報告・指導用</button>
-                        <button class="category-tab px-3 py-1 rounded text-sm border" data-category="other" onclick="switchCategory('other')">その他</button>
+                    <div class="flex flex-wrap gap-2 mb-6" id="categoryTabs">
+                        <button class="tab active" data-category="all" onclick="switchCategory('all')">
+                            すべて
+                        </button>
+                        <button class="tab" data-category="line" onclick="switchCategory('line')">
+                            LINE用
+                        </button>
+                        <button class="tab" data-category="sns" onclick="switchCategory('sns')">
+                            SNS用
+                        </button>
+                        <button class="tab" data-category="report" onclick="switchCategory('report')">
+                            報告・指導
+                        </button>
+                        <button class="tab" data-category="other" onclick="switchCategory('other')">
+                            その他
+                        </button>
                     </div>
 
-                    <!-- プロンプトボタン表示エリア -->
-                    <div id="promptButtons" class="space-y-2 mb-4 min-h-[100px]"></div>
+                    <!-- プロンプト一覧 -->
+                    <div id="promptButtons" class="space-y-3 mb-6"></div>
 
-                    <!-- プロンプト追加フォーム -->
-                    <div class="border-t pt-4">
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-2 mb-2">
-                            <select id="newPromptCategory" class="border border-gray-300 p-2 rounded">
-                                <option value="line">LINE用</option>
-                                <option value="sns">SNS用</option>
-                                <option value="report">報告・指導用</option>
-                                <option value="other">その他</option>
-                            </select>
-                            <input id="newPromptLabel" type="text" class="border border-gray-300 p-2 rounded" placeholder="ボタン名">
+                    <!-- プロンプト追加 -->
+                    <div class="border-t pt-6">
+                        <h3 class="font-semibold text-gray-900 mb-4">新しいプロンプトを追加</h3>
+                        <div class="space-y-3">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <select id="newPromptCategory" class="input-field">
+                                    <option value="line">LINE用</option>
+                                    <option value="sns">SNS用</option>
+                                    <option value="report">報告・指導用</option>
+                                    <option value="other">その他</option>
+                                </select>
+                                <input id="newPromptLabel" type="text" class="input-field" placeholder="ボタン名">
+                            </div>
+                            <textarea id="newPromptText" class="input-field resize-none" rows="3" placeholder="プロンプト内容を入力..."></textarea>
+                            <button onclick="addPrompt()" class="btn btn-primary w-full">
+                                <i class="fas fa-plus mr-2"></i>プロンプトを追加
+                            </button>
                         </div>
-                        <div class="flex gap-2">
-                            <textarea id="newPromptText" class="flex-1 border border-gray-300 p-2 rounded" rows="2" placeholder="プロンプト内容"></textarea>
-                            <button onclick="addPrompt()" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition-colors">追加</button>
-                        </div>
+                        <p class="mt-3 text-sm text-gray-500">
+                            <i class="fas fa-info-circle mr-2"></i>
+                            ボタンクリックでコピー → ChatGPTに貼り付け
+                        </p>
                     </div>
-                    <p class="mt-2 text-sm text-gray-500">※ ボタンをクリックでコピー → ChatGPTに貼り付けて使用</p>
                 </div>
 
-                <!-- CSV整形エリア -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h2 class="text-xl font-semibold mb-4 flex items-center">
-                        <span class="mr-2">📊</span>CSVデータ整形
+                <!-- CSV整形 -->
+                <div class="card p-6">
+                    <h2 class="section-title mb-6">
+                        <i class="fas fa-table"></i>
+                        CSVデータ整形
                     </h2>
-                    <div class="mb-4">
-                        <input type="file" id="csvFileInput" accept=".csv" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" onchange="handleCSVUpload(event)">
+                    
+                    <div class="mb-6">
+                        <input type="file" id="csvFileInput" accept=".csv" class="hidden" onchange="handleCSVUpload(event)">
+                        <button onclick="document.getElementById('csvFileInput').click()" class="w-full border-2 border-dashed border-gray-300 hover:border-blue-400 rounded-lg p-8 text-center transition-all">
+                            <i class="fas fa-upload text-3xl text-gray-400 mb-3"></i>
+                            <p class="text-gray-600">CSVファイルをアップロード</p>
+                            <p class="text-sm text-gray-400 mt-1">クリックまたはドラッグ&ドロップ</p>
+                        </button>
                     </div>
+                    
                     <div id="csvPreview" class="hidden">
-                        <div class="flex justify-between items-center mb-2">
-                            <h3 class="font-medium">プレビュー:</h3>
-                            <button onclick="copyCSVFormatted()" class="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600">整形テキストをコピー</button>
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-semibold text-gray-900">プレビュー</h3>
+                            <button onclick="copyCSVFormatted()" class="btn btn-success">
+                                <i class="fas fa-copy mr-2"></i>コピー
+                            </button>
                         </div>
-                        <div class="csv-table border border-gray-300 rounded">
+                        
+                        <div class="border border-gray-200 rounded-lg mb-4 overflow-auto" style="max-height: 300px;">
                             <table id="csvTable" class="w-full text-sm"></table>
                         </div>
-                        <div class="mt-2">
-                            <label class="text-sm font-medium">ChatGPT用整形テキスト:</label>
-                            <textarea id="csvFormattedText" class="w-full border border-gray-300 rounded p-2 mt-1" rows="4" readonly></textarea>
-                        </div>
+                        
+                        <textarea id="csvFormattedText" class="input-field resize-none" rows="6" readonly placeholder="整形されたテキストがここに表示されます"></textarea>
+                    </div>
+                </div>
+
+                <!-- クイックアクション -->
+                <div class="card p-6">
+                    <h2 class="section-title mb-4">
+                        <i class="fas fa-tools"></i>
+                        クイックアクション
+                    </h2>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="exportData()" class="btn btn-secondary">
+                            <i class="fas fa-download mr-2"></i>エクスポート
+                        </button>
+                        <button onclick="importData()" class="btn btn-secondary">
+                            <i class="fas fa-upload mr-2"></i>インポート
+                        </button>
+                        <button onclick="clearAllData()" class="btn btn-danger">
+                            <i class="fas fa-trash mr-2"></i>全削除
+                        </button>
+                        <button onclick="window.print()" class="btn btn-secondary">
+                            <i class="fas fa-print mr-2"></i>印刷
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- 隠しファイル入力 -->
+    <input type="file" id="importFileInput" accept=".json" class="hidden" onchange="handleDataImport(event)">
 
     <script>
         // グローバル変数
@@ -170,7 +556,8 @@
             updateCurrentDate();
             loadStoreData();
             updateMemoDateSelector();
-            setInterval(updateCurrentDate, 60000); // 1分ごとに時刻更新
+            updateAllStats();
+            setInterval(updateCurrentDate, 60000);
         };
 
         // 現在の日付時刻を更新
@@ -203,6 +590,46 @@
             loadMemo();
             loadPrompts();
             updateMemoDateSelector();
+            updateAllStats();
+        }
+
+        // 統計情報更新
+        function updateAllStats() {
+            updateTaskStats();
+            updatePromptStats();
+            updateMemoStats();
+        }
+
+        function updateTaskStats() {
+            const tasks = JSON.parse(localStorage.getItem(getTaskKey()) || '[]');
+            const completed = tasks.filter(task => task.done).length;
+            const total = tasks.length;
+            const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+            document.getElementById('totalTasks').textContent = total;
+            document.getElementById('completedTasks').textContent = completed;
+            document.getElementById('taskProgress').textContent = `${completed}/${total}`;
+            document.getElementById('progressPercentage').textContent = percentage + '%';
+            document.getElementById('progressBar').style.width = percentage + '%';
+        }
+
+        function updatePromptStats() {
+            const prompts = JSON.parse(localStorage.getItem(getPromptKey()) || '[]');
+            document.getElementById('totalPrompts').textContent = prompts.length;
+        }
+
+        function updateMemoStats() {
+            let count = 0;
+            for (let i = 0; i < 30; i++) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                const dateStr = date.toISOString().split('T')[0];
+                const memoKey = getMemoKey(dateStr);
+                if (localStorage.getItem(memoKey)) {
+                    count++;
+                }
+            }
+            document.getElementById('memoCount').textContent = count;
         }
 
         // タスク管理
@@ -214,15 +641,31 @@
             const savedTasks = JSON.parse(localStorage.getItem(getTaskKey()) || '[]');
             const taskList = document.getElementById('taskList');
             taskList.innerHTML = '';
-            savedTasks.forEach((task, index) => {
-                const li = document.createElement('li');
-                li.className = 'flex items-center p-2 bg-gray-50 rounded';
-                li.innerHTML = `
-                    <input type='checkbox' class='mr-3 w-4 h-4' ${task.done ? 'checked' : ''} onchange='toggleTask(${index})'>
-                    <span class='flex-1 ${task.done ? 'line-through text-gray-500' : ''}'>${task.text}</span>
-                    <button onclick='deleteTask(${index})' class='text-red-500 hover:text-red-700 ml-2 text-sm'>削除</button>
+            
+            if (savedTasks.length === 0) {
+                taskList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-tasks"></i>
+                        <p>まだタスクがありません</p>
+                        <p class="text-sm">新しいタスクを追加してみましょう</p>
+                    </div>
                 `;
-                taskList.appendChild(li);
+                return;
+            }
+            
+            savedTasks.forEach((task, index) => {
+                const div = document.createElement('div');
+                div.className = `task-item ${task.done ? 'completed' : ''}`;
+                div.innerHTML = `
+                    <div class="flex items-center">
+                        <input type='checkbox' class='mr-4 w-5 h-5 text-blue-500 rounded' ${task.done ? 'checked' : ''} onchange='toggleTask(${index})'>
+                        <span class='flex-1 ${task.done ? 'line-through text-gray-500' : 'text-gray-900'}'>${task.text}</span>
+                        <button onclick='deleteTask(${index})' class='text-red-500 hover:text-red-700 ml-3 p-2'>
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                taskList.appendChild(div);
             });
         }
 
@@ -235,6 +678,8 @@
                 localStorage.setItem(getTaskKey(), JSON.stringify(tasks));
                 taskInput.value = '';
                 loadTasks();
+                updateTaskStats();
+                showNotification('タスクを追加しました', 'success');
             }
         }
 
@@ -243,6 +688,7 @@
             tasks[index].done = !tasks[index].done;
             localStorage.setItem(getTaskKey(), JSON.stringify(tasks));
             loadTasks();
+            updateTaskStats();
         }
 
         function deleteTask(index) {
@@ -251,10 +697,12 @@
                 tasks.splice(index, 1);
                 localStorage.setItem(getTaskKey(), JSON.stringify(tasks));
                 loadTasks();
+                updateTaskStats();
+                showNotification('タスクを削除しました', 'info');
             }
         }
 
-        // メモ管理（日付別）
+        // メモ管理
         function getMemoKey(date = null) {
             const today = date || new Date().toISOString().split('T')[0];
             return `memo_${currentStore}_${today}`;
@@ -265,7 +713,7 @@
             const memoKey = getMemoKey(today);
             const savedMemo = localStorage.getItem(memoKey) || '';
             document.getElementById('memoArea').value = savedMemo;
-            document.getElementById('memoSaveDate').textContent = new Date().toLocaleString('ja-JP');
+            document.getElementById('memoSaveDate').textContent = '今日 ' + new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
         }
 
         function saveMemo() {
@@ -274,22 +722,23 @@
             const memoText = document.getElementById('memoArea').value;
             localStorage.setItem(memoKey, memoText);
             updateMemoDateSelector();
+            updateMemoStats();
         }
 
         function clearMemo() {
             if (confirm('現在のメモをクリアしますか？')) {
                 document.getElementById('memoArea').value = '';
                 saveMemo();
+                showNotification('メモをクリアしました', 'info');
             }
         }
 
         function updateMemoDateSelector() {
             const selector = document.getElementById('memoDateSelector');
-            selector.innerHTML = '<option value="">過去のメモを選択</option>';
+            selector.innerHTML = '<option value="">過去のメモ</option>';
             
-            // 過去30日分をチェック
             const dates = [];
-            for (let i = 0; i < 30; i++) {
+            for (let i = 1; i < 30; i++) {
                 const date = new Date();
                 date.setDate(date.getDate() - i);
                 const dateStr = date.toISOString().split('T')[0];
@@ -317,11 +766,12 @@
                 const memoKey = getMemoKey(selectedDate);
                 const savedMemo = localStorage.getItem(memoKey) || '';
                 document.getElementById('memoArea').value = savedMemo;
-                document.getElementById('memoSaveDate').textContent = new Date(selectedDate).toLocaleDateString('ja-JP');
+                document.getElementById('memoSaveDate').textContent = new Date(selectedDate).toLocaleDateString('ja-JP', { month: 'numeric', day: 'numeric', weekday: 'short' });
+            } else {
+                loadMemo();
             }
         }
 
-        // メモの自動保存
         document.getElementById('memoArea').addEventListener('input', saveMemo);
 
         // プロンプト管理
@@ -331,7 +781,7 @@
 
         function switchCategory(category) {
             currentCategory = category;
-            document.querySelectorAll('.category-tab').forEach(tab => {
+            document.querySelectorAll('.tab').forEach(tab => {
                 tab.classList.remove('active');
             });
             document.querySelector(`[data-category="${category}"]`).classList.add('active');
@@ -348,21 +798,30 @@
                 savedPrompts.filter(p => p.category === currentCategory);
             
             if (filteredPrompts.length === 0) {
-                container.innerHTML = '<p class="text-gray-500 text-center py-4">このカテゴリにプロンプトがありません</p>';
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-brain"></i>
+                        <p>このカテゴリにプロンプトがありません</p>
+                    </div>
+                `;
                 return;
             }
             
             filteredPrompts.forEach((p, index) => {
                 const div = document.createElement('div');
-                div.className = 'flex items-center gap-2';
+                div.className = 'prompt-item';
                 div.innerHTML = `
-                    <button onclick="copyPrompt('${p.text.replace(/'/g, "\\'")}', '${p.label}')" 
-                            class="flex-1 bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600 transition-colors text-left">
-                        ${p.label}
-                    </button>
-                    <span class="text-xs text-gray-500 px-2">${getCategoryLabel(p.category)}</span>
-                    <button onclick="deletePrompt(${savedPrompts.indexOf(p)})" 
-                            class="text-red-500 hover:text-red-700 text-sm">削除</button>
+                    <div class="flex items-center justify-between">
+                        <button onclick="copyPrompt('${p.text.replace(/'/g, "\\'")}', '${p.label}')" 
+                                class="btn btn-primary flex-1 mr-3">
+                            <i class="fas fa-copy mr-2"></i>${p.label}
+                        </button>
+                        <span class="text-xs text-gray-500 px-2 py-1 bg-gray-100 rounded mr-2">${getCategoryLabel(p.category)}</span>
+                        <button onclick="deletePrompt(${savedPrompts.indexOf(p)})" 
+                                class="text-red-500 hover:text-red-700 p-2">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
                 `;
                 container.appendChild(div);
             });
@@ -390,8 +849,10 @@
                 document.getElementById('newPromptLabel').value = '';
                 document.getElementById('newPromptText').value = '';
                 loadPrompts();
+                updatePromptStats();
+                showNotification('プロンプトを追加しました', 'success');
             } else {
-                alert('ボタン名とプロンプト内容を入力してください。');
+                showNotification('ボタン名とプロンプト内容を入力してください', 'error');
             }
         }
 
@@ -401,22 +862,16 @@
                 prompts.splice(index, 1);
                 localStorage.setItem(getPromptKey(), JSON.stringify(prompts));
                 loadPrompts();
+                updatePromptStats();
+                showNotification('プロンプトを削除しました', 'info');
             }
         }
 
         function copyPrompt(text, label) {
             navigator.clipboard.writeText(text).then(() => {
-                // 一時的に成功メッセージを表示
-                const button = event.target;
-                const originalText = button.textContent;
-                button.textContent = 'コピーしました！';
-                button.classList.add('bg-green-500');
-                setTimeout(() => {
-                    button.textContent = originalText;
-                    button.classList.remove('bg-green-500');
-                }, 1000);
+                showNotification(`「${label}」をコピーしました`, 'success');
             }).catch(() => {
-                alert('コピーに失敗しました。手動で選択してコピーしてください。');
+                showNotification('コピーに失敗しました', 'error');
             });
         }
 
@@ -436,7 +891,6 @@
         function parseCSV(csv) {
             const lines = csv.trim().split('\n');
             const data = lines.map(line => {
-                // 簡単なCSVパース（カンマ区切り、引用符考慮）
                 const result = [];
                 let current = '';
                 let inQuotes = false;
@@ -460,6 +914,7 @@
             
             csvData = data;
             displayCSV(data);
+            showNotification('CSVファイルを読み込みました', 'success');
         }
 
         function displayCSV(data) {
@@ -468,64 +923,204 @@
             
             table.innerHTML = '';
             
-            // ヘッダー
             if (data.length > 0) {
                 const headerRow = document.createElement('tr');
-                headerRow.className = 'bg-gray-100';
+                headerRow.className = 'bg-gray-50';
                 data[0].forEach(cell => {
                     const th = document.createElement('th');
-                    th.className = 'border border-gray-300 px-2 py-1 text-left font-medium';
+                    th.className = 'border border-gray-200 px-3 py-2 text-left font-semibold text-gray-900';
                     th.textContent = cell;
                     headerRow.appendChild(th);
                 });
                 table.appendChild(headerRow);
             }
             
-            // データ行
-            for (let i = 1; i < data.length; i++) {
+            for (let i = 1; i < data.length && i < 11; i++) {
                 const row = document.createElement('tr');
-                row.className = i % 2 === 0 ? 'bg-gray-50' : 'bg-white';
+                row.className = 'bg-white';
                 data[i].forEach(cell => {
                     const td = document.createElement('td');
-                    td.className = 'border border-gray-300 px-2 py-1';
+                    td.className = 'border border-gray-200 px-3 py-2 text-gray-700';
                     td.textContent = cell;
                     row.appendChild(td);
                 });
                 table.appendChild(row);
             }
             
-            // 整形テキスト生成
             generateFormattedText(data);
             preview.classList.remove('hidden');
         }
 
         function generateFormattedText(data) {
             let formatted = '';
-            
-            // タブ区切りのテキスト形式で整形
             data.forEach((row, index) => {
                 formatted += row.join('\t') + '\n';
                 if (index === 0) {
-                    formatted += '---\n'; // ヘッダーとデータの区切り
+                    formatted += '---\n';
                 }
             });
-            
             document.getElementById('csvFormattedText').value = formatted;
         }
 
         function copyCSVFormatted() {
             const formattedText = document.getElementById('csvFormattedText').value;
             navigator.clipboard.writeText(formattedText).then(() => {
-                alert('整形されたテキストをコピーしました！ChatGPTに貼り付けて使用してください。');
+                showNotification('整形テキストをコピーしました', 'success');
             }).catch(() => {
-                alert('コピーに失敗しました。手動で選択してコピーしてください。');
+                showNotification('コピーに失敗しました', 'error');
             });
+        }
+
+        // データ管理
+        function clearAllData() {
+            if (confirm('⚠️ 現在の店舗のすべてのデータを削除しますか？\nこの操作は取り消せません。')) {
+                localStorage.removeItem(getTaskKey());
+                localStorage.removeItem(getPromptKey());
+                
+                for (let i = 0; i < 30; i++) {
+                    const date = new Date();
+                    date.setDate(date.getDate() - i);
+                    const dateStr = date.toISOString().split('T')[0];
+                    localStorage.removeItem(getMemoKey(dateStr));
+                }
+                
+                loadStoreData();
+                showNotification('すべてのデータをクリアしました', 'info');
+            }
+        }
+
+        function exportData() {
+            const data = {
+                store: currentStore,
+                exportDate: new Date().toISOString(),
+                tasks: JSON.parse(localStorage.getItem(getTaskKey()) || '[]'),
+                prompts: JSON.parse(localStorage.getItem(getPromptKey()) || '[]'),
+                memos: {}
+            };
+            
+            for (let i = 0; i < 30; i++) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                const dateStr = date.toISOString().split('T')[0];
+                const memoKey = getMemoKey(dateStr);
+                const memo = localStorage.getItem(memoKey);
+                if (memo) {
+                    data.memos[dateStr] = memo;
+                }
+            }
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `AI秘書_${currentStore}_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showNotification('データをエクスポートしました', 'success');
+        }
+
+        function importData() {
+            document.getElementById('importFileInput').click();
+        }
+
+        function handleDataImport(event) {
+            const file = event.target.files[0];
+            if (file && file.name.endsWith('.json')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        
+                        if (confirm(`データを「${data.store}」店舗にインポートしますか？\n現在のデータは上書きされます。`)) {
+                            if (data.tasks) {
+                                localStorage.setItem(getTaskKey(), JSON.stringify(data.tasks));
+                            }
+                            if (data.prompts) {
+                                localStorage.setItem(getPromptKey(), JSON.stringify(data.prompts));
+                            }
+                            if (data.memos) {
+                                Object.keys(data.memos).forEach(date => {
+                                    localStorage.setItem(getMemoKey(date), data.memos[date]);
+                                });
+                            }
+                            
+                            loadStoreData();
+                            showNotification('データをインポートしました', 'success');
+                        }
+                    } catch (error) {
+                        showNotification('ファイル形式が正しくありません', 'error');
+                    }
+                };
+                reader.readAsText(file, 'UTF-8');
+            }
+        }
+
+        // 通知システム
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <div class="flex items-center">
+                    <i class="fas fa-${type === 'success' ? 'check' : type === 'error' ? 'exclamation-triangle' : 'info'}-circle mr-2"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    if (document.body.contains(notification)) {
+                        document.body.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
         }
 
         // エンターキーでタスク追加
         document.getElementById('newTask').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 addTask();
+            }
+        });
+
+        // ドラッグ&ドロップ対応
+        const csvUploadArea = document.querySelector('button[onclick="document.getElementById(\'csvFileInput\').click()"]');
+        
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            csvUploadArea.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        csvUploadArea.addEventListener('dragover', (e) => {
+            csvUploadArea.classList.add('border-blue-400', 'bg-blue-50');
+        });
+        
+        csvUploadArea.addEventListener('dragleave', (e) => {
+            csvUploadArea.classList.remove('border-blue-400', 'bg-blue-50');
+        });
+        
+        csvUploadArea.addEventListener('drop', (e) => {
+            csvUploadArea.classList.remove('border-blue-400', 'bg-blue-50');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0 && files[0].name.endsWith('.csv')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const csv = e.target.result;
+                    parseCSV(csv);
+                };
+                reader.readAsText(files[0], 'UTF-8');
             }
         });
     </script>
