@@ -273,6 +273,104 @@
             background-color: #0ea5e9;
         }
         
+        /* CSV編集テーブル */
+        .csv-edit-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .csv-edit-cell {
+            border: 1px solid #d1d5db;
+            padding: 8px 12px;
+            background: white;
+            transition: all 0.2s ease;
+            min-width: 120px;
+            position: relative;
+        }
+        
+        .csv-edit-cell:hover {
+            background-color: #f9fafb;
+            border-color: #60a5fa;
+        }
+        
+        .csv-edit-cell:focus {
+            outline: none;
+            background-color: #eff6ff;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+        }
+        
+        .csv-header-cell {
+            background-color: #f3f4f6;
+            font-weight: 600;
+            color: #374151;
+            border: 1px solid #d1d5db;
+            padding: 8px 12px;
+            position: relative;
+        }
+        
+        .csv-header-cell:hover {
+            background-color: #e5e7eb;
+        }
+        
+        .csv-header-cell:focus {
+            outline: none;
+            background-color: #dbeafe;
+            border-color: #3b82f6;
+        }
+        
+        .csv-row-number {
+            background-color: #f9fafb;
+            color: #6b7280;
+            font-weight: 500;
+            text-align: center;
+            min-width: 40px;
+            border: 1px solid #d1d5db;
+            padding: 8px 4px;
+        }
+        
+        .csv-delete-btn {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            width: 16px;
+            height: 16px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 10px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .csv-edit-cell:hover .csv-delete-btn,
+        .csv-header-cell:hover .csv-delete-btn {
+            display: flex;
+        }
+        
+        .csv-delete-btn:hover {
+            background: #dc2626;
+        }
+        
+        .csv-add-row-btn {
+            background: #f3f4f6;
+            color: #6b7280;
+            border: 1px dashed #d1d5db;
+            padding: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .csv-add-row-btn:hover {
+            background: #e5e7eb;
+            color: #374151;
+            border-color: #9ca3af;
+        }
+        
         /* ログイン画面スタイル */
         .login-container {
             min-height: 100vh;
@@ -628,7 +726,8 @@
                             CSVデータ整形
                         </h2>
                         
-                        <div class="mb-6">
+                        <!-- アップロードエリア -->
+                        <div id="csvUploadArea" class="mb-6">
                             <input type="file" id="csvFileInput" accept=".csv" class="hidden" onchange="handleCSVUpload(event)">
                             <button onclick="document.getElementById('csvFileInput').click()" class="w-full border-2 border-dashed border-gray-300 hover:border-blue-400 rounded-lg p-8 text-center transition-all">
                                 <i class="fas fa-upload text-3xl text-gray-400 mb-3"></i>
@@ -637,19 +736,67 @@
                             </button>
                         </div>
                         
-                        <div id="csvPreview" class="hidden">
-                            <div class="flex justify-between items-center mb-4">
-                                <h3 class="font-semibold text-gray-900">プレビュー</h3>
-                                <button onclick="copyCSVFormatted()" class="btn btn-success">
-                                    <i class="fas fa-copy mr-2"></i>コピー
+                        <!-- CSV編集エリア -->
+                        <div id="csvEditArea" class="hidden">
+                            <!-- コントロールボタン -->
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                <button onclick="addRow()" class="btn btn-secondary text-sm">
+                                    <i class="fas fa-plus mr-1"></i>行追加
+                                </button>
+                                <button onclick="addColumn()" class="btn btn-secondary text-sm">
+                                    <i class="fas fa-plus mr-1"></i>列追加
+                                </button>
+                                <button onclick="saveCSVChanges()" class="btn btn-primary text-sm">
+                                    <i class="fas fa-save mr-1"></i>保存
+                                </button>
+                                <button onclick="copyCSVFormatted()" class="btn btn-success text-sm">
+                                    <i class="fas fa-copy mr-1"></i>コピー
+                                </button>
+                                <button onclick="clearCSVData()" class="btn btn-danger text-sm">
+                                    <i class="fas fa-trash mr-1"></i>削除
+                                </button>
+                                <button onclick="reuploadCSV()" class="btn btn-warning text-sm">
+                                    <i class="fas fa-redo mr-1"></i>再アップロード
                                 </button>
                             </div>
-                            
-                            <div class="border border-gray-200 rounded-lg mb-4 overflow-auto" style="max-height: 300px;">
-                                <table id="csvTable" class="w-full text-sm"></table>
+
+                            <!-- ファイル情報 -->
+                            <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm text-blue-800">
+                                        <i class="fas fa-file-csv mr-2"></i>
+                                        ファイル: <span id="csvFileName">-</span>
+                                    </span>
+                                    <span class="text-sm text-blue-600">
+                                        サイズ: <span id="csvRowCount">0</span>行 × <span id="csvColCount">0</span>列
+                                    </span>
+                                </div>
                             </div>
                             
-                            <textarea id="csvFormattedText" class="input-field resize-none" rows="6" readonly placeholder="整形されたテキストがここに表示されます"></textarea>
+                            <!-- 編集可能テーブル -->
+                            <div class="border border-gray-200 rounded-lg mb-4 overflow-auto" style="max-height: 400px;">
+                                <table id="csvEditTable" class="w-full text-sm">
+                                    <thead id="csvTableHead"></thead>
+                                    <tbody id="csvTableBody"></tbody>
+                                </table>
+                            </div>
+                            
+                            <!-- 整形テキスト -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    <i class="fas fa-code mr-2"></i>ChatGPT用整形テキスト
+                                </label>
+                                <textarea id="csvFormattedText" class="input-field resize-none" rows="6" readonly placeholder="整形されたテキストがここに表示されます"></textarea>
+                            </div>
+
+                            <!-- 使用方法ヒント -->
+                            <div class="mt-4 bg-gray-50 border border-gray-200 rounded-lg p-3">
+                                <p class="text-sm text-gray-600">
+                                    <i class="fas fa-lightbulb mr-2 text-yellow-500"></i>
+                                    <strong>使用方法：</strong>
+                                    セルをクリックして直接編集 | 行・列の追加 | 不要な行・列は右端のボタンで削除
+                                </p>
+                            </div>
                         </div>
                     </div>
 
@@ -1230,13 +1377,15 @@
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     const csv = e.target.result;
-                    parseCSV(csv);
+                    parseCSV(csv, file.name);
                 };
                 reader.readAsText(file, 'UTF-8');
+            } else {
+                showNotification('CSVファイルを選択してください', 'error');
             }
         }
 
-        function parseCSV(csv) {
+        function parseCSV(csv, fileName = 'uploaded.csv') {
             const lines = csv.trim().split('\n');
             const data = lines.map(line => {
                 const result = [];
@@ -1261,62 +1410,231 @@
             });
             
             csvData = data;
-            displayCSV(data);
+            displayEditableCSV(data, fileName);
             showNotification('CSVファイルを読み込みました', 'success');
         }
 
-        function displayCSV(data) {
-            const preview = document.getElementById('csvPreview');
-            const table = document.getElementById('csvTable');
+        function displayEditableCSV(data, fileName) {
+            if (!data || data.length === 0) return;
+
+            // UI切り替え
+            document.getElementById('csvUploadArea').classList.add('hidden');
+            document.getElementById('csvEditArea').classList.remove('hidden');
             
-            if (!preview || !table) return;
+            // ファイル情報更新
+            document.getElementById('csvFileName').textContent = fileName;
+            document.getElementById('csvRowCount').textContent = data.length - 1; // ヘッダー除く
+            document.getElementById('csvColCount').textContent = data[0]?.length || 0;
             
-            table.innerHTML = '';
+            const table = document.getElementById('csvEditTable');
+            const thead = document.getElementById('csvTableHead');
+            const tbody = document.getElementById('csvTableBody');
             
+            // テーブルクリア
+            thead.innerHTML = '';
+            tbody.innerHTML = '';
+            
+            // ヘッダー行作成
             if (data.length > 0) {
                 const headerRow = document.createElement('tr');
-                headerRow.className = 'bg-gray-50';
-                data[0].forEach(cell => {
+                
+                // 行番号ヘッダー
+                const rowNumHeader = document.createElement('th');
+                rowNumHeader.className = 'csv-row-number';
+                rowNumHeader.textContent = '#';
+                headerRow.appendChild(rowNumHeader);
+                
+                // データヘッダー
+                data[0].forEach((cell, colIndex) => {
                     const th = document.createElement('th');
-                    th.className = 'border border-gray-200 px-3 py-2 text-left font-semibold text-gray-900';
+                    th.className = 'csv-header-cell';
+                    th.contentEditable = true;
                     th.textContent = cell;
+                    th.style.position = 'relative';
+                    
+                    // 列削除ボタン
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'csv-delete-btn';
+                    deleteBtn.innerHTML = '×';
+                    deleteBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        deleteColumn(colIndex);
+                    };
+                    th.appendChild(deleteBtn);
+                    
+                    th.addEventListener('blur', saveCSVChanges);
                     headerRow.appendChild(th);
                 });
-                table.appendChild(headerRow);
+                
+                thead.appendChild(headerRow);
             }
             
-            for (let i = 1; i < data.length && i < 11; i++) {
-                const row = document.createElement('tr');
-                row.className = 'bg-white';
-                data[i].forEach(cell => {
-                    const td = document.createElement('td');
-                    td.className = 'border border-gray-200 px-3 py-2 text-gray-700';
-                    td.textContent = cell;
-                    row.appendChild(td);
-                });
-                table.appendChild(row);
+            // データ行作成
+            for (let i = 1; i < data.length; i++) {
+                createEditableRow(data[i], i);
             }
             
-            generateFormattedText(data);
-            preview.classList.remove('hidden');
+            updateFormattedText();
         }
 
-        function generateFormattedText(data) {
+        function createEditableRow(rowData, rowIndex) {
+            const tbody = document.getElementById('csvTableBody');
+            const row = document.createElement('tr');
+            
+            // 行番号
+            const rowNumCell = document.createElement('td');
+            rowNumCell.className = 'csv-row-number';
+            rowNumCell.innerHTML = `
+                ${rowIndex}
+                <button class="csv-delete-btn" onclick="deleteRow(${rowIndex})" style="position: absolute; top: 2px; right: 2px;">×</button>
+            `;
+            rowNumCell.style.position = 'relative';
+            row.appendChild(rowNumCell);
+            
+            // データセル
+            const maxCols = Math.max(rowData.length, csvData[0]?.length || 0);
+            for (let j = 0; j < maxCols; j++) {
+                const cell = document.createElement('td');
+                cell.className = 'csv-edit-cell';
+                cell.contentEditable = true;
+                cell.textContent = rowData[j] || '';
+                cell.addEventListener('blur', saveCSVChanges);
+                row.appendChild(cell);
+            }
+            
+            tbody.appendChild(row);
+        }
+
+        function addRow() {
+            if (!csvData || csvData.length === 0) {
+                showNotification('先にCSVをアップロードしてください', 'error');
+                return;
+            }
+            
+            const newRowData = new Array(csvData[0].length).fill('');
+            csvData.push(newRowData);
+            
+            createEditableRow(newRowData, csvData.length - 1);
+            updateRowNumbers();
+            updateFormattedText();
+            updateFileInfo();
+            showNotification('行を追加しました', 'success');
+        }
+
+        function addColumn() {
+            if (!csvData || csvData.length === 0) {
+                showNotification('先にCSVをアップロードしてください', 'error');
+                return;
+            }
+            
+            // 全行に新しい列を追加
+            csvData.forEach(row => row.push(''));
+            
+            // テーブル再描画
+            displayEditableCSV(csvData, document.getElementById('csvFileName').textContent);
+            showNotification('列を追加しました', 'success');
+        }
+
+        function deleteRow(rowIndex) {
+            if (confirm('この行を削除しますか？')) {
+                csvData.splice(rowIndex, 1);
+                displayEditableCSV(csvData, document.getElementById('csvFileName').textContent);
+                showNotification('行を削除しました', 'info');
+            }
+        }
+
+        function deleteColumn(colIndex) {
+            if (confirm('この列を削除しますか？')) {
+                csvData.forEach(row => row.splice(colIndex, 1));
+                displayEditableCSV(csvData, document.getElementById('csvFileName').textContent);
+                showNotification('列を削除しました', 'info');
+            }
+        }
+
+        function saveCSVChanges() {
+            const table = document.getElementById('csvEditTable');
+            const newData = [];
+            
+            // ヘッダー行を保存
+            const headerCells = table.querySelectorAll('thead th.csv-header-cell');
+            const headerData = Array.from(headerCells).map(cell => cell.textContent.trim());
+            newData.push(headerData);
+            
+            // データ行を保存
+            const bodyRows = table.querySelectorAll('tbody tr');
+            bodyRows.forEach(row => {
+                const cells = row.querySelectorAll('td.csv-edit-cell');
+                const rowData = Array.from(cells).map(cell => cell.textContent.trim());
+                newData.push(rowData);
+            });
+            
+            csvData = newData;
+            updateFormattedText();
+            updateFileInfo();
+        }
+
+        function updateRowNumbers() {
+            const rowNumbers = document.querySelectorAll('.csv-row-number');
+            rowNumbers.forEach((cell, index) => {
+                if (index > 0) { // Skip header
+                    cell.childNodes[0].textContent = index;
+                }
+            });
+        }
+
+        function updateFileInfo() {
+            if (csvData && csvData.length > 0) {
+                document.getElementById('csvRowCount').textContent = csvData.length - 1;
+                document.getElementById('csvColCount').textContent = csvData[0]?.length || 0;
+            }
+        }
+
+        function updateFormattedText() {
+            if (!csvData || csvData.length === 0) return;
+            
             let formatted = '';
-            data.forEach((row, index) => {
+            csvData.forEach((row, index) => {
                 formatted += row.join('\t') + '\n';
                 if (index === 0) {
                     formatted += '---\n';
                 }
             });
+            
             const formattedTextElement = document.getElementById('csvFormattedText');
             if (formattedTextElement) {
                 formattedTextElement.value = formatted;
             }
         }
 
+        function clearCSVData() {
+            if (confirm('⚠️ CSVデータを削除しますか？\nこの操作は取り消せません。')) {
+                csvData = null;
+                document.getElementById('csvUploadArea').classList.remove('hidden');
+                document.getElementById('csvEditArea').classList.add('hidden');
+                document.getElementById('csvFileInput').value = '';
+                showNotification('CSVデータを削除しました', 'info');
+            }
+        }
+
+        function reuploadCSV() {
+            if (csvData && !confirm('現在のデータは失われます。新しいファイルをアップロードしますか？')) {
+                return;
+            }
+            
+            csvData = null;
+            document.getElementById('csvUploadArea').classList.remove('hidden');
+            document.getElementById('csvEditArea').classList.add('hidden');
+            document.getElementById('csvFileInput').value = '';
+            document.getElementById('csvFileInput').click();
+        }
+
         function copyCSVFormatted() {
             const formattedText = document.getElementById('csvFormattedText').value;
+            if (!formattedText.trim()) {
+                showNotification('コピーするデータがありません', 'error');
+                return;
+            }
+            
             navigator.clipboard.writeText(formattedText).then(() => {
                 showNotification('整形テキストをコピーしました', 'success');
             }).catch(() => {
@@ -1481,9 +1799,11 @@
                         const reader = new FileReader();
                         reader.onload = function(e) {
                             const csv = e.target.result;
-                            parseCSV(csv);
+                            parseCSV(csv, files[0].name);
                         };
                         reader.readAsText(files[0], 'UTF-8');
+                    } else {
+                        showNotification('CSVファイルをドロップしてください', 'error');
                     }
                 });
             }
