@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI秘書ちゃんダッシュボード</title>
+    <title>AI秘書ちゃんダッシュボード v3 - 有限会社Rispondere</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
@@ -13,56 +13,215 @@
         textarea {
             resize: vertical;
         }
+        .store-theme {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .category-tab {
+            transition: all 0.3s ease;
+        }
+        .category-tab.active {
+            background-color: #3b82f6;
+            color: white;
+        }
+        .csv-table {
+            max-height: 400px;
+            overflow-y: auto;
+        }
     </style>
 </head>
-<body class="bg-gray-100 p-6">
-    <div class="max-w-4xl mx-auto">
-        <h1 class="text-3xl font-bold mb-6 text-center">AI秘書ちゃんダッシュボード</h1>
-
-        <!-- タスク管理 -->
-        <div class="bg-white p-4 rounded-lg shadow mb-6">
-            <h2 class="text-xl font-semibold mb-2">📅 今日のタスク</h2>
-            <ul id="taskList" class="list-disc ml-6 text-gray-800"></ul>
-            <div class="mt-4">
-                <input id="newTask" type="text" class="border p-2 w-2/3 rounded" placeholder="タスクを追加">
-                <button onclick="addTask()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 ml-2">追加</button>
+<body class="bg-gray-50 min-h-screen">
+    <!-- ヘッダー -->
+    <div class="store-theme text-white py-4 px-6">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center">
+            <h1 class="text-2xl md:text-3xl font-bold mb-2 md:mb-0">AI秘書ちゃんダッシュボード v3</h1>
+            <div class="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-4">
+                <div>
+                    <label class="text-sm font-medium mr-2">店舗選択:</label>
+                    <select id="storeSelector" class="text-gray-800 px-3 py-1 rounded text-sm" onchange="switchStore()">
+                        <option value="classy_tokyo">CLASSY東京</option>
+                        <option value="classy_nagoya">CLASSY名古屋</option>
+                        <option value="classy_yokkaichi">CLASSY四日市</option>
+                        <option value="grandopera_tokyo">GrandOpera東京</option>
+                        <option value="grandopera_yokohama">GrandOpera横浜</option>
+                        <option value="grandopera_nagoya">GrandOpera名古屋</option>
+                        <option value="grandopera_fukuoka">GrandOpera福岡</option>
+                        <option value="wancarat">ワンカラット</option>
+                        <option value="shabour">シャブール</option>
+                        <option value="opera_nishiki">オペラ錦</option>
+                    </select>
+                </div>
+                <div class="text-sm">
+                    <span id="currentStore" class="font-semibold">CLASSY東京</span> | 
+                    <span id="currentDate"></span>
+                </div>
             </div>
         </div>
+    </div>
 
-        <!-- プロンプト集 -->
-        <div class="bg-white p-4 rounded-lg shadow mb-6">
-            <h2 class="text-xl font-semibold mb-2">🧠 よく使うプロンプト集</h2>
-            <div id="promptButtons" class="space-y-2"></div>
-            <div class="mt-4">
-                <input id="newPromptLabel" type="text" class="border p-2 w-1/4 rounded" placeholder="ボタン名">
-                <input id="newPromptText" type="text" class="border p-2 w-1/2 rounded ml-2" placeholder="プロンプト内容">
-                <button onclick="addPrompt()" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 ml-2">追加</button>
+    <div class="max-w-7xl mx-auto p-4">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- 左側: タスク管理・メモ -->
+            <div class="space-y-6">
+                <!-- タスク管理 -->
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h2 class="text-xl font-semibold mb-4 flex items-center">
+                        <span class="mr-2">📅</span>今日のタスク
+                    </h2>
+                    <ul id="taskList" class="space-y-2 mb-4"></ul>
+                    <div class="flex flex-col md:flex-row gap-2">
+                        <input id="newTask" type="text" class="flex-1 border border-gray-300 p-2 rounded-md" placeholder="新しいタスクを追加">
+                        <button onclick="addTask()" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors">追加</button>
+                    </div>
+                </div>
+
+                <!-- 日付別メモ -->
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
+                        <h2 class="text-xl font-semibold flex items-center mb-2 md:mb-0">
+                            <span class="mr-2">📝</span>メモ・ふせん
+                        </h2>
+                        <div class="flex flex-col md:flex-row gap-2">
+                            <select id="memoDateSelector" class="border border-gray-300 p-1 rounded text-sm" onchange="loadSelectedMemo()">
+                                <option value="">過去のメモを選択</option>
+                            </select>
+                            <button onclick="clearMemo()" class="text-sm bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600">クリア</button>
+                        </div>
+                    </div>
+                    <div class="mb-2 text-sm text-gray-600">
+                        保存日時: <span id="memoSaveDate" class="font-medium"></span>
+                    </div>
+                    <textarea id="memoArea" class="w-full border border-gray-300 rounded-md p-3" rows="6" placeholder="気づき・指示事項などをメモ"></textarea>
+                </div>
             </div>
-            <p class="mt-2 text-sm text-gray-500">※ コピーしてChatGPTに貼ってください</p>
-        </div>
 
-        <!-- メモ欄 -->
-        <div class="bg-white p-4 rounded-lg shadow mb-6">
-            <h2 class="text-xl font-semibold mb-2">📝 メモ・ふせん</h2>
-            <textarea id="memoArea" class="w-full border rounded p-2" rows="5" placeholder="気づき・指示事項などをメモ"></textarea>
-        </div>
+            <!-- 右側: プロンプト集・CSV -->
+            <div class="space-y-6">
+                <!-- プロンプト集 -->
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h2 class="text-xl font-semibold mb-4 flex items-center">
+                        <span class="mr-2">🧠</span>よく使うプロンプト集
+                    </h2>
+                    
+                    <!-- カテゴリタブ -->
+                    <div class="flex flex-wrap gap-1 mb-4" id="categoryTabs">
+                        <button class="category-tab px-3 py-1 rounded text-sm border active" data-category="all" onclick="switchCategory('all')">すべて</button>
+                        <button class="category-tab px-3 py-1 rounded text-sm border" data-category="line" onclick="switchCategory('line')">LINE用</button>
+                        <button class="category-tab px-3 py-1 rounded text-sm border" data-category="sns" onclick="switchCategory('sns')">SNS用</button>
+                        <button class="category-tab px-3 py-1 rounded text-sm border" data-category="report" onclick="switchCategory('report')">報告・指導用</button>
+                        <button class="category-tab px-3 py-1 rounded text-sm border" data-category="other" onclick="switchCategory('other')">その他</button>
+                    </div>
 
-        <!-- CSVアップロード準備欄（将来拡張用） -->
-        <div class="bg-white p-4 rounded-lg shadow">
-            <h2 class="text-xl font-semibold mb-2">📊 データアップロード（準備中）</h2>
-            <p class="text-gray-500">今後、CSVアップロード機能やスプレッドシート連携を追加可能です。</p>
+                    <!-- プロンプトボタン表示エリア -->
+                    <div id="promptButtons" class="space-y-2 mb-4 min-h-[100px]"></div>
+
+                    <!-- プロンプト追加フォーム -->
+                    <div class="border-t pt-4">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-2 mb-2">
+                            <select id="newPromptCategory" class="border border-gray-300 p-2 rounded">
+                                <option value="line">LINE用</option>
+                                <option value="sns">SNS用</option>
+                                <option value="report">報告・指導用</option>
+                                <option value="other">その他</option>
+                            </select>
+                            <input id="newPromptLabel" type="text" class="border border-gray-300 p-2 rounded" placeholder="ボタン名">
+                        </div>
+                        <div class="flex gap-2">
+                            <textarea id="newPromptText" class="flex-1 border border-gray-300 p-2 rounded" rows="2" placeholder="プロンプト内容"></textarea>
+                            <button onclick="addPrompt()" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition-colors">追加</button>
+                        </div>
+                    </div>
+                    <p class="mt-2 text-sm text-gray-500">※ ボタンをクリックでコピー → ChatGPTに貼り付けて使用</p>
+                </div>
+
+                <!-- CSV整形エリア -->
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h2 class="text-xl font-semibold mb-4 flex items-center">
+                        <span class="mr-2">📊</span>CSVデータ整形
+                    </h2>
+                    <div class="mb-4">
+                        <input type="file" id="csvFileInput" accept=".csv" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" onchange="handleCSVUpload(event)">
+                    </div>
+                    <div id="csvPreview" class="hidden">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="font-medium">プレビュー:</h3>
+                            <button onclick="copyCSVFormatted()" class="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600">整形テキストをコピー</button>
+                        </div>
+                        <div class="csv-table border border-gray-300 rounded">
+                            <table id="csvTable" class="w-full text-sm"></table>
+                        </div>
+                        <div class="mt-2">
+                            <label class="text-sm font-medium">ChatGPT用整形テキスト:</label>
+                            <textarea id="csvFormattedText" class="w-full border border-gray-300 rounded p-2 mt-1" rows="4" readonly></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        // タスクのローカル保存と表示
+        // グローバル変数
+        let currentStore = 'classy_tokyo';
+        let currentCategory = 'all';
+        let csvData = null;
+
+        // 初期化
+        window.onload = () => {
+            updateCurrentDate();
+            loadStoreData();
+            updateMemoDateSelector();
+            setInterval(updateCurrentDate, 60000); // 1分ごとに時刻更新
+        };
+
+        // 現在の日付時刻を更新
+        function updateCurrentDate() {
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('ja-JP', { 
+                year: 'numeric', 
+                month: 'numeric', 
+                day: 'numeric',
+                weekday: 'short'
+            });
+            const timeStr = now.toLocaleTimeString('ja-JP', { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+            document.getElementById('currentDate').textContent = `${dateStr} ${timeStr}`;
+        }
+
+        // 店舗切り替え
+        function switchStore() {
+            const selector = document.getElementById('storeSelector');
+            currentStore = selector.value;
+            document.getElementById('currentStore').textContent = selector.options[selector.selectedIndex].text;
+            loadStoreData();
+        }
+
+        // 店舗別データ読み込み
+        function loadStoreData() {
+            loadTasks();
+            loadMemo();
+            loadPrompts();
+            updateMemoDateSelector();
+        }
+
+        // タスク管理
+        function getTaskKey() {
+            return `tasks_${currentStore}`;
+        }
+
         function loadTasks() {
-            const savedTasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+            const savedTasks = JSON.parse(localStorage.getItem(getTaskKey()) || '[]');
             const taskList = document.getElementById('taskList');
             taskList.innerHTML = '';
-            savedTasks.forEach(task => {
+            savedTasks.forEach((task, index) => {
                 const li = document.createElement('li');
-                li.innerHTML = `<input type='checkbox' class='mr-2' ${task.done ? 'checked' : ''} onchange='toggleTask(this)'>${task.text}`;
+                li.className = 'flex items-center p-2 bg-gray-50 rounded';
+                li.innerHTML = `
+                    <input type='checkbox' class='mr-3 w-4 h-4' ${task.done ? 'checked' : ''} onchange='toggleTask(${index})'>
+                    <span class='flex-1 ${task.done ? 'line-through text-gray-500' : ''}'>${task.text}</span>
+                    <button onclick='deleteTask(${index})' class='text-red-500 hover:text-red-700 ml-2 text-sm'>削除</button>
+                `;
                 taskList.appendChild(li);
             });
         }
@@ -71,68 +230,304 @@
             const taskInput = document.getElementById('newTask');
             const taskText = taskInput.value.trim();
             if (taskText !== '') {
-                const tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+                const tasks = JSON.parse(localStorage.getItem(getTaskKey()) || '[]');
                 tasks.push({ text: taskText, done: false });
-                localStorage.setItem('tasks', JSON.stringify(tasks));
+                localStorage.setItem(getTaskKey(), JSON.stringify(tasks));
                 taskInput.value = '';
                 loadTasks();
             }
         }
 
-        function toggleTask(checkbox) {
-            const index = Array.from(document.getElementById('taskList').children).indexOf(checkbox.parentElement);
-            const tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
-            tasks[index].done = checkbox.checked;
-            localStorage.setItem('tasks', JSON.stringify(tasks));
+        function toggleTask(index) {
+            const tasks = JSON.parse(localStorage.getItem(getTaskKey()) || '[]');
+            tasks[index].done = !tasks[index].done;
+            localStorage.setItem(getTaskKey(), JSON.stringify(tasks));
+            loadTasks();
         }
 
-        // メモ保存
+        function deleteTask(index) {
+            if (confirm('このタスクを削除しますか？')) {
+                const tasks = JSON.parse(localStorage.getItem(getTaskKey()) || '[]');
+                tasks.splice(index, 1);
+                localStorage.setItem(getTaskKey(), JSON.stringify(tasks));
+                loadTasks();
+            }
+        }
+
+        // メモ管理（日付別）
+        function getMemoKey(date = null) {
+            const today = date || new Date().toISOString().split('T')[0];
+            return `memo_${currentStore}_${today}`;
+        }
+
         function loadMemo() {
-            document.getElementById('memoArea').value = localStorage.getItem('memo') || '';
+            const today = new Date().toISOString().split('T')[0];
+            const memoKey = getMemoKey(today);
+            const savedMemo = localStorage.getItem(memoKey) || '';
+            document.getElementById('memoArea').value = savedMemo;
+            document.getElementById('memoSaveDate').textContent = new Date().toLocaleString('ja-JP');
         }
-        document.getElementById('memoArea').addEventListener('input', (e) => {
-            localStorage.setItem('memo', e.target.value);
-        });
 
-        // プロンプト管理
-        function loadPrompts() {
-            const savedPrompts = JSON.parse(localStorage.getItem('prompts') || '[]');
-            const container = document.getElementById('promptButtons');
-            container.innerHTML = '';
-            savedPrompts.forEach(p => {
-                const button = document.createElement('button');
-                button.innerText = p.label;
-                button.className = 'bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600';
-                button.onclick = () => copyPrompt(p.text);
-                container.appendChild(button);
+        function saveMemo() {
+            const today = new Date().toISOString().split('T')[0];
+            const memoKey = getMemoKey(today);
+            const memoText = document.getElementById('memoArea').value;
+            localStorage.setItem(memoKey, memoText);
+            updateMemoDateSelector();
+        }
+
+        function clearMemo() {
+            if (confirm('現在のメモをクリアしますか？')) {
+                document.getElementById('memoArea').value = '';
+                saveMemo();
+            }
+        }
+
+        function updateMemoDateSelector() {
+            const selector = document.getElementById('memoDateSelector');
+            selector.innerHTML = '<option value="">過去のメモを選択</option>';
+            
+            // 過去30日分をチェック
+            const dates = [];
+            for (let i = 0; i < 30; i++) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                const dateStr = date.toISOString().split('T')[0];
+                const memoKey = getMemoKey(dateStr);
+                if (localStorage.getItem(memoKey)) {
+                    dates.push({
+                        value: dateStr,
+                        label: date.toLocaleDateString('ja-JP', { month: 'numeric', day: 'numeric', weekday: 'short' })
+                    });
+                }
+            }
+            
+            dates.forEach(date => {
+                const option = document.createElement('option');
+                option.value = date.value;
+                option.textContent = date.label;
+                selector.appendChild(option);
             });
         }
 
+        function loadSelectedMemo() {
+            const selector = document.getElementById('memoDateSelector');
+            const selectedDate = selector.value;
+            if (selectedDate) {
+                const memoKey = getMemoKey(selectedDate);
+                const savedMemo = localStorage.getItem(memoKey) || '';
+                document.getElementById('memoArea').value = savedMemo;
+                document.getElementById('memoSaveDate').textContent = new Date(selectedDate).toLocaleDateString('ja-JP');
+            }
+        }
+
+        // メモの自動保存
+        document.getElementById('memoArea').addEventListener('input', saveMemo);
+
+        // プロンプト管理
+        function getPromptKey() {
+            return `prompts_${currentStore}`;
+        }
+
+        function switchCategory(category) {
+            currentCategory = category;
+            document.querySelectorAll('.category-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelector(`[data-category="${category}"]`).classList.add('active');
+            loadPrompts();
+        }
+
+        function loadPrompts() {
+            const savedPrompts = JSON.parse(localStorage.getItem(getPromptKey()) || '[]');
+            const container = document.getElementById('promptButtons');
+            container.innerHTML = '';
+            
+            const filteredPrompts = currentCategory === 'all' ? 
+                savedPrompts : 
+                savedPrompts.filter(p => p.category === currentCategory);
+            
+            if (filteredPrompts.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-center py-4">このカテゴリにプロンプトがありません</p>';
+                return;
+            }
+            
+            filteredPrompts.forEach((p, index) => {
+                const div = document.createElement('div');
+                div.className = 'flex items-center gap-2';
+                div.innerHTML = `
+                    <button onclick="copyPrompt('${p.text.replace(/'/g, "\\'")}', '${p.label}')" 
+                            class="flex-1 bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600 transition-colors text-left">
+                        ${p.label}
+                    </button>
+                    <span class="text-xs text-gray-500 px-2">${getCategoryLabel(p.category)}</span>
+                    <button onclick="deletePrompt(${savedPrompts.indexOf(p)})" 
+                            class="text-red-500 hover:text-red-700 text-sm">削除</button>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function getCategoryLabel(category) {
+            const labels = {
+                'line': 'LINE',
+                'sns': 'SNS',
+                'report': '報告',
+                'other': 'その他'
+            };
+            return labels[category] || 'その他';
+        }
+
         function addPrompt() {
+            const category = document.getElementById('newPromptCategory').value;
             const label = document.getElementById('newPromptLabel').value.trim();
             const text = document.getElementById('newPromptText').value.trim();
+            
             if (label && text) {
-                const prompts = JSON.parse(localStorage.getItem('prompts') || '[]');
-                prompts.push({ label, text });
-                localStorage.setItem('prompts', JSON.stringify(prompts));
+                const prompts = JSON.parse(localStorage.getItem(getPromptKey()) || '[]');
+                prompts.push({ label, text, category });
+                localStorage.setItem(getPromptKey(), JSON.stringify(prompts));
                 document.getElementById('newPromptLabel').value = '';
                 document.getElementById('newPromptText').value = '';
+                loadPrompts();
+            } else {
+                alert('ボタン名とプロンプト内容を入力してください。');
+            }
+        }
+
+        function deletePrompt(index) {
+            if (confirm('このプロンプトを削除しますか？')) {
+                const prompts = JSON.parse(localStorage.getItem(getPromptKey()) || '[]');
+                prompts.splice(index, 1);
+                localStorage.setItem(getPromptKey(), JSON.stringify(prompts));
                 loadPrompts();
             }
         }
 
-        function copyPrompt(text) {
+        function copyPrompt(text, label) {
             navigator.clipboard.writeText(text).then(() => {
-                alert("プロンプトをコピーしました！ChatGPTに貼って使ってください。");
+                // 一時的に成功メッセージを表示
+                const button = event.target;
+                const originalText = button.textContent;
+                button.textContent = 'コピーしました！';
+                button.classList.add('bg-green-500');
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.classList.remove('bg-green-500');
+                }, 1000);
+            }).catch(() => {
+                alert('コピーに失敗しました。手動で選択してコピーしてください。');
             });
         }
 
-        // 初期読み込み
-        window.onload = () => {
-            loadTasks();
-            loadMemo();
-            loadPrompts();
-        };
+        // CSV処理
+        function handleCSVUpload(event) {
+            const file = event.target.files[0];
+            if (file && file.name.endsWith('.csv')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const csv = e.target.result;
+                    parseCSV(csv);
+                };
+                reader.readAsText(file, 'UTF-8');
+            }
+        }
+
+        function parseCSV(csv) {
+            const lines = csv.trim().split('\n');
+            const data = lines.map(line => {
+                // 簡単なCSVパース（カンマ区切り、引用符考慮）
+                const result = [];
+                let current = '';
+                let inQuotes = false;
+                
+                for (let i = 0; i < line.length; i++) {
+                    const char = line[i];
+                    if (char === '"' && (i === 0 || line[i-1] === ',')) {
+                        inQuotes = true;
+                    } else if (char === '"' && inQuotes) {
+                        inQuotes = false;
+                    } else if (char === ',' && !inQuotes) {
+                        result.push(current.trim());
+                        current = '';
+                    } else {
+                        current += char;
+                    }
+                }
+                result.push(current.trim());
+                return result;
+            });
+            
+            csvData = data;
+            displayCSV(data);
+        }
+
+        function displayCSV(data) {
+            const preview = document.getElementById('csvPreview');
+            const table = document.getElementById('csvTable');
+            
+            table.innerHTML = '';
+            
+            // ヘッダー
+            if (data.length > 0) {
+                const headerRow = document.createElement('tr');
+                headerRow.className = 'bg-gray-100';
+                data[0].forEach(cell => {
+                    const th = document.createElement('th');
+                    th.className = 'border border-gray-300 px-2 py-1 text-left font-medium';
+                    th.textContent = cell;
+                    headerRow.appendChild(th);
+                });
+                table.appendChild(headerRow);
+            }
+            
+            // データ行
+            for (let i = 1; i < data.length; i++) {
+                const row = document.createElement('tr');
+                row.className = i % 2 === 0 ? 'bg-gray-50' : 'bg-white';
+                data[i].forEach(cell => {
+                    const td = document.createElement('td');
+                    td.className = 'border border-gray-300 px-2 py-1';
+                    td.textContent = cell;
+                    row.appendChild(td);
+                });
+                table.appendChild(row);
+            }
+            
+            // 整形テキスト生成
+            generateFormattedText(data);
+            preview.classList.remove('hidden');
+        }
+
+        function generateFormattedText(data) {
+            let formatted = '';
+            
+            // タブ区切りのテキスト形式で整形
+            data.forEach((row, index) => {
+                formatted += row.join('\t') + '\n';
+                if (index === 0) {
+                    formatted += '---\n'; // ヘッダーとデータの区切り
+                }
+            });
+            
+            document.getElementById('csvFormattedText').value = formatted;
+        }
+
+        function copyCSVFormatted() {
+            const formattedText = document.getElementById('csvFormattedText').value;
+            navigator.clipboard.writeText(formattedText).then(() => {
+                alert('整形されたテキストをコピーしました！ChatGPTに貼り付けて使用してください。');
+            }).catch(() => {
+                alert('コピーに失敗しました。手動で選択してコピーしてください。');
+            });
+        }
+
+        // エンターキーでタスク追加
+        document.getElementById('newTask').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addTask();
+            }
+        });
     </script>
 </body>
 </html>
