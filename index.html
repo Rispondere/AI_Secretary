@@ -432,16 +432,21 @@
                         class="input-field" 
                         placeholder="パスワードを入力してください"
                         value=""
+                        onkeypress="if(event.key==='Enter') directLogin()"
                     >
                 </div>
                 
-                <button type="button" onclick="loginNow()" class="btn btn-primary w-full">
+                <button type="button" onclick="directLogin()" class="btn btn-primary w-full">
                     <i class="fas fa-sign-in-alt mr-2"></i>ログイン
                 </button>
                 
-                <button type="button" onclick="forceLogin()" class="btn btn-danger w-full">
-                    <i class="fas fa-unlock mr-2"></i>強制ログイン
+                <button type="button" onclick="skipLogin()" class="btn btn-danger w-full">
+                    <i class="fas fa-unlock mr-2"></i>ログインをスキップ
                 </button>
+                
+                <div class="text-xs text-center text-gray-500 mt-4">
+                    ボタンが反応しない場合は「ログインをスキップ」をお使いください
+                </div>
             </div>
             
             <div class="mt-6 p-4 bg-blue-50 rounded-lg">
@@ -3740,26 +3745,32 @@
         let currentStoreStats = {};
 
         // 初期化
-        window.onload = () => {
-            checkAuthentication();
-            setupEventListeners();
+        window.onload = function() {
+            // ログイン状態をチェック
+            const isLoggedIn = sessionStorage.getItem('isLoggedIn');
+            if (isLoggedIn === 'true') {
+                enterDashboard();
+            } else {
+                // ログイン画面を表示
+                const loginScreen = document.getElementById('loginScreen');
+                const dashboard = document.getElementById('mainDashboard');
+                
+                if (loginScreen) loginScreen.style.display = 'block';
+                if (dashboard) dashboard.style.display = 'none';
+                
+                // パスワードフィールドにフォーカス
+                setTimeout(function() {
+                    const input = document.getElementById('passwordInput');
+                    if (input) {
+                        input.focus();
+                        input.value = '';
+                    }
+                }, 500);
+            }
+            
+            // 時刻更新
             updateDateTime();
             setInterval(updateDateTime, 60000);
-            
-            // パスワードフィールドにフォーカス
-            setTimeout(() => {
-                const input = document.getElementById('passwordInput');
-                if (input) {
-                    input.focus();
-                    input.value = ''; // 確実にクリア
-                }
-            }, 200);
-            
-            // アラートチェックは後で有効化
-            setTimeout(() => {
-                checkAlerts();
-                setInterval(checkAlerts, 60000);
-            }, 5000);
         };
 
         // 認証処理
