@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI秘書ちゃんダッシュボード v3 - 有限会社Rispondere</title>
+    <title>AI_Secretary v3 - 有限会社Rispondere</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -488,7 +488,7 @@
             <div class="login-logo">
                 <i class="fas fa-shield-alt"></i>
                 <div class="login-title">セキュアログイン</div>
-                <div class="login-subtitle">有限会社Rispondere<br>AI秘書ちゃんダッシュボード</div>
+                <div class="login-subtitle">有限会社Rispondere<br>AI_Secretary ダッシュボード</div>
             </div>
             
             <form onsubmit="handleLogin(event)">
@@ -542,7 +542,7 @@
                     <div class="text-center md:text-left">
                         <h1 class="text-2xl md:text-3xl font-bold text-gray-900 flex items-center justify-center md:justify-start">
                             <i class="fas fa-briefcase mr-3 text-blue-500"></i>
-                            AI秘書ちゃんダッシュボード
+                            AI_Secretary
                         </h1>
                         <p class="text-gray-600 mt-1">有限会社Rispondere 業務管理システム</p>
                     </div>
@@ -1684,7 +1684,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `AI秘書_${currentStore}_${new Date().toISOString().split('T')[0]}.json`;
+            a.download = `AI_Secretary_${currentStore}_${new Date().toISOString().split('T')[0]}.json`;
             a.click();
             URL.revokeObjectURL(url);
             
