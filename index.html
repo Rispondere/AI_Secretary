@@ -867,16 +867,16 @@
                                                         <span class="font-bold text-blue-600" id="storeDetailAvgSales">¥0</span>
                                                     </div>
                                                     <div class="flex justify-between items-center">
-                                                        <span class="text-sm text-gray-600">総写メ日記</span>
-                                                        <span class="font-bold text-purple-600" id="storeDetailDiary">0件</span>
+                                                        <span class="text-sm text-gray-600">写メ日記 (日平均)</span>
+                                                        <span class="font-bold text-purple-600" id="storeDetailDiary">0件/日</span>
                                                     </div>
                                                     <div class="flex justify-between items-center">
                                                         <span class="text-sm text-gray-600">日平均写メ日記</span>
-                                                        <span class="font-bold text-purple-600" id="storeDetailAvgDiary">0件</span>
+                                                        <span class="font-bold text-purple-600" id="storeDetailAvgDiary">0件/日</span>
                                                     </div>
                                                     <div class="flex justify-between items-center">
-                                                        <span class="text-sm text-gray-600">総口コミ</span>
-                                                        <span class="font-bold text-orange-600" id="storeDetailReviews">0件</span>
+                                                        <span class="text-sm text-gray-600">口コミ (日平均)</span>
+                                                        <span class="font-bold text-orange-600" id="storeDetailReviews">0件/日</span>
                                                     </div>
                                                     <div class="flex justify-between items-center">
                                                         <span class="text-sm text-gray-600">口コミ転換率</span>
@@ -1004,11 +1004,11 @@
                             </div>
                             <div class="text-center p-4 bg-purple-50 rounded-lg">
                                 <div class="text-2xl font-bold text-purple-600" id="overallDiaryAchievement">0%</div>
-                                <div class="text-sm text-gray-600">写メ日記達成率</div>
+                                <div class="text-sm text-gray-600">写メ日記達成率<br>(日平均)</div>
                             </div>
                             <div class="text-center p-4 bg-orange-50 rounded-lg">
                                 <div class="text-2xl font-bold text-orange-600" id="overallReviewAchievement">0%</div>
-                                <div class="text-sm text-gray-600">口コミ達成率</div>
+                                <div class="text-sm text-gray-600">口コミ達成率<br>(日平均)</div>
                             </div>
                         </div>
                         
@@ -1506,9 +1506,9 @@
             document.getElementById('selectedStoreName').textContent = storeName;
             document.getElementById('storeDetailSales').textContent = `¥${storeData.totalSales.toLocaleString()}`;
             document.getElementById('storeDetailAvgSales').textContent = `¥${Math.round(storeData.avgSales).toLocaleString()}`;
-            document.getElementById('storeDetailDiary').textContent = `${storeData.totalDiary.toLocaleString()}件`;
-            document.getElementById('storeDetailAvgDiary').textContent = `${Math.round(storeData.avgDiary)}件`;
-            document.getElementById('storeDetailReviews').textContent = `${storeData.totalReviews}件`;
+            document.getElementById('storeDetailDiary').textContent = `${Math.round(storeData.totalDiary / storeData.days * 10) / 10}件/日`;
+            document.getElementById('storeDetailAvgDiary').textContent = `${Math.round(storeData.avgDiary)}件/日`;
+            document.getElementById('storeDetailReviews').textContent = `${Math.round(storeData.totalReviews / storeData.days * 10) / 10}件/日`;
             document.getElementById('storeDetailConversion').textContent = `${storeData.conversionRate.toFixed(1)}%`;
             document.getElementById('storeDetailRank').textContent = `#${storeData.rank}`;
             
@@ -1702,8 +1702,8 @@
             const storeId = storeMapping[storeName];
             const storeGoals = storeId ? monthGoals[storeId] : {};
             const dailySalesGoal = storeGoals.sales ? Math.round(storeGoals.sales / 30) : 0;
-            const dailyDiaryGoal = storeGoals.diary ? Math.round(storeGoals.diary / 30) : 0;
-            const dailyReviewGoal = storeGoals.review ? Math.round(storeGoals.review / 30) : 0;
+            const dailyDiaryGoal = storeGoals.diary || 0; // 既に日平均
+            const dailyReviewGoal = storeGoals.review || 0; // 既に日平均
             
             tableBody.innerHTML = dailyData.slice(-14).reverse().map(item => {
                 const sales = item.売上 || 0;
@@ -3096,16 +3096,16 @@
                     const stores = ['CLASSY四日市', 'CLASSY東京', 'CLASSY名古屋', 'GrandOpera東京', 'GrandOpera横浜', 'GrandOpera名古屋', 'GrandOpera福岡', 'オペラ錦', 'シャブール', 'ワンカラット'];
                     const store = stores[i % 10];
                     const baseStats = {
-                        'CLASSY四日市': { base: 220000, diary: 100, reviews: 4 },
-                        'CLASSY東京': { base: 112000, diary: 32, reviews: 2 },
-                        'CLASSY名古屋': { base: 61000, diary: 21, reviews: 1 },
-                        'GrandOpera東京': { base: 538000, diary: 73, reviews: 2 },
-                        'GrandOpera横浜': { base: 413000, diary: 84, reviews: 2 },
-                        'GrandOpera名古屋': { base: 511000, diary: 53, reviews: 4 },
-                        'GrandOpera福岡': { base: 677000, diary: 139, reviews: 4 },
-                        'オペラ錦': { base: 58000, diary: 30, reviews: 2 },
-                        'シャブール': { base: 499000, diary: 119, reviews: 7 },
-                        'ワンカラット': { base: 323000, diary: 156, reviews: 3 }
+                        'CLASSY四日市': { base: 220000, diary: 103, reviews: 4.2 },
+                        'CLASSY東京': { base: 112000, diary: 31, reviews: 2.1 },
+                        'CLASSY名古屋': { base: 61000, diary: 21, reviews: 1.4 },
+                        'GrandOpera東京': { base: 538000, diary: 73, reviews: 2.4 },
+                        'GrandOpera横浜': { base: 413000, diary: 84, reviews: 2.2 },
+                        'GrandOpera名古屋': { base: 511000, diary: 53, reviews: 4.0 },
+                        'GrandOpera福岡': { base: 677000, diary: 139, reviews: 3.7 },
+                        'オペラ錦': { base: 58000, diary: 30, reviews: 1.8 },
+                        'シャブール': { base: 499000, diary: 119, reviews: 6.5 },
+                        'ワンカラット': { base: 323000, diary: 156, reviews: 3.3 }
                     };
                     
                     const stats = baseStats[store];
@@ -3149,22 +3149,22 @@
                         </div>
                         <div>
                             <label class="block text-sm text-gray-600 mb-1">
-                                写メ日記目標 <span class="text-xs text-gray-400">(月間・件数)</span>
+                                写メ日記目標 <span class="text-xs text-gray-400">(日平均・件数)</span>
                             </label>
-                            <input type="number" id="diary_${store.id}" class="input-field" placeholder="例: 900">
+                            <input type="number" id="diary_${store.id}" class="input-field" placeholder="例: 30">
                             <div id="diarySuggestion_${store.id}" class="text-xs text-blue-600 mt-1"></div>
                         </div>
                         <div>
                             <label class="block text-sm text-gray-600 mb-1">
-                                口コミ目標 <span class="text-xs text-gray-400">(月間・件数)</span>
+                                口コミ目標 <span class="text-xs text-gray-400">(日平均・件数)</span>
                             </label>
-                            <input type="number" id="review_${store.id}" class="input-field" placeholder="例: 45">
+                            <input type="number" id="review_${store.id}" class="input-field" placeholder="例: 1.5">
                             <div id="reviewSuggestion_${store.id}" class="text-xs text-blue-600 mt-1"></div>
                         </div>
                     </div>
                     <div class="mt-3 text-xs text-gray-500 bg-gray-50 p-2 rounded">
                         <i class="fas fa-info-circle mr-1"></i>
-                        前月実績に基づく推奨値が表示されます
+                        売上は月額、写メ日記・口コミは日平均で設定してください
                     </div>
                 </div>
             `).join('');
@@ -3223,10 +3223,14 @@
                     const totalDiary = storeData.reduce((sum, row) => sum + (row.写メ日記 || 0), 0);
                     const totalReviews = storeData.reduce((sum, row) => sum + (row.口コミ || 0), 0);
                     
+                    // 日平均を計算
+                    const avgDiary = Math.round(totalDiary / storeData.length);
+                    const avgReviews = Math.round(totalReviews / storeData.length);
+                    
                     // 成長率を考慮した推奨値（5%向上を目標）
                     const recommendedSales = Math.round(totalSales * 1.05);
-                    const recommendedDiary = Math.round(totalDiary * 1.05);
-                    const recommendedReviews = Math.round(totalReviews * 1.05);
+                    const recommendedDiary = Math.round(avgDiary * 1.05);
+                    const recommendedReviews = Math.round(avgReviews * 1.05);
                     
                     // ランキング表示
                     if (currentStoreStats[targetStoreName]) {
@@ -3246,8 +3250,8 @@
                     const reviewSuggestion = document.getElementById(`reviewSuggestion_${store.id}`);
                     
                     if (salesSuggestion) salesSuggestion.textContent = `推奨: ¥${recommendedSales.toLocaleString()} (+5%)`;
-                    if (diarySuggestion) diarySuggestion.textContent = `推奨: ${recommendedDiary}件 (+5%)`;
-                    if (reviewSuggestion) reviewSuggestion.textContent = `推奨: ${recommendedReviews}件 (+5%)`;
+                    if (diarySuggestion) diarySuggestion.textContent = `推奨: ${recommendedDiary}件/日 (+5%)`;
+                    if (reviewSuggestion) reviewSuggestion.textContent = `推奨: ${recommendedReviews}件/日 (+5%)`;
                 }
             });
         }
@@ -3324,6 +3328,7 @@
             let totalSalesGoal = 0, totalSalesActual = 0;
             let totalDiaryGoal = 0, totalDiaryActual = 0;
             let totalReviewGoal = 0, totalReviewActual = 0;
+            let storeCount = 0;
             
             const storeResults = STORES.map(store => {
                 const storeGoals = monthGoals[store.id] || {};
@@ -3340,10 +3345,11 @@
                 // 全体統計に加算
                 totalSalesGoal += storeGoals.sales || 0;
                 totalSalesActual += currentSales;
-                totalDiaryGoal += storeGoals.diary || 0;
-                totalDiaryActual += currentDiary;
-                totalReviewGoal += storeGoals.review || 0;
-                totalReviewActual += currentReviews;
+                totalDiaryGoal += storeGoals.diary || 0; // 日平均の合計
+                totalDiaryActual += currentDiary; // 日平均の合計
+                totalReviewGoal += storeGoals.review || 0; // 日平均の合計
+                totalReviewActual += currentReviews; // 日平均の合計
+                storeCount++;
                 
                 return {
                     store,
@@ -3358,7 +3364,7 @@
                 };
             });
             
-            // 全体達成率を更新
+            // 全体達成率を更新（日平均は平均値で比較）
             const overallSalesAchievement = totalSalesGoal > 0 ? Math.round((totalSalesActual / totalSalesGoal) * 100) : 0;
             const overallDiaryAchievement = totalDiaryGoal > 0 ? Math.round((totalDiaryActual / totalDiaryGoal) * 100) : 0;
             const overallReviewAchievement = totalReviewGoal > 0 ? Math.round((totalReviewActual / totalReviewGoal) * 100) : 0;
@@ -3391,16 +3397,16 @@
                                 </div>
                                 <div class="text-center">
                                     <div class="font-medium text-purple-600">写メ日記</div>
-                                    <div class="text-xs text-gray-600">${currentDiary}件</div>
-                                    <div class="text-xs text-gray-500">/ ${storeGoals.diary || 0}件</div>
+                                    <div class="text-xs text-gray-600">${currentDiary}件/日</div>
+                                    <div class="text-xs text-gray-500">/ ${storeGoals.diary || 0}件/日</div>
                                     <div class="${diaryProgress >= 100 ? 'text-green-600' : diaryProgress >= 80 ? 'text-yellow-600' : 'text-red-600'} font-bold">
                                         ${Math.round(diaryProgress)}%
                                     </div>
                                 </div>
                                 <div class="text-center">
                                     <div class="font-medium text-orange-600">口コミ</div>
-                                    <div class="text-xs text-gray-600">${currentReviews}件</div>
-                                    <div class="text-xs text-gray-500">/ ${storeGoals.review || 0}件</div>
+                                    <div class="text-xs text-gray-600">${currentReviews}件/日</div>
+                                    <div class="text-xs text-gray-500">/ ${storeGoals.review || 0}件/日</div>
                                     <div class="${reviewsProgress >= 100 ? 'text-green-600' : reviewsProgress >= 80 ? 'text-yellow-600' : 'text-red-600'} font-bold">
                                         ${Math.round(reviewsProgress)}%
                                     </div>
@@ -3441,30 +3447,30 @@
                                 <!-- 写メ日記進捗 -->
                                 <div>
                                     <div class="flex justify-between text-sm mb-1">
-                                        <span>写メ日記目標</span>
-                                        <span>${currentDiary} / ${storeGoals.diary || 0}件</span>
+                                        <span>写メ日記目標 (日平均)</span>
+                                        <span>${currentDiary} / ${storeGoals.diary || 0}件/日</span>
                                     </div>
                                     <div class="w-full bg-gray-200 rounded-full h-2">
                                         <div class="bg-purple-500 h-2 rounded-full" style="width: ${Math.min(diaryProgress, 100)}%"></div>
                                     </div>
                                     <div class="text-xs text-gray-600 mt-1 flex justify-between">
                                         <span>${Math.round(diaryProgress)}% 達成</span>
-                                        <span>残り: ${Math.max(0, (storeGoals.diary || 0) - currentDiary)}件</span>
+                                        <span>差: ${(currentDiary - (storeGoals.diary || 0)).toFixed(1)}件/日</span>
                                     </div>
                                 </div>
                                 
                                 <!-- 口コミ進捗 -->
                                 <div>
                                     <div class="flex justify-between text-sm mb-1">
-                                        <span>口コミ目標</span>
-                                        <span>${currentReviews} / ${storeGoals.review || 0}件</span>
+                                        <span>口コミ目標 (日平均)</span>
+                                        <span>${currentReviews} / ${storeGoals.review || 0}件/日</span>
                                     </div>
                                     <div class="w-full bg-gray-200 rounded-full h-2">
                                         <div class="bg-green-500 h-2 rounded-full" style="width: ${Math.min(reviewsProgress, 100)}%"></div>
                                     </div>
                                     <div class="text-xs text-gray-600 mt-1 flex justify-between">
                                         <span>${Math.round(reviewsProgress)}% 達成</span>
-                                        <span>残り: ${Math.max(0, (storeGoals.review || 0) - currentReviews)}件</span>
+                                        <span>差: ${(currentReviews - (storeGoals.review || 0)).toFixed(1)}件/日</span>
                                     </div>
                                 </div>
                             </div>
@@ -3727,17 +3733,21 @@
             };
             
             const targetStoreName = storeMapping[storeId];
+            const storeData = salesData.filter(row => {
+                const date = row['日付'] || row['date'] || row.日付 || '';
+                const store = row['店舗名'] || row['店舗'] || row['store'] || row.店舗 || '';
+                return date.includes(month) && store === targetStoreName;
+            });
             
-            return salesData
-                .filter(row => {
-                    const date = row['日付'] || row['date'] || row.日付 || '';
-                    const store = row['店舗名'] || row['店舗'] || row['store'] || row.店舗 || '';
-                    return date.includes(month) && store === targetStoreName;
-                })
-                .reduce((sum, row) => {
-                    const diary = parseInt(row['写メ日記'] || row['diary'] || row.写メ日記 || '0');
-                    return sum + diary;
-                }, 0);
+            if (storeData.length === 0) return 0;
+            
+            const totalDiary = storeData.reduce((sum, row) => {
+                const diary = parseInt(row['写メ日記'] || row['diary'] || row.写メ日記 || '0');
+                return sum + diary;
+            }, 0);
+            
+            // 日平均を返す
+            return Math.round(totalDiary / storeData.length * 10) / 10; // 小数点第1位まで
         }
 
         function calculateCurrentReviews(salesData, storeId, month) {
@@ -3755,17 +3765,21 @@
             };
             
             const targetStoreName = storeMapping[storeId];
+            const storeData = salesData.filter(row => {
+                const date = row['日付'] || row['date'] || row.日付 || '';
+                const store = row['店舗名'] || row['店舗'] || row['store'] || row.店舗 || '';
+                return date.includes(month) && store === targetStoreName;
+            });
             
-            return salesData
-                .filter(row => {
-                    const date = row['日付'] || row['date'] || row.日付 || '';
-                    const store = row['店舗名'] || row['店舗'] || row['store'] || row.店舗 || '';
-                    return date.includes(month) && store === targetStoreName;
-                })
-                .reduce((sum, row) => {
-                    const reviews = parseInt(row['口コミ'] || row['reviews'] || row.口コミ || '0');
-                    return sum + reviews;
-                }, 0);
+            if (storeData.length === 0) return 0;
+            
+            const totalReviews = storeData.reduce((sum, row) => {
+                const reviews = parseInt(row['口コミ'] || row['reviews'] || row.口コミ || '0');
+                return sum + reviews;
+            }, 0);
+            
+            // 日平均を返す
+            return Math.round(totalReviews / storeData.length * 10) / 10; // 小数点第1位まで
         }
 
         // プロンプト管理
