@@ -421,35 +421,32 @@
                 <p class="text-gray-600">有限会社Rispondere<br>統合業務管理システム</p>
             </div>
             
-            <form onsubmit="return simpleLogin(event)">
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                            <i class="fas fa-key mr-2"></i>パスワード
-                        </label>
-                        <input 
-                            type="password" 
-                            id="passwordInput" 
-                            class="input-field" 
-                            placeholder="パスワードを入力してください"
-                            autocomplete="off"
-                            required
-                        >
-                    </div>
-                    
-                    <button type="submit" class="btn btn-primary w-full" id="loginButton">
-                        <i class="fas fa-sign-in-alt mr-2"></i>ログイン
-                    </button>
-                    
-                    <button type="button" onclick="manualPasswordCheck()" class="btn btn-danger w-full">
-                        <i class="fas fa-exclamation-triangle mr-2"></i>緊急ログイン
-                    </button>
-                    
-                    <div class="text-xs text-gray-500 text-center">
-                        ※ ログインできない場合は緊急ログインボタンをお使いください
-                    </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-key mr-2"></i>パスワード
+                    </label>
+                    <input 
+                        type="password" 
+                        id="passwordInput" 
+                        class="input-field" 
+                        placeholder="iam1104JP を入力"
+                        value=""
+                    >
                 </div>
-            </form>
+                
+                <button type="button" onclick="loginNow()" class="btn btn-primary w-full">
+                    <i class="fas fa-sign-in-alt mr-2"></i>ログイン
+                </button>
+                
+                <button type="button" onclick="forceLogin()" class="btn btn-danger w-full">
+                    <i class="fas fa-unlock mr-2"></i>強制ログイン
+                </button>
+                
+                <div class="text-xs text-center text-gray-600">
+                    パスワード: <strong>iam1104JP</strong>
+                </div>
+            </div>
             
             <div class="mt-6 p-4 bg-blue-50 rounded-lg">
                 <div class="flex items-center text-blue-800 text-sm">
@@ -457,16 +454,11 @@
                     セキュアログイン・セッション管理・自動バックアップ
                 </div>
             </div>
-            
-            <div id="loginAttempts" class="hidden mt-4 text-center text-red-600 text-sm">
-                <i class="fas fa-exclamation-triangle mr-2"></i>
-                ログイン試行: <span id="attemptCount">0</span>/5
-            </div>
         </div>
     </div>
 
-    <!-- セッションタイマー -->
-    <div id="sessionTimer" class="session-timer hidden">
+    <!-- セッションタイマー（一時的に非表示） -->
+    <div id="sessionTimer" class="session-timer" style="display: none;">
         <i class="fas fa-clock mr-2"></i>
         <span id="timeRemaining"></span>
     </div>
@@ -599,27 +591,19 @@
         // イベントリスナー設定
         function setupEventListeners() {
             // エンターキーでのログイン処理
-            document.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    const activeElement = document.activeElement;
-                    if (activeElement && activeElement.id === 'passwordInput') {
-                        simpleLogin(e);
-                    } else if (activeElement && activeElement.id === 'newTaskTitle') {
-                        addTask();
+            const passwordInput = document.getElementById('passwordInput');
+            if (passwordInput) {
+                passwordInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        loginNow();
                     }
-                }
-            });
+                });
+            }
 
             // メモの自動保存
             const memoArea = document.getElementById('memoArea');
             if (memoArea) {
                 memoArea.addEventListener('input', saveMemo);
-            }
-            
-            // ログインフォームの直接処理
-            const loginForm = document.querySelector('form');
-            if (loginForm) {
-                loginForm.addEventListener('submit', simpleLogin);
             }
         }
 
@@ -3761,21 +3745,25 @@
 
         // 初期化
         window.onload = () => {
-            // パスワードフィールドに確実にフォーカス
-            setTimeout(() => {
-                const passwordInput = document.getElementById('passwordInput');
-                if (passwordInput) {
-                    passwordInput.focus();
-                    console.log('パスワードフィールドにフォーカスしました');
-                }
-            }, 500);
-            
             checkAuthentication();
+            setupEventListeners();
             updateDateTime();
             setInterval(updateDateTime, 60000);
-            setupEventListeners();
-            checkAlerts();
-            setInterval(checkAlerts, 60000);
+            
+            // パスワードフィールドにフォーカス
+            setTimeout(() => {
+                const input = document.getElementById('passwordInput');
+                if (input) {
+                    input.focus();
+                    input.value = ''; // 確実にクリア
+                }
+            }, 200);
+            
+            // アラートチェックは後で有効化
+            setTimeout(() => {
+                checkAlerts();
+                setInterval(checkAlerts, 60000);
+            }, 5000);
         };
 
         // 認証処理
@@ -3783,23 +3771,17 @@
             const isLoggedIn = sessionStorage.getItem('isLoggedIn');
             
             if (isLoggedIn === 'true') {
-                // ログイン済みの場合はダッシュボードを表示
-                document.getElementById('loginScreen').classList.add('hidden');
-                document.getElementById('mainDashboard').classList.remove('hidden');
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('mainDashboard').style.display = 'block';
                 loadAllData();
                 updateAllStats();
-                startSessionTimer(SESSION_DURATION);
             } else {
-                // ログインしていない場合はログイン画面を表示
-                document.getElementById('loginScreen').classList.remove('hidden');
-                document.getElementById('mainDashboard').classList.add('hidden');
+                document.getElementById('loginScreen').style.display = 'block';
+                document.getElementById('mainDashboard').style.display = 'none';
                 
-                // パスワードフィールドをフォーカス
                 setTimeout(() => {
-                    const passwordInput = document.getElementById('passwordInput');
-                    if (passwordInput) {
-                        passwordInput.focus();
-                    }
+                    const input = document.getElementById('passwordInput');
+                    if (input) input.focus();
                 }, 100);
             }
         }
@@ -3962,29 +3944,8 @@
         }
 
         function startSessionTimer(duration) {
-            const timerElement = document.getElementById('timeRemaining');
-            const sessionTimerDiv = document.getElementById('sessionTimer');
-            
-            sessionTimerDiv.classList.remove('hidden');
-            
-            sessionTimer = setInterval(() => {
-                duration -= 1000;
-                
-                if (duration <= 0) {
-                    clearInterval(sessionTimer);
-                    showNotification('セッションがタイムアウトしました', 'warning');
-                    logout();
-                    return;
-                }
-                
-                const minutes = Math.floor(duration / 60000);
-                const seconds = Math.floor((duration % 60000) / 1000);
-                timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-                
-                if (duration < 5 * 60 * 1000) {
-                    sessionTimerDiv.style.backgroundColor = 'rgba(239, 68, 68, 0.8)';
-                }
-            }, 1000);
+            // セッションタイマーを簡素化（必要に応じて後で実装）
+            console.log('セッション開始');
         }
 
         function showLoginScreen() {
