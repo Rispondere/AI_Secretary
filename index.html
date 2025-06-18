@@ -570,7 +570,2439 @@
                             </div>
                         </div>
                         <div class="text-center mt-4">
-                            <p class="text-sm text-gray-600">タスク完了率</p>
+                            <p class="text-sm text-gray-700 mb-3">${plan.description}</p>
+                            <ul class="text-sm text-gray-600 space-y-1">
+                                ${plan.actions.map(action => `<li class="flex items-center"><i class="fas fa-arrow-right text-xs mr-2"></i>${action}</li>`).join('')}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateStorePeriod() {
+            const selectedStore = document.getElementById('storeSelector').value;
+            if (selectedStore) {
+                renderStoreDetails(selectedStore);
+            }
+        }
+
+        // イベントリスナー設定
+        function setupEventListeners() {
+            // エンターキーでのタスク追加
+            document.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    const activeElement = document.activeElement;
+                    if (activeElement.id === 'newTaskTitle') {
+                        addTask();
+                    } else if (activeElement.id === 'passwordInput') {
+                        const form = activeElement.closest('form');
+                        if (form) handleLogin(e);
+                    }
+                }
+            });
+
+            // メモの自動保存
+            const memoArea = document.getElementById('memoArea');
+            if (memoArea) {
+                memoArea.addEventListener('input', saveMemo);
+            }
+        }
+
+        // データ読み込み
+        function loadAllData() {
+            loadTasks();
+            loadEvents();
+            loadDesignProjects();
+            loadPrompts();
+            loadMemo();
+            updateMemoDateSelector();
+        }
+
+        // 統計更新
+        function updateAllStats() {
+            updateDashboardStats();
+            updateTaskStats();
+            updateDesignStats();
+            updateProgressCircle();
+        }
+
+        function updateDashboardStats() {
+            const tasks = JSON.parse(localStorage.getItem(STORAGE_KEYS.tasks) || '[]');
+            const events = JSON.parse(localStorage.getItem(STORAGE_KEYS.events) || '[]');
+            const designProjects = JSON.parse(localStorage.getItem(STORAGE_KEYS.designProjects) || '[]');
+            
+            const completedTasks = tasks.filter(task => task.completed).length;
+            const urgentTasks = tasks.filter(task => task.priority === 'urgent' && !task.completed).length;
+            const totalEvents = events.length;
+            const designProjectsCount = designProjects.length;
+            
+            document.getElementById('totalTasks').textContent = tasks.length;
+            document.getElementById('completedTasks').textContent = completedTasks;
+            document.getElementById('urgentTasks').textContent = urgentTasks;
+            document.getElementById('totalEvents').textContent = totalEvents;
+            document.getElementById('designProjects').textContent = designProjectsCount;
+            
+            // 緊急・重要事項の表示
+            const urgentItems = document.getElementById('urgentItems');
+            const urgentList = [
+                ...tasks.filter(task => task.priority === 'urgent' && !task.completed).slice(0, 3),
+                ...designProjects.filter(project => project.priority === 'urgent' && project.status !== 'completed').slice(0, 2)
+            ];
+            
+            if (urgentList.length === 0) {
+                urgentItems.innerHTML = '<p class="text-gray-500 text-center py-4">現在、緊急事項はありません</p>';
+            } else {
+                urgentItems.innerHTML = urgentList.map(item => `
+                    <div class="flex items-center justify-between p-3 bg-red-50 border border-red-200 rounded-lg">
+                        <div>
+                            <div class="font-medium">${item.title}</div>
+                            <div class="text-sm text-gray-600">${item.store || item.client || ''}</div>
+                        </div>
+                        <div class="text-red-600">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function updateProgressCircle() {
+            const tasks = JSON.parse(localStorage.getItem(STORAGE_KEYS.tasks) || '[]');
+            const completed = tasks.filter(task => task.completed).length;
+            const total = tasks.length;
+            const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+            
+            const circle = document.getElementById('progressCircle');
+            const text = document.getElementById('progressText');
+            
+            if (circle && text) {
+                const circumference = 2 * Math.PI * 56;
+                const offset = circumference - (percentage / 100) * circumference;
+                
+                circle.style.strokeDasharray = circumference;
+                circle.style.strokeDashoffset = offset;
+                text.textContent = percentage + '%';
+            }
+        }
+
+        // タスク管理
+        function loadTasks() {
+            const tasks = JSON.parse(localStorage.getItem(STORAGE_KEYS.tasks) || '[]');
+            const taskList = document.getElementById('taskList');
+            if (!taskList) return;
+            
+            const filter = document.getElementById('taskFilter')?.value || 'all';
+            const storeFilter = document.getElementById('taskStore')?.value || 'all';
+            
+            let filteredTasks = tasks;
+            
+            if (filter !== 'all') {
+                if (filter === 'completed') {
+                    filteredTasks = filteredTasks.filter(task => task.completed);
+                } else {
+                    filteredTasks = filteredTasks.filter(task => task.priority === filter && !task.completed);
+                }
+            }
+            
+            if (storeFilter !== 'all') {
+                filteredTasks = filteredTasks.filter(task => task.store === storeFilter);
+            }
+            
+            if (filteredTasks.length === 0) {
+                taskList.innerHTML = '<div class="text-center py-8 text-gray-500">タスクがありません</div>';
+                return;
+            }
+            
+            taskList.innerHTML = filteredTasks.map((task, index) => {
+                const originalIndex = tasks.findIndex(t => t.id === task.id);
+                const priorityClass = task.priority === 'urgent' ? 'urgent' : task.priority === 'high' ? 'priority-high' : '';
+                const storeInfo = STORES.find(s => s.id === task.store)?.name || task.store;
+                
+                return `
+                    <div class="task-item ${task.completed ? 'completed' : ''} ${priorityClass}">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center flex-1">
+                                <input type="checkbox" class="mr-3 w-5 h-5" ${task.completed ? 'checked' : ''} 
+                                       onchange="toggleTask(${originalIndex})">
+                                <div class="flex-1">
+                                    <div class="font-medium ${task.completed ? 'line-through text-gray-500' : ''}">${task.title}</div>
+                                    <div class="text-sm text-gray-600">
+                                        ${storeInfo} | ${getPriorityLabel(task.priority)}
+                                        ${task.dueDate ? ` | 期限: ${new Date(task.dueDate).toLocaleDateString('ja-JP')}` : ''}
+                                    </div>
+                                    ${task.description ? `<div class="text-sm text-gray-500 mt-1">${task.description}</div>` : ''}
+                                </div>
+                            </div>
+                            <button onclick="deleteTask(${originalIndex})" class="ml-3 p-2 text-red-500 hover:text-red-700">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function addTask() {
+            const title = document.getElementById('newTaskTitle').value.trim();
+            const store = document.getElementById('newTaskStore').value;
+            const priority = document.getElementById('newTaskPriority').value;
+            const dueDate = document.getElementById('newTaskDue').value;
+            const description = document.getElementById('newTaskDescription').value.trim();
+            
+            if (!title) {
+                showNotification('タスク名を入力してください', 'error');
+                return;
+            }
+            
+            const tasks = JSON.parse(localStorage.getItem(STORAGE_KEYS.tasks) || '[]');
+            const newTask = {
+                id: Date.now(),
+                title,
+                store,
+                priority,
+                dueDate,
+                description,
+                completed: false,
+                createdAt: new Date().toISOString()
+            };
+            
+            tasks.push(newTask);
+            localStorage.setItem(STORAGE_KEYS.tasks, JSON.stringify(tasks));
+            
+            // フォームクリア
+            document.getElementById('newTaskTitle').value = '';
+            document.getElementById('newTaskDescription').value = '';
+            document.getElementById('newTaskDue').value = '';
+            
+            loadTasks();
+            updateAllStats();
+            showNotification('タスクを追加しました', 'success');
+            
+            // 緊急タスクの場合はアラート追加
+            if (priority === 'urgent') {
+                addNotification(`緊急タスクが追加されました: ${title}`, 'urgent');
+            }
+        }
+
+        function toggleTask(index) {
+            const tasks = JSON.parse(localStorage.getItem(STORAGE_KEYS.tasks) || '[]');
+            tasks[index].completed = !tasks[index].completed;
+            
+            if (tasks[index].completed) {
+                tasks[index].completedAt = new Date().toISOString();
+            } else {
+                delete tasks[index].completedAt;
+            }
+            
+            localStorage.setItem(STORAGE_KEYS.tasks, JSON.stringify(tasks));
+            loadTasks();
+            updateAllStats();
+        }
+
+        function deleteTask(index) {
+            if (confirm('このタスクを削除しますか？')) {
+                const tasks = JSON.parse(localStorage.getItem(STORAGE_KEYS.tasks) || '[]');
+                tasks.splice(index, 1);
+                localStorage.setItem(STORAGE_KEYS.tasks, JSON.stringify(tasks));
+                loadTasks();
+                updateAllStats();
+                showNotification('タスクを削除しました', 'info');
+            }
+        }
+
+        function filterTasks() {
+            loadTasks();
+        }
+
+        function updateTaskStats() {
+            const tasks = JSON.parse(localStorage.getItem(STORAGE_KEYS.tasks) || '[]');
+            const completed = tasks.filter(task => task.completed).length;
+            const total = tasks.length;
+            const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+            
+            const today = new Date().toDateString();
+            const overdue = tasks.filter(task => 
+                !task.completed && task.dueDate && new Date(task.dueDate) < new Date(today)
+            ).length;
+            const dueToday = tasks.filter(task => 
+                !task.completed && task.dueDate && new Date(task.dueDate).toDateString() === today
+            ).length;
+            
+            const completionRate = document.getElementById('taskCompletionRate');
+            const progressBar = document.getElementById('taskProgressBar');
+            const overdueCount = document.getElementById('overdueCount');
+            const dueTodayCount = document.getElementById('dueTodayCount');
+            
+            if (completionRate) completionRate.textContent = percentage + '%';
+            if (progressBar) progressBar.style.width = percentage + '%';
+            if (overdueCount) overdueCount.textContent = overdue;
+            if (dueTodayCount) dueTodayCount.textContent = dueToday;
+        }
+
+        function getPriorityLabel(priority) {
+            const labels = {
+                'urgent': '🔴 緊急',
+                'high': '🟡 重要',
+                'normal': '🟢 通常'
+            };
+            return labels[priority] || '通常';
+        }
+
+        // カレンダー・スケジュール管理
+        function renderCalendar() {
+            const calendar = document.getElementById('calendar');
+            const currentMonthElement = document.getElementById('currentMonth');
+            
+            if (!calendar || !currentMonthElement) return;
+            
+            currentMonthElement.textContent = currentMonth.toLocaleDateString('ja-JP', { 
+                year: 'numeric', 
+                month: 'long' 
+            });
+            
+            const year = currentMonth.getFullYear();
+            const month = currentMonth.getMonth();
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const startDate = new Date(firstDay);
+            startDate.setDate(startDate.getDate() - firstDay.getDay());
+            
+            const events = JSON.parse(localStorage.getItem(STORAGE_KEYS.events) || '[]');
+            const daysInMonth = lastDay.getDate();
+            
+            calendar.innerHTML = '';
+            
+            // 曜日ヘッダー
+            const weekdays = ['日', '月', '火', '水', '木', '金', '土'];
+            weekdays.forEach(day => {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'text-center text-sm font-medium text-gray-500 p-2';
+                dayElement.textContent = day;
+                calendar.appendChild(dayElement);
+            });
+            
+            // カレンダーの日付
+            for (let i = 0; i < 42; i++) {
+                const date = new Date(startDate);
+                date.setDate(startDate.getDate() + i);
+                
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day';
+                dayElement.textContent = date.getDate();
+                
+                const isCurrentMonth = date.getMonth() === month;
+                const isToday = date.toDateString() === new Date().toDateString();
+                const hasEvent = events.some(event => 
+                    new Date(event.date).toDateString() === date.toDateString()
+                );
+                
+                if (!isCurrentMonth) {
+                    dayElement.classList.add('text-gray-300');
+                }
+                if (isToday) {
+                    dayElement.classList.add('today');
+                }
+                if (hasEvent) {
+                    dayElement.classList.add('has-event');
+                }
+                
+                dayElement.onclick = () => selectDate(date);
+                calendar.appendChild(dayElement);
+            }
+        }
+
+        function prevMonth() {
+            currentMonth.setMonth(currentMonth.getMonth() - 1);
+            renderCalendar();
+        }
+
+        function nextMonth() {
+            currentMonth.setMonth(currentMonth.getMonth() + 1);
+            renderCalendar();
+        }
+
+        function selectDate(date) {
+            document.getElementById('newEventDate').value = date.toISOString().split('T')[0];
+        }
+
+        function loadEvents() {
+            // イベント読み込み処理
+        }
+
+        function addEvent() {
+            const title = document.getElementById('newEventTitle').value.trim();
+            const date = document.getElementById('newEventDate').value;
+            const time = document.getElementById('newEventTime').value;
+            const type = document.getElementById('newEventType').value;
+            const description = document.getElementById('newEventDescription').value.trim();
+            
+            if (!title || !date) {
+                showNotification('予定名と日付を入力してください', 'error');
+                return;
+            }
+            
+            const events = JSON.parse(localStorage.getItem(STORAGE_KEYS.events) || '[]');
+            const newEvent = {
+                id: Date.now(),
+                title,
+                date,
+                time,
+                type,
+                description,
+                createdAt: new Date().toISOString()
+            };
+            
+            events.push(newEvent);
+            localStorage.setItem(STORAGE_KEYS.events, JSON.stringify(events));
+            
+            // フォームクリア
+            document.getElementById('newEventTitle').value = '';
+            document.getElementById('newEventDate').value = '';
+            document.getElementById('newEventTime').value = '';
+            document.getElementById('newEventDescription').value = '';
+            
+            renderCalendar();
+            loadTodayEvents();
+            updateAllStats();
+            showNotification('予定を追加しました', 'success');
+        }
+
+        function loadTodayEvents() {
+            const today = new Date().toISOString().split('T')[0];
+            const events = JSON.parse(localStorage.getItem(STORAGE_KEYS.events) || '[]');
+            const todayEvents = events.filter(event => event.date === today);
+            
+            const container = document.getElementById('todayEvents');
+            if (!container) return;
+            
+            if (todayEvents.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-center py-4">今日の予定はありません</p>';
+                return;
+            }
+            
+            container.innerHTML = todayEvents.map(event => `
+                <div class="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div class="font-medium">${event.title}</div>
+                    <div class="text-sm text-gray-600">
+                        ${event.time || '時間未設定'} | ${getEventTypeLabel(event.type)}
+                    </div>
+                    ${event.description ? `<div class="text-sm text-gray-500 mt-1">${event.description}</div>` : ''}
+                </div>
+            `).join('');
+        }
+
+        function getEventTypeLabel(type) {
+            const labels = {
+                'meeting': '会議',
+                'deadline': '締切',
+                'event': 'イベント',
+                'reminder': 'リマインダー',
+                'goal_setting': '目標設定'
+            };
+            return labels[type] || 'その他';
+        }
+
+        // デザイン部門管理
+        function loadDesignProjects() {
+            const projects = JSON.parse(localStorage.getItem(STORAGE_KEYS.designProjects) || '[]');
+            const projectList = document.getElementById('designProjectList');
+            if (!projectList) return;
+            
+            const filter = document.getElementById('designFilter')?.value || 'all';
+            let filteredProjects = projects;
+            
+            if (filter !== 'all') {
+                filteredProjects = projects.filter(project => project.status === filter);
+            }
+            
+            if (filteredProjects.length === 0) {
+                projectList.innerHTML = '<div class="text-center py-8 text-gray-500">案件がありません</div>';
+                return;
+            }
+            
+            projectList.innerHTML = filteredProjects.map((project, index) => {
+                const originalIndex = projects.findIndex(p => p.id === project.id);
+                const priorityClass = project.priority === 'urgent' ? 'urgent' : project.priority === 'high' ? 'priority-high' : '';
+                
+                return `
+                    <div class="task-item ${priorityClass}">
+                        <div class="flex items-center justify-between">
+                            <div class="flex-1">
+                                <div class="font-medium">${project.title}</div>
+                                <div class="text-sm text-gray-600">
+                                    ${project.client} | ${getDesignTypeLabel(project.type)} | ${getDesignStatusLabel(project.status)}
+                                    ${project.dueDate ? ` | 期限: ${new Date(project.dueDate).toLocaleDateString('ja-JP')}` : ''}
+                                </div>
+                                ${project.description ? `<div class="text-sm text-gray-500 mt-1">${project.description}</div>` : ''}
+                            </div>
+                            <div class="flex space-x-2">
+                                <select onchange="updateDesignStatus(${originalIndex}, this.value)" class="text-xs p-1 border rounded">
+                                    <option value="planning" ${project.status === 'planning' ? 'selected' : ''}>企画中</option>
+                                    <option value="designing" ${project.status === 'designing' ? 'selected' : ''}>デザイン中</option>
+                                    <option value="review" ${project.status === 'review' ? 'selected' : ''}>レビュー中</option>
+                                    <option value="completed" ${project.status === 'completed' ? 'selected' : ''}>完了</option>
+                                </select>
+                                <button onclick="deleteDesignProject(${originalIndex})" class="p-2 text-red-500 hover:text-red-700">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function addDesignProject() {
+            const title = document.getElementById('newDesignTitle').value.trim();
+            const type = document.getElementById('newDesignType').value;
+            const priority = document.getElementById('newDesignPriority').value;
+            const dueDate = document.getElementById('newDesignDue').value;
+            const client = document.getElementById('newDesignClient').value.trim();
+            const status = document.getElementById('newDesignStatus').value;
+            const description = document.getElementById('newDesignDescription').value.trim();
+            
+            if (!title || !client) {
+                showNotification('案件名と依頼者を入力してください', 'error');
+                return;
+            }
+            
+            const projects = JSON.parse(localStorage.getItem(STORAGE_KEYS.designProjects) || '[]');
+            const newProject = {
+                id: Date.now(),
+                title,
+                type,
+                priority,
+                dueDate,
+                client,
+                status,
+                description,
+                createdAt: new Date().toISOString()
+            };
+            
+            projects.push(newProject);
+            localStorage.setItem(STORAGE_KEYS.designProjects, JSON.stringify(projects));
+            
+            // フォームクリア
+            document.getElementById('newDesignTitle').value = '';
+            document.getElementById('newDesignClient').value = '';
+            document.getElementById('newDesignDue').value = '';
+            document.getElementById('newDesignDescription').value = '';
+            
+            loadDesignProjects();
+            updateDesignStats();
+            updateAllStats();
+            showNotification('デザイン案件を追加しました', 'success');
+        }
+
+        function updateDesignStatus(index, newStatus) {
+            const projects = JSON.parse(localStorage.getItem(STORAGE_KEYS.designProjects) || '[]');
+            projects[index].status = newStatus;
+            
+            if (newStatus === 'completed') {
+                projects[index].completedAt = new Date().toISOString();
+            }
+            
+            localStorage.setItem(STORAGE_KEYS.designProjects, JSON.stringify(projects));
+            loadDesignProjects();
+            updateDesignStats();
+            updateAllStats();
+        }
+
+        function deleteDesignProject(index) {
+            if (confirm('この案件を削除しますか？')) {
+                const projects = JSON.parse(localStorage.getItem(STORAGE_KEYS.designProjects) || '[]');
+                projects.splice(index, 1);
+                localStorage.setItem(STORAGE_KEYS.designProjects, JSON.stringify(projects));
+                loadDesignProjects();
+                updateDesignStats();
+                updateAllStats();
+                showNotification('案件を削除しました', 'info');
+            }
+        }
+
+        function filterDesignProjects() {
+            loadDesignProjects();
+        }
+
+        function updateDesignStats() {
+            const projects = JSON.parse(localStorage.getItem(STORAGE_KEYS.designProjects) || '[]');
+            
+            const planningCount = projects.filter(p => p.status === 'planning').length;
+            const designingCount = projects.filter(p => p.status === 'designing').length;
+            const reviewCount = projects.filter(p => p.status === 'review').length;
+            const completedCount = projects.filter(p => p.status === 'completed').length;
+            
+            const planningElement = document.getElementById('planningCount');
+            const designingElement = document.getElementById('designingCount');
+            const reviewElement = document.getElementById('reviewCount');
+            const completedElement = document.getElementById('designCompletedCount');
+            
+            if (planningElement) planningElement.textContent = planningCount;
+            if (designingElement) designingElement.textContent = designingCount;
+            if (reviewElement) reviewElement.textContent = reviewCount;
+            if (completedElement) completedElement.textContent = completedCount;
+            
+            // 締切迫る案件
+            const today = new Date();
+            const urgentProjects = projects.filter(project => {
+                if (!project.dueDate || project.status === 'completed') return false;
+                const dueDate = new Date(project.dueDate);
+                const daysUntilDue = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
+                return daysUntilDue <= 3 && daysUntilDue >= 0;
+            });
+            
+            const urgentContainer = document.getElementById('urgentDesignProjects');
+            if (urgentContainer) {
+                if (urgentProjects.length === 0) {
+                    urgentContainer.innerHTML = '<p class="text-gray-500 text-center py-4">締切迫る案件はありません</p>';
+                } else {
+                    urgentContainer.innerHTML = urgentProjects.map(project => `
+                        <div class="p-3 bg-red-50 border border-red-200 rounded-lg">
+                            <div class="font-medium text-sm">${project.title}</div>
+                            <div class="text-xs text-gray-600">${project.client}</div>
+                            <div class="text-xs text-red-600 mt-1">
+                                期限: ${new Date(project.dueDate).toLocaleDateString('ja-JP')}
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            }
+        }
+
+        function getDesignTypeLabel(type) {
+            const labels = {
+                'logo': 'ロゴ',
+                'flyer': 'チラシ',
+                'web': 'Web',
+                'banner': 'バナー',
+                'package': 'パッケージ',
+                'interior': '店舗内装',
+                'other': 'その他'
+            };
+            return labels[type] || 'その他';
+        }
+
+        function getDesignStatusLabel(status) {
+            const labels = {
+                'planning': '企画中',
+                'designing': 'デザイン中',
+                'review': 'レビュー中',
+                'completed': '完了'
+            };
+            return labels[status] || '不明';
+        }
+
+        // 売上分析
+        function uploadSalesData(event) {
+            const file = event.target.files[0];
+            if (!file) {
+                showNotification('ファイルを選択してください', 'error');
+                return;
+            }
+            
+            // Excel(.xlsx)とCSV(.csv)両方に対応
+            if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
+                handleExcelUpload(file);
+            } else if (file.name.endsWith('.csv')) {
+                handleCSVUpload(file);
+            } else {
+                showNotification('Excel(.xlsx)またはCSV(.csv)ファイルを選択してください', 'error');
+            }
+        }
+
+        function handleExcelUpload(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const sheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[sheetName];
+                    
+                    // JSONに変換
+                    const rawData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                    const processedData = processExcelData(rawData);
+                    
+                    localStorage.setItem(STORAGE_KEYS.salesData, JSON.stringify(processedData));
+                    analyzeSalesData(processedData);
+                    showNotification('Excelデータを読み込みました', 'success');
+                } catch (error) {
+                    console.error('Excel読み込みエラー:', error);
+                    showNotification('Excelファイルの読み込みに失敗しました', 'error');
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function handleCSVUpload(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const csv = e.target.result;
+                    const lines = csv.trim().split('\n');
+                    const headers = lines[0].split(',').map(h => h.trim());
+                    
+                    const salesData = lines.slice(1).map(line => {
+                        const values = line.split(',');
+                        const data = {};
+                        headers.forEach((header, index) => {
+                            data[header] = values[index]?.trim() || '';
+                        });
+                        return data;
+                    });
+                    
+                    localStorage.setItem(STORAGE_KEYS.salesData, JSON.stringify(salesData));
+                    analyzeSalesData(salesData);
+                    showNotification('CSVデータを読み込みました', 'success');
+                } catch (error) {
+                    showNotification('CSVファイルの読み込みに失敗しました', 'error');
+                }
+            };
+            reader.readAsText(file, 'UTF-8');
+        }
+
+        function processExcelData(rawData) {
+            if (rawData.length < 2) return [];
+            
+            const headers = rawData[0];
+            const dataRows = rawData.slice(1);
+            
+            return dataRows.map(row => {
+                if (!row[0] || !row[1]) return null;
+                
+                // 日付の処理（Excelシリアル値を日付に変換）
+                let normalizedDate = '';
+                if (row[0]) {
+                    if (typeof row[0] === 'number') {
+                        // Excelシリアル値の場合
+                        const excelDate = new Date((row[0] - 25569) * 86400 * 1000);
+                        normalizedDate = excelDate.toISOString().split('T')[0];
+                    } else if (typeof row[0] === 'string') {
+                        // 文字列形式の場合（6/1など）
+                        const dateStr = row[0].toString();
+                        if (dateStr.includes('/')) {
+                            const parts = dateStr.split('/');
+                            if (parts.length === 2) {
+                                const month = parts[0].padStart(2, '0');
+                                const day = parts[1].padStart(2, '0');
+                                normalizedDate = `2025-${month}-${day}`;
+                            }
+                        }
+                    }
+                }
+                
+                // 売上の処理（カンマ除去、数値化）
+                let salesAmount = 0;
+                if (row[2]) {
+                    const cleanSales = row[2].toString().replace(/,/g, '').replace(/¥/g, '');
+                    salesAmount = parseFloat(cleanSales) || 0;
+                }
+                
+                return {
+                    日付: normalizedDate,
+                    店舗: row[1],
+                    売上: salesAmount,
+                    写メ日記: parseInt(row[3]) || 0,
+                    口コミ: parseInt(row[4]) || 0
+                };
+            }).filter(item => item !== null);
+        }
+
+        function analyzeSalesData(data) {
+            document.getElementById('salesUploadArea').classList.add('hidden');
+            document.getElementById('salesAnalysis').classList.remove('hidden');
+            
+            // グローバル変数に保存
+            currentSalesData = data;
+            
+            // 店舗別統計の計算
+            const storeStats = {};
+            const dateStats = {};
+            let totalSales = 0;
+            let totalDiary = 0;
+            let totalReviews = 0;
+            
+            data.forEach(row => {
+                const store = row.店舗 || row['店舗名'] || row.store || '不明';
+                const sales = parseFloat(row.売上 || row.sales || '0');
+                const diary = parseInt(row.写メ日記 || row.diary || '0');
+                const reviews = parseInt(row.口コミ || row.reviews || '0');
+                const date = row.日付 || row.date || '';
+                
+                // 店舗別集計
+                if (!storeStats[store]) {
+                    storeStats[store] = {
+                        総売上: 0,
+                        総写メ日記: 0,
+                        総口コミ: 0,
+                        日数: 0,
+                        売上データ: []
+                    };
+                }
+                
+                storeStats[store].総売上 += sales;
+                storeStats[store].総写メ日記 += diary;
+                storeStats[store].総口コミ += reviews;
+                storeStats[store].日数++;
+                storeStats[store].売上データ.push({ 日付: date, 売上: sales });
+                
+                // 日付別集計
+                if (date && !dateStats[date]) {
+                    dateStats[date] = { 総売上: 0, 店舗数: 0 };
+                }
+                if (date) {
+                    dateStats[date].総売上 += sales;
+                    dateStats[date].店舗数++;
+                }
+                
+                totalSales += sales;
+                totalDiary += diary;
+                totalReviews += reviews;
+            });
+            
+            // グローバル変数に保存
+            currentStoreStats = storeStats;
+            
+            // 上位店舗の特定
+            const sortedStores = Object.entries(storeStats)
+                .sort(([,a], [,b]) => b.総売上 - a.総売上);
+            const topStore = sortedStores[0] ? sortedStores[0][0] : '不明';
+            
+            // 平均売上の計算
+            const averageSales = data.length > 0 ? totalSales / data.length : 0;
+            
+            // 前月比成長率の計算
+            const growthRate = calculateGrowthRate(dateStats);
+            
+            // 基本統計の表示
+            document.getElementById('totalSales').textContent = `¥${Math.round(totalSales).toLocaleString()}`;
+            document.getElementById('averageSales').textContent = `¥${Math.round(averageSales).toLocaleString()}`;
+            document.getElementById('topStore').textContent = topStore;
+            document.getElementById('growthRate').textContent = `+${growthRate.toFixed(1)}%`;
+            
+            // 店舗セレクターの初期化
+            initializeStoreSelector(storeStats);
+            
+            // チャート表示
+            renderSalesChart(storeStats);
+            
+            // 目標管理との連携
+            updateGoalsWithSalesData();
+        }
+
+        function initializeStoreSelector(storeStats) {
+            const selector = document.getElementById('storeSelector');
+            if (!selector) return;
+            
+            // 既存のオプションをクリア（最初のオプションは残す）
+            while (selector.children.length > 1) {
+                selector.removeChild(selector.lastChild);
+            }
+            
+            // 売上順でソートした店舗を追加
+            const sortedStores = Object.entries(storeStats)
+                .sort(([,a], [,b]) => b.総売上 - a.総売上);
+            
+            sortedStores.forEach(([store, stats], index) => {
+                const option = document.createElement('option');
+                option.value = store;
+                const rank = index + 1;
+                const rankIcon = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';
+                option.textContent = `${rankIcon} ${store} (¥${Math.round(stats.総売上 / stats.日数).toLocaleString()}/日)`;
+                selector.appendChild(option);
+            });
+        }
+
+        function updateGoalsWithSalesData() {
+            // 目標管理タブが表示されている場合は更新
+            if (currentTab === 'goals') {
+                loadGoalProgress();
+            }
+        }
+
+        function calculateGrowthRate(dateStats) {
+            const dates = Object.keys(dateStats).sort();
+            if (dates.length < 7) return 0;
+            
+            const recentWeek = dates.slice(-7);
+            const previousWeek = dates.slice(-14, -7);
+            
+            const recentTotal = recentWeek.reduce((sum, date) => sum + dateStats[date].総売上, 0);
+            const previousTotal = previousWeek.reduce((sum, date) => sum + dateStats[date].総売上, 0);
+            
+            if (previousTotal === 0) return 0;
+            return ((recentTotal - previousTotal) / previousTotal) * 100;
+        }
+
+        function renderSalesChart(storeData) {
+            const canvas = document.getElementById('salesChart');
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            const stores = Object.keys(storeData);
+            const sales = Object.values(storeData).map(store => store.総売上);
+            
+            // キャンバスクリア
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // 簡易棒グラフ
+            const maxSales = Math.max(...sales);
+            const barWidth = Math.max(20, (canvas.width - 40) / stores.length - 10);
+            const barHeight = canvas.height - 60;
+            
+            stores.forEach((store, index) => {
+                const x = index * (barWidth + 10) + 20;
+                const height = (sales[index] / maxSales) * barHeight;
+                const y = canvas.height - height - 40;
+                
+                // バー描画
+                ctx.fillStyle = `hsl(${index * 30}, 70%, 50%)`;
+                ctx.fillRect(x, y, barWidth, height);
+                
+                // 店舗名
+                ctx.fillStyle = '#333';
+                ctx.font = '10px Arial';
+                ctx.save();
+                ctx.translate(x + barWidth/2, canvas.height - 20);
+                ctx.rotate(-Math.PI/4);
+                ctx.textAlign = 'right';
+                ctx.fillText(store.length > 8 ? store.substring(0, 6) + '...' : store, 0, 0);
+                ctx.restore();
+                
+                // 売上金額
+                ctx.fillStyle = '#333';
+                ctx.font = '8px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(`¥${Math.round(sales[index]/1000)}K`, x + barWidth/2, y - 5);
+            });
+        }
+
+        function downloadSalesTemplate() {
+            const templateData = [
+                ['日付', '店舗名', '売上', '写メ日記', '口コミ'],
+                ['2025-06-01', 'CLASSY東京', '150000', '25', '3'],
+                ['2025-06-01', 'CLASSY名古屋', '120000', '20', '2'],
+                ['2025-06-02', 'CLASSY東京', '180000', '30', '4']
+            ];
+            
+            const csv = templateData.map(row => row.join(',')).join('\n');
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = '売上データテンプレート.csv';
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showNotification('テンプレートをダウンロードしました', 'success');
+        }
+
+        function loadSampleData() {
+            // アップロードされたExcelファイルの実際のデータをサンプルとして使用
+            const sampleData = [
+                { 日付: '2025-06-01', 店舗: 'CLASSY四日市', 売上: 475000, 写メ日記: 228, 口コミ: 7 },
+                { 日付: '2025-06-01', 店舗: 'CLASSY東京', 売上: 81900, 写メ日記: 44, 口コミ: 0 },
+                { 日付: '2025-06-01', 店舗: 'CLASSY名古屋', 売上: 122564, 写メ日記: 48, 口コミ: 3 },
+                { 日付: '2025-06-01', 店舗: 'GrandOpera東京', 売上: 765860, 写メ日記: 129, 口コミ: 9 },
+                { 日付: '2025-06-01', 店舗: 'GrandOpera横浜', 売上: 678500, 写メ日記: 152, 口コミ: 2 },
+                { 日付: '2025-06-01', 店舗: 'GrandOpera名古屋', 売上: 713800, 写メ日記: 128, 口コミ: 12 },
+                { 日付: '2025-06-01', 店舗: 'GrandOpera福岡', 売上: 1130380, 写メ日記: 267, 口コミ: 8 },
+                { 日付: '2025-06-01', 店舗: 'オペラ錦', 売上: 102900, 写メ日記: 46, 口コミ: 6 },
+                { 日付: '2025-06-01', 店舗: 'シャブール', 売上: 702640, 写メ日記: 232, 口コミ: 13 },
+                { 日付: '2025-06-01', 店舗: 'ワンカラット', 売上: 520000, 写メ日記: 180, 口コミ: 5 },
+                // 30日分のデータをシミュレート
+                ...Array.from({ length: 290 }, (_, i) => {
+                    const date = new Date('2025-06-02');
+                    date.setDate(date.getDate() + Math.floor(i / 10));
+                    const stores = ['CLASSY四日市', 'CLASSY東京', 'CLASSY名古屋', 'GrandOpera東京', 'GrandOpera横浜', 'GrandOpera名古屋', 'GrandOpera福岡', 'オペラ錦', 'シャブール', 'ワンカラット'];
+                    const store = stores[i % 10];
+                    const baseStats = {
+                        'CLASSY四日市': { base: 220000, diary: 103, reviews: 4.2 },
+                        'CLASSY東京': { base: 112000, diary: 31, reviews: 2.1 },
+                        'CLASSY名古屋': { base: 61000, diary: 21, reviews: 1.4 },
+                        'GrandOpera東京': { base: 538000, diary: 73, reviews: 2.4 },
+                        'GrandOpera横浜': { base: 413000, diary: 84, reviews: 2.2 },
+                        'GrandOpera名古屋': { base: 511000, diary: 53, reviews: 4.0 },
+                        'GrandOpera福岡': { base: 677000, diary: 139, reviews: 3.7 },
+                        'オペラ錦': { base: 58000, diary: 30, reviews: 1.8 },
+                        'シャブール': { base: 499000, diary: 119, reviews: 6.5 },
+                        'ワンカラット': { base: 323000, diary: 156, reviews: 3.3 }
+                    };
+                    
+                    const stats = baseStats[store];
+                    const variation = 0.8 + Math.random() * 0.4; // ±20%の変動
+                    
+                    return {
+                        日付: date.toISOString().split('T')[0],
+                        店舗: store,
+                        売上: Math.round(stats.base * variation),
+                        写メ日記: Math.round(stats.diary * variation),
+                        口コミ: Math.round(stats.reviews * variation)
+                    };
+                })
+            ];
+            
+            localStorage.setItem(STORAGE_KEYS.salesData, JSON.stringify(sampleData));
+            analyzeSalesData(sampleData);
+            showNotification('業務管理データ（サンプル30日分）を読み込みました', 'success');
+        }
+
+        // 目標管理 - 修正版
+        function initGoalSettings() {
+            const container = document.getElementById('goalSettings');
+            if (!container) return;
+            
+            const currentMonth = document.getElementById('goalMonth').value;
+            
+            container.innerHTML = STORES.map(store => `
+                <div class="p-4 border border-gray-200 rounded-lg hover:border-blue-300 transition-colors">
+                    <h5 class="font-semibold mb-3 flex items-center">
+                        <i class="fas fa-store mr-2 text-blue-600"></i>${store.name}
+                        <span id="storeRanking_${store.id}" class="ml-2 text-sm text-gray-500"></span>
+                    </h5>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div>
+                            <label class="block text-sm text-gray-600 mb-1">
+                                売上目標 <span class="text-xs text-gray-400">(月額・円)</span>
+                            </label>
+                            <input type="number" id="sales_${store.id}" class="input-field" placeholder="例: 3000000">
+                            <div id="salesSuggestion_${store.id}" class="text-xs text-blue-600 mt-1"></div>
+                        </div>
+                        <div>
+                            <label class="block text-sm text-gray-600 mb-1">
+                                写メ日記目標 <span class="text-xs text-gray-400">(月合計・件数)</span>
+                            </label>
+                            <input type="number" id="diary_${store.id}" class="input-field" placeholder="例: 900">
+                            <div id="diarySuggestion_${store.id}" class="text-xs text-blue-600 mt-1"></div>
+                        </div>
+                        <div>
+                            <label class="block text-sm text-gray-600 mb-1">
+                                口コミ目標 <span class="text-xs text-gray-400">(月合計・件数)</span>
+                            </label>
+                            <input type="number" id="review_${store.id}" class="input-field" placeholder="例: 45">
+                            <div id="reviewSuggestion_${store.id}" class="text-xs text-blue-600 mt-1"></div>
+                        </div>
+                    </div>
+                    <div class="mt-3 text-xs text-gray-500 bg-gray-50 p-2 rounded">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        売上・写メ日記・口コミすべて月合計で設定してください
+                    </div>
+                </div>
+            `).join('');
+            
+            // 既存の目標データを読み込み
+            loadExistingGoals(currentMonth);
+            
+            // 実績ベースの推奨値を表示
+            showGoalSuggestions();
+        }
+
+        function loadExistingGoals(month) {
+            const goals = JSON.parse(localStorage.getItem(STORAGE_KEYS.goals) || '{}');
+            const monthGoals = goals[month] || {};
+            
+            STORES.forEach(store => {
+                const storeGoals = monthGoals[store.id] || {};
+                const salesInput = document.getElementById(`sales_${store.id}`);
+                const diaryInput = document.getElementById(`diary_${store.id}`);
+                const reviewInput = document.getElementById(`review_${store.id}`);
+                
+                if (salesInput) salesInput.value = storeGoals.sales || '';
+                if (diaryInput) diaryInput.value = storeGoals.diary || '';
+                if (reviewInput) reviewInput.value = storeGoals.review || '';
+            });
+        }
+
+        function showGoalSuggestions() {
+            if (!currentSalesData || currentSalesData.length === 0) return;
+            
+            // 直近30日のデータから推奨値を計算
+            const thirtyDaysAgo = new Date();
+            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+            
+            STORES.forEach(store => {
+                const storeMapping = {
+                    'classy_tokyo': 'CLASSY東京',
+                    'classy_nagoya': 'CLASSY名古屋', 
+                    'classy_yokkaichi': 'CLASSY四日市',
+                    'grandopera_tokyo': 'GrandOpera東京',
+                    'grandopera_yokohama': 'GrandOpera横浜',
+                    'grandopera_nagoya': 'GrandOpera名古屋',
+                    'grandopera_fukuoka': 'GrandOpera福岡',
+                    'wancarat': 'ワンカラット',
+                    'shabour': 'シャブール',
+                    'opera_nishiki': 'オペラ錦'
+                };
+                
+                const targetStoreName = storeMapping[store.id];
+                const storeData = currentSalesData.filter(row => 
+                    (row.店舗 || row.店舗名) === targetStoreName
+                );
+                
+                if (storeData.length > 0) {
+                    const totalSales = storeData.reduce((sum, row) => sum + (row.売上 || 0), 0);
+                    const totalDiary = storeData.reduce((sum, row) => sum + (row.写メ日記 || 0), 0);
+                    const totalReviews = storeData.reduce((sum, row) => sum + (row.口コミ || 0), 0);
+                    
+                    // 成長率を考慮した推奨値（5%向上を目標）
+                    const recommendedSales = Math.round(totalSales * 1.05);
+                    const recommendedDiary = Math.round(totalDiary * 1.05);
+                    const recommendedReviews = Math.round(totalReviews * 1.05);
+                    
+                    // ランキング表示
+                    if (currentStoreStats[targetStoreName]) {
+                        const sortedStores = Object.entries(currentStoreStats)
+                            .sort(([,a], [,b]) => b.総売上 - a.総売上);
+                        const rank = sortedStores.findIndex(([storeName,]) => storeName === targetStoreName) + 1;
+                        const rankElement = document.getElementById(`storeRanking_${store.id}`);
+                        if (rankElement) {
+                            const rankIcon = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`;
+                            rankElement.textContent = `${rankIcon} 現在${rank}位`;
+                        }
+                    }
+                    
+                    // 推奨値表示
+                    const salesSuggestion = document.getElementById(`salesSuggestion_${store.id}`);
+                    const diarySuggestion = document.getElementById(`diarySuggestion_${store.id}`);
+                    const reviewSuggestion = document.getElementById(`reviewSuggestion_${store.id}`);
+                    
+                    if (salesSuggestion) salesSuggestion.textContent = `推奨: ¥${recommendedSales.toLocaleString()} (+5%)`;
+                    if (diarySuggestion) diarySuggestion.textContent = `推奨: ${recommendedDiary}件/月 (+5%)`;
+                    if (reviewSuggestion) reviewSuggestion.textContent = `推奨: ${recommendedReviews}件/月 (+5%)`;
+                }
+            });
+        }
+
+        function copyPreviousMonthGoals() {
+            const currentMonth = document.getElementById('goalMonth').value;
+            const prevMonth = new Date(currentMonth + '-01');
+            prevMonth.setMonth(prevMonth.getMonth() - 1);
+            const prevMonthString = prevMonth.toISOString().substr(0, 7);
+            
+            const goals = JSON.parse(localStorage.getItem(STORAGE_KEYS.goals) || '{}');
+            const prevMonthGoals = goals[prevMonthString];
+            
+            if (!prevMonthGoals) {
+                showNotification('前月の目標データが見つかりません', 'warning');
+                return;
+            }
+            
+            STORES.forEach(store => {
+                const storeGoals = prevMonthGoals[store.id] || {};
+                const salesInput = document.getElementById(`sales_${store.id}`);
+                const diaryInput = document.getElementById(`diary_${store.id}`);
+                const reviewInput = document.getElementById(`review_${store.id}`);
+                
+                if (salesInput) salesInput.value = storeGoals.sales || '';
+                if (diaryInput) diaryInput.value = storeGoals.diary || '';
+                if (reviewInput) reviewInput.value = storeGoals.review || '';
+            });
+            
+            showNotification('前月の目標をコピーしました', 'success');
+        }
+
+        function saveGoals() {
+            const month = document.getElementById('goalMonth').value;
+            const goals = JSON.parse(localStorage.getItem(STORAGE_KEYS.goals) || '{}');
+            
+            if (!goals[month]) {
+                goals[month] = {};
+            }
+            
+            STORES.forEach(store => {
+                const sales = document.getElementById(`sales_${store.id}`).value;
+                const diary = document.getElementById(`diary_${store.id}`).value;
+                const review = document.getElementById(`review_${store.id}`).value;
+                
+                goals[month][store.id] = {
+                    sales: sales ? parseInt(sales) : 0,
+                    diary: diary ? parseInt(diary) : 0,
+                    review: review ? parseInt(review) : 0
+                };
+            });
+            
+            localStorage.setItem(STORAGE_KEYS.goals, JSON.stringify(goals));
+            loadGoalProgress();
+            showNotification('目標を保存しました', 'success');
+        }
+
+        function refreshGoalData() {
+            loadGoalProgress();
+            showNotification('目標データを更新しました', 'info');
+        }
+
+        function loadGoalProgress() {
+            const month = document.getElementById('goalMonth').value;
+            const goals = JSON.parse(localStorage.getItem(STORAGE_KEYS.goals) || '{}');
+            const monthGoals = goals[month] || {};
+            
+            const container = document.getElementById('goalProgress');
+            if (!container) return;
+            
+            const salesData = JSON.parse(localStorage.getItem(STORAGE_KEYS.salesData) || '[]');
+            const viewMode = document.getElementById('goalViewMode')?.value || 'overview';
+            
+            let totalSalesGoal = 0, totalSalesActual = 0;
+            let totalDiaryGoal = 0, totalDiaryActual = 0;
+            let totalReviewGoal = 0, totalReviewActual = 0;
+            let storeCount = 0;
+            
+            const storeResults = STORES.map(store => {
+                const storeGoals = monthGoals[store.id] || {};
+                const currentSales = calculateCurrentSales(salesData, store.id, month);
+                const currentDiary = calculateCurrentDiary(salesData, store.id, month);
+                const currentReviews = calculateCurrentReviews(salesData, store.id, month);
+                
+                const salesProgress = storeGoals.sales > 0 ? (currentSales / storeGoals.sales) * 100 : 0;
+                const diaryProgress = storeGoals.diary > 0 ? (currentDiary / storeGoals.diary) * 100 : 0;
+                const reviewsProgress = storeGoals.review > 0 ? (currentReviews / storeGoals.review) * 100 : 0;
+                
+                const overallProgress = (salesProgress + diaryProgress + reviewsProgress) / 3;
+                
+                // 全体統計に加算
+                totalSalesGoal += storeGoals.sales || 0;
+                totalSalesActual += currentSales;
+                totalDiaryGoal += storeGoals.diary || 0;
+                totalDiaryActual += currentDiary;
+                totalReviewGoal += storeGoals.review || 0;
+                totalReviewActual += currentReviews;
+                storeCount++;
+                
+                return {
+                    store,
+                    storeGoals,
+                    currentSales,
+                    currentDiary,
+                    currentReviews,
+                    salesProgress,
+                    diaryProgress,
+                    reviewsProgress,
+                    overallProgress
+                };
+            });
+            
+            // 全体達成率を更新
+            const overallSalesAchievement = totalSalesGoal > 0 ? Math.round((totalSalesActual / totalSalesGoal) * 100) : 0;
+            const overallDiaryAchievement = totalDiaryGoal > 0 ? Math.round((totalDiaryActual / totalDiaryGoal) * 100) : 0;
+            const overallReviewAchievement = totalReviewGoal > 0 ? Math.round((totalReviewActual / totalReviewGoal) * 100) : 0;
+            
+            document.getElementById('overallSalesAchievement').textContent = `${overallSalesAchievement}%`;
+            document.getElementById('overallDiaryAchievement').textContent = `${overallDiaryAchievement}%`;
+            document.getElementById('overallReviewAchievement').textContent = `${overallReviewAchievement}%`;
+            
+            // 店舗別進捗表示
+            if (viewMode === 'overview') {
+                container.innerHTML = storeResults.map(result => {
+                    const {store, storeGoals, currentSales, currentDiary, currentReviews, salesProgress, diaryProgress, reviewsProgress, overallProgress} = result;
+                    
+                    // 写メ日記は日平均で表示
+                    const avgDiary = storeGoals.diary > 0 ? Math.round(storeGoals.diary / 30 * 10) / 10 : 0;
+                    const currentAvgDiary = Math.round(currentDiary / 30 * 10) / 10;
+                    
+                    return `
+                        <div class="p-4 border border-gray-200 rounded-lg ${overallProgress >= 100 ? 'bg-green-50 border-green-200' : overallProgress >= 80 ? 'bg-yellow-50 border-yellow-200' : 'bg-red-50 border-red-200'}">
+                            <div class="flex justify-between items-center mb-3">
+                                <h6 class="font-medium">${store.name}</h6>
+                                <span class="text-sm font-bold ${overallProgress >= 100 ? 'text-green-600' : overallProgress >= 80 ? 'text-yellow-600' : 'text-red-600'}">
+                                    ${Math.round(overallProgress)}%
+                                </span>
+                            </div>
+                            <div class="grid grid-cols-3 gap-3 text-sm">
+                                <div class="text-center">
+                                    <div class="font-medium text-blue-600">売上</div>
+                                    <div class="text-xs text-gray-600">¥${currentSales.toLocaleString()}</div>
+                                    <div class="text-xs text-gray-500">/ ¥${storeGoals.sales?.toLocaleString() || 0}</div>
+                                    <div class="${salesProgress >= 100 ? 'text-green-600' : salesProgress >= 80 ? 'text-yellow-600' : 'text-red-600'} font-bold">
+                                        ${Math.round(salesProgress)}%
+                                    </div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="font-medium text-purple-600">写メ日記</div>
+                                    <div class="text-xs text-gray-600">${currentAvgDiary}件/日</div>
+                                    <div class="text-xs text-gray-500">/ ${avgDiary}件/日</div>
+                                    <div class="${diaryProgress >= 100 ? 'text-green-600' : diaryProgress >= 80 ? 'text-yellow-600' : 'text-red-600'} font-bold">
+                                        ${Math.round(diaryProgress)}%
+                                    </div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="font-medium text-orange-600">口コミ</div>
+                                    <div class="text-xs text-gray-600">${currentReviews}件/月</div>
+                                    <div class="text-xs text-gray-500">/ ${storeGoals.review || 0}件/月</div>
+                                    <div class="${reviewsProgress >= 100 ? 'text-green-600' : reviewsProgress >= 80 ? 'text-yellow-600' : 'text-red-600'} font-bold">
+                                        ${Math.round(reviewsProgress)}%
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                // 詳細表示
+                container.innerHTML = storeResults.map(result => {
+                    const {store, storeGoals, currentSales, currentDiary, currentReviews, salesProgress, diaryProgress, reviewsProgress, overallProgress} = result;
+                    
+                    return `
+                        <div class="p-4 border border-gray-200 rounded-lg ${overallProgress >= 100 ? 'bg-green-50 border-green-200' : overallProgress >= 80 ? 'bg-yellow-50 border-yellow-200' : 'bg-red-50 border-red-200'}">
+                            <div class="flex justify-between items-center mb-3">
+                                <h6 class="font-medium">${store.name}</h6>
+                                <span class="text-sm font-bold ${overallProgress >= 100 ? 'text-green-600' : overallProgress >= 80 ? 'text-yellow-600' : 'text-red-600'}">
+                                    総合 ${Math.round(overallProgress)}%
+                                </span>
+                            </div>
+                            <div class="space-y-3">
+                                <!-- 売上進捗 -->
+                                <div>
+                                    <div class="flex justify-between text-sm mb-1">
+                                        <span>売上目標</span>
+                                        <span>¥${currentSales.toLocaleString()} / ¥${storeGoals.sales?.toLocaleString() || 0}</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="bg-blue-500 h-2 rounded-full" style="width: ${Math.min(salesProgress, 100)}%"></div>
+                                    </div>
+                                    <div class="text-xs text-gray-600 mt-1 flex justify-between">
+                                        <span>${Math.round(salesProgress)}% 達成</span>
+                                        <span>残り: ¥${Math.max(0, (storeGoals.sales || 0) - currentSales).toLocaleString()}</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- 写メ日記進捗 -->
+                                <div>
+                                    <div class="flex justify-between text-sm mb-1">
+                                        <span>写メ日記目標 (月合計)</span>
+                                        <span>${currentDiary} / ${storeGoals.diary || 0}件/月</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="bg-purple-500 h-2 rounded-full" style="width: ${Math.min(diaryProgress, 100)}%"></div>
+                                    </div>
+                                    <div class="text-xs text-gray-600 mt-1 flex justify-between">
+                                        <span>${Math.round(diaryProgress)}% 達成</span>
+                                        <span>差: ${currentDiary - (storeGoals.diary || 0)}件/月</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- 口コミ進捗 -->
+                                <div>
+                                    <div class="flex justify-between text-sm mb-1">
+                                        <span>口コミ目標 (月合計)</span>
+                                        <span>${currentReviews} / ${storeGoals.review || 0}件/月</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="bg-green-500 h-2 rounded-full" style="width: ${Math.min(reviewsProgress, 100)}%"></div>
+                                    </div>
+                                    <div class="text-xs text-gray-600 mt-1 flex justify-between">
+                                        <span>${Math.round(reviewsProgress)}% 達成</span>
+                                        <span>差: ${currentReviews - (storeGoals.review || 0)}件/月</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+            
+            // チャートとアクションプランを更新
+            renderGoalAchievementChart(storeResults);
+            generateGoalActionPlan(storeResults);
+        }
+
+        function renderGoalAchievementChart(storeResults) {
+            const canvas = document.getElementById('goalAchievementChart');
+            if (!canvas || storeResults.length === 0) return;
+            
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const chartWidth = canvas.width - 100;
+            const chartHeight = canvas.height - 80;
+            
+            // 軸の描画
+            ctx.strokeStyle = '#e5e7eb';
+            ctx.lineWidth = 1;
+            
+            // Y軸
+            ctx.beginPath();
+            ctx.moveTo(60, 20);
+            ctx.lineTo(60, chartHeight + 20);
+            ctx.stroke();
+            
+            // X軸
+            ctx.beginPath();
+            ctx.moveTo(60, chartHeight + 20);
+            ctx.lineTo(chartWidth + 60, chartHeight + 20);
+            ctx.stroke();
+            
+            // データバーの描画
+            const barWidth = chartWidth / storeResults.length - 10;
+            
+            storeResults.forEach((result, index) => {
+                const x = 60 + index * (barWidth + 10) + 5;
+                const salesHeight = (result.salesProgress / 100) * (chartHeight / 3);
+                const diaryHeight = (result.diaryProgress / 100) * (chartHeight / 3);
+                const reviewHeight = (result.reviewsProgress / 100) * (chartHeight / 3);
+                
+                // 売上バー（青）
+                ctx.fillStyle = '#3b82f6';
+                ctx.fillRect(x, chartHeight + 20 - salesHeight, barWidth / 3 - 2, salesHeight);
+                
+                // 写メ日記バー（紫）
+                ctx.fillStyle = '#8b5cf6';
+                ctx.fillRect(x + barWidth / 3, chartHeight + 20 - diaryHeight, barWidth / 3 - 2, diaryHeight);
+                
+                // 口コミバー（緑）
+                ctx.fillStyle = '#10b981';
+                ctx.fillRect(x + (barWidth / 3) * 2, chartHeight + 20 - reviewHeight, barWidth / 3 - 2, reviewHeight);
+                
+                // 店舗名ラベル
+                ctx.fillStyle = '#374151';
+                ctx.font = '10px Arial';
+                ctx.textAlign = 'center';
+                ctx.save();
+                ctx.translate(x + barWidth / 2, chartHeight + 40);
+                ctx.rotate(-Math.PI / 4);
+                ctx.fillText(result.store.name, 0, 0);
+                ctx.restore();
+            });
+            
+            // Y軸ラベル
+            ctx.fillStyle = '#374151';
+            ctx.font = '12px Arial';
+            ctx.textAlign = 'right';
+            for (let i = 0; i <= 4; i++) {
+                const y = chartHeight + 20 - (i / 4) * chartHeight;
+                ctx.fillText(`${i * 25}%`, 55, y + 3);
+            }
+            
+            // 凡例
+            ctx.font = '12px Arial';
+            ctx.textAlign = 'left';
+            ctx.fillStyle = '#3b82f6';
+            ctx.fillRect(chartWidth - 150, 30, 12, 12);
+            ctx.fillStyle = '#374151';
+            ctx.fillText('売上', chartWidth - 130, 41);
+            
+            ctx.fillStyle = '#8b5cf6';
+            ctx.fillRect(chartWidth - 150, 50, 12, 12);
+            ctx.fillStyle = '#374151';
+            ctx.fillText('写メ日記', chartWidth - 130, 61);
+            
+            ctx.fillStyle = '#10b981';
+            ctx.fillRect(chartWidth - 150, 70, 12, 12);
+            ctx.fillStyle = '#374151';
+            ctx.fillText('口コミ', chartWidth - 130, 81);
+        }
+
+        function generateGoalActionPlan(storeResults) {
+            const container = document.getElementById('goalActionPlan');
+            if (!container) return;
+            
+            const plans = [];
+            
+            // 低達成率店舗への提案
+            const lowPerformers = storeResults.filter(result => result.overallProgress < 80);
+            lowPerformers.forEach(result => {
+                plans.push({
+                    type: 'warning',
+                    title: `${result.store.name} - 目標達成率向上が必要`,
+                    description: `現在${Math.round(result.overallProgress)}%。80%以上を目指しましょう。`,
+                    actions: [
+                        result.salesProgress < 80 ? '売上向上施策の実施' : null,
+                        result.diaryProgress < 80 ? '写メ日記投稿増加施策' : null,
+                        result.reviewsProgress < 80 ? '口コミ獲得強化' : null
+                    ].filter(Boolean)
+                });
+            });
+            
+            // 高達成率店舗の称賛
+            const topPerformers = storeResults.filter(result => result.overallProgress >= 100);
+            if (topPerformers.length > 0) {
+                plans.push({
+                    type: 'success',
+                    title: '目標達成おめでとうございます！',
+                    description: `${topPerformers.map(r => r.store.name).join('、')}が目標を達成しました。`,
+                    actions: [
+                        '成功要因の分析と文書化',
+                        '他店舗への成功事例共有',
+                        '次月目標の上方修正検討'
+                    ]
+                });
+            }
+            
+            // 全体的な改善提案
+            const avgProgress = storeResults.reduce((sum, result) => sum + result.overallProgress, 0) / storeResults.length;
+            if (avgProgress < 90) {
+                plans.push({
+                    type: 'info',
+                    title: '全体的な目標達成率向上施策',
+                    description: `全体平均${Math.round(avgProgress)}%。組織全体での取り組みが必要です。`,
+                    actions: [
+                        '月次目標の見直し（現実的な設定）',
+                        '店舗間での情報共有強化',
+                        'インセンティブ制度の検討',
+                        '定期的な進捗確認会議の実施'
+                    ]
+                });
+            }
+            
+            container.innerHTML = plans.map(plan => `
+                <div class="border border-${getActionPlanColor(plan.type)}-200 bg-${getActionPlanColor(plan.type)}-50 rounded-lg p-4">
+                    <div class="flex items-start">
+                        <i class="fas fa-${getActionPlanIcon(plan.type)} text-${getActionPlanColor(plan.type)}-600 mr-3 mt-1"></i>
+                        <div class="flex-1">
+                            <h6 class="font-medium text-${getActionPlanColor(plan.type)}-800 mb-2">${plan.title}</h6>
+                            <p class="text-sm text-gray-700 mb-3">${plan.description}</p>
+                            <ul class="text-sm text-gray-600 space-y-1">
+                                ${plan.actions.map(action => `<li class="flex items-center"><i class="fas fa-arrow-right text-xs mr-2"></i>${action}</li>`).join('')}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function generateGoalReport() {
+            const month = document.getElementById('goalMonth').value;
+            const goals = JSON.parse(localStorage.getItem(STORAGE_KEYS.goals) || '{}');
+            const monthGoals = goals[month] || {};
+            const salesData = JSON.parse(localStorage.getItem(STORAGE_KEYS.salesData) || '[]');
+            
+            const reportData = {
+                対象月: month,
+                生成日時: new Date().toLocaleString('ja-JP'),
+                店舗別目標達成状況: {}
+            };
+            
+            STORES.forEach(store => {
+                const storeGoals = monthGoals[store.id] || {};
+                const currentSales = calculateCurrentSales(salesData, store.id, month);
+                const currentDiary = calculateCurrentDiary(salesData, store.id, month);
+                const currentReviews = calculateCurrentReviews(salesData, store.id, month);
+                
+                reportData.店舗別目標達成状況[store.name] = {
+                    売上: {
+                        目標: storeGoals.sales || 0,
+                        実績: currentSales,
+                        達成率: storeGoals.sales > 0 ? Math.round((currentSales / storeGoals.sales) * 100) : 0
+                    },
+                    写メ日記: {
+                        目標: storeGoals.diary || 0,
+                        実績: currentDiary,
+                        達成率: storeGoals.diary > 0 ? Math.round((currentDiary / storeGoals.diary) * 100) : 0
+                    },
+                    口コミ: {
+                        目標: storeGoals.review || 0,
+                        実績: currentReviews,
+                        達成率: storeGoals.review > 0 ? Math.round((currentReviews / storeGoals.review) * 100) : 0
+                    }
+                };
+            });
+            
+            const reportText = JSON.stringify(reportData, null, 2);
+            const blob = new Blob([reportText], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `目標管理レポート_${month}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showNotification('目標管理レポートを生成しました', 'success');
+        }
+
+        function calculateCurrentSales(salesData, storeId, month) {
+            const storeName = STORES.find(s => s.id === storeId)?.name || storeId;
+            
+            // 店舗名のマッピング（Excel内の表記と統一）
+            const storeMapping = {
+                'classy_tokyo': 'CLASSY東京',
+                'classy_nagoya': 'CLASSY名古屋', 
+                'classy_yokkaichi': 'CLASSY四日市',
+                'grandopera_tokyo': 'GrandOpera東京',
+                'grandopera_yokohama': 'GrandOpera横浜',
+                'grandopera_nagoya': 'GrandOpera名古屋',
+                'grandopera_fukuoka': 'GrandOpera福岡',
+                'wancarat': 'ワンカラット',
+                'shabour': 'シャブール',
+                'opera_nishiki': 'オペラ錦'
+            };
+            
+            const targetStoreName = storeMapping[storeId] || storeName;
+            
+            return salesData
+                .filter(row => {
+                    const date = row['日付'] || row['date'] || row.日付 || '';
+                    const store = row['店舗名'] || row['店舗'] || row['store'] || row.店舗 || '';
+                    return date.includes(month) && store === targetStoreName;
+                })
+                .reduce((sum, row) => {
+                    const sales = parseFloat(row['売上'] || row['sales'] || row.売上 || '0');
+                    return sum + sales;
+                }, 0);
+        }
+
+        function calculateCurrentDiary(salesData, storeId, month) {
+            const storeMapping = {
+                'classy_tokyo': 'CLASSY東京',
+                'classy_nagoya': 'CLASSY名古屋', 
+                'classy_yokkaichi': 'CLASSY四日市',
+                'grandopera_tokyo': 'GrandOpera東京',
+                'grandopera_yokohama': 'GrandOpera横浜',
+                'grandopera_nagoya': 'GrandOpera名古屋',
+                'grandopera_fukuoka': 'GrandOpera福岡',
+                'wancarat': 'ワンカラット',
+                'shabour': 'シャブール',
+                'opera_nishiki': 'オペラ錦'
+            };
+            
+            const targetStoreName = storeMapping[storeId];
+            const storeData = salesData.filter(row => {
+                const date = row['日付'] || row['date'] || row.日付 || '';
+                const store = row['店舗名'] || row['店舗'] || row['store'] || row.店舗 || '';
+                return date.includes(month) && store === targetStoreName;
+            });
+            
+            if (storeData.length === 0) return 0;
+            
+            const totalDiary = storeData.reduce((sum, row) => {
+                const diary = parseInt(row['写メ日記'] || row['diary'] || row.写メ日記 || '0');
+                return sum + diary;
+            }, 0);
+            
+            // 月合計を返す
+            return totalDiary;
+        }
+
+        function calculateCurrentReviews(salesData, storeId, month) {
+            const storeMapping = {
+                'classy_tokyo': 'CLASSY東京',
+                'classy_nagoya': 'CLASSY名古屋', 
+                'classy_yokkaichi': 'CLASSY四日市',
+                'grandopera_tokyo': 'GrandOpera東京',
+                'grandopera_yokohama': 'GrandOpera横浜',
+                'grandopera_nagoya': 'GrandOpera名古屋',
+                'grandopera_fukuoka': 'GrandOpera福岡',
+                'wancarat': 'ワンカラット',
+                'shabour': 'シャブール',
+                'opera_nishiki': 'オペラ錦'
+            };
+            
+            const targetStoreName = storeMapping[storeId];
+            const storeData = salesData.filter(row => {
+                const date = row['日付'] || row['date'] || row.日付 || '';
+                const store = row['店舗名'] || row['店舗'] || row['store'] || row.店舗 || '';
+                return date.includes(month) && store === targetStoreName;
+            });
+            
+            if (storeData.length === 0) return 0;
+            
+            const totalReviews = storeData.reduce((sum, row) => {
+                const reviews = parseInt(row['口コミ'] || row['reviews'] || row.口コミ || '0');
+                return sum + reviews;
+            }, 0);
+            
+            // 月合計を返す
+            return totalReviews;
+        }
+
+        // 共通関数
+        function getActionPlanColor(type) {
+            const colors = {
+                'warning': 'yellow',
+                'info': 'blue',
+                'success': 'green'
+            };
+            return colors[type] || 'gray';
+        }
+
+        function getActionPlanIcon(type) {
+            const icons = {
+                'warning': 'exclamation-triangle',
+                'info': 'info-circle',
+                'success': 'check-circle'
+            };
+            return icons[type] || 'info-circle';
+        }
+
+        // プロンプト管理
+        function loadPrompts() {
+            const prompts = JSON.parse(localStorage.getItem(STORAGE_KEYS.prompts) || '[]');
+            const promptList = document.getElementById('promptList');
+            if (!promptList) return;
+            
+            const filteredPrompts = currentPromptCategory === 'all' ? 
+                prompts : 
+                prompts.filter(p => p.category === currentPromptCategory);
+            
+            if (filteredPrompts.length === 0) {
+                promptList.innerHTML = '<div class="text-center py-4 text-gray-500">プロンプトがありません</div>';
+                return;
+            }
+            
+            promptList.innerHTML = filteredPrompts.map((prompt, index) => {
+                const originalIndex = prompts.findIndex(p => p.id === prompt.id);
+                return `
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <button onclick="copyPrompt('${prompt.text.replace(/'/g, "\\'")}', '${prompt.label}')" 
+                                class="btn btn-primary flex-1 mr-3 text-sm">
+                            <i class="fas fa-copy mr-2"></i>${prompt.label}
+                        </button>
+                        <span class="text-xs text-gray-500 px-2 py-1 bg-white rounded mr-2">
+                            ${getPromptCategoryLabel(prompt.category)}
+                        </span>
+                        <button onclick="deletePrompt(${originalIndex})" 
+                                class="text-red-500 hover:text-red-700 p-1">
+                            <i class="fas fa-trash text-sm"></i>
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function switchPromptCategory(category) {
+            currentPromptCategory = category;
+            document.querySelectorAll('#promptCategoryTabs .nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelector(`[data-category="${category}"]`).classList.add('active');
+            loadPrompts();
+        }
+
+        function addPrompt() {
+            const category = document.getElementById('newPromptCategory').value;
+            const label = document.getElementById('newPromptLabel').value.trim();
+            const text = document.getElementById('newPromptText').value.trim();
+            
+            if (!label || !text) {
+                showNotification('ボタン名とプロンプト内容を入力してください', 'error');
+                return;
+            }
+            
+            const prompts = JSON.parse(localStorage.getItem(STORAGE_KEYS.prompts) || '[]');
+            const newPrompt = {
+                id: Date.now(),
+                label,
+                text,
+                category,
+                createdAt: new Date().toISOString()
+            };
+            
+            prompts.push(newPrompt);
+            localStorage.setItem(STORAGE_KEYS.prompts, JSON.stringify(prompts));
+            
+            // フォームクリア
+            document.getElementById('newPromptLabel').value = '';
+            document.getElementById('newPromptText').value = '';
+            
+            loadPrompts();
+            showNotification('プロンプトを追加しました', 'success');
+        }
+
+        function deletePrompt(index) {
+            if (confirm('このプロンプトを削除しますか？')) {
+                const prompts = JSON.parse(localStorage.getItem(STORAGE_KEYS.prompts) || '[]');
+                prompts.splice(index, 1);
+                localStorage.setItem(STORAGE_KEYS.prompts, JSON.stringify(prompts));
+                loadPrompts();
+                showNotification('プロンプトを削除しました', 'info');
+            }
+        }
+
+        function copyPrompt(text, label) {
+            navigator.clipboard.writeText(text).then(() => {
+                showNotification(`「${label}」をコピーしました`, 'success');
+            }).catch(() => {
+                showNotification('コピーに失敗しました', 'error');
+            });
+        }
+
+        function getPromptCategoryLabel(category) {
+            const labels = {
+                'line': 'LINE',
+                'sns': 'SNS',
+                'report': '報告',
+                'design': 'デザイン',
+                'other': 'その他'
+            };
+            return labels[category] || 'その他';
+        }
+
+        // メモ管理
+        function getMemoKey(date = null) {
+            const today = date || new Date().toISOString().split('T')[0];
+            return STORAGE_KEYS.memos + today;
+        }
+
+        function loadMemo() {
+            const today = new Date().toISOString().split('T')[0];
+            const memoKey = getMemoKey(today);
+            const savedMemo = localStorage.getItem(memoKey) || '';
+            const memoArea = document.getElementById('memoArea');
+            const memoSaveDate = document.getElementById('memoSaveDate');
+            
+            if (memoArea) memoArea.value = savedMemo;
+            if (memoSaveDate) {
+                memoSaveDate.textContent = '今日 ' + new Date().toLocaleTimeString('ja-JP', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+            }
+        }
+
+        function saveMemo() {
+            const selectedDate = document.getElementById('memoDateSelector').value;
+            const today = selectedDate || new Date().toISOString().split('T')[0];
+            const memoKey = getMemoKey(today);
+            const memoArea = document.getElementById('memoArea');
+            
+            if (memoArea) {
+                const memoText = memoArea.value;
+                localStorage.setItem(memoKey, memoText);
+                updateMemoDateSelector();
+            }
+        }
+
+        function clearMemo() {
+            if (confirm('現在のメモをクリアしますか？')) {
+                const memoArea = document.getElementById('memoArea');
+                if (memoArea) {
+                    memoArea.value = '';
+                    saveMemo();
+                    showNotification('メモをクリアしました', 'info');
+                }
+            }
+        }
+
+        function updateMemoDateSelector() {
+            const selector = document.getElementById('memoDateSelector');
+            if (!selector) return;
+            
+            selector.innerHTML = '<option value="">今日のメモ</option>';
+            
+            const dates = [];
+            for (let i = 1; i < 30; i++) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                const dateStr = date.toISOString().split('T')[0];
+                const memoKey = getMemoKey(dateStr);
+                if (localStorage.getItem(memoKey)) {
+                    dates.push({
+                        value: dateStr,
+                        label: date.toLocaleDateString('ja-JP', { 
+                            month: 'numeric', 
+                            day: 'numeric', 
+                            weekday: 'short' 
+                        })
+                    });
+                }
+            }
+            
+            dates.forEach(date => {
+                const option = document.createElement('option');
+                option.value = date.value;
+                option.textContent = date.label;
+                selector.appendChild(option);
+            });
+        }
+
+        function loadSelectedMemo() {
+            const selector = document.getElementById('memoDateSelector');
+            const selectedDate = selector.value;
+            
+            if (selectedDate) {
+                const memoKey = getMemoKey(selectedDate);
+                const savedMemo = localStorage.getItem(memoKey) || '';
+                const memoArea = document.getElementById('memoArea');
+                const memoSaveDate = document.getElementById('memoSaveDate');
+                
+                if (memoArea) memoArea.value = savedMemo;
+                if (memoSaveDate) {
+                    memoSaveDate.textContent = new Date(selectedDate).toLocaleDateString('ja-JP', { 
+                        month: 'numeric', 
+                        day: 'numeric', 
+                        weekday: 'short' 
+                    });
+                }
+            } else {
+                loadMemo();
+            }
+        }
+
+        // 通知・アラートシステム
+        function checkAlerts() {
+            const tasks = JSON.parse(localStorage.getItem(STORAGE_KEYS.tasks) || '[]');
+            const events = JSON.parse(localStorage.getItem(STORAGE_KEYS.events) || '[]');
+            const designProjects = JSON.parse(localStorage.getItem(STORAGE_KEYS.designProjects) || '[]');
+            
+            const today = new Date();
+            const tomorrow = new Date(today);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            
+            // 期限切れタスク
+            const overdueTasks = tasks.filter(task => 
+                !task.completed && task.dueDate && new Date(task.dueDate) < today
+            );
+            
+            // 今日期限のタスク
+            const dueTodayTasks = tasks.filter(task => 
+                !task.completed && task.dueDate && 
+                new Date(task.dueDate).toDateString() === today.toDateString()
+            );
+            
+            // 明日期限のタスク
+            const dueTomorrowTasks = tasks.filter(task => 
+                !task.completed && task.dueDate && 
+                new Date(task.dueDate).toDateString() === tomorrow.toDateString()
+            );
+            
+            // 今日の予定
+            const todayEvents = events.filter(event => 
+                event.date === today.toISOString().split('T')[0]
+            );
+            
+            // デザイン案件の緊急アラート
+            const urgentDesign = designProjects.filter(project => {
+                if (!project.dueDate || project.status === 'completed') return false;
+                const dueDate = new Date(project.dueDate);
+                const daysUntilDue = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
+                return daysUntilDue <= 2 && daysUntilDue >= 0;
+            });
+            
+            // 通知の追加
+            if (overdueTasks.length > 0) {
+                addNotification(`期限切れタスクが${overdueTasks.length}件あります`, 'urgent');
+            }
+            
+            if (dueTodayTasks.length > 0) {
+                addNotification(`今日期限のタスクが${dueTodayTasks.length}件あります`, 'warning');
+            }
+            
+            if (dueTomorrowTasks.length > 0) {
+                addNotification(`明日期限のタスクが${dueTomorrowTasks.length}件あります`, 'info');
+            }
+            
+            if (todayEvents.length > 0) {
+                addNotification(`今日の予定が${todayEvents.length}件あります`, 'info');
+            }
+            
+            if (urgentDesign.length > 0) {
+                addNotification(`緊急デザイン案件が${urgentDesign.length}件あります`, 'urgent');
+            }
+            
+            updateNotificationCount();
+        }
+
+        function addNotification(message, type = 'info') {
+            const notification = {
+                id: Date.now(),
+                message,
+                type,
+                timestamp: new Date().toISOString(),
+                read: false
+            };
+            
+            notifications.push(notification);
+            
+            // 最大100件まで保持
+            if (notifications.length > 100) {
+                notifications = notifications.slice(-100);
+            }
+            
+            updateNotificationCount();
+        }
+
+        function updateNotificationCount() {
+            const unreadCount = notifications.filter(n => !n.read).length;
+            const countElement = document.getElementById('notificationCount');
+            if (countElement) {
+                countElement.textContent = unreadCount;
+                countElement.style.display = unreadCount > 0 ? 'inline' : 'none';
+            }
+        }
+
+        function showNotifications() {
+            const modal = document.getElementById('notificationModal');
+            const list = document.getElementById('notificationList');
+            
+            if (notifications.length === 0) {
+                list.innerHTML = '<p class="text-gray-500 text-center py-4">通知はありません</p>';
+            } else {
+                list.innerHTML = notifications.slice(-20).reverse().map(notification => `
+                    <div class="p-3 border rounded-lg ${notification.read ? 'bg-gray-50' : 'bg-blue-50 border-blue-200'}">
+                        <div class="flex items-center justify-between">
+                            <div class="flex-1">
+                                <div class="text-sm ${getNotificationIcon(notification.type)} mr-2">
+                                    ${notification.message}
+                                </div>
+                                <div class="text-xs text-gray-500 mt-1">
+                                    ${new Date(notification.timestamp).toLocaleString('ja-JP')}
+                                </div>
+                            </div>
+                            <button onclick="markAsRead(${notification.id})" 
+                                    class="text-gray-400 hover:text-gray-600 ml-2">
+                                <i class="fas fa-check"></i>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            
+            modal.classList.add('show');
+        }
+
+        function getNotificationIcon(type) {
+            const icons = {
+                'urgent': '🔴',
+                'warning': '🟡',
+                'info': '🔵',
+                'success': '🟢'
+            };
+            return icons[type] || '🔵';
+        }
+
+        function markAsRead(notificationId) {
+            const notification = notifications.find(n => n.id === notificationId);
+            if (notification) {
+                notification.read = true;
+                updateNotificationCount();
+                showNotifications(); // リフレッシュ
+            }
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+        }
+
+        // データ管理
+        function exportAllData() {
+            const data = {
+                exportDate: new Date().toISOString(),
+                version: '4.0',
+                tasks: JSON.parse(localStorage.getItem(STORAGE_KEYS.tasks) || '[]'),
+                events: JSON.parse(localStorage.getItem(STORAGE_KEYS.events) || '[]'),
+                prompts: JSON.parse(localStorage.getItem(STORAGE_KEYS.prompts) || '[]'),
+                designProjects: JSON.parse(localStorage.getItem(STORAGE_KEYS.designProjects) || '[]'),
+                goals: JSON.parse(localStorage.getItem(STORAGE_KEYS.goals) || '{}'),
+                salesData: JSON.parse(localStorage.getItem(STORAGE_KEYS.salesData) || '[]'),
+                memos: {}
+            };
+            
+            // メモデータの収集
+            for (let i = 0; i < 30; i++) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                const dateStr = date.toISOString().split('T')[0];
+                const memoKey = getMemoKey(dateStr);
+                const memo = localStorage.getItem(memoKey);
+                if (memo) {
+                    data.memos[dateStr] = memo;
+                }
+            }
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Rispondere_全データ_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showNotification('全データをエクスポートしました', 'success');
+        }
+
+        function importAllData() {
+            document.getElementById('importFileInput').click();
+        }
+
+        function handleDataImport(event) {
+            const file = event.target.files[0];
+            if (!file || !file.name.endsWith('.json')) {
+                showNotification('JSONファイルを選択してください', 'error');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    if (confirm('データをインポートしますか？\n現在のデータは上書きされます。')) {
+                        // データの復元
+                        if (data.tasks) localStorage.setItem(STORAGE_KEYS.tasks, JSON.stringify(data.tasks));
+                        if (data.events) localStorage.setItem(STORAGE_KEYS.events, JSON.stringify(data.events));
+                        if (data.prompts) localStorage.setItem(STORAGE_KEYS.prompts, JSON.stringify(data.prompts));
+                        if (data.designProjects) localStorage.setItem(STORAGE_KEYS.designProjects, JSON.stringify(data.designProjects));
+                        if (data.goals) localStorage.setItem(STORAGE_KEYS.goals, JSON.stringify(data.goals));
+                        if (data.salesData) localStorage.setItem(STORAGE_KEYS.salesData, JSON.stringify(data.salesData));
+                        
+                        // メモデータの復元
+                        if (data.memos) {
+                            Object.keys(data.memos).forEach(date => {
+                                localStorage.setItem(getMemoKey(date), data.memos[date]);
+                            });
+                        }
+                        
+                        // UI更新
+                        loadAllData();
+                        updateAllStats();
+                        showNotification('データをインポートしました', 'success');
+                    }
+                } catch (error) {
+                    showNotification('ファイル形式が正しくありません', 'error');
+                }
+            };
+            reader.readAsText(file, 'UTF-8');
+        }
+
+        function clearAllData() {
+            if (confirm('⚠️ すべてのデータを削除しますか？\nこの操作は取り消せません。')) {
+                if (confirm('本当によろしいですか？すべてのタスク、予定、メモが削除されます。')) {
+                    // 全データクリア
+                    Object.values(STORAGE_KEYS).forEach(key => {
+                        if (key.includes('memos_')) {
+                            // メモは個別に削除
+                            for (let i = 0; i < 30; i++) {
+                                const date = new Date();
+                                date.setDate(date.getDate() - i);
+                                const dateStr = date.toISOString().split('T')[0];
+                                localStorage.removeItem(getMemoKey(dateStr));
+                            }
+                        } else {
+                            localStorage.removeItem(key);
+                        }
+                    });
+                    
+                    // UI更新
+                    loadAllData();
+                    updateAllStats();
+                    notifications = [];
+                    updateNotificationCount();
+                    
+                    showNotification('すべてのデータを削除しました', 'info');
+                }
+            }
+        }
+
+        function generateReport() {
+            const tasks = JSON.parse(localStorage.getItem(STORAGE_KEYS.tasks) || '[]');
+            const events = JSON.parse(localStorage.getItem(STORAGE_KEYS.events) || '[]');
+            const designProjects = JSON.parse(localStorage.getItem(STORAGE_KEYS.designProjects) || '[]');
+            const salesData = JSON.parse(localStorage.getItem(STORAGE_KEYS.salesData) || '[]');
+            
+            const today = new Date();
+            const reportData = {
+                生成日時: today.toLocaleString('ja-JP'),
+                タスク統計: {
+                    総数: tasks.length,
+                    完了: tasks.filter(t => t.completed).length,
+                    緊急: tasks.filter(t => t.priority === 'urgent' && !t.completed).length,
+                    期限切れ: tasks.filter(t => !t.completed && t.dueDate && new Date(t.dueDate) < today).length
+                },
+                予定統計: {
+                    総数: events.length,
+                    今月: events.filter(e => e.date && e.date.includes(today.toISOString().substr(0, 7))).length
+                },
+                デザイン案件統計: {
+                    総数: designProjects.length,
+                    企画中: designProjects.filter(p => p.status === 'planning').length,
+                    デザイン中: designProjects.filter(p => p.status === 'designing').length,
+                    レビュー中: designProjects.filter(p => p.status === 'review').length,
+                    完了: designProjects.filter(p => p.status === 'completed').length
+                },
+                売上データ: {
+                    データ件数: salesData.length,
+                    最終更新: salesData.length > 0 ? '利用可能' : '未登録'
+                }
+            };
+            
+            const reportText = JSON.stringify(reportData, null, 2);
+            const blob = new Blob([reportText], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Rispondere_レポート_${today.toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showNotification('レポートを生成しました', 'success');
+        }
+
+        // 通知システム
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <div class="flex items-center">
+                    <i class="fas fa-${getNotificationIconClass(type)} mr-2"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    if (document.body.contains(notification)) {
+                        document.body.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        function getNotificationIconClass(type) {
+            const icons = {
+                'success': 'check-circle',
+                'error': 'exclamation-triangle',
+                'warning': 'exclamation-circle',
+                'info': 'info-circle'
+            };
+            return icons[type] || 'info-circle';
+        }
+
+        // 2日の目標設定リマインダー
+        function checkGoalSettingReminder() {
+            const today = new Date();
+            if (today.getDate() === 2) {
+                addNotification('今日は月次目標設定日です', 'warning');
+                
+                // 目標設定タブへの誘導
+                setTimeout(() => {
+                    if (confirm('今日は月次目標設定日です。目標管理タブを開きますか？')) {
+                        switchTab('goals');
+                    }
+                }, 5000);
+            }
+        }
+
+        // ドラッグ&ドロップ対応の追加
+        function setupSalesUploadDragDrop() {
+            const uploadArea = document.getElementById('salesUploadArea');
+            if (!uploadArea) return;
+            
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, preventDefaults, false);
+            });
+
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            uploadArea.addEventListener('dragenter', (e) => {
+                uploadArea.classList.add('border-blue-400', 'bg-blue-50');
+            });
+            
+            uploadArea.addEventListener('dragleave', (e) => {
+                if (!uploadArea.contains(e.relatedTarget)) {
+                    uploadArea.classList.remove('border-blue-400', 'bg-blue-50');
+                }
+            });
+            
+            uploadArea.addEventListener('dragover', (e) => {
+                uploadArea.classList.add('border-blue-400', 'bg-blue-50');
+            });
+            
+            uploadArea.addEventListener('drop', (e) => {
+                uploadArea.classList.remove('border-blue-400', 'bg-blue-50');
+                
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    const file = files[0];
+                    if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
+                        handleExcelUpload(file);
+                    } else if (file.name.endsWith('.csv')) {
+                        handleCSVUpload(file);
+                    } else {
+                        showNotification('Excel(.xlsx)またはCSV(.csv)ファイルをドロップしてください', 'error');
+                    }
+                }
+            });
+        }
+
+        // セッション拡張機能の改良
+        function extendSession() {
+            if (sessionStorage.getItem('isLoggedIn')) {
+                sessionStorage.setItem('loginTime', Date.now().toString());
+                if (sessionTimer) {
+                    clearInterval(sessionTimer);
+                    startSessionTimer(SESSION_DURATION);
+                }
+            }
+        }
+
+        // アクティビティ監視の強化
+        function setupActivityMonitoring() {
+            let lastActivity = Date.now();
+            
+            ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'].forEach(event => {
+                document.addEventListener(event, () => {
+                    if (sessionStorage.getItem('isLoggedIn')) {
+                        const now = Date.now();
+                        if (now - lastActivity > 10 * 60 * 1000) { // 10分間隔
+                            sessionStorage.setItem('lastActivity', now.toString());
+                            extendSession();
+                            lastActivity = now;
+                        }
+                    }
+                }, { passive: true });
+            });
+        }
+
+        // データ整合性チェック
+        function validateDataIntegrity() {
+            try {
+                // 各ストレージキーのデータを検証
+                Object.values(STORAGE_KEYS).forEach(key => {
+                    const data = localStorage.getItem(key);
+                    if (data && data !== '[]' && data !== '{}') {
+                        JSON.parse(data); // JSONパースエラーをチェック
+                    }
+                });
+                return true;
+            } catch (error) {
+                console.error('Data integrity check failed:', error);
+                showNotification('データの整合性エラーが発生しました', 'error');
+                return false;
+            }
+        }
+
+        // 自動バックアップ機能
+        function performAutoBackup() {
+            try {
+                const backupData = {
+                    timestamp: new Date().toISOString(),
+                    tasks: localStorage.getItem(STORAGE_KEYS.tasks),
+                    events: localStorage.getItem(STORAGE_KEYS.events),
+                    goals: localStorage.getItem(STORAGE_KEYS.goals),
+                    salesData: localStorage.getItem(STORAGE_KEYS.salesData)
+                };
+                
+                localStorage.setItem('autoBackup', JSON.stringify(backupData));
+                console.log('Auto backup completed');
+            } catch (error) {
+                console.error('Auto backup failed:', error);
+            }
+        }
+
+        // エラーハンドリングの強化
+        window.addEventListener('error', (event) => {
+            console.error('Global error:', event.error);
+            showNotification('システムエラーが発生しました。ページを再読み込みしてください。', 'error');
+        });
+
+        window.addEventListener('unhandledrejection', (event) => {
+            console.error('Unhandled promise rejection:', event.reason);
+            showNotification('処理エラーが発生しました', 'error');
+        });
+
+        // 定期実行タスク
+        setInterval(() => {
+            if (sessionStorage.getItem('isLoggedIn')) {
+                checkAlerts();
+                checkGoalSettingReminder();
+                validateDataIntegrity();
+                performAutoBackup();
+            }
+        }, 30 * 60 * 1000); // 30分ごと
+
+        // 初期化完了後の処理
+        document.addEventListener('DOMContentLoaded', () => {
+            setupActivityMonitoring();
+            setTimeout(() => {
+                if (document.getElementById('salesUploadArea')) {
+                    setupSalesUploadDragDrop();
+                }
+            }, 1000);
+        });
+
+        // ページの可視性変更時の処理
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden && sessionStorage.getItem('isLoggedIn')) {
+                // ページが再表示されたときのデータ整合性チェック
+                setTimeout(validateDataIntegrity, 1000);
+            }
+        });
+
+        // ローカルストレージの変更監視
+        window.addEventListener('storage', (e) => {
+            if (e.key && Object.values(STORAGE_KEYS).includes(e.key)) {
+                // 他のタブでデータが変更された場合の処理
+                if (currentTab === 'dashboard') {
+                    updateAllStats();
+                }
+            }
+        });
+
+        // PWA対応の基本設定
+        if ('serviceWorker' in navigator) {
+            // Service Workerは実装されていないが、将来の拡張のための準備
+            console.log('Service Worker support detected');
+        }
+
+        // オフライン対応の基本検知
+        window.addEventListener('online', () => {
+            showNotification('オンラインに復帰しました', 'success');
+        });
+
+        window.addEventListener('offline', () => {
+            showNotification('オフラインモードです。一部機能が制限されます', 'warning');
+        });
+
+        // パフォーマンス監視
+        function monitorPerformance() {
+            if ('performance' in window) {
+                setTimeout(() => {
+                    const navigation = performance.getEntriesByType('navigation')[0];
+                    if (navigation && navigation.loadEventEnd > 5000) {
+                        console.warn('Slow page load detected:', navigation.loadEventEnd);
+                    }
+                }, 5000);
+            }
+        }
+
+        // メモリ使用量の監視（可能な場合）
+        function checkMemoryUsage() {
+            if ('memory' in performance) {
+                const memInfo = performance.memory;
+                const usedMB = Math.round(memInfo.usedJSHeapSize / 1048576);
+                if (usedMB > 100) { // 100MB以上の場合警告
+                    console.warn('High memory usage detected:', usedMB, 'MB');
+                }
+            }
+        }
+
+        // 定期パフォーマンスチェック
+        setInterval(() => {
+            if (sessionStorage.getItem('isLoggedIn')) {
+                checkMemoryUsage();
+            }
+        }, 5 * 60 * 1000); // 5分ごと
+
+        // 初期パフォーマンス監視
+        window.addEventListener('load', monitorPerformance);
+
+        // ページ閉じる前の確認
+        window.addEventListener('beforeunload', (e) => {
+            if (sessionStorage.getItem('isLoggedIn')) {
+                const message = '作業中のデータが保存されていない可能性があります。ページを離れますか？';
+                e.returnValue = message;
+                return message;
+            }
+        });
+
+        // モーダル外クリックで閉じる
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal')) {
+                e.target.classList.remove('show');
+            }
+        });
+    </script>
+</body>
+</html>sm text-gray-600">タスク完了率</p>
                         </div>
                     </div>
                 </div>
