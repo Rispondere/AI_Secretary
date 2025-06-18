@@ -794,6 +794,7 @@
                         </div>
                         
                         <div id="salesAnalysis" class="hidden">
+                            <!-- 全体統計 -->
                             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                                 <div class="stats-card">
                                     <div class="text-xl font-bold text-green-600 mb-2" id="totalSales">¥0</div>
@@ -813,9 +814,123 @@
                                 </div>
                             </div>
                             
-                            <div class="chart-container">
-                                <h4 class="font-semibold mb-4">店舗別売上チャート</h4>
-                                <canvas id="salesChart" width="400" height="200"></canvas>
+                            <!-- 店舗別分析セクション -->
+                            <div class="glass-card p-6 mb-6">
+                                <div class="flex justify-between items-center mb-6">
+                                    <h4 class="font-semibold flex items-center">
+                                        <i class="fas fa-store mr-2 text-blue-600"></i>店舗別詳細分析
+                                    </h4>
+                                    <div class="flex space-x-3">
+                                        <select id="storeSelector" class="input-field w-48" onchange="showStoreDetails()">
+                                            <option value="">全店舗概要</option>
+                                            <option value="CLASSY四日市">CLASSY四日市</option>
+                                            <option value="CLASSY東京">CLASSY東京</option>
+                                            <option value="CLASSY名古屋">CLASSY名古屋</option>
+                                            <option value="GrandOpera東京">GrandOpera東京</option>
+                                            <option value="GrandOpera横浜">GrandOpera横浜</option>
+                                            <option value="GrandOpera名古屋">GrandOpera名古屋</option>
+                                            <option value="GrandOpera福岡">GrandOpera福岡</option>
+                                            <option value="オペラ錦">オペラ錦</option>
+                                            <option value="シャブール">シャブール</option>
+                                            <option value="ワンカラット">ワンカラット</option>
+                                        </select>
+                                        <select id="periodSelector" class="input-field w-32" onchange="updateStorePeriod()">
+                                            <option value="30">30日間</option>
+                                            <option value="14">2週間</option>
+                                            <option value="7">1週間</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <!-- 全店舗概要表示 -->
+                                <div id="allStoresView">
+                                    <div class="chart-container mb-6">
+                                        <h5 class="font-semibold mb-4">店舗別売上チャート</h5>
+                                        <canvas id="salesChart" width="400" height="200"></canvas>
+                                    </div>
+                                </div>
+                                
+                                <!-- 個別店舗詳細表示 -->
+                                <div id="individualStoreView" class="hidden">
+                                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                                        <!-- 店舗KPI -->
+                                        <div class="lg:col-span-1">
+                                            <div class="bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg p-6">
+                                                <h5 class="font-semibold mb-4 text-gray-800" id="selectedStoreName">店舗名</h5>
+                                                <div class="space-y-4">
+                                                    <div class="flex justify-between items-center">
+                                                        <span class="text-sm text-gray-600">総売上</span>
+                                                        <span class="font-bold text-lg text-green-600" id="storeDetailSales">¥0</span>
+                                                    </div>
+                                                    <div class="flex justify-between items-center">
+                                                        <span class="text-sm text-gray-600">日平均売上</span>
+                                                        <span class="font-bold text-blue-600" id="storeDetailAvgSales">¥0</span>
+                                                    </div>
+                                                    <div class="flex justify-between items-center">
+                                                        <span class="text-sm text-gray-600">総写メ日記</span>
+                                                        <span class="font-bold text-purple-600" id="storeDetailDiary">0件</span>
+                                                    </div>
+                                                    <div class="flex justify-between items-center">
+                                                        <span class="text-sm text-gray-600">日平均写メ日記</span>
+                                                        <span class="font-bold text-purple-600" id="storeDetailAvgDiary">0件</span>
+                                                    </div>
+                                                    <div class="flex justify-between items-center">
+                                                        <span class="text-sm text-gray-600">総口コミ</span>
+                                                        <span class="font-bold text-orange-600" id="storeDetailReviews">0件</span>
+                                                    </div>
+                                                    <div class="flex justify-between items-center">
+                                                        <span class="text-sm text-gray-600">口コミ転換率</span>
+                                                        <span class="font-bold text-green-600" id="storeDetailConversion">0%</span>
+                                                    </div>
+                                                    <div class="pt-3 border-t">
+                                                        <div class="flex justify-between items-center">
+                                                            <span class="text-sm text-gray-600">店舗ランキング</span>
+                                                            <span class="font-bold text-xl" id="storeDetailRank">#1</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- 売上推移グラフ -->
+                                        <div class="lg:col-span-2">
+                                            <div class="bg-white rounded-lg p-6 border">
+                                                <h5 class="font-semibold mb-4">売上推移</h5>
+                                                <canvas id="storeDetailChart" width="600" height="300"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- 詳細データテーブル -->
+                                    <div class="bg-white rounded-lg p-6 border">
+                                        <h5 class="font-semibold mb-4">日別詳細データ</h5>
+                                        <div class="overflow-x-auto">
+                                            <table id="storeDetailTable" class="w-full text-sm">
+                                                <thead class="bg-gray-50">
+                                                    <tr>
+                                                        <th class="px-4 py-2 text-left">日付</th>
+                                                        <th class="px-4 py-2 text-right">売上</th>
+                                                        <th class="px-4 py-2 text-right">写メ日記</th>
+                                                        <th class="px-4 py-2 text-right">口コミ</th>
+                                                        <th class="px-4 py-2 text-right">転換率</th>
+                                                        <th class="px-4 py-2 text-center">目標達成</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="storeDetailTableBody">
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- 店舗別アクションプラン -->
+                                    <div class="bg-white rounded-lg p-6 border mt-6">
+                                        <h5 class="font-semibold mb-4 flex items-center">
+                                            <i class="fas fa-lightbulb mr-2 text-yellow-500"></i>店舗別改善提案
+                                        </h5>
+                                        <div id="storeActionPlan" class="space-y-3">
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -840,7 +955,12 @@
                         <div class="mb-6">
                             <div class="flex items-center justify-between mb-4">
                                 <label class="font-medium">対象月</label>
-                                <input type="month" id="goalMonth" class="input-field w-48" value="2025-07">
+                                <div class="flex space-x-2">
+                                    <input type="month" id="goalMonth" class="input-field w-48" value="2025-07" onchange="loadExistingGoals(this.value); loadGoalProgress();">
+                                    <button onclick="copyPreviousMonthGoals()" class="btn btn-secondary">
+                                        <i class="fas fa-copy mr-2"></i>前月コピー
+                                    </button>
+                                </div>
                             </div>
                         </div>
                         
@@ -848,20 +968,75 @@
                             <!-- 店舗別目標設定 -->
                         </div>
                         
-                        <button onclick="saveGoals()" class="btn btn-primary w-full mt-6">
-                            <i class="fas fa-save mr-2"></i>目標を保存
-                        </button>
+                        <div class="flex space-x-3 mt-6">
+                            <button onclick="saveGoals()" class="btn btn-primary flex-1">
+                                <i class="fas fa-save mr-2"></i>目標を保存
+                            </button>
+                            <button onclick="generateGoalReport()" class="btn btn-secondary">
+                                <i class="fas fa-file-alt mr-2"></i>レポート
+                            </button>
+                        </div>
                     </div>
                 </div>
 
                 <div class="col-span-6">
                     <div class="glass-card p-6">
-                        <h3 class="text-lg font-semibold mb-4 flex items-center">
-                            <i class="fas fa-chart-pie mr-2 text-blue-600"></i>目標達成状況
-                        </h3>
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-semibold flex items-center">
+                                <i class="fas fa-chart-pie mr-2 text-blue-600"></i>目標達成状況
+                            </h3>
+                            <div class="flex space-x-2">
+                                <select id="goalViewMode" class="input-field w-32" onchange="loadGoalProgress()">
+                                    <option value="overview">概要</option>
+                                    <option value="detailed">詳細</option>
+                                </select>
+                                <button onclick="refreshGoalData()" class="btn btn-secondary">
+                                    <i class="fas fa-sync mr-2"></i>更新
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- 全体進捗サマリー -->
+                        <div class="grid grid-cols-3 gap-4 mb-6">
+                            <div class="text-center p-4 bg-green-50 rounded-lg">
+                                <div class="text-2xl font-bold text-green-600" id="overallSalesAchievement">0%</div>
+                                <div class="text-sm text-gray-600">売上達成率</div>
+                            </div>
+                            <div class="text-center p-4 bg-purple-50 rounded-lg">
+                                <div class="text-2xl font-bold text-purple-600" id="overallDiaryAchievement">0%</div>
+                                <div class="text-sm text-gray-600">写メ日記達成率</div>
+                            </div>
+                            <div class="text-center p-4 bg-orange-50 rounded-lg">
+                                <div class="text-2xl font-bold text-orange-600" id="overallReviewAchievement">0%</div>
+                                <div class="text-sm text-gray-600">口コミ達成率</div>
+                            </div>
+                        </div>
                         
                         <div id="goalProgress" class="space-y-4">
                             <!-- 目標進捗表示 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 詳細分析セクション -->
+            <div class="glass-card p-6 mt-6">
+                <h3 class="text-lg font-semibold mb-4 flex items-center">
+                    <i class="fas fa-analytics mr-2 text-indigo-600"></i>目標分析・改善提案
+                </h3>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- 達成状況チャート -->
+                    <div>
+                        <h4 class="font-semibold mb-4">店舗別達成状況</h4>
+                        <canvas id="goalAchievementChart" width="400" height="300"></canvas>
+                    </div>
+                    
+                    <!-- 改善提案 -->
+                    <div>
+                        <h4 class="font-semibold mb-4">改善提案・アクションプラン</h4>
+                        <div id="goalActionPlan" class="space-y-3 max-h-64 overflow-y-auto">
+                            <!-- 動的に生成される改善提案 -->
                         </div>
                     </div>
                 </div>
@@ -1301,7 +1476,387 @@
                     loadGoalProgress();
                     break;
                 case 'sales':
-                    // 売上分析タブの初期化
+                    // 店舗別詳細分析
+        let currentSalesData = [];
+        let currentStoreStats = {};
+
+        function showStoreDetails() {
+            const selectedStore = document.getElementById('storeSelector').value;
+            const allStoresView = document.getElementById('allStoresView');
+            const individualStoreView = document.getElementById('individualStoreView');
+            
+            if (!selectedStore) {
+                // 全店舗概要表示
+                allStoresView.classList.remove('hidden');
+                individualStoreView.classList.add('hidden');
+                renderSalesChart(currentStoreStats);
+            } else {
+                // 個別店舗詳細表示
+                allStoresView.classList.add('hidden');
+                individualStoreView.classList.remove('hidden');
+                renderStoreDetails(selectedStore);
+            }
+        }
+
+        function renderStoreDetails(storeName) {
+            const storeData = getStoreData(storeName);
+            const period = parseInt(document.getElementById('periodSelector').value);
+            
+            // 基本情報の表示
+            document.getElementById('selectedStoreName').textContent = storeName;
+            document.getElementById('storeDetailSales').textContent = `¥${storeData.totalSales.toLocaleString()}`;
+            document.getElementById('storeDetailAvgSales').textContent = `¥${Math.round(storeData.avgSales).toLocaleString()}`;
+            document.getElementById('storeDetailDiary').textContent = `${storeData.totalDiary.toLocaleString()}件`;
+            document.getElementById('storeDetailAvgDiary').textContent = `${Math.round(storeData.avgDiary)}件`;
+            document.getElementById('storeDetailReviews').textContent = `${storeData.totalReviews}件`;
+            document.getElementById('storeDetailConversion').textContent = `${storeData.conversionRate.toFixed(1)}%`;
+            document.getElementById('storeDetailRank').textContent = `#${storeData.rank}`;
+            
+            // ランキングに応じた表示色変更
+            const rankElement = document.getElementById('storeDetailRank');
+            if (storeData.rank <= 3) {
+                rankElement.className = 'font-bold text-xl text-yellow-600';
+                rankElement.innerHTML = `${storeData.rank === 1 ? '🥇' : storeData.rank === 2 ? '🥈' : '🥉'} #${storeData.rank}`;
+            } else {
+                rankElement.className = 'font-bold text-xl text-gray-600';
+            }
+            
+            // 売上推移チャート
+            renderStoreDetailChart(storeData.dailyData, storeName);
+            
+            // 詳細テーブル
+            renderStoreDetailTable(storeData.dailyData, storeName);
+            
+            // 店舗別アクションプラン
+            generateStoreActionPlan(storeName, storeData);
+        }
+
+        function getStoreData(storeName) {
+            const period = parseInt(document.getElementById('periodSelector').value);
+            const storeData = currentSalesData.filter(row => 
+                (row.店舗 || row.店舗名) === storeName
+            );
+            
+            // 期間でフィルタリング
+            const today = new Date();
+            const cutoffDate = new Date(today.getTime() - (period * 24 * 60 * 60 * 1000));
+            
+            const filteredData = storeData.filter(row => {
+                const date = new Date(row.日付);
+                return date >= cutoffDate;
+            }).sort((a, b) => new Date(a.日付) - new Date(b.日付));
+            
+            // 統計計算
+            const totalSales = filteredData.reduce((sum, row) => sum + (row.売上 || 0), 0);
+            const totalDiary = filteredData.reduce((sum, row) => sum + (row.写メ日記 || 0), 0);
+            const totalReviews = filteredData.reduce((sum, row) => sum + (row.口コミ || 0), 0);
+            const days = filteredData.length;
+            
+            const avgSales = days > 0 ? totalSales / days : 0;
+            const avgDiary = days > 0 ? totalDiary / days : 0;
+            const conversionRate = totalDiary > 0 ? (totalReviews / totalDiary) * 100 : 0;
+            
+            // ランキング計算
+            const allStoreRanking = Object.entries(currentStoreStats)
+                .sort(([,a], [,b]) => b.総売上 - a.総売上);
+            const rank = allStoreRanking.findIndex(([store,]) => store === storeName) + 1;
+            
+            return {
+                dailyData: filteredData,
+                totalSales,
+                totalDiary,
+                totalReviews,
+                avgSales,
+                avgDiary,
+                conversionRate,
+                rank,
+                days
+            };
+        }
+
+        function renderStoreDetailChart(dailyData, storeName) {
+            const canvas = document.getElementById('storeDetailChart');
+            if (!canvas || dailyData.length === 0) return;
+            
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const maxSales = Math.max(...dailyData.map(d => d.売上 || 0));
+            const chartWidth = canvas.width - 100;
+            const chartHeight = canvas.height - 80;
+            
+            // 軸の描画
+            ctx.strokeStyle = '#e5e7eb';
+            ctx.lineWidth = 1;
+            
+            // Y軸
+            ctx.beginPath();
+            ctx.moveTo(60, 20);
+            ctx.lineTo(60, chartHeight + 20);
+            ctx.stroke();
+            
+            // X軸
+            ctx.beginPath();
+            ctx.moveTo(60, chartHeight + 20);
+            ctx.lineTo(chartWidth + 60, chartHeight + 20);
+            ctx.stroke();
+            
+            // グリッド線
+            ctx.strokeStyle = '#f3f4f6';
+            for (let i = 1; i <= 5; i++) {
+                const y = 20 + (chartHeight / 5) * i;
+                ctx.beginPath();
+                ctx.moveTo(60, y);
+                ctx.lineTo(chartWidth + 60, y);
+                ctx.stroke();
+            }
+            
+            // データライン
+            ctx.strokeStyle = '#3b82f6';
+            ctx.fillStyle = '#3b82f6';
+            ctx.lineWidth = 3;
+            
+            ctx.beginPath();
+            dailyData.forEach((item, index) => {
+                const x = 60 + (index / Math.max(dailyData.length - 1, 1)) * chartWidth;
+                const y = 20 + chartHeight - ((item.売上 || 0) / maxSales) * chartHeight;
+                
+                if (index === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+                
+                // データポイント
+                ctx.fillRect(x - 3, y - 3, 6, 6);
+            });
+            ctx.stroke();
+            
+            // ラベル
+            ctx.fillStyle = '#374151';
+            ctx.font = '12px Arial';
+            
+            // Y軸ラベル
+            for (let i = 0; i <= 5; i++) {
+                const value = (maxSales / 5) * (5 - i);
+                const y = 20 + (chartHeight / 5) * i;
+                ctx.textAlign = 'right';
+                ctx.fillText(`¥${Math.round(value / 1000)}K`, 55, y + 3);
+            }
+            
+            // 日付ラベル（最初と最後のみ）
+            ctx.textAlign = 'center';
+            if (dailyData.length > 0) {
+                const firstDate = new Date(dailyData[0].日付).toLocaleDateString('ja-JP', { month: 'numeric', day: 'numeric' });
+                const lastDate = new Date(dailyData[dailyData.length - 1].日付).toLocaleDateString('ja-JP', { month: 'numeric', day: 'numeric' });
+                ctx.fillText(firstDate, 60, chartHeight + 40);
+                ctx.fillText(lastDate, chartWidth + 60, chartHeight + 40);
+            }
+            
+            // トレンド線（移動平均）
+            if (dailyData.length > 7) {
+                ctx.strokeStyle = '#ef4444';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([5, 5]);
+                
+                ctx.beginPath();
+                for (let i = 6; i < dailyData.length; i++) {
+                    const movingAvg = dailyData.slice(i - 6, i + 1).reduce((sum, item) => sum + (item.売上 || 0), 0) / 7;
+                    const x = 60 + (i / Math.max(dailyData.length - 1, 1)) * chartWidth;
+                    const y = 20 + chartHeight - (movingAvg / maxSales) * chartHeight;
+                    
+                    if (i === 6) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                }
+                ctx.stroke();
+                ctx.setLineDash([]);
+            }
+        }
+
+        function renderStoreDetailTable(dailyData, storeName) {
+            const tableBody = document.getElementById('storeDetailTableBody');
+            if (!tableBody) return;
+            
+            // 目標データの取得
+            const currentMonth = new Date().toISOString().substr(0, 7);
+            const goals = JSON.parse(localStorage.getItem(STORAGE_KEYS.goals) || '{}');
+            const monthGoals = goals[currentMonth] || {};
+            
+            // 店舗IDの逆引き
+            const storeMapping = {
+                'CLASSY東京': 'classy_tokyo',
+                'CLASSY名古屋': 'classy_nagoya', 
+                'CLASSY四日市': 'classy_yokkaichi',
+                'GrandOpera東京': 'grandopera_tokyo',
+                'GrandOpera横浜': 'grandopera_yokohama',
+                'GrandOpera名古屋': 'grandopera_nagoya',
+                'GrandOpera福岡': 'grandopera_fukuoka',
+                'ワンカラット': 'wancarat',
+                'シャブール': 'shabour',
+                'オペラ錦': 'opera_nishiki'
+            };
+            
+            const storeId = storeMapping[storeName];
+            const storeGoals = storeId ? monthGoals[storeId] : {};
+            const dailySalesGoal = storeGoals.sales ? Math.round(storeGoals.sales / 30) : 0;
+            const dailyDiaryGoal = storeGoals.diary ? Math.round(storeGoals.diary / 30) : 0;
+            const dailyReviewGoal = storeGoals.review ? Math.round(storeGoals.review / 30) : 0;
+            
+            tableBody.innerHTML = dailyData.slice(-14).reverse().map(item => {
+                const sales = item.売上 || 0;
+                const diary = item.写メ日記 || 0;
+                const reviews = item.口コミ || 0;
+                const conversionRate = diary > 0 ? (reviews / diary * 100).toFixed(1) : '0.0';
+                
+                // 目標達成状況
+                const salesAchieved = dailySalesGoal > 0 ? sales >= dailySalesGoal : false;
+                const diaryAchieved = dailyDiaryGoal > 0 ? diary >= dailyDiaryGoal : false;
+                const reviewAchieved = dailyReviewGoal > 0 ? reviews >= dailyReviewGoal : false;
+                
+                const achievementScore = [salesAchieved, diaryAchieved, reviewAchieved].filter(Boolean).length;
+                const achievementClass = achievementScore === 3 ? 'text-green-600' : achievementScore >= 2 ? 'text-yellow-600' : 'text-red-600';
+                const achievementIcon = achievementScore === 3 ? '🟢' : achievementScore >= 2 ? '🟡' : '🔴';
+                
+                return `
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="px-4 py-2">${new Date(item.日付).toLocaleDateString('ja-JP')}</td>
+                        <td class="px-4 py-2 text-right font-medium ${salesAchieved ? 'text-green-600' : ''}">${sales.toLocaleString()}</td>
+                        <td class="px-4 py-2 text-right ${diaryAchieved ? 'text-green-600' : ''}">${diary}</td>
+                        <td class="px-4 py-2 text-right ${reviewAchieved ? 'text-green-600' : ''}">${reviews}</td>
+                        <td class="px-4 py-2 text-right">${conversionRate}%</td>
+                        <td class="px-4 py-2 text-center">
+                            <span class="${achievementClass}" title="${achievementScore}/3 目標達成">
+                                ${achievementIcon} ${achievementScore}/3
+                            </span>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function generateStoreActionPlan(storeName, storeData) {
+            const container = document.getElementById('storeActionPlan');
+            if (!container) return;
+            
+            const plans = [];
+            
+            // 売上分析
+            if (storeData.rank > 5) {
+                plans.push({
+                    type: 'warning',
+                    title: '売上改善が必要',
+                    description: `現在${storeData.rank}位。上位店舗との差を縮める施策が必要です。`,
+                    actions: [
+                        '集客施策の強化',
+                        'サービス品質の向上',
+                        '料金体系の見直し'
+                    ]
+                });
+            }
+            
+            // 口コミ転換率分析
+            if (storeData.conversionRate < 5) {
+                plans.push({
+                    type: 'info',
+                    title: '口コミ転換率の改善',
+                    description: `現在の転換率${storeData.conversionRate.toFixed(1)}%を向上させましょう。`,
+                    actions: [
+                        '顧客満足度調査の実施',
+                        '口コミ投稿促進キャンペーン',
+                        'アフターフォローの充実'
+                    ]
+                });
+            }
+            
+            // 写メ日記分析
+            if (storeData.avgDiary < 50) {
+                plans.push({
+                    type: 'info',
+                    title: '写メ日記投稿数増加',
+                    description: `日平均${Math.round(storeData.avgDiary)}件の投稿数を増やしましょう。`,
+                    actions: [
+                        'キャスト教育の強化',
+                        '投稿インセンティブの導入',
+                        '投稿コンテンツの質向上'
+                    ]
+                });
+            }
+            
+            // 好調店舗への提案
+            if (storeData.rank <= 3) {
+                plans.push({
+                    type: 'success',
+                    title: '優秀店舗として他店への展開',
+                    description: `${storeData.rank}位の好成績。成功要因を他店舗に共有しましょう。`,
+                    actions: [
+                        '成功事例の文書化',
+                        '他店舗への指導・サポート',
+                        'ベストプラクティスの標準化'
+                    ]
+                });
+            }
+            
+            // トレンド分析
+            if (storeData.dailyData.length >= 7) {
+                const recentWeek = storeData.dailyData.slice(-7);
+                const previousWeek = storeData.dailyData.slice(-14, -7);
+                
+                if (recentWeek.length === 7 && previousWeek.length === 7) {
+                    const recentAvg = recentWeek.reduce((sum, item) => sum + (item.売上 || 0), 0) / 7;
+                    const previousAvg = previousWeek.reduce((sum, item) => sum + (item.売上 || 0), 0) / 7;
+                    const trendRate = previousAvg > 0 ? ((recentAvg - previousAvg) / previousAvg) * 100 : 0;
+                    
+                    if (trendRate < -10) {
+                        plans.push({
+                            type: 'warning',
+                            title: '売上下降トレンド',
+                            description: `直近1週間で${Math.abs(trendRate).toFixed(1)}%の減少トレンドです。`,
+                            actions: [
+                                '要因分析の実施',
+                                '緊急対策の検討',
+                                '競合店調査'
+                            ]
+                        });
+                    } else if (trendRate > 10) {
+                        plans.push({
+                            type: 'success',
+                            title: '好調な成長トレンド',
+                            description: `直近1週間で${trendRate.toFixed(1)}%の成長。この勢いを維持しましょう。`,
+                            actions: [
+                                '成功要因の分析',
+                                '施策の継続・強化',
+                                '成功体験の他店共有'
+                            ]
+                        });
+                    }
+                }
+            }
+            
+            container.innerHTML = plans.map(plan => `
+                <div class="border border-${getActionPlanColor(plan.type)}-200 bg-${getActionPlanColor(plan.type)}-50 rounded-lg p-4">
+                    <div class="flex items-start">
+                        <i class="fas fa-${getActionPlanIcon(plan.type)} text-${getActionPlanColor(plan.type)}-600 mr-3 mt-1"></i>
+                        <div class="flex-1">
+                            <h6 class="font-medium text-${getActionPlanColor(plan.type)}-800 mb-2">${plan.title}</h6>
+                            <p class="text-sm text-gray-700 mb-3">${plan.description}</p>
+                            <ul class="text-sm text-gray-600 space-y-1">
+                                ${plan.actions.map(action => `<li class="flex items-center"><i class="fas fa-arrow-right text-xs mr-2"></i>${action}</li>`).join('')}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateStorePeriod() {
+            const selectedStore = document.getElementById('storeSelector').value;
+            if (selectedStore) {
+                renderStoreDetails(selectedStore);
+            }
+        }タブの初期化
                     break;
                 case 'tools':
                     loadPrompts();
@@ -2037,6 +2592,9 @@
             document.getElementById('salesUploadArea').classList.add('hidden');
             document.getElementById('salesAnalysis').classList.remove('hidden');
             
+            // グローバル変数に保存
+            currentSalesData = data;
+            
             // 店舗別統計の計算
             const storeStats = {};
             const dateStats = {};
@@ -2082,6 +2640,9 @@
                 totalReviews += reviews;
             });
             
+            // グローバル変数に保存
+            currentStoreStats = storeStats;
+            
             // 上位店舗の特定
             const sortedStores = Object.entries(storeStats)
                 .sort(([,a], [,b]) => b.総売上 - a.総売上);
@@ -2090,7 +2651,7 @@
             // 平均売上の計算
             const averageSales = data.length > 0 ? totalSales / data.length : 0;
             
-            // 前月比成長率の計算（仮の値、実際は前月データとの比較）
+            // 前月比成長率の計算
             const growthRate = calculateGrowthRate(dateStats);
             
             // 基本統計の表示
@@ -2099,11 +2660,47 @@
             document.getElementById('topStore').textContent = topStore;
             document.getElementById('growthRate').textContent = `+${growthRate.toFixed(1)}%`;
             
+            // 店舗セレクターの初期化
+            initializeStoreSelector(storeStats);
+            
             // 詳細分析の表示
             renderAdvancedSalesAnalysis(storeStats, dateStats, data);
             
             // チャート表示
             renderSalesChart(storeStats);
+            
+            // 目標管理との連携
+            updateGoalsWithSalesData();
+        }
+
+        function initializeStoreSelector(storeStats) {
+            const selector = document.getElementById('storeSelector');
+            if (!selector) return;
+            
+            // 既存のオプションをクリア（最初のオプションは残す）
+            while (selector.children.length > 1) {
+                selector.removeChild(selector.lastChild);
+            }
+            
+            // 売上順でソートした店舗を追加
+            const sortedStores = Object.entries(storeStats)
+                .sort(([,a], [,b]) => b.総売上 - a.総売上);
+            
+            sortedStores.forEach(([store, stats], index) => {
+                const option = document.createElement('option');
+                option.value = store;
+                const rank = index + 1;
+                const rankIcon = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';
+                option.textContent = `${rankIcon} ${store} (¥${Math.round(stats.総売上 / stats.日数).toLocaleString()}/日)`;
+                selector.appendChild(option);
+            });
+        }
+
+        function updateGoalsWithSalesData() {
+            // 目標管理タブが表示されている場合は更新
+            if (currentTab === 'goals') {
+                loadGoalProgress();
+            }
         }
 
         function calculateGrowthRate(dateStats) {
@@ -2537,27 +3134,46 @@
             const currentMonth = document.getElementById('goalMonth').value;
             
             container.innerHTML = STORES.map(store => `
-                <div class="p-4 border border-gray-200 rounded-lg">
-                    <h5 class="font-semibold mb-3">${store.name}</h5>
+                <div class="p-4 border border-gray-200 rounded-lg hover:border-blue-300 transition-colors">
+                    <h5 class="font-semibold mb-3 flex items-center">
+                        <i class="fas fa-store mr-2 text-blue-600"></i>${store.name}
+                        <span id="storeRanking_${store.id}" class="ml-2 text-sm text-gray-500"></span>
+                    </h5>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                         <div>
-                            <label class="block text-sm text-gray-600 mb-1">売上目標</label>
-                            <input type="number" id="sales_${store.id}" class="input-field" placeholder="¥">
+                            <label class="block text-sm text-gray-600 mb-1">
+                                売上目標 <span class="text-xs text-gray-400">(月額・円)</span>
+                            </label>
+                            <input type="number" id="sales_${store.id}" class="input-field" placeholder="例: 3000000">
+                            <div id="salesSuggestion_${store.id}" class="text-xs text-blue-600 mt-1"></div>
                         </div>
                         <div>
-                            <label class="block text-sm text-gray-600 mb-1">日記目標</label>
-                            <input type="number" id="diary_${store.id}" class="input-field" placeholder="件数">
+                            <label class="block text-sm text-gray-600 mb-1">
+                                写メ日記目標 <span class="text-xs text-gray-400">(月間・件数)</span>
+                            </label>
+                            <input type="number" id="diary_${store.id}" class="input-field" placeholder="例: 900">
+                            <div id="diarySuggestion_${store.id}" class="text-xs text-blue-600 mt-1"></div>
                         </div>
                         <div>
-                            <label class="block text-sm text-gray-600 mb-1">口コミ目標</label>
-                            <input type="number" id="review_${store.id}" class="input-field" placeholder="件数">
+                            <label class="block text-sm text-gray-600 mb-1">
+                                口コミ目標 <span class="text-xs text-gray-400">(月間・件数)</span>
+                            </label>
+                            <input type="number" id="review_${store.id}" class="input-field" placeholder="例: 45">
+                            <div id="reviewSuggestion_${store.id}" class="text-xs text-blue-600 mt-1"></div>
                         </div>
+                    </div>
+                    <div class="mt-3 text-xs text-gray-500 bg-gray-50 p-2 rounded">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        前月実績に基づく推奨値が表示されます
                     </div>
                 </div>
             `).join('');
             
             // 既存の目標データを読み込み
             loadExistingGoals(currentMonth);
+            
+            // 実績ベースの推奨値を表示
+            showGoalSuggestions();
         }
 
         function loadExistingGoals(month) {
@@ -2574,6 +3190,94 @@
                 if (diaryInput) diaryInput.value = storeGoals.diary || '';
                 if (reviewInput) reviewInput.value = storeGoals.review || '';
             });
+        }
+
+        function showGoalSuggestions() {
+            if (!currentSalesData || currentSalesData.length === 0) return;
+            
+            // 直近30日のデータから推奨値を計算
+            const thirtyDaysAgo = new Date();
+            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+            
+            STORES.forEach(store => {
+                const storeMapping = {
+                    'classy_tokyo': 'CLASSY東京',
+                    'classy_nagoya': 'CLASSY名古屋', 
+                    'classy_yokkaichi': 'CLASSY四日市',
+                    'grandopera_tokyo': 'GrandOpera東京',
+                    'grandopera_yokohama': 'GrandOpera横浜',
+                    'grandopera_nagoya': 'GrandOpera名古屋',
+                    'grandopera_fukuoka': 'GrandOpera福岡',
+                    'wancarat': 'ワンカラット',
+                    'shabour': 'シャブール',
+                    'opera_nishiki': 'オペラ錦'
+                };
+                
+                const targetStoreName = storeMapping[store.id];
+                const storeData = currentSalesData.filter(row => 
+                    (row.店舗 || row.店舗名) === targetStoreName
+                );
+                
+                if (storeData.length > 0) {
+                    const totalSales = storeData.reduce((sum, row) => sum + (row.売上 || 0), 0);
+                    const totalDiary = storeData.reduce((sum, row) => sum + (row.写メ日記 || 0), 0);
+                    const totalReviews = storeData.reduce((sum, row) => sum + (row.口コミ || 0), 0);
+                    
+                    // 成長率を考慮した推奨値（5%向上を目標）
+                    const recommendedSales = Math.round(totalSales * 1.05);
+                    const recommendedDiary = Math.round(totalDiary * 1.05);
+                    const recommendedReviews = Math.round(totalReviews * 1.05);
+                    
+                    // ランキング表示
+                    if (currentStoreStats[targetStoreName]) {
+                        const sortedStores = Object.entries(currentStoreStats)
+                            .sort(([,a], [,b]) => b.総売上 - a.総売上);
+                        const rank = sortedStores.findIndex(([storeName,]) => storeName === targetStoreName) + 1;
+                        const rankElement = document.getElementById(`storeRanking_${store.id}`);
+                        if (rankElement) {
+                            const rankIcon = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`;
+                            rankElement.textContent = `${rankIcon} 現在${rank}位`;
+                        }
+                    }
+                    
+                    // 推奨値表示
+                    const salesSuggestion = document.getElementById(`salesSuggestion_${store.id}`);
+                    const diarySuggestion = document.getElementById(`diarySuggestion_${store.id}`);
+                    const reviewSuggestion = document.getElementById(`reviewSuggestion_${store.id}`);
+                    
+                    if (salesSuggestion) salesSuggestion.textContent = `推奨: ¥${recommendedSales.toLocaleString()} (+5%)`;
+                    if (diarySuggestion) diarySuggestion.textContent = `推奨: ${recommendedDiary}件 (+5%)`;
+                    if (reviewSuggestion) reviewSuggestion.textContent = `推奨: ${recommendedReviews}件 (+5%)`;
+                }
+            });
+        }
+
+        function copyPreviousMonthGoals() {
+            const currentMonth = document.getElementById('goalMonth').value;
+            const prevMonth = new Date(currentMonth + '-01');
+            prevMonth.setMonth(prevMonth.getMonth() - 1);
+            const prevMonthString = prevMonth.toISOString().substr(0, 7);
+            
+            const goals = JSON.parse(localStorage.getItem(STORAGE_KEYS.goals) || '{}');
+            const prevMonthGoals = goals[prevMonthString];
+            
+            if (!prevMonthGoals) {
+                showNotification('前月の目標データが見つかりません', 'warning');
+                return;
+            }
+            
+            STORES.forEach(store => {
+                const storeGoals = prevMonthGoals[store.id] || {};
+                const salesInput = document.getElementById(`sales_${store.id}`);
+                const diaryInput = document.getElementById(`diary_${store.id}`);
+                const reviewInput = document.getElementById(`review_${store.id}`);
+                
+                if (salesInput) salesInput.value = storeGoals.sales || '';
+                if (diaryInput) diaryInput.value = storeGoals.diary || '';
+                if (reviewInput) reviewInput.value = storeGoals.review || '';
+            });
+            
+            showNotification('前月の目標をコピーしました', 'success');
         }
 
         function saveGoals() {
@@ -2601,6 +3305,11 @@
             showNotification('目標を保存しました', 'success');
         }
 
+        function refreshGoalData() {
+            loadGoalProgress();
+            showNotification('目標データを更新しました', 'info');
+        }
+
         function loadGoalProgress() {
             const month = document.getElementById('goalMonth').value;
             const goals = JSON.parse(localStorage.getItem(STORAGE_KEYS.goals) || '{}');
@@ -2610,67 +3319,366 @@
             if (!container) return;
             
             const salesData = JSON.parse(localStorage.getItem(STORAGE_KEYS.salesData) || '[]');
+            const viewMode = document.getElementById('goalViewMode')?.value || 'overview';
             
-            container.innerHTML = STORES.map(store => {
+            let totalSalesGoal = 0, totalSalesActual = 0;
+            let totalDiaryGoal = 0, totalDiaryActual = 0;
+            let totalReviewGoal = 0, totalReviewActual = 0;
+            
+            const storeResults = STORES.map(store => {
                 const storeGoals = monthGoals[store.id] || {};
                 const currentSales = calculateCurrentSales(salesData, store.id, month);
                 const currentDiary = calculateCurrentDiary(salesData, store.id, month);
                 const currentReviews = calculateCurrentReviews(salesData, store.id, month);
                 
-                const salesProgress = storeGoals.sales > 0 ? Math.round((currentSales / storeGoals.sales) * 100) : 0;
-                const diaryProgress = storeGoals.diary > 0 ? Math.round((currentDiary / storeGoals.diary) * 100) : 0;
-                const reviewsProgress = storeGoals.review > 0 ? Math.round((currentReviews / storeGoals.review) * 100) : 0;
+                const salesProgress = storeGoals.sales > 0 ? (currentSales / storeGoals.sales) * 100 : 0;
+                const diaryProgress = storeGoals.diary > 0 ? (currentDiary / storeGoals.diary) * 100 : 0;
+                const reviewsProgress = storeGoals.review > 0 ? (currentReviews / storeGoals.review) * 100 : 0;
                 
                 const overallProgress = (salesProgress + diaryProgress + reviewsProgress) / 3;
                 
-                return `
-                    <div class="p-4 border border-gray-200 rounded-lg ${overallProgress >= 100 ? 'bg-green-50 border-green-200' : overallProgress >= 80 ? 'bg-yellow-50 border-yellow-200' : 'bg-red-50 border-red-200'}">
-                        <div class="flex justify-between items-center mb-3">
-                            <h6 class="font-medium">${store.name}</h6>
-                            <span class="text-sm font-bold ${overallProgress >= 100 ? 'text-green-600' : overallProgress >= 80 ? 'text-yellow-600' : 'text-red-600'}">
-                                ${Math.round(overallProgress)}%
-                            </span>
+                // 全体統計に加算
+                totalSalesGoal += storeGoals.sales || 0;
+                totalSalesActual += currentSales;
+                totalDiaryGoal += storeGoals.diary || 0;
+                totalDiaryActual += currentDiary;
+                totalReviewGoal += storeGoals.review || 0;
+                totalReviewActual += currentReviews;
+                
+                return {
+                    store,
+                    storeGoals,
+                    currentSales,
+                    currentDiary,
+                    currentReviews,
+                    salesProgress,
+                    diaryProgress,
+                    reviewsProgress,
+                    overallProgress
+                };
+            });
+            
+            // 全体達成率を更新
+            const overallSalesAchievement = totalSalesGoal > 0 ? Math.round((totalSalesActual / totalSalesGoal) * 100) : 0;
+            const overallDiaryAchievement = totalDiaryGoal > 0 ? Math.round((totalDiaryActual / totalDiaryGoal) * 100) : 0;
+            const overallReviewAchievement = totalReviewGoal > 0 ? Math.round((totalReviewActual / totalReviewGoal) * 100) : 0;
+            
+            document.getElementById('overallSalesAchievement').textContent = `${overallSalesAchievement}%`;
+            document.getElementById('overallDiaryAchievement').textContent = `${overallDiaryAchievement}%`;
+            document.getElementById('overallReviewAchievement').textContent = `${overallReviewAchievement}%`;
+            
+            // 店舗別進捗表示
+            if (viewMode === 'overview') {
+                container.innerHTML = storeResults.map(result => {
+                    const {store, storeGoals, currentSales, currentDiary, currentReviews, salesProgress, diaryProgress, reviewsProgress, overallProgress} = result;
+                    
+                    return `
+                        <div class="p-4 border border-gray-200 rounded-lg ${overallProgress >= 100 ? 'bg-green-50 border-green-200' : overallProgress >= 80 ? 'bg-yellow-50 border-yellow-200' : 'bg-red-50 border-red-200'}">
+                            <div class="flex justify-between items-center mb-3">
+                                <h6 class="font-medium">${store.name}</h6>
+                                <span class="text-sm font-bold ${overallProgress >= 100 ? 'text-green-600' : overallProgress >= 80 ? 'text-yellow-600' : 'text-red-600'}">
+                                    ${Math.round(overallProgress)}%
+                                </span>
+                            </div>
+                            <div class="grid grid-cols-3 gap-3 text-sm">
+                                <div class="text-center">
+                                    <div class="font-medium text-blue-600">売上</div>
+                                    <div class="text-xs text-gray-600">¥${currentSales.toLocaleString()}</div>
+                                    <div class="text-xs text-gray-500">/ ¥${storeGoals.sales?.toLocaleString() || 0}</div>
+                                    <div class="${salesProgress >= 100 ? 'text-green-600' : salesProgress >= 80 ? 'text-yellow-600' : 'text-red-600'} font-bold">
+                                        ${Math.round(salesProgress)}%
+                                    </div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="font-medium text-purple-600">写メ日記</div>
+                                    <div class="text-xs text-gray-600">${currentDiary}件</div>
+                                    <div class="text-xs text-gray-500">/ ${storeGoals.diary || 0}件</div>
+                                    <div class="${diaryProgress >= 100 ? 'text-green-600' : diaryProgress >= 80 ? 'text-yellow-600' : 'text-red-600'} font-bold">
+                                        ${Math.round(diaryProgress)}%
+                                    </div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="font-medium text-orange-600">口コミ</div>
+                                    <div class="text-xs text-gray-600">${currentReviews}件</div>
+                                    <div class="text-xs text-gray-500">/ ${storeGoals.review || 0}件</div>
+                                    <div class="${reviewsProgress >= 100 ? 'text-green-600' : reviewsProgress >= 80 ? 'text-yellow-600' : 'text-red-600'} font-bold">
+                                        ${Math.round(reviewsProgress)}%
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="space-y-3">
-                            <!-- 売上進捗 -->
-                            <div>
-                                <div class="flex justify-between text-sm mb-1">
-                                    <span>売上目標</span>
-                                    <span>¥${currentSales.toLocaleString()} / ¥${storeGoals.sales?.toLocaleString() || 0}</span>
-                                </div>
-                                <div class="w-full bg-gray-200 rounded-full h-2">
-                                    <div class="bg-blue-500 h-2 rounded-full" style="width: ${Math.min(salesProgress, 100)}%"></div>
-                                </div>
-                                <div class="text-xs text-gray-600 mt-1">${salesProgress}% 達成</div>
+                    `;
+                }).join('');
+            } else {
+                // 詳細表示
+                container.innerHTML = storeResults.map(result => {
+                    const {store, storeGoals, currentSales, currentDiary, currentReviews, salesProgress, diaryProgress, reviewsProgress, overallProgress} = result;
+                    
+                    return `
+                        <div class="p-4 border border-gray-200 rounded-lg ${overallProgress >= 100 ? 'bg-green-50 border-green-200' : overallProgress >= 80 ? 'bg-yellow-50 border-yellow-200' : 'bg-red-50 border-red-200'}">
+                            <div class="flex justify-between items-center mb-3">
+                                <h6 class="font-medium">${store.name}</h6>
+                                <span class="text-sm font-bold ${overallProgress >= 100 ? 'text-green-600' : overallProgress >= 80 ? 'text-yellow-600' : 'text-red-600'}">
+                                    総合 ${Math.round(overallProgress)}%
+                                </span>
                             </div>
-                            
-                            <!-- 写メ日記進捗 -->
-                            <div>
-                                <div class="flex justify-between text-sm mb-1">
-                                    <span>写メ日記目標</span>
-                                    <span>${currentDiary} / ${storeGoals.diary || 0}件</span>
+                            <div class="space-y-3">
+                                <!-- 売上進捗 -->
+                                <div>
+                                    <div class="flex justify-between text-sm mb-1">
+                                        <span>売上目標</span>
+                                        <span>¥${currentSales.toLocaleString()} / ¥${storeGoals.sales?.toLocaleString() || 0}</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="bg-blue-500 h-2 rounded-full" style="width: ${Math.min(salesProgress, 100)}%"></div>
+                                    </div>
+                                    <div class="text-xs text-gray-600 mt-1 flex justify-between">
+                                        <span>${Math.round(salesProgress)}% 達成</span>
+                                        <span>残り: ¥${Math.max(0, (storeGoals.sales || 0) - currentSales).toLocaleString()}</span>
+                                    </div>
                                 </div>
-                                <div class="w-full bg-gray-200 rounded-full h-2">
-                                    <div class="bg-purple-500 h-2 rounded-full" style="width: ${Math.min(diaryProgress, 100)}%"></div>
+                                
+                                <!-- 写メ日記進捗 -->
+                                <div>
+                                    <div class="flex justify-between text-sm mb-1">
+                                        <span>写メ日記目標</span>
+                                        <span>${currentDiary} / ${storeGoals.diary || 0}件</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="bg-purple-500 h-2 rounded-full" style="width: ${Math.min(diaryProgress, 100)}%"></div>
+                                    </div>
+                                    <div class="text-xs text-gray-600 mt-1 flex justify-between">
+                                        <span>${Math.round(diaryProgress)}% 達成</span>
+                                        <span>残り: ${Math.max(0, (storeGoals.diary || 0) - currentDiary)}件</span>
+                                    </div>
                                 </div>
-                                <div class="text-xs text-gray-600 mt-1">${diaryProgress}% 達成</div>
+                                
+                                <!-- 口コミ進捗 -->
+                                <div>
+                                    <div class="flex justify-between text-sm mb-1">
+                                        <span>口コミ目標</span>
+                                        <span>${currentReviews} / ${storeGoals.review || 0}件</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="bg-green-500 h-2 rounded-full" style="width: ${Math.min(reviewsProgress, 100)}%"></div>
+                                    </div>
+                                    <div class="text-xs text-gray-600 mt-1 flex justify-between">
+                                        <span>${Math.round(reviewsProgress)}% 達成</span>
+                                        <span>残り: ${Math.max(0, (storeGoals.review || 0) - currentReviews)}件</span>
+                                    </div>
+                                </div>
                             </div>
-                            
-                            <!-- 口コミ進捗 -->
-                            <div>
-                                <div class="flex justify-between text-sm mb-1">
-                                    <span>口コミ目標</span>
-                                    <span>${currentReviews} / ${storeGoals.review || 0}件</span>
-                                </div>
-                                <div class="w-full bg-gray-200 rounded-full h-2">
-                                    <div class="bg-green-500 h-2 rounded-full" style="width: ${Math.min(reviewsProgress, 100)}%"></div>
-                                </div>
-                                <div class="text-xs text-gray-600 mt-1">${reviewsProgress}% 達成</div>
-                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+            
+            // チャートとアクションプランを更新
+            renderGoalAchievementChart(storeResults);
+            generateGoalActionPlan(storeResults);
+        }
+
+        function renderGoalAchievementChart(storeResults) {
+            const canvas = document.getElementById('goalAchievementChart');
+            if (!canvas || storeResults.length === 0) return;
+            
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const chartWidth = canvas.width - 100;
+            const chartHeight = canvas.height - 80;
+            
+            // 軸の描画
+            ctx.strokeStyle = '#e5e7eb';
+            ctx.lineWidth = 1;
+            
+            // Y軸
+            ctx.beginPath();
+            ctx.moveTo(60, 20);
+            ctx.lineTo(60, chartHeight + 20);
+            ctx.stroke();
+            
+            // X軸
+            ctx.beginPath();
+            ctx.moveTo(60, chartHeight + 20);
+            ctx.lineTo(chartWidth + 60, chartHeight + 20);
+            ctx.stroke();
+            
+            // データバーの描画
+            const barWidth = chartWidth / storeResults.length - 10;
+            
+            storeResults.forEach((result, index) => {
+                const x = 60 + index * (barWidth + 10) + 5;
+                const salesHeight = (result.salesProgress / 100) * (chartHeight / 3);
+                const diaryHeight = (result.diaryProgress / 100) * (chartHeight / 3);
+                const reviewHeight = (result.reviewsProgress / 100) * (chartHeight / 3);
+                
+                // 売上バー（青）
+                ctx.fillStyle = '#3b82f6';
+                ctx.fillRect(x, chartHeight + 20 - salesHeight, barWidth / 3 - 2, salesHeight);
+                
+                // 写メ日記バー（紫）
+                ctx.fillStyle = '#8b5cf6';
+                ctx.fillRect(x + barWidth / 3, chartHeight + 20 - diaryHeight, barWidth / 3 - 2, diaryHeight);
+                
+                // 口コミバー（緑）
+                ctx.fillStyle = '#10b981';
+                ctx.fillRect(x + (barWidth / 3) * 2, chartHeight + 20 - reviewHeight, barWidth / 3 - 2, reviewHeight);
+                
+                // 店舗名ラベル
+                ctx.fillStyle = '#374151';
+                ctx.font = '10px Arial';
+                ctx.textAlign = 'center';
+                ctx.save();
+                ctx.translate(x + barWidth / 2, chartHeight + 40);
+                ctx.rotate(-Math.PI / 4);
+                ctx.fillText(result.store.name, 0, 0);
+                ctx.restore();
+            });
+            
+            // Y軸ラベル
+            ctx.fillStyle = '#374151';
+            ctx.font = '12px Arial';
+            ctx.textAlign = 'right';
+            for (let i = 0; i <= 4; i++) {
+                const y = chartHeight + 20 - (i / 4) * chartHeight;
+                ctx.fillText(`${i * 25}%`, 55, y + 3);
+            }
+            
+            // 凡例
+            ctx.font = '12px Arial';
+            ctx.textAlign = 'left';
+            ctx.fillStyle = '#3b82f6';
+            ctx.fillRect(chartWidth - 150, 30, 12, 12);
+            ctx.fillStyle = '#374151';
+            ctx.fillText('売上', chartWidth - 130, 41);
+            
+            ctx.fillStyle = '#8b5cf6';
+            ctx.fillRect(chartWidth - 150, 50, 12, 12);
+            ctx.fillStyle = '#374151';
+            ctx.fillText('写メ日記', chartWidth - 130, 61);
+            
+            ctx.fillStyle = '#10b981';
+            ctx.fillRect(chartWidth - 150, 70, 12, 12);
+            ctx.fillStyle = '#374151';
+            ctx.fillText('口コミ', chartWidth - 130, 81);
+        }
+
+        function generateGoalActionPlan(storeResults) {
+            const container = document.getElementById('goalActionPlan');
+            if (!container) return;
+            
+            const plans = [];
+            
+            // 低達成率店舗への提案
+            const lowPerformers = storeResults.filter(result => result.overallProgress < 80);
+            lowPerformers.forEach(result => {
+                plans.push({
+                    type: 'warning',
+                    title: `${result.store.name} - 目標達成率向上が必要`,
+                    description: `現在${Math.round(result.overallProgress)}%。80%以上を目指しましょう。`,
+                    actions: [
+                        result.salesProgress < 80 ? '売上向上施策の実施' : null,
+                        result.diaryProgress < 80 ? '写メ日記投稿増加施策' : null,
+                        result.reviewsProgress < 80 ? '口コミ獲得強化' : null
+                    ].filter(Boolean)
+                });
+            });
+            
+            // 高達成率店舗の称賛
+            const topPerformers = storeResults.filter(result => result.overallProgress >= 100);
+            if (topPerformers.length > 0) {
+                plans.push({
+                    type: 'success',
+                    title: '目標達成おめでとうございます！',
+                    description: `${topPerformers.map(r => r.store.name).join('、')}が目標を達成しました。`,
+                    actions: [
+                        '成功要因の分析と文書化',
+                        '他店舗への成功事例共有',
+                        '次月目標の上方修正検討'
+                    ]
+                });
+            }
+            
+            // 全体的な改善提案
+            const avgProgress = storeResults.reduce((sum, result) => sum + result.overallProgress, 0) / storeResults.length;
+            if (avgProgress < 90) {
+                plans.push({
+                    type: 'info',
+                    title: '全体的な目標達成率向上施策',
+                    description: `全体平均${Math.round(avgProgress)}%。組織全体での取り組みが必要です。`,
+                    actions: [
+                        '月次目標の見直し（現実的な設定）',
+                        '店舗間での情報共有強化',
+                        'インセンティブ制度の検討',
+                        '定期的な進捗確認会議の実施'
+                    ]
+                });
+            }
+            
+            container.innerHTML = plans.map(plan => `
+                <div class="border border-${getActionPlanColor(plan.type)}-200 bg-${getActionPlanColor(plan.type)}-50 rounded-lg p-4">
+                    <div class="flex items-start">
+                        <i class="fas fa-${getActionPlanIcon(plan.type)} text-${getActionPlanColor(plan.type)}-600 mr-3 mt-1"></i>
+                        <div class="flex-1">
+                            <h6 class="font-medium text-${getActionPlanColor(plan.type)}-800 mb-2">${plan.title}</h6>
+                            <p class="text-sm text-gray-700 mb-3">${plan.description}</p>
+                            <ul class="text-sm text-gray-600 space-y-1">
+                                ${plan.actions.map(action => `<li class="flex items-center"><i class="fas fa-arrow-right text-xs mr-2"></i>${action}</li>`).join('')}
+                            </ul>
                         </div>
                     </div>
-                `;
-            }).join('');
+                </div>
+            `).join('');
+        }
+
+        function generateGoalReport() {
+            const month = document.getElementById('goalMonth').value;
+            const goals = JSON.parse(localStorage.getItem(STORAGE_KEYS.goals) || '{}');
+            const monthGoals = goals[month] || {};
+            const salesData = JSON.parse(localStorage.getItem(STORAGE_KEYS.salesData) || '[]');
+            
+            const reportData = {
+                対象月: month,
+                生成日時: new Date().toLocaleString('ja-JP'),
+                店舗別目標達成状況: {}
+            };
+            
+            STORES.forEach(store => {
+                const storeGoals = monthGoals[store.id] || {};
+                const currentSales = calculateCurrentSales(salesData, store.id, month);
+                const currentDiary = calculateCurrentDiary(salesData, store.id, month);
+                const currentReviews = calculateCurrentReviews(salesData, store.id, month);
+                
+                reportData.店舗別目標達成状況[store.name] = {
+                    売上: {
+                        目標: storeGoals.sales || 0,
+                        実績: currentSales,
+                        達成率: storeGoals.sales > 0 ? Math.round((currentSales / storeGoals.sales) * 100) : 0
+                    },
+                    写メ日記: {
+                        目標: storeGoals.diary || 0,
+                        実績: currentDiary,
+                        達成率: storeGoals.diary > 0 ? Math.round((currentDiary / storeGoals.diary) * 100) : 0
+                    },
+                    口コミ: {
+                        目標: storeGoals.review || 0,
+                        実績: currentReviews,
+                        達成率: storeGoals.review > 0 ? Math.round((currentReviews / storeGoals.review) * 100) : 0
+                    }
+                };
+            });
+            
+            const reportText = JSON.stringify(reportData, null, 2);
+            const blob = new Blob([reportText], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `目標管理レポート_${month}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showNotification('目標管理レポートを生成しました', 'success');
         }
 
         function calculateCurrentSales(salesData, storeId, month) {
@@ -3321,16 +4329,222 @@
             const today = new Date();
             if (today.getDate() === 2) {
                 addNotification('今日は月次目標設定日です', 'warning');
+                
+                // 目標設定タブへの誘導
+                setTimeout(() => {
+                    if (confirm('今日は月次目標設定日です。目標管理タブを開きますか？')) {
+                        switchTab('goals');
+                    }
+                }, 5000);
             }
         }
+
+        // ドラッグ&ドロップ対応の追加
+        function setupSalesUploadDragDrop() {
+            const uploadArea = document.getElementById('salesUploadArea');
+            if (!uploadArea) return;
+            
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, preventDefaults, false);
+            });
+
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            uploadArea.addEventListener('dragenter', (e) => {
+                uploadArea.classList.add('border-blue-400', 'bg-blue-50');
+            });
+            
+            uploadArea.addEventListener('dragleave', (e) => {
+                if (!uploadArea.contains(e.relatedTarget)) {
+                    uploadArea.classList.remove('border-blue-400', 'bg-blue-50');
+                }
+            });
+            
+            uploadArea.addEventListener('dragover', (e) => {
+                uploadArea.classList.add('border-blue-400', 'bg-blue-50');
+            });
+            
+            uploadArea.addEventListener('drop', (e) => {
+                uploadArea.classList.remove('border-blue-400', 'bg-blue-50');
+                
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    const file = files[0];
+                    if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
+                        handleExcelUpload(file);
+                    } else if (file.name.endsWith('.csv')) {
+                        handleCSVUpload(file);
+                    } else {
+                        showNotification('Excel(.xlsx)またはCSV(.csv)ファイルをドロップしてください', 'error');
+                    }
+                }
+            });
+        }
+
+        // セッション拡張機能の改良
+        function extendSession() {
+            if (sessionStorage.getItem('isLoggedIn')) {
+                sessionStorage.setItem('loginTime', Date.now().toString());
+                if (sessionTimer) {
+                    clearInterval(sessionTimer);
+                    startSessionTimer(SESSION_DURATION);
+                }
+            }
+        }
+
+        // アクティビティ監視の強化
+        function setupActivityMonitoring() {
+            let lastActivity = Date.now();
+            
+            ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'].forEach(event => {
+                document.addEventListener(event, () => {
+                    if (sessionStorage.getItem('isLoggedIn')) {
+                        const now = Date.now();
+                        if (now - lastActivity > 10 * 60 * 1000) { // 10分間隔
+                            sessionStorage.setItem('lastActivity', now.toString());
+                            extendSession();
+                            lastActivity = now;
+                        }
+                    }
+                }, { passive: true });
+            });
+        }
+
+        // データ整合性チェック
+        function validateDataIntegrity() {
+            try {
+                // 各ストレージキーのデータを検証
+                Object.values(STORAGE_KEYS).forEach(key => {
+                    const data = localStorage.getItem(key);
+                    if (data && data !== '[]' && data !== '{}') {
+                        JSON.parse(data); // JSONパースエラーをチェック
+                    }
+                });
+                return true;
+            } catch (error) {
+                console.error('Data integrity check failed:', error);
+                showNotification('データの整合性エラーが発生しました', 'error');
+                return false;
+            }
+        }
+
+        // 自動バックアップ機能
+        function performAutoBackup() {
+            try {
+                const backupData = {
+                    timestamp: new Date().toISOString(),
+                    tasks: localStorage.getItem(STORAGE_KEYS.tasks),
+                    events: localStorage.getItem(STORAGE_KEYS.events),
+                    goals: localStorage.getItem(STORAGE_KEYS.goals),
+                    salesData: localStorage.getItem(STORAGE_KEYS.salesData)
+                };
+                
+                localStorage.setItem('autoBackup', JSON.stringify(backupData));
+                console.log('Auto backup completed');
+            } catch (error) {
+                console.error('Auto backup failed:', error);
+            }
+        }
+
+        // エラーハンドリングの強化
+        window.addEventListener('error', (event) => {
+            console.error('Global error:', event.error);
+            showNotification('システムエラーが発生しました。ページを再読み込みしてください。', 'error');
+        });
+
+        window.addEventListener('unhandledrejection', (event) => {
+            console.error('Unhandled promise rejection:', event.reason);
+            showNotification('処理エラーが発生しました', 'error');
+        });
 
         // 定期実行タスク
         setInterval(() => {
             if (sessionStorage.getItem('isLoggedIn')) {
                 checkAlerts();
                 checkGoalSettingReminder();
+                validateDataIntegrity();
+                performAutoBackup();
             }
         }, 30 * 60 * 1000); // 30分ごと
+
+        // 初期化完了後の処理
+        document.addEventListener('DOMContentLoaded', () => {
+            setupActivityMonitoring();
+            setTimeout(() => {
+                if (document.getElementById('salesUploadArea')) {
+                    setupSalesUploadDragDrop();
+                }
+            }, 1000);
+        });
+
+        // ページの可視性変更時の処理
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden && sessionStorage.getItem('isLoggedIn')) {
+                // ページが再表示されたときのデータ整合性チェック
+                setTimeout(validateDataIntegrity, 1000);
+            }
+        });
+
+        // ローカルストレージの変更監視
+        window.addEventListener('storage', (e) => {
+            if (e.key && Object.values(STORAGE_KEYS).includes(e.key)) {
+                // 他のタブでデータが変更された場合の処理
+                if (currentTab === 'dashboard') {
+                    updateAllStats();
+                }
+            }
+        });
+
+        // PWA対応の基本設定
+        if ('serviceWorker' in navigator) {
+            // Service Workerは実装されていないが、将来の拡張のための準備
+            console.log('Service Worker support detected');
+        }
+
+        // オフライン対応の基本検知
+        window.addEventListener('online', () => {
+            showNotification('オンラインに復帰しました', 'success');
+        });
+
+        window.addEventListener('offline', () => {
+            showNotification('オフラインモードです。一部機能が制限されます', 'warning');
+        });
+
+        // パフォーマンス監視
+        function monitorPerformance() {
+            if ('performance' in window) {
+                setTimeout(() => {
+                    const navigation = performance.getEntriesByType('navigation')[0];
+                    if (navigation && navigation.loadEventEnd > 5000) {
+                        console.warn('Slow page load detected:', navigation.loadEventEnd);
+                    }
+                }, 5000);
+            }
+        }
+
+        // メモリ使用量の監視（可能な場合）
+        function checkMemoryUsage() {
+            if ('memory' in performance) {
+                const memInfo = performance.memory;
+                const usedMB = Math.round(memInfo.usedJSHeapSize / 1048576);
+                if (usedMB > 100) { // 100MB以上の場合警告
+                    console.warn('High memory usage detected:', usedMB, 'MB');
+                }
+            }
+        }
+
+        // 定期パフォーマンスチェック
+        setInterval(() => {
+            if (sessionStorage.getItem('isLoggedIn')) {
+                checkMemoryUsage();
+            }
+        }, 5 * 60 * 1000); // 5分ごと
+
+        // 初期パフォーマンス監視
+        window.addEventListener('load', monitorPerformance);
     </script>
 </body>
 </html>
