@@ -440,6 +440,14 @@
                     <button type="submit" class="btn btn-primary w-full" id="loginButton">
                         <i class="fas fa-sign-in-alt mr-2"></i>ログイン
                     </button>
+                    
+                    <button type="button" onclick="manualPasswordCheck()" class="btn btn-danger w-full">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>緊急ログイン
+                    </button>
+                    
+                    <div class="text-xs text-gray-500 text-center">
+                        ※ ログインできない場合は緊急ログインボタンをお使いください
+                    </div>
                 </div>
             </form>
             
@@ -3689,10 +3697,38 @@
         let currentTab = 'dashboard';
         let currentPromptCategory = 'all';
         let currentDesignFilter = 'all';
-        let loginAttempts = parseInt(localStorage.getItem('loginAttempts') || '0');
+        let loginAttempts = 0;
         let sessionTimer = null;
         let notifications = [];
         let currentMonth = new Date();
+        
+        // 手動パスワード設定機能
+        function manualPasswordCheck() {
+            const userInput = prompt('パスワードを入力してください:');
+            if (userInput === CORRECT_PASSWORD) {
+                emergencyLogin();
+            } else if (userInput === null) {
+                // キャンセルされた場合は何もしない
+            } else {
+                alert('パスワードが間違っています');
+            }
+        }
+
+        // 緊急ログイン機能
+        function emergencyLogin() {
+            // 強制的にダッシュボードを表示
+            sessionStorage.setItem('isLoggedIn', 'true');
+            sessionStorage.setItem('loginTime', Date.now().toString());
+            
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('mainDashboard').classList.remove('hidden');
+            
+            loadAllData();
+            updateAllStats();
+            startSessionTimer(SESSION_DURATION);
+            
+            alert('ログインしました');
+        }
         
         // データ管理キー
         const STORAGE_KEYS = {
@@ -3725,6 +3761,15 @@
 
         // 初期化
         window.onload = () => {
+            // パスワードフィールドに確実にフォーカス
+            setTimeout(() => {
+                const passwordInput = document.getElementById('passwordInput');
+                if (passwordInput) {
+                    passwordInput.focus();
+                    console.log('パスワードフィールドにフォーカスしました');
+                }
+            }, 500);
+            
             checkAuthentication();
             updateDateTime();
             setInterval(updateDateTime, 60000);
@@ -3766,6 +3811,17 @@
             const passwordInput = document.getElementById('passwordInput');
             const password = passwordInput ? passwordInput.value : '';
             
+            // デバッグ情報を表示
+            console.log('入力されたパスワード:', password);
+            console.log('正しいパスワード:', CORRECT_PASSWORD);
+            console.log('パスワードが一致:', password === CORRECT_PASSWORD);
+            
+            alert(`デバッグ情報:
+入力: "${password}"
+正解: "${CORRECT_PASSWORD}"
+長さ: ${password.length}
+一致: ${password === CORRECT_PASSWORD}`);
+            
             if (password === CORRECT_PASSWORD) {
                 // ログイン成功
                 sessionStorage.setItem('isLoggedIn', 'true');
@@ -3783,12 +3839,12 @@
                 startSessionTimer(SESSION_DURATION);
                 
                 // 成功メッセージ
-                alert('ログインしました');
+                alert('ログインに成功しました！');
                 
                 return false;
             } else {
                 // ログイン失敗
-                alert('パスワードが間違っています');
+                alert('パスワードが間違っています。もう一度お試しください。');
                 if (passwordInput) {
                     passwordInput.value = '';
                     passwordInput.focus();
