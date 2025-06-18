@@ -116,6 +116,12 @@
             color: white;
         }
         
+        .btn-warning:hover {
+            background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(245, 158, 11, 0.4);
+        }
+        
         .btn-danger {
             background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
             color: white;
@@ -136,6 +142,8 @@
             transition: all 0.3s ease;
             background: rgba(255, 255, 255, 0.9);
             backdrop-filter: blur(10px);
+            cursor: text;
+            pointer-events: auto;
         }
         
         .input-field:focus {
@@ -143,6 +151,12 @@
             border-color: #667eea;
             box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
             background: rgba(255, 255, 255, 1);
+        }
+        
+        .input-field:disabled {
+            background: rgba(200, 200, 200, 0.5);
+            cursor: not-allowed;
+            pointer-events: none;
         }
         
         .nav-tab {
@@ -407,6 +421,14 @@
         .modal.show .modal-content {
             transform: scale(1);
         }
+        
+        code {
+            background-color: #f3f4f6;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
     </style>
 </head>
 <body>
@@ -433,6 +455,7 @@
                             class="input-field" 
                             placeholder="パスワードを入力してください"
                             required
+                            autocomplete="current-password"
                         >
                     </div>
                     
@@ -440,9 +463,18 @@
                         <i class="fas fa-sign-in-alt mr-2"></i>ログイン
                     </button>
                     
-                    <button type="button" onclick="resetLoginState()" class="btn btn-secondary w-full">
-                        <i class="fas fa-refresh mr-2"></i>リセット
-                    </button>
+                    <div class="flex space-x-2">
+                        <button type="button" onclick="resetLoginState()" class="btn btn-secondary flex-1">
+                            <i class="fas fa-refresh mr-2"></i>リセット
+                        </button>
+                        <button type="button" onclick="forceShowLoginScreen()" class="btn btn-warning flex-1">
+                            <i class="fas fa-undo mr-2"></i>強制初期化
+                        </button>
+                    </div>
+                    
+                    <div class="text-center text-xs text-gray-500 mt-4">
+                        パスワード: <code class="bg-gray-100 px-2 py-1 rounded">iam1104JP</code>
+                    </div>
                 </div>
             </form>
             
@@ -3721,12 +3753,11 @@
         let currentSalesData = [];
         let currentStoreStats = {};
 
-        // 初期化
+        // 初期化 - シンプルに修正
         window.onload = () => {
-            // ログイン状態をリセット（開発時・デバッグ用）
-            resetLoginState();
+            // 強制的にログイン画面を表示
+            forceShowLoginScreen();
             
-            checkAuthentication();
             updateDateTime();
             setInterval(updateDateTime, 60000);
             setupEventListeners();
@@ -3734,8 +3765,53 @@
             setInterval(checkAlerts, 60000);
         };
 
-        // 認証処理
+        // 強制ログイン画面表示
+        function forceShowLoginScreen() {
+            // すべてのログイン関連データをクリア
+            localStorage.removeItem('loginAttempts');
+            sessionStorage.removeItem('isLoggedIn');
+            sessionStorage.removeItem('loginTime');
+            
+            // グローバル変数もリセット
+            loginAttempts = 0;
+            
+            // 画面切り替え
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('mainDashboard').classList.add('hidden');
+            document.getElementById('sessionTimer').classList.add('hidden');
+            
+            // パスワードフィールドを確実に有効化
+            setTimeout(() => {
+                const passwordInput = document.getElementById('passwordInput');
+                const submitBtn = document.querySelector('button[type="submit"]');
+                const attemptsDiv = document.getElementById('loginAttempts');
+                
+                if (passwordInput) {
+                    passwordInput.disabled = false;
+                    passwordInput.value = '';
+                    passwordInput.style.backgroundColor = 'white';
+                    passwordInput.style.cursor = 'text';
+                    passwordInput.focus();
+                }
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-sign-in-alt mr-2"></i>ログイン';
+                }
+                if (attemptsDiv) {
+                    attemptsDiv.classList.add('hidden');
+                }
+                
+                console.log('ログイン画面を初期化しました');
+            }, 100);
+        }
+
+        // 認証処理 - 簡素化
         function checkAuthentication() {
+            // 強制的にログイン画面を表示（デバッグ用）
+            forceShowLoginScreen();
+            
+            // 以下はコメントアウト（後で必要に応じて有効化）
+            /*
             const isLoggedIn = sessionStorage.getItem('isLoggedIn');
             const loginTime = sessionStorage.getItem('loginTime');
             
@@ -3749,13 +3825,23 @@
             }
             
             showLoginScreen();
+            */
         }
 
         function handleLogin(event) {
             event.preventDefault();
-            const password = document.getElementById('passwordInput').value;
+            
+            const passwordInput = document.getElementById('passwordInput');
+            if (!passwordInput) {
+                alert('パスワードフィールドが見つかりません');
+                return;
+            }
+            
+            const password = passwordInput.value;
+            console.log('入力されたパスワード:', password); // デバッグ用
             
             if (password === CORRECT_PASSWORD) {
+                // ログイン成功
                 sessionStorage.setItem('isLoggedIn', 'true');
                 sessionStorage.setItem('loginTime', Date.now().toString());
                 localStorage.removeItem('loginAttempts');
@@ -3764,19 +3850,25 @@
                 showDashboard();
                 startSessionTimer(SESSION_DURATION);
                 showNotification('ログインしました', 'success');
-                document.getElementById('passwordInput').value = '';
+                passwordInput.value = '';
+                
+                console.log('ログイン成功');
             } else {
+                // ログイン失敗
                 loginAttempts++;
                 localStorage.setItem('loginAttempts', loginAttempts.toString());
                 
+                console.log('ログイン失敗。試行回数:', loginAttempts);
+                
                 if (loginAttempts >= MAX_LOGIN_ATTEMPTS) {
-                    showNotification(`セキュリティのため${MAX_LOGIN_ATTEMPTS}分間ロックされました`, 'error');
+                    showNotification(`セキュリティのため30秒間ロックされました`, 'error');
                     lockLogin();
                 } else {
                     showNotification(`パスワードが間違っています (${loginAttempts}/${MAX_LOGIN_ATTEMPTS})`, 'error');
                     updateLoginAttemptDisplay();
                 }
-                document.getElementById('passwordInput').value = '';
+                passwordInput.value = '';
+                passwordInput.focus();
             }
         }
 
@@ -3794,53 +3886,83 @@
             const passwordInput = document.getElementById('passwordInput');
             const submitBtn = document.querySelector('button[type="submit"]');
             
-            passwordInput.disabled = true;
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-lock mr-2"></i>ロック中...';
+            console.log('ログインをロックします...');
+            
+            if (passwordInput) {
+                passwordInput.disabled = true;
+                passwordInput.style.backgroundColor = 'rgba(200, 200, 200, 0.5)';
+            }
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-lock mr-2"></i>ロック中...';
+            }
             
             setTimeout(() => {
-                passwordInput.disabled = false;
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '<i class="fas fa-sign-in-alt mr-2"></i>ログイン';
+                console.log('ロックを解除します...');
+                if (passwordInput) {
+                    passwordInput.disabled = false;
+                    passwordInput.style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
+                    passwordInput.focus();
+                }
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-sign-in-alt mr-2"></i>ログイン';
+                }
                 localStorage.removeItem('loginAttempts');
                 loginAttempts = 0;
                 document.getElementById('loginAttempts').classList.add('hidden');
-                showNotification('ロックが解除されました', 'info');
-            }, 30 * 1000); // 30秒に短縮
+                alert('ロックが解除されました。パスワード: iam1104JP');
+            }, 10 * 1000); // 10秒に短縮
         }
 
-        // ログイン状態をリセットする関数を追加
+        // ログイン状態をリセットする関数 - 簡素化
         function resetLoginState() {
+            console.log('リセット開始...');
+            
+            // ストレージクリア
             localStorage.removeItem('loginAttempts');
+            sessionStorage.removeItem('isLoggedIn');
+            sessionStorage.removeItem('loginTime');
+            
+            // グローバル変数リセット
             loginAttempts = 0;
             
+            // UI要素の確実な有効化
             const passwordInput = document.getElementById('passwordInput');
             const submitBtn = document.querySelector('button[type="submit"]');
             const attemptsDiv = document.getElementById('loginAttempts');
             
             if (passwordInput) {
                 passwordInput.disabled = false;
+                passwordInput.readOnly = false;
                 passwordInput.value = '';
-                passwordInput.focus(); // フォーカスを当てる
+                passwordInput.style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
+                passwordInput.style.cursor = 'text';
+                passwordInput.style.pointerEvents = 'auto';
+                
+                // フォーカスを当てる
+                setTimeout(() => {
+                    passwordInput.focus();
+                }, 100);
+                
+                console.log('パスワードフィールドを有効化しました');
+            } else {
+                console.error('パスワードフィールドが見つかりません');
             }
+            
             if (submitBtn) {
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = '<i class="fas fa-sign-in-alt mr-2"></i>ログイン';
+                console.log('ログインボタンを有効化しました');
             }
+            
             if (attemptsDiv) {
                 attemptsDiv.classList.add('hidden');
             }
             
-            // ログイン関連のセッションデータもクリア
-            sessionStorage.removeItem('isLoggedIn');
-            sessionStorage.removeItem('loginTime');
-            
-            console.log('ログイン状態をリセットしました');
-            
-            // 通知を表示（showNotification関数が利用可能な場合のみ）
-            if (typeof showNotification === 'function') {
-                showNotification('ログイン状態をリセットしました', 'info');
-            }
+            // 成功メッセージ
+            alert('ログイン状態をリセットしました。パスワード: iam1104JP');
+            console.log('リセット完了');
         }
 
         function logout() {
@@ -3890,7 +4012,6 @@
             
             // ログイン状態をリセット
             resetLoginState();
-            updateLoginAttemptDisplay();
         }
 
         function showDashboard() {
