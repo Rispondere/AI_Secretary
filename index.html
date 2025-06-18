@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI_Secretary v3 - 有限会社Rispondere</title>
+    <title>AI_Secretary v4 - 有限会社Rispondere 統合業務管理システム</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -24,7 +24,10 @@
                             500: '#0ea5e9',
                             600: '#0284c7',
                             700: '#0369a1'
-                        }
+                        },
+                        success: '#10b981',
+                        warning: '#f59e0b',
+                        danger: '#ef4444'
                     }
                 }
             }
@@ -33,19 +36,31 @@
     <style>
         body {
             font-family: 'Inter', 'Noto Sans JP', sans-serif;
-            background-color: #f8fafc;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            min-height: 100vh;
         }
         
-        .card {
-            background: white;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            transition: box-shadow 0.2s ease;
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
         
-        .card:hover {
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .glass-card:hover {
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
         }
         
         .btn {
@@ -54,207 +69,132 @@
             justify-content: center;
             padding: 12px 20px;
             font-weight: 500;
-            border-radius: 8px;
-            transition: all 0.2s ease;
+            border-radius: 12px;
+            transition: all 0.3s ease;
             border: none;
             cursor: pointer;
-            font-size: 16px;
-            min-height: 48px;
+            font-size: 14px;
+            min-height: 44px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn:hover::before {
+            left: 100%;
         }
         
         .btn-primary {
-            background-color: #0ea5e9;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
         }
         
         .btn-primary:hover {
-            background-color: #0284c7;
-        }
-        
-        .btn-secondary {
-            background-color: #f1f5f9;
-            color: #334155;
-            border: 1px solid #e2e8f0;
-        }
-        
-        .btn-secondary:hover {
-            background-color: #e2e8f0;
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
         }
         
         .btn-success {
-            background-color: #10b981;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: white;
-        }
-        
-        .btn-success:hover {
-            background-color: #059669;
         }
         
         .btn-warning {
-            background-color: #f59e0b;
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
             color: white;
-        }
-        
-        .btn-warning:hover {
-            background-color: #d97706;
         }
         
         .btn-danger {
-            background-color: #ef4444;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
             color: white;
         }
         
-        .btn-danger:hover {
-            background-color: #dc2626;
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.8);
+            color: #374151;
+            border: 1px solid rgba(0, 0, 0, 0.1);
         }
         
         .input-field {
             width: 100%;
             padding: 12px 16px;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.2s ease;
-            min-height: 48px;
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
         }
         
         .input-field:focus {
             outline: none;
-            border-color: #0ea5e9;
-            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            background: rgba(255, 255, 255, 1);
         }
         
-        .tab {
-            padding: 8px 16px;
-            border-radius: 6px;
+        .nav-tab {
+            padding: 12px 20px;
+            border-radius: 12px;
             font-weight: 500;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
             cursor: pointer;
-            border: 1px solid #e2e8f0;
-            background: white;
-            min-height: 40px;
-            display: inline-flex;
-            align-items: center;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin: 0 4px;
         }
         
-        .tab.active {
-            background-color: #0ea5e9;
+        .nav-tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            border-color: #0ea5e9;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
         }
         
-        .tab:not(.active):hover {
-            background-color: #f1f5f9;
+        .nav-tab:not(.active):hover {
+            background: rgba(255, 255, 255, 0.8);
+            transform: translateY(-1px);
         }
         
-        .task-item {
-            background: white;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            padding: 16px;
-            transition: all 0.2s ease;
-        }
-        
-        .task-item:hover {
-            border-color: #bae6fd;
-            background-color: #f0f9ff;
-        }
-        
-        .task-item.completed {
-            background-color: #f0fdf4;
-            border-color: #bbf7d0;
-        }
-        
-        .prompt-item {
-            background: white;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            padding: 16px;
-            transition: all 0.2s ease;
-        }
-        
-        .prompt-item:hover {
-            border-color: #bae6fd;
-            background-color: #f0f9ff;
-        }
-        
-        .section-title {
-            font-size: 20px;
-            font-weight: 600;
-            color: #1e293b;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-        }
-        
-        .section-title i {
-            margin-right: 8px;
-            color: #0ea5e9;
-        }
-        
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 12px;
-            margin-bottom: 24px;
-        }
-        
-        .stat-card {
-            background: white;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            padding: 16px;
+        .stats-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 16px;
+            padding: 20px;
             text-align: center;
+            transition: all 0.3s ease;
         }
         
-        .stat-number {
-            font-size: 24px;
-            font-weight: 700;
-            color: #1e293b;
-        }
-        
-        .stat-label {
-            font-size: 12px;
-            color: #64748b;
-            margin-top: 4px;
-        }
-        
-        .progress-bar {
-            background-color: #e2e8f0;
-            border-radius: 4px;
-            height: 8px;
-            overflow: hidden;
-        }
-        
-        .progress-fill {
-            background-color: #10b981;
-            height: 100%;
-            transition: width 0.3s ease;
-        }
-        
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: #64748b;
-        }
-        
-        .empty-state i {
-            font-size: 48px;
-            color: #cbd5e1;
-            margin-bottom: 16px;
+        .stats-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
         }
         
         .notification {
             position: fixed;
             top: 20px;
             right: 20px;
-            padding: 16px 20px;
-            border-radius: 8px;
+            padding: 16px 24px;
+            border-radius: 12px;
             color: white;
             font-weight: 500;
             z-index: 1000;
+            backdrop-filter: blur(20px);
             transform: translateX(400px);
             transition: transform 0.3s ease;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
         }
         
         .notification.show {
@@ -262,119 +202,95 @@
         }
         
         .notification.success {
-            background-color: #10b981;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
         }
         
         .notification.error {
-            background-color: #ef4444;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
         }
         
         .notification.info {
-            background-color: #0ea5e9;
+            background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
         }
         
-        /* CSV編集テーブル */
-        .csv-edit-table {
-            width: 100%;
-            border-collapse: collapse;
+        .notification.warning {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
         }
         
-        .csv-edit-cell {
-            border: 1px solid #d1d5db;
-            padding: 8px 12px;
-            background: white;
-            transition: all 0.2s ease;
-            min-width: 120px;
-            position: relative;
+        .chart-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 16px 0;
         }
         
-        .csv-edit-cell:hover {
-            background-color: #f9fafb;
-            border-color: #60a5fa;
+        .progress-ring {
+            transform: rotate(-90deg);
         }
         
-        .csv-edit-cell:focus {
-            outline: none;
-            background-color: #eff6ff;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+        .progress-ring-fill {
+            transition: stroke-dasharray 0.5s ease;
         }
         
-        .csv-header-cell {
-            background-color: #f3f4f6;
-            font-weight: 600;
-            color: #374151;
-            border: 1px solid #d1d5db;
-            padding: 8px 12px;
-            position: relative;
-        }
-        
-        .csv-header-cell:hover {
-            background-color: #e5e7eb;
-        }
-        
-        .csv-header-cell:focus {
-            outline: none;
-            background-color: #dbeafe;
-            border-color: #3b82f6;
-        }
-        
-        .csv-row-number {
-            background-color: #f9fafb;
-            color: #6b7280;
-            font-weight: 500;
-            text-align: center;
-            min-width: 40px;
-            border: 1px solid #d1d5db;
-            padding: 8px 4px;
-        }
-        
-        .csv-delete-btn {
-            position: absolute;
-            top: 2px;
-            right: 2px;
-            width: 16px;
-            height: 16px;
-            background: #ef4444;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            font-size: 10px;
-            cursor: pointer;
-            display: none;
+        .calendar-day {
+            width: 40px;
+            height: 40px;
+            display: flex;
             align-items: center;
             justify-content: center;
-        }
-        
-        .csv-edit-cell:hover .csv-delete-btn,
-        .csv-header-cell:hover .csv-delete-btn {
-            display: flex;
-        }
-        
-        .csv-delete-btn:hover {
-            background: #dc2626;
-        }
-        
-        .csv-add-row-btn {
-            background: #f3f4f6;
-            color: #6b7280;
-            border: 1px dashed #d1d5db;
-            padding: 8px;
-            text-align: center;
             cursor: pointer;
+            border-radius: 8px;
             transition: all 0.2s ease;
+            font-size: 14px;
         }
         
-        .csv-add-row-btn:hover {
-            background: #e5e7eb;
-            color: #374151;
-            border-color: #9ca3af;
+        .calendar-day:hover {
+            background: rgba(102, 126, 234, 0.1);
         }
         
-        /* ログイン画面スタイル */
+        .calendar-day.today {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .calendar-day.has-event {
+            background: rgba(245, 158, 11, 0.2);
+            border: 2px solid #f59e0b;
+        }
+        
+        .task-item {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            padding: 16px;
+            margin: 8px 0;
+            transition: all 0.3s ease;
+        }
+        
+        .task-item:hover {
+            background: rgba(255, 255, 255, 0.95);
+            transform: translateX(4px);
+        }
+        
+        .task-item.completed {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+        
+        .task-item.urgent {
+            border-left: 4px solid #ef4444;
+            background: rgba(239, 68, 68, 0.05);
+        }
+        
+        .task-item.priority-high {
+            border-left: 4px solid #f59e0b;
+            background: rgba(245, 158, 11, 0.05);
+        }
+        
         .login-container {
             min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -382,113 +298,126 @@
         }
         
         .login-card {
-            background: white;
-            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 24px;
             padding: 40px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
             width: 100%;
-            max-width: 400px;
+            max-width: 420px;
+            animation: slideUp 0.6s ease-out;
         }
         
-        .login-logo {
-            text-align: center;
-            margin-bottom: 32px;
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         
-        .login-logo i {
-            font-size: 48px;
-            color: #0ea5e9;
-            margin-bottom: 16px;
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 24px;
+            margin: 24px 0;
         }
         
-        .login-title {
-            font-size: 24px;
-            font-weight: 700;
-            color: #1e293b;
-            text-align: center;
-            margin-bottom: 8px;
+        .col-span-3 { grid-column: span 3; }
+        .col-span-4 { grid-column: span 4; }
+        .col-span-6 { grid-column: span 6; }
+        .col-span-8 { grid-column: span 8; }
+        .col-span-12 { grid-column: span 12; }
+        
+        @media (max-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: repeat(6, 1fr);
+            }
+            .col-span-3 { grid-column: span 6; }
+            .col-span-4 { grid-column: span 6; }
+            .col-span-8 { grid-column: span 6; }
         }
         
-        .login-subtitle {
-            color: #64748b;
-            text-align: center;
-            margin-bottom: 32px;
-        }
-        
-        .security-info {
-            background: #f0f9ff;
-            border: 1px solid #bae6fd;
-            border-radius: 8px;
-            padding: 12px;
-            margin-top: 16px;
-            font-size: 14px;
-            color: #0369a1;
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: repeat(1, 1fr);
+                gap: 16px;
+            }
+            .col-span-3,
+            .col-span-4,
+            .col-span-6,
+            .col-span-8,
+            .col-span-12 {
+                grid-column: span 1;
+            }
         }
         
         .session-timer {
             position: fixed;
             top: 20px;
             left: 20px;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
             color: white;
-            padding: 8px 12px;
-            border-radius: 6px;
+            padding: 8px 16px;
+            border-radius: 12px;
             font-size: 12px;
             z-index: 1000;
         }
         
-        @media (max-width: 768px) {
-            .container {
-                padding: 16px;
-            }
-            
-            .card {
-                margin-bottom: 20px;
-            }
-            
-            .btn {
-                padding: 14px 20px;
-                font-size: 16px;
-                min-height: 52px;
-            }
-            
-            .input-field {
-                padding: 14px 16px;
-                font-size: 16px;
-                min-height: 52px;
-            }
-            
-            .login-card {
-                padding: 32px 24px;
-            }
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
         }
         
-        @media (min-width: 769px) {
-            .desktop-grid {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 24px;
-            }
+        .modal.show {
+            opacity: 1;
+            pointer-events: all;
         }
         
-        .fade-in {
-            animation: fadeIn 0.5s ease-out;
+        .modal-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 24px;
+            max-width: 90vw;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
         }
         
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        .modal.show .modal-content {
+            transform: scale(1);
         }
     </style>
 </head>
 <body>
     <!-- ログイン画面 -->
     <div id="loginScreen" class="login-container">
-        <div class="login-card fade-in">
-            <div class="login-logo">
-                <i class="fas fa-shield-alt"></i>
-                <div class="login-title">セキュアログイン</div>
-                <div class="login-subtitle">有限会社Rispondere<br>AI_Secretary ダッシュボード</div>
+        <div class="login-card">
+            <div class="text-center mb-8">
+                <div class="text-6xl mb-4">
+                    <i class="fas fa-building text-purple-600"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-gray-900 mb-2">AI Secretary v4</h1>
+                <p class="text-gray-600">有限会社Rispondere<br>統合業務管理システム</p>
             </div>
             
             <form onsubmit="handleLogin(event)">
@@ -503,7 +432,6 @@
                             class="input-field" 
                             placeholder="パスワードを入力してください"
                             required
-                            autocomplete="current-password"
                         >
                     </div>
                     
@@ -513,16 +441,16 @@
                 </div>
             </form>
             
-            <div class="security-info">
-                <i class="fas fa-info-circle mr-2"></i>
-                セキュリティ機能：自動ログアウト（30分）・ログイン試行制限・セッション管理
+            <div class="mt-6 p-4 bg-blue-50 rounded-lg">
+                <div class="flex items-center text-blue-800 text-sm">
+                    <i class="fas fa-shield-alt mr-2"></i>
+                    セキュアログイン・セッション管理・自動バックアップ
+                </div>
             </div>
             
-            <div id="loginAttempts" class="hidden mt-4 text-center">
-                <div class="text-red-600 text-sm">
-                    <i class="fas fa-exclamation-triangle mr-2"></i>
-                    ログイン試行回数: <span id="attemptCount">0</span>/5
-                </div>
+            <div id="loginAttempts" class="hidden mt-4 text-center text-red-600 text-sm">
+                <i class="fas fa-exclamation-triangle mr-2"></i>
+                ログイン試行: <span id="attemptCount">0</span>/5
             </div>
         </div>
     </div>
@@ -530,45 +458,32 @@
     <!-- セッションタイマー -->
     <div id="sessionTimer" class="session-timer hidden">
         <i class="fas fa-clock mr-2"></i>
-        セッション残り時間: <span id="timeRemaining"></span>
+        <span id="timeRemaining"></span>
     </div>
 
     <!-- メインダッシュボード -->
-    <div id="mainDashboard" class="hidden">
+    <div id="mainDashboard" class="hidden min-h-screen">
         <!-- ヘッダー -->
-        <div class="bg-white border-b border-gray-200">
-            <div class="max-w-6xl mx-auto px-4 py-6">
-                <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-                    <div class="text-center md:text-left">
-                        <h1 class="text-2xl md:text-3xl font-bold text-gray-900 flex items-center justify-center md:justify-start">
-                            <i class="fas fa-briefcase mr-3 text-blue-500"></i>
-                            AI_Secretary
+        <div class="glass-card mx-4 mt-4 mb-6">
+            <div class="p-6">
+                <div class="flex flex-col lg:flex-row justify-between items-center space-y-4 lg:space-y-0">
+                    <div>
+                        <h1 class="text-3xl font-bold text-gray-900 flex items-center">
+                            <i class="fas fa-building mr-3 text-purple-600"></i>
+                            Rispondere 統合管理
                         </h1>
-                        <p class="text-gray-600 mt-1">有限会社Rispondere 業務管理システム</p>
+                        <p class="text-gray-600 mt-1">AI Secretary v4 - 全店舗・全部門統合システム</p>
                     </div>
                     
-                    <div class="flex flex-col md:flex-row items-center space-y-3 md:space-y-0 md:space-x-4">
-                        <div class="flex items-center space-x-2">
-                            <i class="fas fa-store text-gray-500"></i>
-                            <select id="storeSelector" class="input-field" style="width: auto; min-width: 180px;" onchange="switchStore()">
-                                <option value="classy_tokyo">CLASSY東京</option>
-                                <option value="classy_nagoya">CLASSY名古屋</option>
-                                <option value="classy_yokkaichi">CLASSY四日市</option>
-                                <option value="grandopera_tokyo">GrandOpera東京</option>
-                                <option value="grandopera_yokohama">GrandOpera横浜</option>
-                                <option value="grandopera_nagoya">GrandOpera名古屋</option>
-                                <option value="grandopera_fukuoka">GrandOpera福岡</option>
-                                <option value="wancarat">ワンカラット</option>
-                                <option value="shabour">シャブール</option>
-                                <option value="opera_nishiki">オペラ錦</option>
-                            </select>
+                    <div class="flex items-center space-x-4">
+                        <div class="text-center">
+                            <div class="font-semibold text-gray-900" id="currentDate"></div>
+                            <div class="text-sm text-gray-500" id="currentTime"></div>
                         </div>
-                        
-                        <div class="text-center md:text-right">
-                            <div class="font-semibold text-gray-900" id="currentStore">CLASSY東京</div>
-                            <div class="text-sm text-gray-500" id="currentDate"></div>
-                        </div>
-                        
+                        <button onclick="showNotifications()" class="btn btn-secondary">
+                            <i class="fas fa-bell mr-2"></i>
+                            <span id="notificationCount" class="bg-red-500 text-white text-xs rounded-full px-2 py-1 ml-1">0</span>
+                        </button>
                         <button onclick="logout()" class="btn btn-danger">
                             <i class="fas fa-sign-out-alt mr-2"></i>ログアウト
                         </button>
@@ -577,81 +492,517 @@
             </div>
         </div>
 
-        <!-- 統計情報 -->
-        <div class="max-w-6xl mx-auto px-4 py-6">
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-number" id="totalTasks">0</div>
-                    <div class="stat-label">総タスク</div>
+        <!-- ナビゲーション -->
+        <div class="mx-4 mb-6">
+            <div class="flex flex-wrap justify-center lg:justify-start gap-2">
+                <button class="nav-tab active" data-tab="dashboard" onclick="switchTab('dashboard')">
+                    <i class="fas fa-chart-line mr-2"></i>ダッシュボード
+                </button>
+                <button class="nav-tab" data-tab="tasks" onclick="switchTab('tasks')">
+                    <i class="fas fa-tasks mr-2"></i>タスク管理
+                </button>
+                <button class="nav-tab" data-tab="schedule" onclick="switchTab('schedule')">
+                    <i class="fas fa-calendar mr-2"></i>スケジュール
+                </button>
+                <button class="nav-tab" data-tab="sales" onclick="switchTab('sales')">
+                    <i class="fas fa-chart-bar mr-2"></i>売上分析
+                </button>
+                <button class="nav-tab" data-tab="goals" onclick="switchTab('goals')">
+                    <i class="fas fa-target mr-2"></i>目標管理
+                </button>
+                <button class="nav-tab" data-tab="design" onclick="switchTab('design')">
+                    <i class="fas fa-palette mr-2"></i>デザイン部門
+                </button>
+                <button class="nav-tab" data-tab="tools" onclick="switchTab('tools')">
+                    <i class="fas fa-tools mr-2"></i>ツール
+                </button>
+            </div>
+        </div>
+
+        <!-- ダッシュボードタブ -->
+        <div id="dashboardTab" class="tab-content mx-4">
+            <!-- 統計カード -->
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-6">
+                <div class="stats-card">
+                    <div class="text-2xl font-bold text-purple-600 mb-2" id="totalTasks">0</div>
+                    <div class="text-sm text-gray-600">総タスク数</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="completedTasks">0</div>
-                    <div class="stat-label">完了済み</div>
+                <div class="stats-card">
+                    <div class="text-2xl font-bold text-green-600 mb-2" id="completedTasks">0</div>
+                    <div class="text-sm text-gray-600">完了済み</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="totalPrompts">0</div>
-                    <div class="stat-label">プロンプト</div>
+                <div class="stats-card">
+                    <div class="text-2xl font-bold text-red-600 mb-2" id="urgentTasks">0</div>
+                    <div class="text-sm text-gray-600">緊急タスク</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="memoCount">0</div>
-                    <div class="stat-label">メモ履歴</div>
+                <div class="stats-card">
+                    <div class="text-2xl font-bold text-blue-600 mb-2" id="totalEvents">0</div>
+                    <div class="text-sm text-gray-600">予定数</div>
+                </div>
+                <div class="stats-card">
+                    <div class="text-2xl font-bold text-yellow-600 mb-2" id="totalStores">10</div>
+                    <div class="text-sm text-gray-600">運営店舗</div>
+                </div>
+                <div class="stats-card">
+                    <div class="text-2xl font-bold text-indigo-600 mb-2" id="designProjects">0</div>
+                    <div class="text-sm text-gray-600">デザイン案件</div>
+                </div>
+            </div>
+
+            <!-- クイック概要 -->
+            <div class="dashboard-grid">
+                <div class="col-span-4">
+                    <div class="glass-card p-6">
+                        <h3 class="text-lg font-semibold mb-4 flex items-center">
+                            <i class="fas fa-chart-pie mr-2 text-purple-600"></i>今日の進捗
+                        </h3>
+                        <div class="flex items-center justify-center">
+                            <div class="relative w-32 h-32">
+                                <svg class="w-32 h-32 progress-ring">
+                                    <circle cx="64" cy="64" r="56" stroke="#e5e7eb" stroke-width="8" fill="none"/>
+                                    <circle id="progressCircle" cx="64" cy="64" r="56" stroke="#667eea" stroke-width="8" 
+                                            fill="none" stroke-linecap="round" class="progress-ring-fill"/>
+                                </svg>
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                    <span id="progressText" class="text-xl font-bold text-gray-900">0%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-center mt-4">
+                            <p class="text-sm text-gray-600">タスク完了率</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-span-8">
+                    <div class="glass-card p-6">
+                        <h3 class="text-lg font-semibold mb-4 flex items-center">
+                            <i class="fas fa-exclamation-triangle mr-2 text-red-600"></i>緊急・重要事項
+                        </h3>
+                        <div id="urgentItems" class="space-y-3"></div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- メインコンテンツ -->
-        <div class="max-w-6xl mx-auto px-4 pb-8">
-            <div class="desktop-grid">
-                <!-- 左カラム: タスク・メモ -->
-                <div class="space-y-6">
-                    <!-- タスク管理 -->
-                    <div class="card p-6">
-                        <div class="flex items-center justify-between mb-6">
-                            <h2 class="section-title">
-                                <i class="fas fa-tasks"></i>
-                                今日のタスク
-                            </h2>
-                            <div class="text-sm text-gray-500">
-                                <span id="taskProgress">0/0</span>
-                            </div>
-                        </div>
-
-                        <!-- 進捗バー -->
-                        <div class="mb-6">
-                            <div class="flex justify-between text-sm text-gray-600 mb-2">
-                                <span>完了率</span>
-                                <span id="progressPercentage">0%</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+        <!-- タスク管理タブ -->
+        <div id="tasksTab" class="tab-content mx-4 hidden">
+            <div class="dashboard-grid">
+                <div class="col-span-8">
+                    <div class="glass-card p-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-lg font-semibold flex items-center">
+                                <i class="fas fa-tasks mr-2 text-purple-600"></i>全社タスク管理
+                            </h3>
+                            <div class="flex space-x-2">
+                                <select id="taskFilter" class="input-field w-40" onchange="filterTasks()">
+                                    <option value="all">すべて</option>
+                                    <option value="urgent">緊急</option>
+                                    <option value="high">重要</option>
+                                    <option value="normal">通常</option>
+                                    <option value="completed">完了済み</option>
+                                </select>
+                                <select id="taskStore" class="input-field w-40" onchange="filterTasks()">
+                                    <option value="all">全店舗</option>
+                                    <option value="classy_tokyo">CLASSY東京</option>
+                                    <option value="classy_nagoya">CLASSY名古屋</option>
+                                    <option value="classy_yokkaichi">CLASSY四日市</option>
+                                    <option value="grandopera_tokyo">GrandOpera東京</option>
+                                    <option value="grandopera_yokohama">GrandOpera横浜</option>
+                                    <option value="grandopera_nagoya">GrandOpera名古屋</option>
+                                    <option value="grandopera_fukuoka">GrandOpera福岡</option>
+                                    <option value="wancarat">ワンカラット</option>
+                                    <option value="shabour">シャブール</option>
+                                    <option value="opera_nishiki">オペラ錦</option>
+                                    <option value="design">デザイン部門</option>
+                                    <option value="head_office">本社</option>
+                                </select>
                             </div>
                         </div>
                         
-                        <div id="taskList" class="space-y-3 mb-6"></div>
+                        <div id="taskList" class="space-y-3 mb-6 max-h-96 overflow-y-auto"></div>
                         
-                        <div class="space-y-3">
-                            <input id="newTask" type="text" class="input-field" placeholder="新しいタスクを入力...">
+                        <div class="border-t pt-4">
+                            <h4 class="font-semibold mb-3">新しいタスクを追加</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                                <input id="newTaskTitle" type="text" class="input-field" placeholder="タスク名">
+                                <select id="newTaskStore" class="input-field">
+                                    <option value="head_office">本社</option>
+                                    <option value="classy_tokyo">CLASSY東京</option>
+                                    <option value="classy_nagoya">CLASSY名古屋</option>
+                                    <option value="classy_yokkaichi">CLASSY四日市</option>
+                                    <option value="grandopera_tokyo">GrandOpera東京</option>
+                                    <option value="grandopera_yokohama">GrandOpera横浜</option>
+                                    <option value="grandopera_nagoya">GrandOpera名古屋</option>
+                                    <option value="grandopera_fukuoka">GrandOpera福岡</option>
+                                    <option value="wancarat">ワンカラット</option>
+                                    <option value="shabour">シャブール</option>
+                                    <option value="opera_nishiki">オペラ錦</option>
+                                    <option value="design">デザイン部門</option>
+                                </select>
+                                <select id="newTaskPriority" class="input-field">
+                                    <option value="normal">通常</option>
+                                    <option value="high">重要</option>
+                                    <option value="urgent">緊急</option>
+                                </select>
+                                <input id="newTaskDue" type="date" class="input-field">
+                            </div>
+                            <textarea id="newTaskDescription" class="input-field mb-3" rows="2" placeholder="詳細説明"></textarea>
                             <button onclick="addTask()" class="btn btn-primary w-full">
                                 <i class="fas fa-plus mr-2"></i>タスクを追加
                             </button>
                         </div>
                     </div>
+                </div>
 
-                    <!-- メモ -->
-                    <div class="card p-6">
-                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 space-y-3 md:space-y-0">
-                            <h2 class="section-title">
-                                <i class="fas fa-sticky-note"></i>
-                                メモ・ふせん
-                            </h2>
-                            <div class="flex space-x-2 w-full md:w-auto">
-                                <select id="memoDateSelector" class="input-field flex-1 md:flex-none" style="min-width: 140px;" onchange="loadSelectedMemo()">
-                                    <option value="">過去のメモ</option>
-                                </select>
-                                <button onclick="clearMemo()" class="btn btn-warning">
-                                    <i class="fas fa-eraser"></i>
+                <div class="col-span-4">
+                    <div class="glass-card p-6 mb-6">
+                        <h3 class="text-lg font-semibold mb-4 flex items-center">
+                            <i class="fas fa-chart-bar mr-2 text-green-600"></i>タスク統計
+                        </h3>
+                        <div class="space-y-4">
+                            <div class="flex justify-between">
+                                <span>完了率</span>
+                                <span id="taskCompletionRate">0%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div id="taskProgressBar" class="bg-green-500 h-2 rounded-full" style="width: 0%"></div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4 text-center">
+                                <div>
+                                    <div class="text-xl font-bold text-red-600" id="overdueCount">0</div>
+                                    <div class="text-xs text-gray-600">期限切れ</div>
+                                </div>
+                                <div>
+                                    <div class="text-xl font-bold text-yellow-600" id="dueTodayCount">0</div>
+                                    <div class="text-xs text-gray-600">今日期限</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-card p-6">
+                        <h3 class="text-lg font-semibold mb-4 flex items-center">
+                            <i class="fas fa-bell mr-2 text-yellow-600"></i>アラート設定
+                        </h3>
+                        <div class="space-y-3">
+                            <label class="flex items-center">
+                                <input type="checkbox" id="alertDeadline" class="mr-2" checked>
+                                <span class="text-sm">期限前通知</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="alertOverdue" class="mr-2" checked>
+                                <span class="text-sm">期限切れ通知</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" id="alertMilestone" class="mr-2" checked>
+                                <span class="text-sm">マイルストーン通知</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- スケジュール管理タブ -->
+        <div id="scheduleTab" class="tab-content mx-4 hidden">
+            <div class="dashboard-grid">
+                <div class="col-span-8">
+                    <div class="glass-card p-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-lg font-semibold flex items-center">
+                                <i class="fas fa-calendar mr-2 text-blue-600"></i>カレンダー
+                            </h3>
+                            <div class="flex space-x-2">
+                                <button onclick="prevMonth()" class="btn btn-secondary">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <span id="currentMonth" class="px-4 py-2 font-semibold"></span>
+                                <button onclick="nextMonth()" class="btn btn-secondary">
+                                    <i class="fas fa-chevron-right"></i>
                                 </button>
                             </div>
+                        </div>
+                        
+                        <div id="calendar" class="grid grid-cols-7 gap-2 mb-6"></div>
+                        
+                        <div class="border-t pt-4">
+                            <h4 class="font-semibold mb-3">予定を追加</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                                <input id="newEventTitle" type="text" class="input-field" placeholder="予定名">
+                                <input id="newEventDate" type="date" class="input-field">
+                                <input id="newEventTime" type="time" class="input-field">
+                                <select id="newEventType" class="input-field">
+                                    <option value="meeting">会議</option>
+                                    <option value="deadline">締切</option>
+                                    <option value="event">イベント</option>
+                                    <option value="reminder">リマインダー</option>
+                                    <option value="goal_setting">目標設定日</option>
+                                </select>
+                            </div>
+                            <textarea id="newEventDescription" class="input-field mb-3" rows="2" placeholder="詳細"></textarea>
+                            <button onclick="addEvent()" class="btn btn-primary w-full">
+                                <i class="fas fa-plus mr-2"></i>予定を追加
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-span-4">
+                    <div class="glass-card p-6">
+                        <h3 class="text-lg font-semibold mb-4 flex items-center">
+                            <i class="fas fa-list mr-2 text-green-600"></i>今日の予定
+                        </h3>
+                        <div id="todayEvents" class="space-y-3"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 売上分析タブ -->
+        <div id="salesTab" class="tab-content mx-4 hidden">
+            <div class="dashboard-grid">
+                <div class="col-span-12">
+                    <div class="glass-card p-6 mb-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-lg font-semibold flex items-center">
+                                <i class="fas fa-chart-line mr-2 text-green-600"></i>売上データ分析
+                            </h3>
+                            <div class="flex space-x-2">
+                                <input type="file" id="salesFileInput" accept=".csv" class="hidden" onchange="uploadSalesData(event)">
+                                <button onclick="document.getElementById('salesFileInput').click()" class="btn btn-primary">
+                                    <i class="fas fa-upload mr-2"></i>売上CSV読込
+                                </button>
+                                <button onclick="downloadSalesTemplate()" class="btn btn-secondary">
+                                    <i class="fas fa-download mr-2"></i>テンプレート
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div id="salesUploadArea" class="text-center py-12 border-2 border-dashed border-gray-300 rounded-lg">
+                            <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4"></i>
+                            <p class="text-gray-600 mb-2">売上CSVファイルをアップロードしてください</p>
+                            <p class="text-sm text-gray-400">ドラッグ&ドロップまたはクリックしてファイルを選択</p>
+                        </div>
+                        
+                        <div id="salesAnalysis" class="hidden">
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                                <div class="stats-card">
+                                    <div class="text-xl font-bold text-green-600 mb-2" id="totalSales">¥0</div>
+                                    <div class="text-sm text-gray-600">総売上</div>
+                                </div>
+                                <div class="stats-card">
+                                    <div class="text-xl font-bold text-blue-600 mb-2" id="averageSales">¥0</div>
+                                    <div class="text-sm text-gray-600">平均売上</div>
+                                </div>
+                                <div class="stats-card">
+                                    <div class="text-xl font-bold text-purple-600 mb-2" id="topStore">-</div>
+                                    <div class="text-sm text-gray-600">最高売上店舗</div>
+                                </div>
+                                <div class="stats-card">
+                                    <div class="text-xl font-bold text-orange-600 mb-2" id="growthRate">0%</div>
+                                    <div class="text-sm text-gray-600">成長率</div>
+                                </div>
+                            </div>
+                            
+                            <div class="chart-container">
+                                <h4 class="font-semibold mb-4">店舗別売上チャート</h4>
+                                <canvas id="salesChart" width="400" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 目標管理タブ -->
+        <div id="goalsTab" class="tab-content mx-4 hidden">
+            <div class="dashboard-grid">
+                <div class="col-span-6">
+                    <div class="glass-card p-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-lg font-semibold flex items-center">
+                                <i class="fas fa-target mr-2 text-red-600"></i>月次目標設定
+                            </h3>
+                            <div class="text-sm text-gray-600">
+                                次回設定日: <span id="nextGoalDate" class="font-semibold">2025年7月2日</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <label class="font-medium">対象月</label>
+                                <input type="month" id="goalMonth" class="input-field w-48" value="2025-07">
+                            </div>
+                        </div>
+                        
+                        <div id="goalSettings" class="space-y-6">
+                            <!-- 店舗別目標設定 -->
+                        </div>
+                        
+                        <button onclick="saveGoals()" class="btn btn-primary w-full mt-6">
+                            <i class="fas fa-save mr-2"></i>目標を保存
+                        </button>
+                    </div>
+                </div>
+
+                <div class="col-span-6">
+                    <div class="glass-card p-6">
+                        <h3 class="text-lg font-semibold mb-4 flex items-center">
+                            <i class="fas fa-chart-pie mr-2 text-blue-600"></i>目標達成状況
+                        </h3>
+                        
+                        <div id="goalProgress" class="space-y-4">
+                            <!-- 目標進捗表示 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- デザイン部門タブ -->
+        <div id="designTab" class="tab-content mx-4 hidden">
+            <div class="dashboard-grid">
+                <div class="col-span-8">
+                    <div class="glass-card p-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-lg font-semibold flex items-center">
+                                <i class="fas fa-palette mr-2 text-pink-600"></i>デザイン案件管理
+                            </h3>
+                            <div class="flex space-x-2">
+                                <select id="designFilter" class="input-field w-40" onchange="filterDesignProjects()">
+                                    <option value="all">すべて</option>
+                                    <option value="planning">企画中</option>
+                                    <option value="designing">デザイン中</option>
+                                    <option value="review">レビュー中</option>
+                                    <option value="completed">完了</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div id="designProjectList" class="space-y-3 mb-6 max-h-96 overflow-y-auto"></div>
+                        
+                        <div class="border-t pt-4">
+                            <h4 class="font-semibold mb-3">新しい案件を追加</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                                <input id="newDesignTitle" type="text" class="input-field" placeholder="案件名">
+                                <select id="newDesignType" class="input-field">
+                                    <option value="logo">ロゴデザイン</option>
+                                    <option value="flyer">チラシ・フライヤー</option>
+                                    <option value="web">Webデザイン</option>
+                                    <option value="banner">バナー制作</option>
+                                    <option value="package">パッケージデザイン</option>
+                                    <option value="interior">店舗内装</option>
+                                    <option value="other">その他</option>
+                                </select>
+                                <select id="newDesignPriority" class="input-field">
+                                    <option value="normal">通常</option>
+                                    <option value="high">重要</option>
+                                    <option value="urgent">緊急</option>
+                                </select>
+                                <input id="newDesignDue" type="date" class="input-field">
+                                <input id="newDesignClient" type="text" class="input-field" placeholder="依頼者・店舗">
+                                <select id="newDesignStatus" class="input-field">
+                                    <option value="planning">企画中</option>
+                                    <option value="designing">デザイン中</option>
+                                    <option value="review">レビュー中</option>
+                                </select>
+                            </div>
+                            <textarea id="newDesignDescription" class="input-field mb-3" rows="3" placeholder="詳細・要件"></textarea>
+                            <button onclick="addDesignProject()" class="btn btn-primary w-full">
+                                <i class="fas fa-plus mr-2"></i>案件を追加
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-span-4">
+                    <div class="glass-card p-6 mb-6">
+                        <h3 class="text-lg font-semibold mb-4 flex items-center">
+                            <i class="fas fa-chart-doughnut mr-2 text-purple-600"></i>案件状況
+                        </h3>
+                        <div class="space-y-4">
+                            <div class="flex justify-between">
+                                <span class="text-sm">企画中</span>
+                                <span id="planningCount" class="font-bold text-blue-600">0</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-sm">デザイン中</span>
+                                <span id="designingCount" class="font-bold text-yellow-600">0</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-sm">レビュー中</span>
+                                <span id="reviewCount" class="font-bold text-purple-600">0</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-sm">完了</span>
+                                <span id="designCompletedCount" class="font-bold text-green-600">0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-card p-6">
+                        <h3 class="text-lg font-semibold mb-4 flex items-center">
+                            <i class="fas fa-clock mr-2 text-orange-600"></i>締切迫る案件
+                        </h3>
+                        <div id="urgentDesignProjects" class="space-y-3"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ツールタブ -->
+        <div id="toolsTab" class="tab-content mx-4 hidden">
+            <div class="dashboard-grid">
+                <div class="col-span-6">
+                    <div class="glass-card p-6">
+                        <h3 class="text-lg font-semibold mb-4 flex items-center">
+                            <i class="fas fa-brain mr-2 text-purple-600"></i>プロンプト集
+                        </h3>
+                        
+                        <div class="flex flex-wrap gap-2 mb-4" id="promptCategoryTabs">
+                            <button class="nav-tab active" data-category="all" onclick="switchPromptCategory('all')">すべて</button>
+                            <button class="nav-tab" data-category="line" onclick="switchPromptCategory('line')">LINE</button>
+                            <button class="nav-tab" data-category="sns" onclick="switchPromptCategory('sns')">SNS</button>
+                            <button class="nav-tab" data-category="report" onclick="switchPromptCategory('report')">報告</button>
+                            <button class="nav-tab" data-category="design" onclick="switchPromptCategory('design')">デザイン</button>
+                        </div>
+
+                        <div id="promptList" class="space-y-3 mb-6 max-h-64 overflow-y-auto"></div>
+                        
+                        <div class="border-t pt-4">
+                            <h4 class="font-semibold mb-3">新しいプロンプトを追加</h4>
+                            <div class="grid grid-cols-2 gap-3 mb-3">
+                                <select id="newPromptCategory" class="input-field">
+                                    <option value="line">LINE用</option>
+                                    <option value="sns">SNS用</option>
+                                    <option value="report">報告用</option>
+                                    <option value="design">デザイン用</option>
+                                    <option value="other">その他</option>
+                                </select>
+                                <input id="newPromptLabel" type="text" class="input-field" placeholder="ボタン名">
+                            </div>
+                            <textarea id="newPromptText" class="input-field mb-3" rows="3" placeholder="プロンプト内容"></textarea>
+                            <button onclick="addPrompt()" class="btn btn-primary w-full">
+                                <i class="fas fa-plus mr-2"></i>プロンプトを追加
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-span-6">
+                    <div class="glass-card p-6">
+                        <h3 class="text-lg font-semibold mb-4 flex items-center">
+                            <i class="fas fa-sticky-note mr-2 text-yellow-600"></i>メモ・ふせん
+                        </h3>
+                        
+                        <div class="flex justify-between items-center mb-4">
+                            <select id="memoDateSelector" class="input-field w-40" onchange="loadSelectedMemo()">
+                                <option value="">今日のメモ</option>
+                            </select>
+                            <button onclick="clearMemo()" class="btn btn-warning">
+                                <i class="fas fa-eraser mr-2"></i>クリア
+                            </button>
                         </div>
                         
                         <div class="mb-3 text-sm text-gray-600">
@@ -659,165 +1010,31 @@
                             <span id="memoSaveDate"></span>
                         </div>
                         
-                        <textarea id="memoArea" class="input-field resize-none" rows="8" placeholder="気づき・指示事項・重要なポイントをメモ..."></textarea>
+                        <textarea id="memoArea" class="input-field resize-none" rows="12" 
+                                placeholder="気づき・指示事項・重要なポイントをメモ..."></textarea>
                     </div>
                 </div>
+            </div>
 
-                <!-- 右カラム: プロンプト・CSV -->
-                <div class="space-y-6">
-                    <!-- プロンプト集 -->
-                    <div class="card p-6">
-                        <h2 class="section-title mb-6">
-                            <i class="fas fa-brain"></i>
-                            プロンプト集
-                        </h2>
+            <div class="dashboard-grid mt-6">
+                <div class="col-span-12">
+                    <div class="glass-card p-6">
+                        <h3 class="text-lg font-semibold mb-4 flex items-center">
+                            <i class="fas fa-cogs mr-2 text-gray-600"></i>システム管理
+                        </h3>
                         
-                        <!-- カテゴリタブ -->
-                        <div class="flex flex-wrap gap-2 mb-6" id="categoryTabs">
-                            <button class="tab active" data-category="all" onclick="switchCategory('all')">
-                                すべて
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <button onclick="exportAllData()" class="btn btn-secondary">
+                                <i class="fas fa-download mr-2"></i>全データ出力
                             </button>
-                            <button class="tab" data-category="line" onclick="switchCategory('line')">
-                                LINE用
-                            </button>
-                            <button class="tab" data-category="sns" onclick="switchCategory('sns')">
-                                SNS用
-                            </button>
-                            <button class="tab" data-category="report" onclick="switchCategory('report')">
-                                報告・指導
-                            </button>
-                            <button class="tab" data-category="other" onclick="switchCategory('other')">
-                                その他
-                            </button>
-                        </div>
-
-                        <!-- プロンプト一覧 -->
-                        <div id="promptButtons" class="space-y-3 mb-6"></div>
-
-                        <!-- プロンプト追加 -->
-                        <div class="border-t pt-6">
-                            <h3 class="font-semibold text-gray-900 mb-4">新しいプロンプトを追加</h3>
-                            <div class="space-y-3">
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                    <select id="newPromptCategory" class="input-field">
-                                        <option value="line">LINE用</option>
-                                        <option value="sns">SNS用</option>
-                                        <option value="report">報告・指導用</option>
-                                        <option value="other">その他</option>
-                                    </select>
-                                    <input id="newPromptLabel" type="text" class="input-field" placeholder="ボタン名">
-                                </div>
-                                <textarea id="newPromptText" class="input-field resize-none" rows="3" placeholder="プロンプト内容を入力..."></textarea>
-                                <button onclick="addPrompt()" class="btn btn-primary w-full">
-                                    <i class="fas fa-plus mr-2"></i>プロンプトを追加
-                                </button>
-                            </div>
-                            <p class="mt-3 text-sm text-gray-500">
-                                <i class="fas fa-info-circle mr-2"></i>
-                                ボタンクリックでコピー → ChatGPTに貼り付け
-                            </p>
-                        </div>
-                    </div>
-
-                    <!-- CSV整形 -->
-                    <div class="card p-6">
-                        <h2 class="section-title mb-6">
-                            <i class="fas fa-table"></i>
-                            CSVデータ整形
-                        </h2>
-                        
-                        <!-- アップロードエリア -->
-                        <div id="csvUploadArea" class="mb-6">
-                            <input type="file" id="csvFileInput" accept=".csv" class="hidden" onchange="handleCSVUpload(event)">
-                            <button onclick="document.getElementById('csvFileInput').click()" class="w-full border-2 border-dashed border-gray-300 hover:border-blue-400 rounded-lg p-8 text-center transition-all">
-                                <i class="fas fa-upload text-3xl text-gray-400 mb-3"></i>
-                                <p class="text-gray-600">CSVファイルをアップロード</p>
-                                <p class="text-sm text-gray-400 mt-1">クリックまたはドラッグ&ドロップ</p>
-                            </button>
-                        </div>
-                        
-                        <!-- CSV編集エリア -->
-                        <div id="csvEditArea" class="hidden">
-                            <!-- コントロールボタン -->
-                            <div class="flex flex-wrap gap-2 mb-4">
-                                <button onclick="addRow()" class="btn btn-secondary text-sm">
-                                    <i class="fas fa-plus mr-1"></i>行追加
-                                </button>
-                                <button onclick="addColumn()" class="btn btn-secondary text-sm">
-                                    <i class="fas fa-plus mr-1"></i>列追加
-                                </button>
-                                <button onclick="saveCSVChanges()" class="btn btn-primary text-sm">
-                                    <i class="fas fa-save mr-1"></i>保存
-                                </button>
-                                <button onclick="copyCSVFormatted()" class="btn btn-success text-sm">
-                                    <i class="fas fa-copy mr-1"></i>コピー
-                                </button>
-                                <button onclick="clearCSVData()" class="btn btn-danger text-sm">
-                                    <i class="fas fa-trash mr-1"></i>削除
-                                </button>
-                                <button onclick="reuploadCSV()" class="btn btn-warning text-sm">
-                                    <i class="fas fa-redo mr-1"></i>再アップロード
-                                </button>
-                            </div>
-
-                            <!-- ファイル情報 -->
-                            <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-sm text-blue-800">
-                                        <i class="fas fa-file-csv mr-2"></i>
-                                        ファイル: <span id="csvFileName">-</span>
-                                    </span>
-                                    <span class="text-sm text-blue-600">
-                                        サイズ: <span id="csvRowCount">0</span>行 × <span id="csvColCount">0</span>列
-                                    </span>
-                                </div>
-                            </div>
-                            
-                            <!-- 編集可能テーブル -->
-                            <div class="border border-gray-200 rounded-lg mb-4 overflow-auto" style="max-height: 400px;">
-                                <table id="csvEditTable" class="w-full text-sm">
-                                    <thead id="csvTableHead"></thead>
-                                    <tbody id="csvTableBody"></tbody>
-                                </table>
-                            </div>
-                            
-                            <!-- 整形テキスト -->
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    <i class="fas fa-code mr-2"></i>ChatGPT用整形テキスト
-                                </label>
-                                <textarea id="csvFormattedText" class="input-field resize-none" rows="6" readonly placeholder="整形されたテキストがここに表示されます"></textarea>
-                            </div>
-
-                            <!-- 使用方法ヒント -->
-                            <div class="mt-4 bg-gray-50 border border-gray-200 rounded-lg p-3">
-                                <p class="text-sm text-gray-600">
-                                    <i class="fas fa-lightbulb mr-2 text-yellow-500"></i>
-                                    <strong>使用方法：</strong>
-                                    セルをクリックして直接編集 | 行・列の追加 | 不要な行・列は右端のボタンで削除
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- クイックアクション -->
-                    <div class="card p-6">
-                        <h2 class="section-title mb-4">
-                            <i class="fas fa-tools"></i>
-                            クイックアクション
-                        </h2>
-                        <div class="grid grid-cols-2 gap-3">
-                            <button onclick="exportData()" class="btn btn-secondary">
-                                <i class="fas fa-download mr-2"></i>エクスポート
-                            </button>
-                            <button onclick="importData()" class="btn btn-secondary">
-                                <i class="fas fa-upload mr-2"></i>インポート
+                            <button onclick="importAllData()" class="btn btn-secondary">
+                                <i class="fas fa-upload mr-2"></i>データ取込
                             </button>
                             <button onclick="clearAllData()" class="btn btn-danger">
-                                <i class="fas fa-trash mr-2"></i>全削除
+                                <i class="fas fa-trash mr-2"></i>全データ削除
                             </button>
-                            <button onclick="window.print()" class="btn btn-secondary">
-                                <i class="fas fa-print mr-2"></i>印刷
+                            <button onclick="generateReport()" class="btn btn-primary">
+                                <i class="fas fa-file-alt mr-2"></i>レポート生成
                             </button>
                         </div>
                     </div>
@@ -826,31 +1043,72 @@
         </div>
     </div>
 
+    <!-- モーダル -->
+    <div id="notificationModal" class="modal">
+        <div class="modal-content w-96">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold">通知・アラート</h3>
+                <button onclick="closeModal('notificationModal')" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="notificationList" class="space-y-3 max-h-64 overflow-y-auto"></div>
+        </div>
+    </div>
+
     <!-- 隠しファイル入力 -->
     <input type="file" id="importFileInput" accept=".json" class="hidden" onchange="handleDataImport(event)">
 
     <script>
-        // セキュリティ設定
+        // グローバル変数
         const CORRECT_PASSWORD = 'iam1104JP';
-        const SESSION_DURATION = 30 * 60 * 1000; // 30分
+        const SESSION_DURATION = 30 * 60 * 1000;
         const MAX_LOGIN_ATTEMPTS = 5;
         
-        // グローバル変数
-        let currentStore = 'classy_tokyo';
-        let currentCategory = 'all';
-        let csvData = null;
-        let sessionTimer = null;
-        let sessionStartTime = null;
+        let currentTab = 'dashboard';
+        let currentPromptCategory = 'all';
+        let currentDesignFilter = 'all';
         let loginAttempts = parseInt(localStorage.getItem('loginAttempts') || '0');
+        let sessionTimer = null;
+        let notifications = [];
+        let currentMonth = new Date();
+        
+        // データ管理キー
+        const STORAGE_KEYS = {
+            tasks: 'rispondere_tasks',
+            events: 'rispondere_events', 
+            prompts: 'rispondere_prompts',
+            designProjects: 'rispondere_design_projects',
+            goals: 'rispondere_goals',
+            salesData: 'rispondere_sales_data',
+            memos: 'rispondere_memos_'
+        };
+
+        // 店舗リスト
+        const STORES = [
+            { id: 'classy_tokyo', name: 'CLASSY東京' },
+            { id: 'classy_nagoya', name: 'CLASSY名古屋' },
+            { id: 'classy_yokkaichi', name: 'CLASSY四日市' },
+            { id: 'grandopera_tokyo', name: 'GrandOpera東京' },
+            { id: 'grandopera_yokohama', name: 'GrandOpera横浜' },
+            { id: 'grandopera_nagoya', name: 'GrandOpera名古屋' },
+            { id: 'grandopera_fukuoka', name: 'GrandOpera福岡' },
+            { id: 'wancarat', name: 'ワンカラット' },
+            { id: 'shabour', name: 'シャブール' },
+            { id: 'opera_nishiki', name: 'オペラ錦' }
+        ];
 
         // 初期化
         window.onload = () => {
             checkAuthentication();
-            updateCurrentDate();
-            setInterval(updateCurrentDate, 60000);
+            updateDateTime();
+            setInterval(updateDateTime, 60000);
+            setupEventListeners();
+            checkAlerts();
+            setInterval(checkAlerts, 60000);
         };
 
-        // 認証チェック
+        // 認証処理
         function checkAuthentication() {
             const isLoggedIn = sessionStorage.getItem('isLoggedIn');
             const loginTime = sessionStorage.getItem('loginTime');
@@ -858,25 +1116,20 @@
             if (isLoggedIn && loginTime) {
                 const elapsed = Date.now() - parseInt(loginTime);
                 if (elapsed < SESSION_DURATION) {
-                    // セッション有効
                     showDashboard();
                     startSessionTimer(SESSION_DURATION - elapsed);
                     return;
                 }
             }
             
-            // セッション無効またはログイン必要
             showLoginScreen();
         }
 
-        // ログイン処理
         function handleLogin(event) {
             event.preventDefault();
-            
             const password = document.getElementById('passwordInput').value;
             
             if (password === CORRECT_PASSWORD) {
-                // ログイン成功
                 sessionStorage.setItem('isLoggedIn', 'true');
                 sessionStorage.setItem('loginTime', Date.now().toString());
                 localStorage.removeItem('loginAttempts');
@@ -885,11 +1138,8 @@
                 showDashboard();
                 startSessionTimer(SESSION_DURATION);
                 showNotification('ログインしました', 'success');
-                
-                // パスワード入力をクリア
                 document.getElementById('passwordInput').value = '';
             } else {
-                // ログイン失敗
                 loginAttempts++;
                 localStorage.setItem('loginAttempts', loginAttempts.toString());
                 
@@ -900,12 +1150,10 @@
                     showNotification(`パスワードが間違っています (${loginAttempts}/${MAX_LOGIN_ATTEMPTS})`, 'error');
                     updateLoginAttemptDisplay();
                 }
-                
                 document.getElementById('passwordInput').value = '';
             }
         }
 
-        // ログイン試行表示更新
         function updateLoginAttemptDisplay() {
             const attemptsDiv = document.getElementById('loginAttempts');
             const countSpan = document.getElementById('attemptCount');
@@ -916,7 +1164,6 @@
             }
         }
 
-        // ログインロック
         function lockLogin() {
             const passwordInput = document.getElementById('passwordInput');
             const submitBtn = document.querySelector('button[type="submit"]');
@@ -933,10 +1180,9 @@
                 loginAttempts = 0;
                 document.getElementById('loginAttempts').classList.add('hidden');
                 showNotification('ロックが解除されました', 'info');
-            }, 5 * 60 * 1000); // 5分間ロック
+            }, 5 * 60 * 1000);
         }
 
-        // ログアウト処理
         function logout() {
             if (confirm('ログアウトしますか？')) {
                 sessionStorage.removeItem('isLoggedIn');
@@ -951,42 +1197,32 @@
             }
         }
 
-        // セッションタイマー開始
         function startSessionTimer(duration) {
-            sessionStartTime = Date.now();
             const timerElement = document.getElementById('timeRemaining');
             const sessionTimerDiv = document.getElementById('sessionTimer');
             
             sessionTimerDiv.classList.remove('hidden');
             
             sessionTimer = setInterval(() => {
-                const elapsed = Date.now() - sessionStartTime;
-                const remaining = duration - elapsed;
+                duration -= 1000;
                 
-                if (remaining <= 0) {
+                if (duration <= 0) {
                     clearInterval(sessionTimer);
-                    showNotification('セッションがタイムアウトしました', 'info');
+                    showNotification('セッションがタイムアウトしました', 'warning');
                     logout();
                     return;
                 }
                 
-                const minutes = Math.floor(remaining / 60000);
-                const seconds = Math.floor((remaining % 60000) / 1000);
+                const minutes = Math.floor(duration / 60000);
+                const seconds = Math.floor((duration % 60000) / 1000);
                 timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
                 
-                // 5分前から警告色
-                if (remaining < 5 * 60 * 1000) {
+                if (duration < 5 * 60 * 1000) {
                     sessionTimerDiv.style.backgroundColor = 'rgba(239, 68, 68, 0.8)';
-                }
-                
-                // 1分前から点滅
-                if (remaining < 1 * 60 * 1000) {
-                    sessionTimerDiv.style.animation = 'blink 1s infinite';
                 }
             }, 1000);
         }
 
-        // 画面切り替え
         function showLoginScreen() {
             document.getElementById('loginScreen').classList.remove('hidden');
             document.getElementById('mainDashboard').classList.add('hidden');
@@ -997,38 +1233,12 @@
         function showDashboard() {
             document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('mainDashboard').classList.remove('hidden');
-            loadStoreData();
-            updateMemoDateSelector();
+            loadAllData();
             updateAllStats();
         }
 
-        // セッション延長（アクティビティ検出）
-        function extendSession() {
-            if (sessionStorage.getItem('isLoggedIn')) {
-                sessionStorage.setItem('loginTime', Date.now().toString());
-                if (sessionTimer) {
-                    clearInterval(sessionTimer);
-                    startSessionTimer(SESSION_DURATION);
-                }
-            }
-        }
-
-        // アクティビティ監視
-        ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'].forEach(event => {
-            document.addEventListener(event, () => {
-                if (sessionStorage.getItem('isLoggedIn')) {
-                    // 10分ごとにセッション延長
-                    const lastActivity = sessionStorage.getItem('lastActivity') || '0';
-                    if (Date.now() - parseInt(lastActivity) > 10 * 60 * 1000) {
-                        sessionStorage.setItem('lastActivity', Date.now().toString());
-                        extendSession();
-                    }
-                }
-            }, { passive: true });
-        });
-
-        // 現在の日付時刻を更新
-        function updateCurrentDate() {
+        // 日時更新
+        function updateDateTime() {
             const now = new Date();
             const dateStr = now.toLocaleDateString('ja-JP', { 
                 year: 'numeric', 
@@ -1040,144 +1250,1031 @@
                 hour: '2-digit', 
                 minute: '2-digit' 
             });
+            
             const currentDateElement = document.getElementById('currentDate');
-            if (currentDateElement) {
-                currentDateElement.textContent = `${dateStr} ${timeStr}`;
+            const currentTimeElement = document.getElementById('currentTime');
+            
+            if (currentDateElement) currentDateElement.textContent = dateStr;
+            if (currentTimeElement) currentTimeElement.textContent = timeStr;
+        }
+
+        // タブ切り替え
+        function switchTab(tabName) {
+            // タブボタンの更新
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+            
+            // コンテンツの切り替え
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            document.getElementById(`${tabName}Tab`).classList.remove('hidden');
+            
+            currentTab = tabName;
+            
+            // タブ固有の初期化
+            switch(tabName) {
+                case 'schedule':
+                    renderCalendar();
+                    loadTodayEvents();
+                    break;
+                case 'tasks':
+                    loadTasks();
+                    updateTaskStats();
+                    break;
+                case 'design':
+                    loadDesignProjects();
+                    updateDesignStats();
+                    break;
+                case 'goals':
+                    initGoalSettings();
+                    loadGoalProgress();
+                    break;
+                case 'sales':
+                    // 売上分析タブの初期化
+                    break;
+                case 'tools':
+                    loadPrompts();
+                    loadMemo();
+                    updateMemoDateSelector();
+                    break;
             }
         }
 
-        // 店舗切り替え
-        function switchStore() {
-            const selector = document.getElementById('storeSelector');
-            currentStore = selector.value;
-            document.getElementById('currentStore').textContent = selector.options[selector.selectedIndex].text;
-            loadStoreData();
+        // イベントリスナー設定
+        function setupEventListeners() {
+            // エンターキーでのタスク追加
+            document.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    const activeElement = document.activeElement;
+                    if (activeElement.id === 'newTaskTitle') {
+                        addTask();
+                    } else if (activeElement.id === 'passwordInput') {
+                        const form = activeElement.closest('form');
+                        if (form) handleLogin(e);
+                    }
+                }
+            });
+
+            // メモの自動保存
+            const memoArea = document.getElementById('memoArea');
+            if (memoArea) {
+                memoArea.addEventListener('input', saveMemo);
+            }
         }
 
-        // 店舗別データ読み込み
-        function loadStoreData() {
+        // データ読み込み
+        function loadAllData() {
             loadTasks();
-            loadMemo();
+            loadEvents();
+            loadDesignProjects();
             loadPrompts();
+            loadMemo();
             updateMemoDateSelector();
-            updateAllStats();
         }
 
-        // 統計情報更新
+        // 統計更新
         function updateAllStats() {
+            updateDashboardStats();
             updateTaskStats();
-            updatePromptStats();
-            updateMemoStats();
+            updateDesignStats();
+            updateProgressCircle();
         }
 
-        function updateTaskStats() {
-            const tasks = JSON.parse(localStorage.getItem(getTaskKey()) || '[]');
-            const completed = tasks.filter(task => task.done).length;
+        function updateDashboardStats() {
+            const tasks = JSON.parse(localStorage.getItem(STORAGE_KEYS.tasks) || '[]');
+            const events = JSON.parse(localStorage.getItem(STORAGE_KEYS.events) || '[]');
+            const designProjects = JSON.parse(localStorage.getItem(STORAGE_KEYS.designProjects) || '[]');
+            
+            const completedTasks = tasks.filter(task => task.completed).length;
+            const urgentTasks = tasks.filter(task => task.priority === 'urgent' && !task.completed).length;
+            const totalEvents = events.length;
+            const designProjectsCount = designProjects.length;
+            
+            document.getElementById('totalTasks').textContent = tasks.length;
+            document.getElementById('completedTasks').textContent = completedTasks;
+            document.getElementById('urgentTasks').textContent = urgentTasks;
+            document.getElementById('totalEvents').textContent = totalEvents;
+            document.getElementById('designProjects').textContent = designProjectsCount;
+            
+            // 緊急・重要事項の表示
+            const urgentItems = document.getElementById('urgentItems');
+            const urgentList = [
+                ...tasks.filter(task => task.priority === 'urgent' && !task.completed).slice(0, 3),
+                ...designProjects.filter(project => project.priority === 'urgent' && project.status !== 'completed').slice(0, 2)
+            ];
+            
+            if (urgentList.length === 0) {
+                urgentItems.innerHTML = '<p class="text-gray-500 text-center py-4">現在、緊急事項はありません</p>';
+            } else {
+                urgentItems.innerHTML = urgentList.map(item => `
+                    <div class="flex items-center justify-between p-3 bg-red-50 border border-red-200 rounded-lg">
+                        <div>
+                            <div class="font-medium">${item.title}</div>
+                            <div class="text-sm text-gray-600">${item.store || item.client || ''}</div>
+                        </div>
+                        <div class="text-red-600">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function updateProgressCircle() {
+            const tasks = JSON.parse(localStorage.getItem(STORAGE_KEYS.tasks) || '[]');
+            const completed = tasks.filter(task => task.completed).length;
             const total = tasks.length;
             const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
-
-            document.getElementById('totalTasks').textContent = total;
-            document.getElementById('completedTasks').textContent = completed;
-            document.getElementById('taskProgress').textContent = `${completed}/${total}`;
-            document.getElementById('progressPercentage').textContent = percentage + '%';
-            document.getElementById('progressBar').style.width = percentage + '%';
-        }
-
-        function updatePromptStats() {
-            const prompts = JSON.parse(localStorage.getItem(getPromptKey()) || '[]');
-            document.getElementById('totalPrompts').textContent = prompts.length;
-        }
-
-        function updateMemoStats() {
-            let count = 0;
-            for (let i = 0; i < 30; i++) {
-                const date = new Date();
-                date.setDate(date.getDate() - i);
-                const dateStr = date.toISOString().split('T')[0];
-                const memoKey = getMemoKey(dateStr);
-                if (localStorage.getItem(memoKey)) {
-                    count++;
-                }
+            
+            const circle = document.getElementById('progressCircle');
+            const text = document.getElementById('progressText');
+            
+            if (circle && text) {
+                const circumference = 2 * Math.PI * 56;
+                const offset = circumference - (percentage / 100) * circumference;
+                
+                circle.style.strokeDasharray = circumference;
+                circle.style.strokeDashoffset = offset;
+                text.textContent = percentage + '%';
             }
-            document.getElementById('memoCount').textContent = count;
         }
 
         // タスク管理
-        function getTaskKey() {
-            return `tasks_${currentStore}`;
-        }
-
         function loadTasks() {
-            const savedTasks = JSON.parse(localStorage.getItem(getTaskKey()) || '[]');
+            const tasks = JSON.parse(localStorage.getItem(STORAGE_KEYS.tasks) || '[]');
             const taskList = document.getElementById('taskList');
             if (!taskList) return;
             
-            taskList.innerHTML = '';
+            const filter = document.getElementById('taskFilter')?.value || 'all';
+            const storeFilter = document.getElementById('taskStore')?.value || 'all';
             
-            if (savedTasks.length === 0) {
-                taskList.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-tasks"></i>
-                        <p>まだタスクがありません</p>
-                        <p class="text-sm">新しいタスクを追加してみましょう</p>
-                    </div>
-                `;
+            let filteredTasks = tasks;
+            
+            if (filter !== 'all') {
+                if (filter === 'completed') {
+                    filteredTasks = filteredTasks.filter(task => task.completed);
+                } else {
+                    filteredTasks = filteredTasks.filter(task => task.priority === filter && !task.completed);
+                }
+            }
+            
+            if (storeFilter !== 'all') {
+                filteredTasks = filteredTasks.filter(task => task.store === storeFilter);
+            }
+            
+            if (filteredTasks.length === 0) {
+                taskList.innerHTML = '<div class="text-center py-8 text-gray-500">タスクがありません</div>';
                 return;
             }
             
-            savedTasks.forEach((task, index) => {
-                const div = document.createElement('div');
-                div.className = `task-item ${task.done ? 'completed' : ''}`;
-                div.innerHTML = `
-                    <div class="flex items-center">
-                        <input type='checkbox' class='mr-4 w-5 h-5 text-blue-500 rounded' ${task.done ? 'checked' : ''} onchange='toggleTask(${index})'>
-                        <span class='flex-1 ${task.done ? 'line-through text-gray-500' : 'text-gray-900'}'>${task.text}</span>
-                        <button onclick='deleteTask(${index})' class='text-red-500 hover:text-red-700 ml-3 p-2'>
-                            <i class="fas fa-trash"></i>
-                        </button>
+            taskList.innerHTML = filteredTasks.map((task, index) => {
+                const originalIndex = tasks.findIndex(t => t.id === task.id);
+                const priorityClass = task.priority === 'urgent' ? 'urgent' : task.priority === 'high' ? 'priority-high' : '';
+                const storeInfo = STORES.find(s => s.id === task.store)?.name || task.store;
+                
+                return `
+                    <div class="task-item ${task.completed ? 'completed' : ''} ${priorityClass}">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center flex-1">
+                                <input type="checkbox" class="mr-3 w-5 h-5" ${task.completed ? 'checked' : ''} 
+                                       onchange="toggleTask(${originalIndex})">
+                                <div class="flex-1">
+                                    <div class="font-medium ${task.completed ? 'line-through text-gray-500' : ''}">${task.title}</div>
+                                    <div class="text-sm text-gray-600">
+                                        ${storeInfo} | ${getPriorityLabel(task.priority)}
+                                        ${task.dueDate ? ` | 期限: ${new Date(task.dueDate).toLocaleDateString('ja-JP')}` : ''}
+                                    </div>
+                                    ${task.description ? `<div class="text-sm text-gray-500 mt-1">${task.description}</div>` : ''}
+                                </div>
+                            </div>
+                            <button onclick="deleteTask(${originalIndex})" class="ml-3 p-2 text-red-500 hover:text-red-700">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
                     </div>
                 `;
-                taskList.appendChild(div);
-            });
+            }).join('');
         }
 
         function addTask() {
-            const taskInput = document.getElementById('newTask');
-            const taskText = taskInput.value.trim();
-            if (taskText !== '') {
-                const tasks = JSON.parse(localStorage.getItem(getTaskKey()) || '[]');
-                tasks.push({ text: taskText, done: false });
-                localStorage.setItem(getTaskKey(), JSON.stringify(tasks));
-                taskInput.value = '';
-                loadTasks();
-                updateTaskStats();
-                showNotification('タスクを追加しました', 'success');
+            const title = document.getElementById('newTaskTitle').value.trim();
+            const store = document.getElementById('newTaskStore').value;
+            const priority = document.getElementById('newTaskPriority').value;
+            const dueDate = document.getElementById('newTaskDue').value;
+            const description = document.getElementById('newTaskDescription').value.trim();
+            
+            if (!title) {
+                showNotification('タスク名を入力してください', 'error');
+                return;
+            }
+            
+            const tasks = JSON.parse(localStorage.getItem(STORAGE_KEYS.tasks) || '[]');
+            const newTask = {
+                id: Date.now(),
+                title,
+                store,
+                priority,
+                dueDate,
+                description,
+                completed: false,
+                createdAt: new Date().toISOString()
+            };
+            
+            tasks.push(newTask);
+            localStorage.setItem(STORAGE_KEYS.tasks, JSON.stringify(tasks));
+            
+            // フォームクリア
+            document.getElementById('newTaskTitle').value = '';
+            document.getElementById('newTaskDescription').value = '';
+            document.getElementById('newTaskDue').value = '';
+            
+            loadTasks();
+            updateAllStats();
+            showNotification('タスクを追加しました', 'success');
+            
+            // 緊急タスクの場合はアラート追加
+            if (priority === 'urgent') {
+                addNotification(`緊急タスクが追加されました: ${title}`, 'urgent');
             }
         }
 
         function toggleTask(index) {
-            const tasks = JSON.parse(localStorage.getItem(getTaskKey()) || '[]');
-            tasks[index].done = !tasks[index].done;
-            localStorage.setItem(getTaskKey(), JSON.stringify(tasks));
+            const tasks = JSON.parse(localStorage.getItem(STORAGE_KEYS.tasks) || '[]');
+            tasks[index].completed = !tasks[index].completed;
+            
+            if (tasks[index].completed) {
+                tasks[index].completedAt = new Date().toISOString();
+            } else {
+                delete tasks[index].completedAt;
+            }
+            
+            localStorage.setItem(STORAGE_KEYS.tasks, JSON.stringify(tasks));
             loadTasks();
-            updateTaskStats();
+            updateAllStats();
         }
 
         function deleteTask(index) {
             if (confirm('このタスクを削除しますか？')) {
-                const tasks = JSON.parse(localStorage.getItem(getTaskKey()) || '[]');
+                const tasks = JSON.parse(localStorage.getItem(STORAGE_KEYS.tasks) || '[]');
                 tasks.splice(index, 1);
-                localStorage.setItem(getTaskKey(), JSON.stringify(tasks));
+                localStorage.setItem(STORAGE_KEYS.tasks, JSON.stringify(tasks));
                 loadTasks();
-                updateTaskStats();
+                updateAllStats();
                 showNotification('タスクを削除しました', 'info');
             }
+        }
+
+        function filterTasks() {
+            loadTasks();
+        }
+
+        function updateTaskStats() {
+            const tasks = JSON.parse(localStorage.getItem(STORAGE_KEYS.tasks) || '[]');
+            const completed = tasks.filter(task => task.completed).length;
+            const total = tasks.length;
+            const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+            
+            const today = new Date().toDateString();
+            const overdue = tasks.filter(task => 
+                !task.completed && task.dueDate && new Date(task.dueDate) < new Date(today)
+            ).length;
+            const dueToday = tasks.filter(task => 
+                !task.completed && task.dueDate && new Date(task.dueDate).toDateString() === today
+            ).length;
+            
+            const completionRate = document.getElementById('taskCompletionRate');
+            const progressBar = document.getElementById('taskProgressBar');
+            const overdueCount = document.getElementById('overdueCount');
+            const dueTodayCount = document.getElementById('dueTodayCount');
+            
+            if (completionRate) completionRate.textContent = percentage + '%';
+            if (progressBar) progressBar.style.width = percentage + '%';
+            if (overdueCount) overdueCount.textContent = overdue;
+            if (dueTodayCount) dueTodayCount.textContent = dueToday;
+        }
+
+        function getPriorityLabel(priority) {
+            const labels = {
+                'urgent': '🔴 緊急',
+                'high': '🟡 重要',
+                'normal': '🟢 通常'
+            };
+            return labels[priority] || '通常';
+        }
+
+        // カレンダー・スケジュール管理
+        function renderCalendar() {
+            const calendar = document.getElementById('calendar');
+            const currentMonthElement = document.getElementById('currentMonth');
+            
+            if (!calendar || !currentMonthElement) return;
+            
+            currentMonthElement.textContent = currentMonth.toLocaleDateString('ja-JP', { 
+                year: 'numeric', 
+                month: 'long' 
+            });
+            
+            const year = currentMonth.getFullYear();
+            const month = currentMonth.getMonth();
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const startDate = new Date(firstDay);
+            startDate.setDate(startDate.getDate() - firstDay.getDay());
+            
+            const events = JSON.parse(localStorage.getItem(STORAGE_KEYS.events) || '[]');
+            const daysInMonth = lastDay.getDate();
+            
+            calendar.innerHTML = '';
+            
+            // 曜日ヘッダー
+            const weekdays = ['日', '月', '火', '水', '木', '金', '土'];
+            weekdays.forEach(day => {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'text-center text-sm font-medium text-gray-500 p-2';
+                dayElement.textContent = day;
+                calendar.appendChild(dayElement);
+            });
+            
+            // カレンダーの日付
+            for (let i = 0; i < 42; i++) {
+                const date = new Date(startDate);
+                date.setDate(startDate.getDate() + i);
+                
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day';
+                dayElement.textContent = date.getDate();
+                
+                const isCurrentMonth = date.getMonth() === month;
+                const isToday = date.toDateString() === new Date().toDateString();
+                const hasEvent = events.some(event => 
+                    new Date(event.date).toDateString() === date.toDateString()
+                );
+                
+                if (!isCurrentMonth) {
+                    dayElement.classList.add('text-gray-300');
+                }
+                if (isToday) {
+                    dayElement.classList.add('today');
+                }
+                if (hasEvent) {
+                    dayElement.classList.add('has-event');
+                }
+                
+                dayElement.onclick = () => selectDate(date);
+                calendar.appendChild(dayElement);
+            }
+        }
+
+        function prevMonth() {
+            currentMonth.setMonth(currentMonth.getMonth() - 1);
+            renderCalendar();
+        }
+
+        function nextMonth() {
+            currentMonth.setMonth(currentMonth.getMonth() + 1);
+            renderCalendar();
+        }
+
+        function selectDate(date) {
+            document.getElementById('newEventDate').value = date.toISOString().split('T')[0];
+        }
+
+        function loadEvents() {
+            // イベント読み込み処理
+        }
+
+        function addEvent() {
+            const title = document.getElementById('newEventTitle').value.trim();
+            const date = document.getElementById('newEventDate').value;
+            const time = document.getElementById('newEventTime').value;
+            const type = document.getElementById('newEventType').value;
+            const description = document.getElementById('newEventDescription').value.trim();
+            
+            if (!title || !date) {
+                showNotification('予定名と日付を入力してください', 'error');
+                return;
+            }
+            
+            const events = JSON.parse(localStorage.getItem(STORAGE_KEYS.events) || '[]');
+            const newEvent = {
+                id: Date.now(),
+                title,
+                date,
+                time,
+                type,
+                description,
+                createdAt: new Date().toISOString()
+            };
+            
+            events.push(newEvent);
+            localStorage.setItem(STORAGE_KEYS.events, JSON.stringify(events));
+            
+            // フォームクリア
+            document.getElementById('newEventTitle').value = '';
+            document.getElementById('newEventDate').value = '';
+            document.getElementById('newEventTime').value = '';
+            document.getElementById('newEventDescription').value = '';
+            
+            renderCalendar();
+            loadTodayEvents();
+            updateAllStats();
+            showNotification('予定を追加しました', 'success');
+        }
+
+        function loadTodayEvents() {
+            const today = new Date().toISOString().split('T')[0];
+            const events = JSON.parse(localStorage.getItem(STORAGE_KEYS.events) || '[]');
+            const todayEvents = events.filter(event => event.date === today);
+            
+            const container = document.getElementById('todayEvents');
+            if (!container) return;
+            
+            if (todayEvents.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-center py-4">今日の予定はありません</p>';
+                return;
+            }
+            
+            container.innerHTML = todayEvents.map(event => `
+                <div class="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div class="font-medium">${event.title}</div>
+                    <div class="text-sm text-gray-600">
+                        ${event.time || '時間未設定'} | ${getEventTypeLabel(event.type)}
+                    </div>
+                    ${event.description ? `<div class="text-sm text-gray-500 mt-1">${event.description}</div>` : ''}
+                </div>
+            `).join('');
+        }
+
+        function getEventTypeLabel(type) {
+            const labels = {
+                'meeting': '会議',
+                'deadline': '締切',
+                'event': 'イベント',
+                'reminder': 'リマインダー',
+                'goal_setting': '目標設定'
+            };
+            return labels[type] || 'その他';
+        }
+
+        // デザイン部門管理
+        function loadDesignProjects() {
+            const projects = JSON.parse(localStorage.getItem(STORAGE_KEYS.designProjects) || '[]');
+            const projectList = document.getElementById('designProjectList');
+            if (!projectList) return;
+            
+            const filter = document.getElementById('designFilter')?.value || 'all';
+            let filteredProjects = projects;
+            
+            if (filter !== 'all') {
+                filteredProjects = projects.filter(project => project.status === filter);
+            }
+            
+            if (filteredProjects.length === 0) {
+                projectList.innerHTML = '<div class="text-center py-8 text-gray-500">案件がありません</div>';
+                return;
+            }
+            
+            projectList.innerHTML = filteredProjects.map((project, index) => {
+                const originalIndex = projects.findIndex(p => p.id === project.id);
+                const priorityClass = project.priority === 'urgent' ? 'urgent' : project.priority === 'high' ? 'priority-high' : '';
+                
+                return `
+                    <div class="task-item ${priorityClass}">
+                        <div class="flex items-center justify-between">
+                            <div class="flex-1">
+                                <div class="font-medium">${project.title}</div>
+                                <div class="text-sm text-gray-600">
+                                    ${project.client} | ${getDesignTypeLabel(project.type)} | ${getDesignStatusLabel(project.status)}
+                                    ${project.dueDate ? ` | 期限: ${new Date(project.dueDate).toLocaleDateString('ja-JP')}` : ''}
+                                </div>
+                                ${project.description ? `<div class="text-sm text-gray-500 mt-1">${project.description}</div>` : ''}
+                            </div>
+                            <div class="flex space-x-2">
+                                <select onchange="updateDesignStatus(${originalIndex}, this.value)" class="text-xs p-1 border rounded">
+                                    <option value="planning" ${project.status === 'planning' ? 'selected' : ''}>企画中</option>
+                                    <option value="designing" ${project.status === 'designing' ? 'selected' : ''}>デザイン中</option>
+                                    <option value="review" ${project.status === 'review' ? 'selected' : ''}>レビュー中</option>
+                                    <option value="completed" ${project.status === 'completed' ? 'selected' : ''}>完了</option>
+                                </select>
+                                <button onclick="deleteDesignProject(${originalIndex})" class="p-2 text-red-500 hover:text-red-700">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function addDesignProject() {
+            const title = document.getElementById('newDesignTitle').value.trim();
+            const type = document.getElementById('newDesignType').value;
+            const priority = document.getElementById('newDesignPriority').value;
+            const dueDate = document.getElementById('newDesignDue').value;
+            const client = document.getElementById('newDesignClient').value.trim();
+            const status = document.getElementById('newDesignStatus').value;
+            const description = document.getElementById('newDesignDescription').value.trim();
+            
+            if (!title || !client) {
+                showNotification('案件名と依頼者を入力してください', 'error');
+                return;
+            }
+            
+            const projects = JSON.parse(localStorage.getItem(STORAGE_KEYS.designProjects) || '[]');
+            const newProject = {
+                id: Date.now(),
+                title,
+                type,
+                priority,
+                dueDate,
+                client,
+                status,
+                description,
+                createdAt: new Date().toISOString()
+            };
+            
+            projects.push(newProject);
+            localStorage.setItem(STORAGE_KEYS.designProjects, JSON.stringify(projects));
+            
+            // フォームクリア
+            document.getElementById('newDesignTitle').value = '';
+            document.getElementById('newDesignClient').value = '';
+            document.getElementById('newDesignDue').value = '';
+            document.getElementById('newDesignDescription').value = '';
+            
+            loadDesignProjects();
+            updateDesignStats();
+            updateAllStats();
+            showNotification('デザイン案件を追加しました', 'success');
+        }
+
+        function updateDesignStatus(index, newStatus) {
+            const projects = JSON.parse(localStorage.getItem(STORAGE_KEYS.designProjects) || '[]');
+            projects[index].status = newStatus;
+            
+            if (newStatus === 'completed') {
+                projects[index].completedAt = new Date().toISOString();
+            }
+            
+            localStorage.setItem(STORAGE_KEYS.designProjects, JSON.stringify(projects));
+            loadDesignProjects();
+            updateDesignStats();
+            updateAllStats();
+        }
+
+        function deleteDesignProject(index) {
+            if (confirm('この案件を削除しますか？')) {
+                const projects = JSON.parse(localStorage.getItem(STORAGE_KEYS.designProjects) || '[]');
+                projects.splice(index, 1);
+                localStorage.setItem(STORAGE_KEYS.designProjects, JSON.stringify(projects));
+                loadDesignProjects();
+                updateDesignStats();
+                updateAllStats();
+                showNotification('案件を削除しました', 'info');
+            }
+        }
+
+        function filterDesignProjects() {
+            loadDesignProjects();
+        }
+
+        function updateDesignStats() {
+            const projects = JSON.parse(localStorage.getItem(STORAGE_KEYS.designProjects) || '[]');
+            
+            const planningCount = projects.filter(p => p.status === 'planning').length;
+            const designingCount = projects.filter(p => p.status === 'designing').length;
+            const reviewCount = projects.filter(p => p.status === 'review').length;
+            const completedCount = projects.filter(p => p.status === 'completed').length;
+            
+            const planningElement = document.getElementById('planningCount');
+            const designingElement = document.getElementById('designingCount');
+            const reviewElement = document.getElementById('reviewCount');
+            const completedElement = document.getElementById('designCompletedCount');
+            
+            if (planningElement) planningElement.textContent = planningCount;
+            if (designingElement) designingElement.textContent = designingCount;
+            if (reviewElement) reviewElement.textContent = reviewCount;
+            if (completedElement) completedElement.textContent = completedCount;
+            
+            // 締切迫る案件
+            const today = new Date();
+            const urgentProjects = projects.filter(project => {
+                if (!project.dueDate || project.status === 'completed') return false;
+                const dueDate = new Date(project.dueDate);
+                const daysUntilDue = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
+                return daysUntilDue <= 3 && daysUntilDue >= 0;
+            });
+            
+            const urgentContainer = document.getElementById('urgentDesignProjects');
+            if (urgentContainer) {
+                if (urgentProjects.length === 0) {
+                    urgentContainer.innerHTML = '<p class="text-gray-500 text-center py-4">締切迫る案件はありません</p>';
+                } else {
+                    urgentContainer.innerHTML = urgentProjects.map(project => `
+                        <div class="p-3 bg-red-50 border border-red-200 rounded-lg">
+                            <div class="font-medium text-sm">${project.title}</div>
+                            <div class="text-xs text-gray-600">${project.client}</div>
+                            <div class="text-xs text-red-600 mt-1">
+                                期限: ${new Date(project.dueDate).toLocaleDateString('ja-JP')}
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            }
+        }
+
+        function getDesignTypeLabel(type) {
+            const labels = {
+                'logo': 'ロゴ',
+                'flyer': 'チラシ',
+                'web': 'Web',
+                'banner': 'バナー',
+                'package': 'パッケージ',
+                'interior': '店舗内装',
+                'other': 'その他'
+            };
+            return labels[type] || 'その他';
+        }
+
+        function getDesignStatusLabel(status) {
+            const labels = {
+                'planning': '企画中',
+                'designing': 'デザイン中',
+                'review': 'レビュー中',
+                'completed': '完了'
+            };
+            return labels[status] || '不明';
+        }
+
+        // 売上分析
+        function uploadSalesData(event) {
+            const file = event.target.files[0];
+            if (!file || !file.name.endsWith('.csv')) {
+                showNotification('CSVファイルを選択してください', 'error');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const csv = e.target.result;
+                    const lines = csv.trim().split('\n');
+                    const headers = lines[0].split(',').map(h => h.trim());
+                    
+                    const salesData = lines.slice(1).map(line => {
+                        const values = line.split(',');
+                        const data = {};
+                        headers.forEach((header, index) => {
+                            data[header] = values[index]?.trim() || '';
+                        });
+                        return data;
+                    });
+                    
+                    localStorage.setItem(STORAGE_KEYS.salesData, JSON.stringify(salesData));
+                    analyzeSalesData(salesData);
+                    showNotification('売上データを読み込みました', 'success');
+                } catch (error) {
+                    showNotification('CSVファイルの読み込みに失敗しました', 'error');
+                }
+            };
+            reader.readAsText(file, 'UTF-8');
+        }
+
+        function analyzeSalesData(data) {
+            document.getElementById('salesUploadArea').classList.add('hidden');
+            document.getElementById('salesAnalysis').classList.remove('hidden');
+            
+            // 基本統計の計算
+            let totalSales = 0;
+            const storeData = {};
+            
+            data.forEach(row => {
+                const sales = parseFloat(row['売上'] || row['sales'] || '0');
+                const store = row['店舗'] || row['store'] || '不明';
+                
+                totalSales += sales;
+                
+                if (!storeData[store]) {
+                    storeData[store] = 0;
+                }
+                storeData[store] += sales;
+            });
+            
+            const averageSales = data.length > 0 ? totalSales / data.length : 0;
+            const topStore = Object.keys(storeData).reduce((a, b) => storeData[a] > storeData[b] ? a : b, '');
+            
+            // 統計表示
+            document.getElementById('totalSales').textContent = `¥${totalSales.toLocaleString()}`;
+            document.getElementById('averageSales').textContent = `¥${Math.round(averageSales).toLocaleString()}`;
+            document.getElementById('topStore').textContent = topStore;
+            
+            // 簡単な成長率計算（仮）
+            const growthRate = 5.2; // 実際のデータから計算する場合はここを修正
+            document.getElementById('growthRate').textContent = `+${growthRate}%`;
+            
+            // チャート表示（簡易版）
+            renderSalesChart(storeData);
+        }
+
+        function renderSalesChart(storeData) {
+            const canvas = document.getElementById('salesChart');
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            const stores = Object.keys(storeData);
+            const sales = Object.values(storeData);
+            
+            // キャンバスクリア
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // 簡易棒グラフ
+            const maxSales = Math.max(...sales);
+            const barWidth = canvas.width / stores.length - 20;
+            const barHeight = canvas.height - 60;
+            
+            stores.forEach((store, index) => {
+                const x = index * (barWidth + 20) + 10;
+                const height = (sales[index] / maxSales) * barHeight;
+                const y = canvas.height - height - 40;
+                
+                // バー描画
+                ctx.fillStyle = `hsl(${index * 30}, 70%, 50%)`;
+                ctx.fillRect(x, y, barWidth, height);
+                
+                // 店舗名
+                ctx.fillStyle = '#333';
+                ctx.font = '12px Arial';
+                ctx.save();
+                ctx.translate(x + barWidth/2, canvas.height - 20);
+                ctx.rotate(-Math.PI/4);
+                ctx.textAlign = 'right';
+                ctx.fillText(store, 0, 0);
+                ctx.restore();
+                
+                // 売上金額
+                ctx.fillStyle = '#333';
+                ctx.font = '10px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(`¥${Math.round(sales[index]/1000)}K`, x + barWidth/2, y - 5);
+            });
+        }
+
+        function downloadSalesTemplate() {
+            const templateData = [
+                ['日付', '店舗', '売上', '客数', '口コミ数'],
+                ['2025-06-01', 'CLASSY東京', '150000', '25', '3'],
+                ['2025-06-01', 'CLASSY名古屋', '120000', '20', '2'],
+                ['2025-06-02', 'CLASSY東京', '180000', '30', '4']
+            ];
+            
+            const csv = templateData.map(row => row.join(',')).join('\n');
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = '売上データテンプレート.csv';
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showNotification('テンプレートをダウンロードしました', 'success');
+        }
+
+        // 目標管理
+        function initGoalSettings() {
+            const container = document.getElementById('goalSettings');
+            if (!container) return;
+            
+            const currentMonth = document.getElementById('goalMonth').value;
+            
+            container.innerHTML = STORES.map(store => `
+                <div class="p-4 border border-gray-200 rounded-lg">
+                    <h5 class="font-semibold mb-3">${store.name}</h5>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div>
+                            <label class="block text-sm text-gray-600 mb-1">売上目標</label>
+                            <input type="number" id="sales_${store.id}" class="input-field" placeholder="¥">
+                        </div>
+                        <div>
+                            <label class="block text-sm text-gray-600 mb-1">日記目標</label>
+                            <input type="number" id="diary_${store.id}" class="input-field" placeholder="件数">
+                        </div>
+                        <div>
+                            <label class="block text-sm text-gray-600 mb-1">口コミ目標</label>
+                            <input type="number" id="review_${store.id}" class="input-field" placeholder="件数">
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            // 既存の目標データを読み込み
+            loadExistingGoals(currentMonth);
+        }
+
+        function loadExistingGoals(month) {
+            const goals = JSON.parse(localStorage.getItem(STORAGE_KEYS.goals) || '{}');
+            const monthGoals = goals[month] || {};
+            
+            STORES.forEach(store => {
+                const storeGoals = monthGoals[store.id] || {};
+                const salesInput = document.getElementById(`sales_${store.id}`);
+                const diaryInput = document.getElementById(`diary_${store.id}`);
+                const reviewInput = document.getElementById(`review_${store.id}`);
+                
+                if (salesInput) salesInput.value = storeGoals.sales || '';
+                if (diaryInput) diaryInput.value = storeGoals.diary || '';
+                if (reviewInput) reviewInput.value = storeGoals.review || '';
+            });
+        }
+
+        function saveGoals() {
+            const month = document.getElementById('goalMonth').value;
+            const goals = JSON.parse(localStorage.getItem(STORAGE_KEYS.goals) || '{}');
+            
+            if (!goals[month]) {
+                goals[month] = {};
+            }
+            
+            STORES.forEach(store => {
+                const sales = document.getElementById(`sales_${store.id}`).value;
+                const diary = document.getElementById(`diary_${store.id}`).value;
+                const review = document.getElementById(`review_${store.id}`).value;
+                
+                goals[month][store.id] = {
+                    sales: sales ? parseInt(sales) : 0,
+                    diary: diary ? parseInt(diary) : 0,
+                    review: review ? parseInt(review) : 0
+                };
+            });
+            
+            localStorage.setItem(STORAGE_KEYS.goals, JSON.stringify(goals));
+            loadGoalProgress();
+            showNotification('目標を保存しました', 'success');
+        }
+
+        function loadGoalProgress() {
+            const month = document.getElementById('goalMonth').value;
+            const goals = JSON.parse(localStorage.getItem(STORAGE_KEYS.goals) || '{}');
+            const monthGoals = goals[month] || {};
+            
+            const container = document.getElementById('goalProgress');
+            if (!container) return;
+            
+            const salesData = JSON.parse(localStorage.getItem(STORAGE_KEYS.salesData) || '[]');
+            
+            container.innerHTML = STORES.map(store => {
+                const storeGoals = monthGoals[store.id] || {};
+                const currentSales = calculateCurrentSales(salesData, store.id, month);
+                const salesProgress = storeGoals.sales > 0 ? Math.round((currentSales / storeGoals.sales) * 100) : 0;
+                
+                return `
+                    <div class="p-4 border border-gray-200 rounded-lg">
+                        <div class="flex justify-between items-center mb-2">
+                            <h6 class="font-medium">${store.name}</h6>
+                            <span class="text-sm text-gray-500">${salesProgress}%</span>
+                        </div>
+                        <div class="space-y-2">
+                            <div>
+                                <div class="flex justify-between text-sm">
+                                    <span>売上</span>
+                                    <span>¥${currentSales.toLocaleString()} / ¥${storeGoals.sales?.toLocaleString() || 0}</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-green-500 h-2 rounded-full" style="width: ${Math.min(salesProgress, 100)}%"></div>
+                                </div>
+                            </div>
+                            <div class="text-xs text-gray-600">
+                                日記: ${storeGoals.diary || 0}件 | 口コミ: ${storeGoals.review || 0}件
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function calculateCurrentSales(salesData, storeId, month) {
+            const storeName = STORES.find(s => s.id === storeId)?.name || storeId;
+            return salesData
+                .filter(row => {
+                    const date = row['日付'] || row['date'] || '';
+                    const store = row['店舗'] || row['store'] || '';
+                    return date.includes(month) && store.includes(storeName);
+                })
+                .reduce((sum, row) => {
+                    const sales = parseFloat(row['売上'] || row['sales'] || '0');
+                    return sum + sales;
+                }, 0);
+        }
+
+        // プロンプト管理
+        function loadPrompts() {
+            const prompts = JSON.parse(localStorage.getItem(STORAGE_KEYS.prompts) || '[]');
+            const promptList = document.getElementById('promptList');
+            if (!promptList) return;
+            
+            const filteredPrompts = currentPromptCategory === 'all' ? 
+                prompts : 
+                prompts.filter(p => p.category === currentPromptCategory);
+            
+            if (filteredPrompts.length === 0) {
+                promptList.innerHTML = '<div class="text-center py-4 text-gray-500">プロンプトがありません</div>';
+                return;
+            }
+            
+            promptList.innerHTML = filteredPrompts.map((prompt, index) => {
+                const originalIndex = prompts.findIndex(p => p.id === prompt.id);
+                return `
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <button onclick="copyPrompt('${prompt.text.replace(/'/g, "\\'")}', '${prompt.label}')" 
+                                class="btn btn-primary flex-1 mr-3 text-sm">
+                            <i class="fas fa-copy mr-2"></i>${prompt.label}
+                        </button>
+                        <span class="text-xs text-gray-500 px-2 py-1 bg-white rounded mr-2">
+                            ${getPromptCategoryLabel(prompt.category)}
+                        </span>
+                        <button onclick="deletePrompt(${originalIndex})" 
+                                class="text-red-500 hover:text-red-700 p-1">
+                            <i class="fas fa-trash text-sm"></i>
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function switchPromptCategory(category) {
+            currentPromptCategory = category;
+            document.querySelectorAll('#promptCategoryTabs .nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelector(`[data-category="${category}"]`).classList.add('active');
+            loadPrompts();
+        }
+
+        function addPrompt() {
+            const category = document.getElementById('newPromptCategory').value;
+            const label = document.getElementById('newPromptLabel').value.trim();
+            const text = document.getElementById('newPromptText').value.trim();
+            
+            if (!label || !text) {
+                showNotification('ボタン名とプロンプト内容を入力してください', 'error');
+                return;
+            }
+            
+            const prompts = JSON.parse(localStorage.getItem(STORAGE_KEYS.prompts) || '[]');
+            const newPrompt = {
+                id: Date.now(),
+                label,
+                text,
+                category,
+                createdAt: new Date().toISOString()
+            };
+            
+            prompts.push(newPrompt);
+            localStorage.setItem(STORAGE_KEYS.prompts, JSON.stringify(prompts));
+            
+            // フォームクリア
+            document.getElementById('newPromptLabel').value = '';
+            document.getElementById('newPromptText').value = '';
+            
+            loadPrompts();
+            showNotification('プロンプトを追加しました', 'success');
+        }
+
+        function deletePrompt(index) {
+            if (confirm('このプロンプトを削除しますか？')) {
+                const prompts = JSON.parse(localStorage.getItem(STORAGE_KEYS.prompts) || '[]');
+                prompts.splice(index, 1);
+                localStorage.setItem(STORAGE_KEYS.prompts, JSON.stringify(prompts));
+                loadPrompts();
+                showNotification('プロンプトを削除しました', 'info');
+            }
+        }
+
+        function copyPrompt(text, label) {
+            navigator.clipboard.writeText(text).then(() => {
+                showNotification(`「${label}」をコピーしました`, 'success');
+            }).catch(() => {
+                showNotification('コピーに失敗しました', 'error');
+            });
+        }
+
+        function getPromptCategoryLabel(category) {
+            const labels = {
+                'line': 'LINE',
+                'sns': 'SNS',
+                'report': '報告',
+                'design': 'デザイン',
+                'other': 'その他'
+            };
+            return labels[category] || 'その他';
         }
 
         // メモ管理
         function getMemoKey(date = null) {
             const today = date || new Date().toISOString().split('T')[0];
-            return `memo_${currentStore}_${today}`;
+            return STORAGE_KEYS.memos + today;
         }
 
         function loadMemo() {
@@ -1188,18 +2285,24 @@
             const memoSaveDate = document.getElementById('memoSaveDate');
             
             if (memoArea) memoArea.value = savedMemo;
-            if (memoSaveDate) memoSaveDate.textContent = '今日 ' + new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
+            if (memoSaveDate) {
+                memoSaveDate.textContent = '今日 ' + new Date().toLocaleTimeString('ja-JP', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+            }
         }
 
         function saveMemo() {
-            const today = new Date().toISOString().split('T')[0];
+            const selectedDate = document.getElementById('memoDateSelector').value;
+            const today = selectedDate || new Date().toISOString().split('T')[0];
             const memoKey = getMemoKey(today);
             const memoArea = document.getElementById('memoArea');
+            
             if (memoArea) {
                 const memoText = memoArea.value;
                 localStorage.setItem(memoKey, memoText);
                 updateMemoDateSelector();
-                updateMemoStats();
             }
         }
 
@@ -1218,7 +2321,7 @@
             const selector = document.getElementById('memoDateSelector');
             if (!selector) return;
             
-            selector.innerHTML = '<option value="">過去のメモ</option>';
+            selector.innerHTML = '<option value="">今日のメモ</option>';
             
             const dates = [];
             for (let i = 1; i < 30; i++) {
@@ -1229,7 +2332,11 @@
                 if (localStorage.getItem(memoKey)) {
                     dates.push({
                         value: dateStr,
-                        label: date.toLocaleDateString('ja-JP', { month: 'numeric', day: 'numeric', weekday: 'short' })
+                        label: date.toLocaleDateString('ja-JP', { 
+                            month: 'numeric', 
+                            day: 'numeric', 
+                            weekday: 'short' 
+                        })
                     });
                 }
             }
@@ -1245,6 +2352,7 @@
         function loadSelectedMemo() {
             const selector = document.getElementById('memoDateSelector');
             const selectedDate = selector.value;
+            
             if (selectedDate) {
                 const memoKey = getMemoKey(selectedDate);
                 const savedMemo = localStorage.getItem(memoKey) || '';
@@ -1252,423 +2360,178 @@
                 const memoSaveDate = document.getElementById('memoSaveDate');
                 
                 if (memoArea) memoArea.value = savedMemo;
-                if (memoSaveDate) memoSaveDate.textContent = new Date(selectedDate).toLocaleDateString('ja-JP', { month: 'numeric', day: 'numeric', weekday: 'short' });
+                if (memoSaveDate) {
+                    memoSaveDate.textContent = new Date(selectedDate).toLocaleDateString('ja-JP', { 
+                        month: 'numeric', 
+                        day: 'numeric', 
+                        weekday: 'short' 
+                    });
+                }
             } else {
                 loadMemo();
             }
         }
 
-        // メモの自動保存
-        document.addEventListener('DOMContentLoaded', () => {
-            const memoArea = document.getElementById('memoArea');
-            if (memoArea) {
-                memoArea.addEventListener('input', saveMemo);
-            }
-        });
-
-        // プロンプト管理
-        function getPromptKey() {
-            return `prompts_${currentStore}`;
-        }
-
-        function switchCategory(category) {
-            currentCategory = category;
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.classList.remove('active');
+        // 通知・アラートシステム
+        function checkAlerts() {
+            const tasks = JSON.parse(localStorage.getItem(STORAGE_KEYS.tasks) || '[]');
+            const events = JSON.parse(localStorage.getItem(STORAGE_KEYS.events) || '[]');
+            const designProjects = JSON.parse(localStorage.getItem(STORAGE_KEYS.designProjects) || '[]');
+            
+            const today = new Date();
+            const tomorrow = new Date(today);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            
+            // 期限切れタスク
+            const overdueTasks = tasks.filter(task => 
+                !task.completed && task.dueDate && new Date(task.dueDate) < today
+            );
+            
+            // 今日期限のタスク
+            const dueTodayTasks = tasks.filter(task => 
+                !task.completed && task.dueDate && 
+                new Date(task.dueDate).toDateString() === today.toDateString()
+            );
+            
+            // 明日期限のタスク
+            const dueTomorrowTasks = tasks.filter(task => 
+                !task.completed && task.dueDate && 
+                new Date(task.dueDate).toDateString() === tomorrow.toDateString()
+            );
+            
+            // 今日の予定
+            const todayEvents = events.filter(event => 
+                event.date === today.toISOString().split('T')[0]
+            );
+            
+            // デザイン案件の緊急アラート
+            const urgentDesign = designProjects.filter(project => {
+                if (!project.dueDate || project.status === 'completed') return false;
+                const dueDate = new Date(project.dueDate);
+                const daysUntilDue = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
+                return daysUntilDue <= 2 && daysUntilDue >= 0;
             });
-            const activeTab = document.querySelector(`[data-category="${category}"]`);
-            if (activeTab) activeTab.classList.add('active');
-            loadPrompts();
-        }
-
-        function loadPrompts() {
-            const savedPrompts = JSON.parse(localStorage.getItem(getPromptKey()) || '[]');
-            const container = document.getElementById('promptButtons');
-            if (!container) return;
             
-            container.innerHTML = '';
-            
-            const filteredPrompts = currentCategory === 'all' ? 
-                savedPrompts : 
-                savedPrompts.filter(p => p.category === currentCategory);
-            
-            if (filteredPrompts.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-brain"></i>
-                        <p>このカテゴリにプロンプトがありません</p>
-                    </div>
-                `;
-                return;
+            // 通知の追加
+            if (overdueTasks.length > 0) {
+                addNotification(`期限切れタスクが${overdueTasks.length}件あります`, 'urgent');
             }
             
-            filteredPrompts.forEach((p, index) => {
-                const div = document.createElement('div');
-                div.className = 'prompt-item';
-                div.innerHTML = `
-                    <div class="flex items-center justify-between">
-                        <button onclick="copyPrompt('${p.text.replace(/'/g, "\\'")}', '${p.label}')" 
-                                class="btn btn-primary flex-1 mr-3">
-                            <i class="fas fa-copy mr-2"></i>${p.label}
-                        </button>
-                        <span class="text-xs text-gray-500 px-2 py-1 bg-gray-100 rounded mr-2">${getCategoryLabel(p.category)}</span>
-                        <button onclick="deletePrompt(${savedPrompts.indexOf(p)})" 
-                                class="text-red-500 hover:text-red-700 p-2">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                `;
-                container.appendChild(div);
-            });
+            if (dueTodayTasks.length > 0) {
+                addNotification(`今日期限のタスクが${dueTodayTasks.length}件あります`, 'warning');
+            }
+            
+            if (dueTomorrowTasks.length > 0) {
+                addNotification(`明日期限のタスクが${dueTomorrowTasks.length}件あります`, 'info');
+            }
+            
+            if (todayEvents.length > 0) {
+                addNotification(`今日の予定が${todayEvents.length}件あります`, 'info');
+            }
+            
+            if (urgentDesign.length > 0) {
+                addNotification(`緊急デザイン案件が${urgentDesign.length}件あります`, 'urgent');
+            }
+            
+            updateNotificationCount();
         }
 
-        function getCategoryLabel(category) {
-            const labels = {
-                'line': 'LINE',
-                'sns': 'SNS',
-                'report': '報告',
-                'other': 'その他'
+        function addNotification(message, type = 'info') {
+            const notification = {
+                id: Date.now(),
+                message,
+                type,
+                timestamp: new Date().toISOString(),
+                read: false
             };
-            return labels[category] || 'その他';
+            
+            notifications.push(notification);
+            
+            // 最大100件まで保持
+            if (notifications.length > 100) {
+                notifications = notifications.slice(-100);
+            }
+            
+            updateNotificationCount();
         }
 
-        function addPrompt() {
-            const category = document.getElementById('newPromptCategory').value;
-            const label = document.getElementById('newPromptLabel').value.trim();
-            const text = document.getElementById('newPromptText').value.trim();
+        function updateNotificationCount() {
+            const unreadCount = notifications.filter(n => !n.read).length;
+            const countElement = document.getElementById('notificationCount');
+            if (countElement) {
+                countElement.textContent = unreadCount;
+                countElement.style.display = unreadCount > 0 ? 'inline' : 'none';
+            }
+        }
+
+        function showNotifications() {
+            const modal = document.getElementById('notificationModal');
+            const list = document.getElementById('notificationList');
             
-            if (label && text) {
-                const prompts = JSON.parse(localStorage.getItem(getPromptKey()) || '[]');
-                prompts.push({ label, text, category });
-                localStorage.setItem(getPromptKey(), JSON.stringify(prompts));
-                document.getElementById('newPromptLabel').value = '';
-                document.getElementById('newPromptText').value = '';
-                loadPrompts();
-                updatePromptStats();
-                showNotification('プロンプトを追加しました', 'success');
+            if (notifications.length === 0) {
+                list.innerHTML = '<p class="text-gray-500 text-center py-4">通知はありません</p>';
             } else {
-                showNotification('ボタン名とプロンプト内容を入力してください', 'error');
+                list.innerHTML = notifications.slice(-20).reverse().map(notification => `
+                    <div class="p-3 border rounded-lg ${notification.read ? 'bg-gray-50' : 'bg-blue-50 border-blue-200'}">
+                        <div class="flex items-center justify-between">
+                            <div class="flex-1">
+                                <div class="text-sm ${getNotificationIcon(notification.type)} mr-2">
+                                    ${notification.message}
+                                </div>
+                                <div class="text-xs text-gray-500 mt-1">
+                                    ${new Date(notification.timestamp).toLocaleString('ja-JP')}
+                                </div>
+                            </div>
+                            <button onclick="markAsRead(${notification.id})" 
+                                    class="text-gray-400 hover:text-gray-600 ml-2">
+                                <i class="fas fa-check"></i>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            
+            modal.classList.add('show');
+        }
+
+        function getNotificationIcon(type) {
+            const icons = {
+                'urgent': '🔴',
+                'warning': '🟡',
+                'info': '🔵',
+                'success': '🟢'
+            };
+            return icons[type] || '🔵';
+        }
+
+        function markAsRead(notificationId) {
+            const notification = notifications.find(n => n.id === notificationId);
+            if (notification) {
+                notification.read = true;
+                updateNotificationCount();
+                showNotifications(); // リフレッシュ
             }
         }
 
-        function deletePrompt(index) {
-            if (confirm('このプロンプトを削除しますか？')) {
-                const prompts = JSON.parse(localStorage.getItem(getPromptKey()) || '[]');
-                prompts.splice(index, 1);
-                localStorage.setItem(getPromptKey(), JSON.stringify(prompts));
-                loadPrompts();
-                updatePromptStats();
-                showNotification('プロンプトを削除しました', 'info');
-            }
-        }
-
-        function copyPrompt(text, label) {
-            navigator.clipboard.writeText(text).then(() => {
-                showNotification(`「${label}」をコピーしました`, 'success');
-            }).catch(() => {
-                showNotification('コピーに失敗しました', 'error');
-            });
-        }
-
-        // CSV処理
-        function handleCSVUpload(event) {
-            const file = event.target.files[0];
-            if (file && file.name.endsWith('.csv')) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const csv = e.target.result;
-                    parseCSV(csv, file.name);
-                };
-                reader.readAsText(file, 'UTF-8');
-            } else {
-                showNotification('CSVファイルを選択してください', 'error');
-            }
-        }
-
-        function parseCSV(csv, fileName = 'uploaded.csv') {
-            const lines = csv.trim().split('\n');
-            const data = lines.map(line => {
-                const result = [];
-                let current = '';
-                let inQuotes = false;
-                
-                for (let i = 0; i < line.length; i++) {
-                    const char = line[i];
-                    if (char === '"' && (i === 0 || line[i-1] === ',')) {
-                        inQuotes = true;
-                    } else if (char === '"' && inQuotes) {
-                        inQuotes = false;
-                    } else if (char === ',' && !inQuotes) {
-                        result.push(current.trim());
-                        current = '';
-                    } else {
-                        current += char;
-                    }
-                }
-                result.push(current.trim());
-                return result;
-            });
-            
-            csvData = data;
-            displayEditableCSV(data, fileName);
-            showNotification('CSVファイルを読み込みました', 'success');
-        }
-
-        function displayEditableCSV(data, fileName) {
-            if (!data || data.length === 0) return;
-
-            // UI切り替え
-            document.getElementById('csvUploadArea').classList.add('hidden');
-            document.getElementById('csvEditArea').classList.remove('hidden');
-            
-            // ファイル情報更新
-            document.getElementById('csvFileName').textContent = fileName;
-            document.getElementById('csvRowCount').textContent = data.length - 1; // ヘッダー除く
-            document.getElementById('csvColCount').textContent = data[0]?.length || 0;
-            
-            const table = document.getElementById('csvEditTable');
-            const thead = document.getElementById('csvTableHead');
-            const tbody = document.getElementById('csvTableBody');
-            
-            // テーブルクリア
-            thead.innerHTML = '';
-            tbody.innerHTML = '';
-            
-            // ヘッダー行作成
-            if (data.length > 0) {
-                const headerRow = document.createElement('tr');
-                
-                // 行番号ヘッダー
-                const rowNumHeader = document.createElement('th');
-                rowNumHeader.className = 'csv-row-number';
-                rowNumHeader.textContent = '#';
-                headerRow.appendChild(rowNumHeader);
-                
-                // データヘッダー
-                data[0].forEach((cell, colIndex) => {
-                    const th = document.createElement('th');
-                    th.className = 'csv-header-cell';
-                    th.contentEditable = true;
-                    th.textContent = cell;
-                    th.style.position = 'relative';
-                    
-                    // 列削除ボタン
-                    const deleteBtn = document.createElement('button');
-                    deleteBtn.className = 'csv-delete-btn';
-                    deleteBtn.innerHTML = '×';
-                    deleteBtn.onclick = (e) => {
-                        e.stopPropagation();
-                        deleteColumn(colIndex);
-                    };
-                    th.appendChild(deleteBtn);
-                    
-                    th.addEventListener('blur', saveCSVChanges);
-                    headerRow.appendChild(th);
-                });
-                
-                thead.appendChild(headerRow);
-            }
-            
-            // データ行作成
-            for (let i = 1; i < data.length; i++) {
-                createEditableRow(data[i], i);
-            }
-            
-            updateFormattedText();
-        }
-
-        function createEditableRow(rowData, rowIndex) {
-            const tbody = document.getElementById('csvTableBody');
-            const row = document.createElement('tr');
-            
-            // 行番号
-            const rowNumCell = document.createElement('td');
-            rowNumCell.className = 'csv-row-number';
-            rowNumCell.innerHTML = `
-                ${rowIndex}
-                <button class="csv-delete-btn" onclick="deleteRow(${rowIndex})" style="position: absolute; top: 2px; right: 2px;">×</button>
-            `;
-            rowNumCell.style.position = 'relative';
-            row.appendChild(rowNumCell);
-            
-            // データセル
-            const maxCols = Math.max(rowData.length, csvData[0]?.length || 0);
-            for (let j = 0; j < maxCols; j++) {
-                const cell = document.createElement('td');
-                cell.className = 'csv-edit-cell';
-                cell.contentEditable = true;
-                cell.textContent = rowData[j] || '';
-                cell.addEventListener('blur', saveCSVChanges);
-                row.appendChild(cell);
-            }
-            
-            tbody.appendChild(row);
-        }
-
-        function addRow() {
-            if (!csvData || csvData.length === 0) {
-                showNotification('先にCSVをアップロードしてください', 'error');
-                return;
-            }
-            
-            const newRowData = new Array(csvData[0].length).fill('');
-            csvData.push(newRowData);
-            
-            createEditableRow(newRowData, csvData.length - 1);
-            updateRowNumbers();
-            updateFormattedText();
-            updateFileInfo();
-            showNotification('行を追加しました', 'success');
-        }
-
-        function addColumn() {
-            if (!csvData || csvData.length === 0) {
-                showNotification('先にCSVをアップロードしてください', 'error');
-                return;
-            }
-            
-            // 全行に新しい列を追加
-            csvData.forEach(row => row.push(''));
-            
-            // テーブル再描画
-            displayEditableCSV(csvData, document.getElementById('csvFileName').textContent);
-            showNotification('列を追加しました', 'success');
-        }
-
-        function deleteRow(rowIndex) {
-            if (confirm('この行を削除しますか？')) {
-                csvData.splice(rowIndex, 1);
-                displayEditableCSV(csvData, document.getElementById('csvFileName').textContent);
-                showNotification('行を削除しました', 'info');
-            }
-        }
-
-        function deleteColumn(colIndex) {
-            if (confirm('この列を削除しますか？')) {
-                csvData.forEach(row => row.splice(colIndex, 1));
-                displayEditableCSV(csvData, document.getElementById('csvFileName').textContent);
-                showNotification('列を削除しました', 'info');
-            }
-        }
-
-        function saveCSVChanges() {
-            const table = document.getElementById('csvEditTable');
-            const newData = [];
-            
-            // ヘッダー行を保存
-            const headerCells = table.querySelectorAll('thead th.csv-header-cell');
-            const headerData = Array.from(headerCells).map(cell => cell.textContent.trim());
-            newData.push(headerData);
-            
-            // データ行を保存
-            const bodyRows = table.querySelectorAll('tbody tr');
-            bodyRows.forEach(row => {
-                const cells = row.querySelectorAll('td.csv-edit-cell');
-                const rowData = Array.from(cells).map(cell => cell.textContent.trim());
-                newData.push(rowData);
-            });
-            
-            csvData = newData;
-            updateFormattedText();
-            updateFileInfo();
-        }
-
-        function updateRowNumbers() {
-            const rowNumbers = document.querySelectorAll('.csv-row-number');
-            rowNumbers.forEach((cell, index) => {
-                if (index > 0) { // Skip header
-                    cell.childNodes[0].textContent = index;
-                }
-            });
-        }
-
-        function updateFileInfo() {
-            if (csvData && csvData.length > 0) {
-                document.getElementById('csvRowCount').textContent = csvData.length - 1;
-                document.getElementById('csvColCount').textContent = csvData[0]?.length || 0;
-            }
-        }
-
-        function updateFormattedText() {
-            if (!csvData || csvData.length === 0) return;
-            
-            let formatted = '';
-            csvData.forEach((row, index) => {
-                formatted += row.join('\t') + '\n';
-                if (index === 0) {
-                    formatted += '---\n';
-                }
-            });
-            
-            const formattedTextElement = document.getElementById('csvFormattedText');
-            if (formattedTextElement) {
-                formattedTextElement.value = formatted;
-            }
-        }
-
-        function clearCSVData() {
-            if (confirm('⚠️ CSVデータを削除しますか？\nこの操作は取り消せません。')) {
-                csvData = null;
-                document.getElementById('csvUploadArea').classList.remove('hidden');
-                document.getElementById('csvEditArea').classList.add('hidden');
-                document.getElementById('csvFileInput').value = '';
-                showNotification('CSVデータを削除しました', 'info');
-            }
-        }
-
-        function reuploadCSV() {
-            if (csvData && !confirm('現在のデータは失われます。新しいファイルをアップロードしますか？')) {
-                return;
-            }
-            
-            csvData = null;
-            document.getElementById('csvUploadArea').classList.remove('hidden');
-            document.getElementById('csvEditArea').classList.add('hidden');
-            document.getElementById('csvFileInput').value = '';
-            document.getElementById('csvFileInput').click();
-        }
-
-        function copyCSVFormatted() {
-            const formattedText = document.getElementById('csvFormattedText').value;
-            if (!formattedText.trim()) {
-                showNotification('コピーするデータがありません', 'error');
-                return;
-            }
-            
-            navigator.clipboard.writeText(formattedText).then(() => {
-                showNotification('整形テキストをコピーしました', 'success');
-            }).catch(() => {
-                showNotification('コピーに失敗しました', 'error');
-            });
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
         }
 
         // データ管理
-        function clearAllData() {
-            if (confirm('⚠️ 現在の店舗のすべてのデータを削除しますか？\nこの操作は取り消せません。')) {
-                localStorage.removeItem(getTaskKey());
-                localStorage.removeItem(getPromptKey());
-                
-                for (let i = 0; i < 30; i++) {
-                    const date = new Date();
-                    date.setDate(date.getDate() - i);
-                    const dateStr = date.toISOString().split('T')[0];
-                    localStorage.removeItem(getMemoKey(dateStr));
-                }
-                
-                loadStoreData();
-                showNotification('すべてのデータをクリアしました', 'info');
-            }
-        }
-
-        function exportData() {
+        function exportAllData() {
             const data = {
-                store: currentStore,
                 exportDate: new Date().toISOString(),
-                tasks: JSON.parse(localStorage.getItem(getTaskKey()) || '[]'),
-                prompts: JSON.parse(localStorage.getItem(getPromptKey()) || '[]'),
+                version: '4.0',
+                tasks: JSON.parse(localStorage.getItem(STORAGE_KEYS.tasks) || '[]'),
+                events: JSON.parse(localStorage.getItem(STORAGE_KEYS.events) || '[]'),
+                prompts: JSON.parse(localStorage.getItem(STORAGE_KEYS.prompts) || '[]'),
+                designProjects: JSON.parse(localStorage.getItem(STORAGE_KEYS.designProjects) || '[]'),
+                goals: JSON.parse(localStorage.getItem(STORAGE_KEYS.goals) || '{}'),
+                salesData: JSON.parse(localStorage.getItem(STORAGE_KEYS.salesData) || '[]'),
                 memos: {}
             };
             
+            // メモデータの収集
             for (let i = 0; i < 30; i++) {
                 const date = new Date();
                 date.setDate(date.getDate() - i);
@@ -1684,47 +2547,128 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `AI_Secretary_${currentStore}_${new Date().toISOString().split('T')[0]}.json`;
+            a.download = `Rispondere_全データ_${new Date().toISOString().split('T')[0]}.json`;
             a.click();
             URL.revokeObjectURL(url);
             
-            showNotification('データをエクスポートしました', 'success');
+            showNotification('全データをエクスポートしました', 'success');
         }
 
-        function importData() {
+        function importAllData() {
             document.getElementById('importFileInput').click();
         }
 
         function handleDataImport(event) {
             const file = event.target.files[0];
-            if (file && file.name.endsWith('.json')) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    try {
-                        const data = JSON.parse(e.target.result);
-                        
-                        if (confirm(`データを「${data.store}」店舗にインポートしますか？\n現在のデータは上書きされます。`)) {
-                            if (data.tasks) {
-                                localStorage.setItem(getTaskKey(), JSON.stringify(data.tasks));
-                            }
-                            if (data.prompts) {
-                                localStorage.setItem(getPromptKey(), JSON.stringify(data.prompts));
-                            }
-                            if (data.memos) {
-                                Object.keys(data.memos).forEach(date => {
-                                    localStorage.setItem(getMemoKey(date), data.memos[date]);
-                                });
-                            }
-                            
-                            loadStoreData();
-                            showNotification('データをインポートしました', 'success');
-                        }
-                    } catch (error) {
-                        showNotification('ファイル形式が正しくありません', 'error');
-                    }
-                };
-                reader.readAsText(file, 'UTF-8');
+            if (!file || !file.name.endsWith('.json')) {
+                showNotification('JSONファイルを選択してください', 'error');
+                return;
             }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    if (confirm('データをインポートしますか？\n現在のデータは上書きされます。')) {
+                        // データの復元
+                        if (data.tasks) localStorage.setItem(STORAGE_KEYS.tasks, JSON.stringify(data.tasks));
+                        if (data.events) localStorage.setItem(STORAGE_KEYS.events, JSON.stringify(data.events));
+                        if (data.prompts) localStorage.setItem(STORAGE_KEYS.prompts, JSON.stringify(data.prompts));
+                        if (data.designProjects) localStorage.setItem(STORAGE_KEYS.designProjects, JSON.stringify(data.designProjects));
+                        if (data.goals) localStorage.setItem(STORAGE_KEYS.goals, JSON.stringify(data.goals));
+                        if (data.salesData) localStorage.setItem(STORAGE_KEYS.salesData, JSON.stringify(data.salesData));
+                        
+                        // メモデータの復元
+                        if (data.memos) {
+                            Object.keys(data.memos).forEach(date => {
+                                localStorage.setItem(getMemoKey(date), data.memos[date]);
+                            });
+                        }
+                        
+                        // UI更新
+                        loadAllData();
+                        updateAllStats();
+                        showNotification('データをインポートしました', 'success');
+                    }
+                } catch (error) {
+                    showNotification('ファイル形式が正しくありません', 'error');
+                }
+            };
+            reader.readAsText(file, 'UTF-8');
+        }
+
+        function clearAllData() {
+            if (confirm('⚠️ すべてのデータを削除しますか？\nこの操作は取り消せません。')) {
+                if (confirm('本当によろしいですか？すべてのタスク、予定、メモが削除されます。')) {
+                    // 全データクリア
+                    Object.values(STORAGE_KEYS).forEach(key => {
+                        if (key.includes('memos_')) {
+                            // メモは個別に削除
+                            for (let i = 0; i < 30; i++) {
+                                const date = new Date();
+                                date.setDate(date.getDate() - i);
+                                const dateStr = date.toISOString().split('T')[0];
+                                localStorage.removeItem(getMemoKey(dateStr));
+                            }
+                        } else {
+                            localStorage.removeItem(key);
+                        }
+                    });
+                    
+                    // UI更新
+                    loadAllData();
+                    updateAllStats();
+                    notifications = [];
+                    updateNotificationCount();
+                    
+                    showNotification('すべてのデータを削除しました', 'info');
+                }
+            }
+        }
+
+        function generateReport() {
+            const tasks = JSON.parse(localStorage.getItem(STORAGE_KEYS.tasks) || '[]');
+            const events = JSON.parse(localStorage.getItem(STORAGE_KEYS.events) || '[]');
+            const designProjects = JSON.parse(localStorage.getItem(STORAGE_KEYS.designProjects) || '[]');
+            const salesData = JSON.parse(localStorage.getItem(STORAGE_KEYS.salesData) || '[]');
+            
+            const today = new Date();
+            const reportData = {
+                生成日時: today.toLocaleString('ja-JP'),
+                タスク統計: {
+                    総数: tasks.length,
+                    完了: tasks.filter(t => t.completed).length,
+                    緊急: tasks.filter(t => t.priority === 'urgent' && !t.completed).length,
+                    期限切れ: tasks.filter(t => !t.completed && t.dueDate && new Date(t.dueDate) < today).length
+                },
+                予定統計: {
+                    総数: events.length,
+                    今月: events.filter(e => e.date && e.date.includes(today.toISOString().substr(0, 7))).length
+                },
+                デザイン案件統計: {
+                    総数: designProjects.length,
+                    企画中: designProjects.filter(p => p.status === 'planning').length,
+                    デザイン中: designProjects.filter(p => p.status === 'designing').length,
+                    レビュー中: designProjects.filter(p => p.status === 'review').length,
+                    完了: designProjects.filter(p => p.status === 'completed').length
+                },
+                売上データ: {
+                    データ件数: salesData.length,
+                    最終更新: salesData.length > 0 ? '利用可能' : '未登録'
+                }
+            };
+            
+            const reportText = JSON.stringify(reportData, null, 2);
+            const blob = new Blob([reportText], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Rispondere_レポート_${today.toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showNotification('レポートを生成しました', 'success');
         }
 
         // 通知システム
@@ -1733,7 +2677,7 @@
             notification.className = `notification ${type}`;
             notification.innerHTML = `
                 <div class="flex items-center">
-                    <i class="fas fa-${type === 'success' ? 'check' : type === 'error' ? 'exclamation-triangle' : 'info'}-circle mr-2"></i>
+                    <i class="fas fa-${getNotificationIconClass(type)} mr-2"></i>
                     <span>${message}</span>
                 </div>
             `;
@@ -1754,71 +2698,47 @@
             }, 3000);
         }
 
-        // エンターキーでタスク追加・ログイン
-        document.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                const activeElement = document.activeElement;
-                if (activeElement.id === 'newTask') {
-                    addTask();
-                } else if (activeElement.id === 'passwordInput') {
-                    const form = activeElement.closest('form');
-                    if (form) {
-                        handleLogin(e);
-                    }
-                }
+        function getNotificationIconClass(type) {
+            const icons = {
+                'success': 'check-circle',
+                'error': 'exclamation-triangle',
+                'warning': 'exclamation-circle',
+                'info': 'info-circle'
+            };
+            return icons[type] || 'info-circle';
+        }
+
+        // ページ閉じる前の確認
+        window.addEventListener('beforeunload', (e) => {
+            if (sessionStorage.getItem('isLoggedIn')) {
+                const message = '作業中のデータが保存されていない可能性があります。ページを離れますか？';
+                e.returnValue = message;
+                return message;
             }
         });
 
-        // ドラッグ&ドロップ対応
-        document.addEventListener('DOMContentLoaded', () => {
-            const csvUploadArea = document.querySelector('button[onclick="document.getElementById(\'csvFileInput\').click()"]');
-            
-            if (csvUploadArea) {
-                ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-                    csvUploadArea.addEventListener(eventName, preventDefaults, false);
-                });
-
-                function preventDefaults(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                }
-
-                csvUploadArea.addEventListener('dragover', (e) => {
-                    csvUploadArea.classList.add('border-blue-400', 'bg-blue-50');
-                });
-                
-                csvUploadArea.addEventListener('dragleave', (e) => {
-                    csvUploadArea.classList.remove('border-blue-400', 'bg-blue-50');
-                });
-                
-                csvUploadArea.addEventListener('drop', (e) => {
-                    csvUploadArea.classList.remove('border-blue-400', 'bg-blue-50');
-                    
-                    const files = e.dataTransfer.files;
-                    if (files.length > 0 && files[0].name.endsWith('.csv')) {
-                        const reader = new FileReader();
-                        reader.onload = function(e) {
-                            const csv = e.target.result;
-                            parseCSV(csv, files[0].name);
-                        };
-                        reader.readAsText(files[0], 'UTF-8');
-                    } else {
-                        showNotification('CSVファイルをドロップしてください', 'error');
-                    }
-                });
+        // モーダル外クリックで閉じる
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal')) {
+                e.target.classList.remove('show');
             }
         });
 
-        // セキュリティイベント
-        document.addEventListener('visibilitychange', () => {
-            if (document.hidden && sessionStorage.getItem('isLoggedIn')) {
-                // ページが非表示になった時の処理（必要に応じて）
+        // 2日の目標設定リマインダー
+        function checkGoalSettingReminder() {
+            const today = new Date();
+            if (today.getDate() === 2) {
+                addNotification('今日は月次目標設定日です', 'warning');
             }
-        });
+        }
 
-        window.addEventListener('beforeunload', () => {
-            // ページを離れる前の処理（必要に応じて）
-        });
+        // 定期実行タスク
+        setInterval(() => {
+            if (sessionStorage.getItem('isLoggedIn')) {
+                checkAlerts();
+                checkGoalSettingReminder();
+            }
+        }, 30 * 60 * 1000); // 30分ごと
     </script>
 </body>
 </html>
