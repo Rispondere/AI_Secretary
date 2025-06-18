@@ -439,6 +439,10 @@
                     <button type="submit" class="btn btn-primary w-full">
                         <i class="fas fa-sign-in-alt mr-2"></i>ログイン
                     </button>
+                    
+                    <button type="button" onclick="resetLoginState()" class="btn btn-secondary w-full">
+                        <i class="fas fa-refresh mr-2"></i>リセット
+                    </button>
                 </div>
             </form>
             
@@ -3719,6 +3723,9 @@
 
         // 初期化
         window.onload = () => {
+            // ログイン状態をリセット（開発時・デバッグ用）
+            resetLoginState();
+            
             checkAuthentication();
             updateDateTime();
             setInterval(updateDateTime, 60000);
@@ -3799,7 +3806,41 @@
                 loginAttempts = 0;
                 document.getElementById('loginAttempts').classList.add('hidden');
                 showNotification('ロックが解除されました', 'info');
-            }, 5 * 60 * 1000);
+            }, 30 * 1000); // 30秒に短縮
+        }
+
+        // ログイン状態をリセットする関数を追加
+        function resetLoginState() {
+            localStorage.removeItem('loginAttempts');
+            loginAttempts = 0;
+            
+            const passwordInput = document.getElementById('passwordInput');
+            const submitBtn = document.querySelector('button[type="submit"]');
+            const attemptsDiv = document.getElementById('loginAttempts');
+            
+            if (passwordInput) {
+                passwordInput.disabled = false;
+                passwordInput.value = '';
+                passwordInput.focus(); // フォーカスを当てる
+            }
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-sign-in-alt mr-2"></i>ログイン';
+            }
+            if (attemptsDiv) {
+                attemptsDiv.classList.add('hidden');
+            }
+            
+            // ログイン関連のセッションデータもクリア
+            sessionStorage.removeItem('isLoggedIn');
+            sessionStorage.removeItem('loginTime');
+            
+            console.log('ログイン状態をリセットしました');
+            
+            // 通知を表示（showNotification関数が利用可能な場合のみ）
+            if (typeof showNotification === 'function') {
+                showNotification('ログイン状態をリセットしました', 'info');
+            }
         }
 
         function logout() {
@@ -3846,6 +3887,9 @@
             document.getElementById('loginScreen').classList.remove('hidden');
             document.getElementById('mainDashboard').classList.add('hidden');
             document.getElementById('sessionTimer').classList.add('hidden');
+            
+            // ログイン状態をリセット
+            resetLoginState();
             updateLoginAttemptDisplay();
         }
 
