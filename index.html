@@ -145,6 +145,44 @@
             background: rgba(255, 255, 255, 1);
         }
         
+        .nav-tab {
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin: 0 4px;
+        }
+        
+        .nav-tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+        
+        .nav-tab:not(.active):hover {
+            background: rgba(255, 255, 255, 0.8);
+            transform: translateY(-1px);
+        }
+        
+        .stats-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .stats-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+        }
+        
         .login-container {
             min-height: 100vh;
             display: flex;
@@ -209,6 +247,72 @@
         
         .notification.warning {
             background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 24px;
+            margin: 24px 0;
+        }
+        
+        .col-span-3 { grid-column: span 3; }
+        .col-span-4 { grid-column: span 4; }
+        .col-span-6 { grid-column: span 6; }
+        .col-span-8 { grid-column: span 8; }
+        .col-span-12 { grid-column: span 12; }
+        
+        @media (max-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: repeat(6, 1fr);
+            }
+            .col-span-3 { grid-column: span 6; }
+            .col-span-4 { grid-column: span 6; }
+            .col-span-8 { grid-column: span 6; }
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: repeat(1, 1fr);
+                gap: 16px;
+            }
+            .col-span-3,
+            .col-span-4,
+            .col-span-6,
+            .col-span-8,
+            .col-span-12 {
+                grid-column: span 1;
+            }
+        }
+        
+        .task-item {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            padding: 16px;
+            margin: 8px 0;
+            transition: all 0.3s ease;
+        }
+        
+        .task-item:hover {
+            background: rgba(255, 255, 255, 0.95);
+            transform: translateX(4px);
+        }
+        
+        .task-item.completed {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+        
+        .task-item.urgent {
+            border-left: 4px solid #ef4444;
+            background: rgba(239, 68, 68, 0.05);
+        }
+        
+        .task-item.priority-high {
+            border-left: 4px solid #f59e0b;
+            background: rgba(245, 158, 11, 0.05);
         }
     </style>
 </head>
@@ -275,6 +379,10 @@
                             <div class="font-semibold text-gray-900" id="currentDate"></div>
                             <div class="text-sm text-gray-500" id="currentTime"></div>
                         </div>
+                        <button onclick="showNotifications()" class="btn btn-secondary">
+                            <i class="fas fa-bell mr-2"></i>
+                            <span id="notificationCount" class="bg-red-500 text-white text-xs rounded-full px-2 py-1 ml-1">0</span>
+                        </button>
                         <button onclick="logout()" class="btn btn-danger">
                             <i class="fas fa-sign-out-alt mr-2"></i>ログアウト
                         </button>
@@ -283,40 +391,243 @@
             </div>
         </div>
 
-        <!-- ダッシュボードコンテンツ -->
-        <div class="mx-4">
-            <div class="glass-card p-8 text-center">
-                <h2 class="text-2xl font-bold text-gray-900 mb-4">
-                    <i class="fas fa-check-circle text-green-600 mr-3"></i>
-                    ログイン成功！
-                </h2>
-                <p class="text-gray-600 mb-6">AI Secretary v4 へようこそ。統合業務管理システムにアクセスできます。</p>
-                
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+        <!-- ナビゲーション -->
+        <div class="mx-4 mb-6">
+            <div class="flex flex-wrap justify-center lg:justify-start gap-2">
+                <button class="nav-tab active" data-tab="dashboard" onclick="switchTab('dashboard')">
+                    <i class="fas fa-chart-line mr-2"></i>ダッシュボード
+                </button>
+                <button class="nav-tab" data-tab="tasks" onclick="switchTab('tasks')">
+                    <i class="fas fa-tasks mr-2"></i>タスク管理
+                </button>
+                <button class="nav-tab" data-tab="schedule" onclick="switchTab('schedule')">
+                    <i class="fas fa-calendar mr-2"></i>スケジュール
+                </button>
+                <button class="nav-tab" data-tab="sales" onclick="switchTab('sales')">
+                    <i class="fas fa-chart-bar mr-2"></i>売上分析
+                </button>
+                <button class="nav-tab" data-tab="goals" onclick="switchTab('goals')">
+                    <i class="fas fa-target mr-2"></i>目標管理
+                </button>
+                <button class="nav-tab" data-tab="design" onclick="switchTab('design')">
+                    <i class="fas fa-palette mr-2"></i>デザイン部門
+                </button>
+                <button class="nav-tab" data-tab="tools" onclick="switchTab('tools')">
+                    <i class="fas fa-tools mr-2"></i>ツール
+                </button>
+            </div>
+        </div>
+
+        <!-- ダッシュボードタブ -->
+        <div id="dashboardTab" class="tab-content mx-4">
+            <!-- 統計カード -->
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-6">
+                <div class="stats-card">
+                    <div class="text-2xl font-bold text-purple-600 mb-2" id="totalTasks">0</div>
+                    <div class="text-sm text-gray-600">総タスク数</div>
+                </div>
+                <div class="stats-card">
+                    <div class="text-2xl font-bold text-green-600 mb-2" id="completedTasks">0</div>
+                    <div class="text-sm text-gray-600">完了済み</div>
+                </div>
+                <div class="stats-card">
+                    <div class="text-2xl font-bold text-red-600 mb-2" id="urgentTasks">0</div>
+                    <div class="text-sm text-gray-600">緊急タスク</div>
+                </div>
+                <div class="stats-card">
+                    <div class="text-2xl font-bold text-blue-600 mb-2" id="totalEvents">0</div>
+                    <div class="text-sm text-gray-600">予定数</div>
+                </div>
+                <div class="stats-card">
+                    <div class="text-2xl font-bold text-yellow-600 mb-2" id="totalStores">10</div>
+                    <div class="text-sm text-gray-600">運営店舗</div>
+                </div>
+                <div class="stats-card">
+                    <div class="text-2xl font-bold text-indigo-600 mb-2" id="designProjects">0</div>
+                    <div class="text-sm text-gray-600">デザイン案件</div>
+                </div>
+            </div>
+
+            <!-- クイック概要 -->
+            <div class="dashboard-grid">
+                <div class="col-span-4">
                     <div class="glass-card p-6">
-                        <i class="fas fa-tasks text-4xl text-blue-600 mb-4"></i>
-                        <h3 class="text-lg font-semibold mb-2">タスク管理</h3>
-                        <p class="text-gray-600 text-sm">全店舗のタスクを統合管理</p>
-                    </div>
-                    
-                    <div class="glass-card p-6">
-                        <i class="fas fa-chart-line text-4xl text-green-600 mb-4"></i>
-                        <h3 class="text-lg font-semibold mb-2">売上分析</h3>
-                        <p class="text-gray-600 text-sm">リアルタイム売上データ分析</p>
-                    </div>
-                    
-                    <div class="glass-card p-6">
-                        <i class="fas fa-target text-4xl text-red-600 mb-4"></i>
-                        <h3 class="text-lg font-semibold mb-2">目標管理</h3>
-                        <p class="text-gray-600 text-sm">月次目標設定と進捗追跡</p>
+                        <h3 class="text-lg font-semibold mb-4 flex items-center">
+                            <i class="fas fa-chart-pie mr-2 text-purple-600"></i>今日の進捗
+                        </h3>
+                        <div class="flex items-center justify-center">
+                            <div class="relative w-32 h-32">
+                                <svg class="w-32 h-32">
+                                    <circle cx="64" cy="64" r="56" stroke="#e5e7eb" stroke-width="8" fill="none"/>
+                                    <circle id="progressCircle" cx="64" cy="64" r="56" stroke="#667eea" stroke-width="8" 
+                                            fill="none" stroke-linecap="round"/>
+                                </svg>
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                    <span id="progressText" class="text-xl font-bold text-gray-900">0%</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                
-                <div class="mt-8 p-4 bg-green-50 rounded-lg">
-                    <p class="text-green-800 text-sm">
-                        <i class="fas fa-info-circle mr-2"></i>
-                        システムが正常に動作しています。全ての機能が利用可能です。
-                    </p>
+
+                <div class="col-span-8">
+                    <div class="glass-card p-6">
+                        <h3 class="text-lg font-semibold mb-4 flex items-center">
+                            <i class="fas fa-exclamation-triangle mr-2 text-red-600"></i>緊急・重要事項
+                        </h3>
+                        <div id="urgentItems" class="space-y-3"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- タスク管理タブ -->
+        <div id="tasksTab" class="tab-content mx-4 hidden">
+            <div class="dashboard-grid">
+                <div class="col-span-8">
+                    <div class="glass-card p-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-lg font-semibold flex items-center">
+                                <i class="fas fa-tasks mr-2 text-purple-600"></i>全社タスク管理
+                            </h3>
+                            <div class="flex space-x-2">
+                                <select id="taskFilter" class="input-field w-40" onchange="filterTasks()">
+                                    <option value="all">すべて</option>
+                                    <option value="urgent">緊急</option>
+                                    <option value="high">重要</option>
+                                    <option value="normal">通常</option>
+                                    <option value="completed">完了済み</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div id="taskList" class="space-y-3 mb-6 max-h-96 overflow-y-auto"></div>
+                        
+                        <div class="border-t pt-4">
+                            <h4 class="font-semibold mb-3">新しいタスクを追加</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                                <input id="newTaskTitle" type="text" class="input-field" placeholder="タスク名">
+                                <select id="newTaskPriority" class="input-field">
+                                    <option value="normal">通常</option>
+                                    <option value="high">重要</option>
+                                    <option value="urgent">緊急</option>
+                                </select>
+                            </div>
+                            <textarea id="newTaskDescription" class="input-field mb-3" rows="2" placeholder="詳細説明"></textarea>
+                            <button onclick="addTask()" class="btn btn-primary w-full">
+                                <i class="fas fa-plus mr-2"></i>タスクを追加
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-span-4">
+                    <div class="glass-card p-6">
+                        <h3 class="text-lg font-semibold mb-4 flex items-center">
+                            <i class="fas fa-chart-bar mr-2 text-green-600"></i>タスク統計
+                        </h3>
+                        <div class="space-y-4">
+                            <div class="flex justify-between">
+                                <span>完了率</span>
+                                <span id="taskCompletionRate">0%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div id="taskProgressBar" class="bg-green-500 h-2 rounded-full" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- スケジュール管理タブ -->
+        <div id="scheduleTab" class="tab-content mx-4 hidden">
+            <div class="glass-card p-6">
+                <h3 class="text-lg font-semibold mb-4 flex items-center">
+                    <i class="fas fa-calendar mr-2 text-blue-600"></i>スケジュール管理
+                </h3>
+                <p class="text-gray-600">スケジュール機能を準備中です...</p>
+            </div>
+        </div>
+
+        <!-- 売上分析タブ -->
+        <div id="salesTab" class="tab-content mx-4 hidden">
+            <div class="glass-card p-6">
+                <h3 class="text-lg font-semibold mb-4 flex items-center">
+                    <i class="fas fa-chart-line mr-2 text-green-600"></i>売上データ分析
+                </h3>
+                <p class="text-gray-600">売上分析機能を準備中です...</p>
+            </div>
+        </div>
+
+        <!-- 目標管理タブ -->
+        <div id="goalsTab" class="tab-content mx-4 hidden">
+            <div class="glass-card p-6">
+                <h3 class="text-lg font-semibold mb-4 flex items-center">
+                    <i class="fas fa-target mr-2 text-red-600"></i>目標管理
+                </h3>
+                <p class="text-gray-600">目標管理機能を準備中です...</p>
+            </div>
+        </div>
+
+        <!-- デザイン部門タブ -->
+        <div id="designTab" class="tab-content mx-4 hidden">
+            <div class="glass-card p-6">
+                <h3 class="text-lg font-semibold mb-4 flex items-center">
+                    <i class="fas fa-palette mr-2 text-pink-600"></i>デザイン案件管理
+                </h3>
+                <p class="text-gray-600">デザイン案件管理機能を準備中です...</p>
+            </div>
+        </div>
+
+        <!-- ツールタブ -->
+        <div id="toolsTab" class="tab-content mx-4 hidden">
+            <div class="dashboard-grid">
+                <div class="col-span-6">
+                    <div class="glass-card p-6">
+                        <h3 class="text-lg font-semibold mb-4 flex items-center">
+                            <i class="fas fa-brain mr-2 text-purple-600"></i>プロンプト集
+                        </h3>
+                        
+                        <div id="promptList" class="space-y-3 mb-6 max-h-64 overflow-y-auto"></div>
+                        
+                        <div class="border-t pt-4">
+                            <h4 class="font-semibold mb-3">新しいプロンプトを追加</h4>
+                            <div class="grid grid-cols-2 gap-3 mb-3">
+                                <input id="newPromptLabel" type="text" class="input-field" placeholder="ボタン名">
+                                <select id="newPromptCategory" class="input-field">
+                                    <option value="line">LINE用</option>
+                                    <option value="sns">SNS用</option>
+                                    <option value="report">報告用</option>
+                                    <option value="other">その他</option>
+                                </select>
+                            </div>
+                            <textarea id="newPromptText" class="input-field mb-3" rows="3" placeholder="プロンプト内容"></textarea>
+                            <button onclick="addPrompt()" class="btn btn-primary w-full">
+                                <i class="fas fa-plus mr-2"></i>プロンプトを追加
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-span-6">
+                    <div class="glass-card p-6">
+                        <h3 class="text-lg font-semibold mb-4 flex items-center">
+                            <i class="fas fa-sticky-note mr-2 text-yellow-600"></i>メモ・ふせん
+                        </h3>
+                        
+                        <textarea id="memoArea" class="input-field resize-none" rows="12" 
+                                placeholder="気づき・指示事項・重要なポイントをメモ..."></textarea>
+                        
+                        <div class="flex space-x-2 mt-3">
+                            <button onclick="saveMemo()" class="btn btn-primary flex-1">
+                                <i class="fas fa-save mr-2"></i>保存
+                            </button>
+                            <button onclick="clearMemo()" class="btn btn-warning">
+                                <i class="fas fa-eraser mr-2"></i>クリア
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -325,7 +636,16 @@
     <script>
         // グローバル変数
         const CORRECT_PASSWORD = 'iam1104JP';
-        let isLoggedIn = false;
+        let currentTab = 'dashboard';
+        let notifications = [];
+
+        // データ管理キー
+        const STORAGE_KEYS = {
+            tasks: 'rispondere_tasks',
+            events: 'rispondere_events', 
+            prompts: 'rispondere_prompts',
+            memos: 'rispondere_memos'
+        };
 
         // ページ読み込み時の初期化
         window.addEventListener('DOMContentLoaded', function() {
@@ -348,7 +668,7 @@
         // ログイン状態チェック
         function checkLoginStatus() {
             const loginStatus = sessionStorage.getItem('isLoggedIn');
-            if (loginStatus === 'true') {
+            if (loginStatus === 'true' || loginStatus === 'demo') {
                 showDashboard();
             } else {
                 showLoginScreen();
@@ -366,8 +686,6 @@
             }
             
             const password = passwordInput.value.trim();
-            console.log('入力されたパスワード:', password);
-            console.log('正しいパスワード:', CORRECT_PASSWORD);
             
             if (!password) {
                 showNotification('パスワードを入力してください', 'warning');
@@ -377,21 +695,17 @@
             
             if (password === CORRECT_PASSWORD) {
                 // ログイン成功
-                console.log('ログイン成功');
                 sessionStorage.setItem('isLoggedIn', 'true');
                 sessionStorage.setItem('loginTime', Date.now().toString());
-                isLoggedIn = true;
                 
                 showNotification('ログインに成功しました！', 'success');
                 
-                // ダッシュボードを表示
                 setTimeout(() => {
                     showDashboard();
                 }, 1000);
                 
             } else {
                 // ログイン失敗
-                console.log('ログイン失敗');
                 showNotification('パスワードが間違っています', 'error');
                 passwordInput.value = '';
                 passwordInput.focus();
@@ -400,12 +714,9 @@
 
         // ログインスキップ機能
         function skipLogin() {
-            console.log('skipLogin() が呼び出されました');
-            
             if (confirm('ログインをスキップしてデモモードで起動しますか？')) {
                 sessionStorage.setItem('isLoggedIn', 'demo');
                 sessionStorage.setItem('loginTime', Date.now().toString());
-                isLoggedIn = true;
                 
                 showNotification('デモモードで起動しました', 'info');
                 
@@ -420,7 +731,6 @@
             if (confirm('ログアウトしますか？')) {
                 sessionStorage.removeItem('isLoggedIn');
                 sessionStorage.removeItem('loginTime');
-                isLoggedIn = false;
                 
                 showNotification('ログアウトしました', 'info');
                 
@@ -432,7 +742,6 @@
 
         // ログイン画面表示
         function showLoginScreen() {
-            console.log('ログイン画面を表示');
             document.getElementById('loginScreen').style.display = 'flex';
             document.getElementById('mainDashboard').style.display = 'none';
             
@@ -448,9 +757,346 @@
 
         // ダッシュボード表示
         function showDashboard() {
-            console.log('ダッシュボードを表示');
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('mainDashboard').style.display = 'block';
+            
+            // データ読み込み
+            loadAllData();
+            updateAllStats();
+        }
+
+        // タブ切り替え
+        function switchTab(tabName) {
+            // タブボタンの更新
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+            
+            // コンテンツの切り替え
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            document.getElementById(`${tabName}Tab`).classList.remove('hidden');
+            
+            currentTab = tabName;
+            
+            // タブ固有の初期化
+            switch(tabName) {
+                case 'tasks':
+                    loadTasks();
+                    break;
+                case 'tools':
+                    loadPrompts();
+                    loadMemo();
+                    break;
+            }
+        }
+
+        // データ読み込み関数群
+        function loadAllData() {
+            loadTasks();
+            loadPrompts();
+            loadMemo();
+        }
+
+        function updateAllStats() {
+            updateDashboardStats();
+            updateProgressCircle();
+        }
+
+        function updateDashboardStats() {
+            const tasks = JSON.parse(localStorage.getItem(STORAGE_KEYS.tasks) || '[]');
+            const prompts = JSON.parse(localStorage.getItem(STORAGE_KEYS.prompts) || '[]');
+            
+            const completedTasks = tasks.filter(task => task.completed).length;
+            const urgentTasks = tasks.filter(task => task.priority === 'urgent' && !task.completed).length;
+            
+            document.getElementById('totalTasks').textContent = tasks.length;
+            document.getElementById('completedTasks').textContent = completedTasks;
+            document.getElementById('urgentTasks').textContent = urgentTasks;
+            document.getElementById('totalEvents').textContent = 0; // イベント機能は後で実装
+            document.getElementById('designProjects').textContent = 0; // デザイン機能は後で実装
+            
+            // 緊急・重要事項の表示
+            const urgentItems = document.getElementById('urgentItems');
+            const urgentList = tasks.filter(task => task.priority === 'urgent' && !task.completed).slice(0, 3);
+            
+            if (urgentList.length === 0) {
+                urgentItems.innerHTML = '<p class="text-gray-500 text-center py-4">現在、緊急事項はありません</p>';
+            } else {
+                urgentItems.innerHTML = urgentList.map(item => `
+                    <div class="flex items-center justify-between p-3 bg-red-50 border border-red-200 rounded-lg">
+                        <div>
+                            <div class="font-medium">${item.title}</div>
+                            <div class="text-sm text-gray-600">${item.description || ''}</div>
+                        </div>
+                        <div class="text-red-600">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function updateProgressCircle() {
+            const tasks = JSON.parse(localStorage.getItem(STORAGE_KEYS.tasks) || '[]');
+            const completed = tasks.filter(task => task.completed).length;
+            const total = tasks.length;
+            const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+            
+            const circle = document.getElementById('progressCircle');
+            const text = document.getElementById('progressText');
+            
+            if (circle && text) {
+                const circumference = 2 * Math.PI * 56;
+                const offset = circumference - (percentage / 100) * circumference;
+                
+                circle.style.strokeDasharray = circumference;
+                circle.style.strokeDashoffset = offset;
+                text.textContent = percentage + '%';
+            }
+        }
+
+        // タスク管理
+        function loadTasks() {
+            const tasks = JSON.parse(localStorage.getItem(STORAGE_KEYS.tasks) || '[]');
+            const taskList = document.getElementById('taskList');
+            if (!taskList) return;
+            
+            if (tasks.length === 0) {
+                taskList.innerHTML = '<div class="text-center py-8 text-gray-500">タスクがありません</div>';
+                return;
+            }
+            
+            taskList.innerHTML = tasks.map((task, index) => {
+                const priorityClass = task.priority === 'urgent' ? 'urgent' : task.priority === 'high' ? 'priority-high' : '';
+                
+                return `
+                    <div class="task-item ${task.completed ? 'completed' : ''} ${priorityClass}">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center flex-1">
+                                <input type="checkbox" class="mr-3 w-5 h-5" ${task.completed ? 'checked' : ''} 
+                                       onchange="toggleTask(${index})">
+                                <div class="flex-1">
+                                    <div class="font-medium ${task.completed ? 'line-through text-gray-500' : ''}">${task.title}</div>
+                                    <div class="text-sm text-gray-600">
+                                        ${getPriorityLabel(task.priority)}
+                                    </div>
+                                    ${task.description ? `<div class="text-sm text-gray-500 mt-1">${task.description}</div>` : ''}
+                                </div>
+                            </div>
+                            <button onclick="deleteTask(${index})" class="ml-3 p-2 text-red-500 hover:text-red-700">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            updateTaskStats();
+        }
+
+        function addTask() {
+            const title = document.getElementById('newTaskTitle').value.trim();
+            const priority = document.getElementById('newTaskPriority').value;
+            const description = document.getElementById('newTaskDescription').value.trim();
+            
+            if (!title) {
+                showNotification('タスク名を入力してください', 'error');
+                return;
+            }
+            
+            const tasks = JSON.parse(localStorage.getItem(STORAGE_KEYS.tasks) || '[]');
+            const newTask = {
+                id: Date.now(),
+                title,
+                priority,
+                description,
+                completed: false,
+                createdAt: new Date().toISOString()
+            };
+            
+            tasks.push(newTask);
+            localStorage.setItem(STORAGE_KEYS.tasks, JSON.stringify(tasks));
+            
+            // フォームクリア
+            document.getElementById('newTaskTitle').value = '';
+            document.getElementById('newTaskDescription').value = '';
+            
+            loadTasks();
+            updateAllStats();
+            showNotification('タスクを追加しました', 'success');
+        }
+
+        function toggleTask(index) {
+            const tasks = JSON.parse(localStorage.getItem(STORAGE_KEYS.tasks) || '[]');
+            tasks[index].completed = !tasks[index].completed;
+            
+            localStorage.setItem(STORAGE_KEYS.tasks, JSON.stringify(tasks));
+            loadTasks();
+            updateAllStats();
+        }
+
+        function deleteTask(index) {
+            if (confirm('このタスクを削除しますか？')) {
+                const tasks = JSON.parse(localStorage.getItem(STORAGE_KEYS.tasks) || '[]');
+                tasks.splice(index, 1);
+                localStorage.setItem(STORAGE_KEYS.tasks, JSON.stringify(tasks));
+                loadTasks();
+                updateAllStats();
+                showNotification('タスクを削除しました', 'info');
+            }
+        }
+
+        function filterTasks() {
+            loadTasks();
+        }
+
+        function updateTaskStats() {
+            const tasks = JSON.parse(localStorage.getItem(STORAGE_KEYS.tasks) || '[]');
+            const completed = tasks.filter(task => task.completed).length;
+            const total = tasks.length;
+            const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+            
+            const completionRate = document.getElementById('taskCompletionRate');
+            const progressBar = document.getElementById('taskProgressBar');
+            
+            if (completionRate) completionRate.textContent = percentage + '%';
+            if (progressBar) progressBar.style.width = percentage + '%';
+        }
+
+        function getPriorityLabel(priority) {
+            const labels = {
+                'urgent': '🔴 緊急',
+                'high': '🟡 重要',
+                'normal': '🟢 通常'
+            };
+            return labels[priority] || '通常';
+        }
+
+        // プロンプト管理
+        function loadPrompts() {
+            const prompts = JSON.parse(localStorage.getItem(STORAGE_KEYS.prompts) || '[]');
+            const promptList = document.getElementById('promptList');
+            if (!promptList) return;
+            
+            if (prompts.length === 0) {
+                promptList.innerHTML = '<div class="text-center py-4 text-gray-500">プロンプトがありません</div>';
+                return;
+            }
+            
+            promptList.innerHTML = prompts.map((prompt, index) => `
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <button onclick="copyPrompt('${prompt.text.replace(/'/g, "\\'")}', '${prompt.label}')" 
+                            class="btn btn-primary flex-1 mr-3 text-sm">
+                        <i class="fas fa-copy mr-2"></i>${prompt.label}
+                    </button>
+                    <span class="text-xs text-gray-500 px-2 py-1 bg-white rounded mr-2">
+                        ${getPromptCategoryLabel(prompt.category)}
+                    </span>
+                    <button onclick="deletePrompt(${index})" 
+                            class="text-red-500 hover:text-red-700 p-1">
+                        <i class="fas fa-trash text-sm"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function addPrompt() {
+            const category = document.getElementById('newPromptCategory').value;
+            const label = document.getElementById('newPromptLabel').value.trim();
+            const text = document.getElementById('newPromptText').value.trim();
+            
+            if (!label || !text) {
+                showNotification('ボタン名とプロンプト内容を入力してください', 'error');
+                return;
+            }
+            
+            const prompts = JSON.parse(localStorage.getItem(STORAGE_KEYS.prompts) || '[]');
+            const newPrompt = {
+                id: Date.now(),
+                label,
+                text,
+                category,
+                createdAt: new Date().toISOString()
+            };
+            
+            prompts.push(newPrompt);
+            localStorage.setItem(STORAGE_KEYS.prompts, JSON.stringify(prompts));
+            
+            // フォームクリア
+            document.getElementById('newPromptLabel').value = '';
+            document.getElementById('newPromptText').value = '';
+            
+            loadPrompts();
+            showNotification('プロンプトを追加しました', 'success');
+        }
+
+        function deletePrompt(index) {
+            if (confirm('このプロンプトを削除しますか？')) {
+                const prompts = JSON.parse(localStorage.getItem(STORAGE_KEYS.prompts) || '[]');
+                prompts.splice(index, 1);
+                localStorage.setItem(STORAGE_KEYS.prompts, JSON.stringify(prompts));
+                loadPrompts();
+                showNotification('プロンプトを削除しました', 'info');
+            }
+        }
+
+        function copyPrompt(text, label) {
+            navigator.clipboard.writeText(text).then(() => {
+                showNotification(`「${label}」をコピーしました`, 'success');
+            }).catch(() => {
+                showNotification('コピーに失敗しました', 'error');
+            });
+        }
+
+        function getPromptCategoryLabel(category) {
+            const labels = {
+                'line': 'LINE',
+                'sns': 'SNS',
+                'report': '報告',
+                'other': 'その他'
+            };
+            return labels[category] || 'その他';
+        }
+
+        // メモ管理
+        function loadMemo() {
+            const today = new Date().toISOString().split('T')[0];
+            const memoKey = STORAGE_KEYS.memos + today;
+            const savedMemo = localStorage.getItem(memoKey) || '';
+            const memoArea = document.getElementById('memoArea');
+            
+            if (memoArea) memoArea.value = savedMemo;
+        }
+
+        function saveMemo() {
+            const today = new Date().toISOString().split('T')[0];
+            const memoKey = STORAGE_KEYS.memos + today;
+            const memoArea = document.getElementById('memoArea');
+            
+            if (memoArea) {
+                const memoText = memoArea.value;
+                localStorage.setItem(memoKey, memoText);
+                showNotification('メモを保存しました', 'success');
+            }
+        }
+
+        function clearMemo() {
+            if (confirm('現在のメモをクリアしますか？')) {
+                const memoArea = document.getElementById('memoArea');
+                if (memoArea) {
+                    memoArea.value = '';
+                    saveMemo();
+                    showNotification('メモをクリアしました', 'info');
+                }
+            }
+        }
+
+        // 通知管理
+        function showNotifications() {
+            showNotification('通知機能は準備中です', 'info');
         }
 
         // 日時更新
@@ -476,8 +1122,6 @@
 
         // 通知表示
         function showNotification(message, type = 'info') {
-            console.log('通知:', message, type);
-            
             const notification = document.createElement('div');
             notification.className = `notification ${type}`;
             notification.innerHTML = `
@@ -489,12 +1133,10 @@
             
             document.body.appendChild(notification);
             
-            // アニメーション
             setTimeout(() => {
                 notification.classList.add('show');
             }, 100);
             
-            // 自動削除
             setTimeout(() => {
                 notification.classList.remove('show');
                 setTimeout(() => {
@@ -505,7 +1147,6 @@
             }, 3000);
         }
 
-        // 通知アイコン取得
         function getNotificationIcon(type) {
             const icons = {
                 'success': 'check-circle',
@@ -518,46 +1159,17 @@
 
         // キーボードイベント処理
         document.addEventListener('keydown', function(event) {
-            // Enterキーでログイン（ログイン画面表示時のみ）
             if (event.key === 'Enter' && document.getElementById('loginScreen').style.display !== 'none') {
                 event.preventDefault();
                 directLogin();
             }
             
-            // Escapeキーでログアウト（ダッシュボード表示時のみ）
             if (event.key === 'Escape' && document.getElementById('mainDashboard').style.display !== 'none') {
                 logout();
             }
         });
 
-        // エラーハンドリング
-        window.addEventListener('error', function(event) {
-            console.error('エラーが発生しました:', event.error);
-            showNotification('システムエラーが発生しました', 'error');
-        });
-
-        // デバッグ用関数（コンソールから実行可能）
-        function debugInfo() {
-            console.log('=== デバッグ情報 ===');
-            console.log('ログイン状態:', isLoggedIn);
-            console.log('セッションストレージ:', sessionStorage.getItem('isLoggedIn'));
-            console.log('パスワード入力値:', document.getElementById('passwordInput')?.value);
-            console.log('正しいパスワード:', CORRECT_PASSWORD);
-            console.log('現在表示中の画面:', 
-                document.getElementById('loginScreen').style.display !== 'none' ? 'ログイン画面' : 'ダッシュボード');
-        }
-
-        // テスト用の強制ログイン関数
-        function forceLogin() {
-            console.log('強制ログインを実行');
-            sessionStorage.setItem('isLoggedIn', 'true');
-            isLoggedIn = true;
-            showDashboard();
-            showNotification('強制ログインしました', 'success');
-        }
-
-        console.log('スクリプトが読み込まれました');
-        console.log('パスワード:', CORRECT_PASSWORD);
+        console.log('AI Secretary v4 スクリプトが読み込まれました');
     </script>
 </body>
 </html>
