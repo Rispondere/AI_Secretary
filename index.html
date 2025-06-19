@@ -8,32 +8,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        'sans': ['Inter', 'Noto Sans JP', 'sans-serif']
-                    },
-                    colors: {
-                        primary: {
-                            50: '#f0f9ff',
-                            100: '#e0f2fe',
-                            200: '#bae6fd',
-                            300: '#7dd3fc',
-                            400: '#38bdf8',
-                            500: '#0ea5e9',
-                            600: '#0284c7',
-                            700: '#0369a1'
-                        },
-                        success: '#10b981',
-                        warning: '#f59e0b',
-                        danger: '#ef4444'
-                    }
-                }
-            }
-        }
-    </script>
     <style>
         body {
             font-family: 'Inter', 'Noto Sans JP', sans-serif;
@@ -58,12 +32,6 @@
             transition: all 0.3s ease;
         }
         
-        .glass-card:hover {
-            background: rgba(255, 255, 255, 0.98);
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-            transform: translateY(-2px);
-        }
-        
         .btn {
             display: inline-flex;
             align-items: center;
@@ -76,23 +44,6 @@
             cursor: pointer;
             font-size: 14px;
             min-height: 44px;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-            transition: left 0.5s;
-        }
-        
-        .btn:hover::before {
-            left: 100%;
         }
         
         .btn-primary {
@@ -106,25 +57,9 @@
             box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
         }
         
-        .btn-success {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: white;
-        }
-        
-        .btn-warning {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-            color: white;
-        }
-        
         .btn-danger {
             background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
             color: white;
-        }
-        
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.8);
-            color: #374151;
-            border: 1px solid rgba(0, 0, 0, 0.1);
         }
         
         .input-field {
@@ -135,7 +70,6 @@
             font-size: 14px;
             transition: all 0.3s ease;
             background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
         }
         
         .input-field:focus {
@@ -143,44 +77,6 @@
             border-color: #667eea;
             box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
             background: rgba(255, 255, 255, 1);
-        }
-        
-        .nav-tab {
-            padding: 12px 20px;
-            border-radius: 12px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            background: rgba(255, 255, 255, 0.6);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            margin: 0 4px;
-        }
-        
-        .nav-tab.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-        }
-        
-        .nav-tab:not(.active):hover {
-            background: rgba(255, 255, 255, 0.8);
-            transform: translateY(-1px);
-        }
-        
-        .stats-card {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 16px;
-            padding: 20px;
-            text-align: center;
-            transition: all 0.3s ease;
-        }
-        
-        .stats-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
         }
         
         .login-container {
@@ -214,207 +110,7 @@
             }
         }
         
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 16px 24px;
-            border-radius: 12px;
-            color: white;
-            font-weight: 500;
-            z-index: 1000;
-            backdrop-filter: blur(20px);
-            transform: translateX(400px);
-            transition: transform 0.3s ease;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-        }
-        
-        .notification.show {
-            transform: translateX(0);
-        }
-        
-        .notification.success {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-        }
-        
-        .notification.error {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-        }
-        
-        .notification.info {
-            background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
-        }
-        
-        .notification.warning {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-        }
-        
-        .hidden {
-            display: none !important;
-        }
-        
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(12, 1fr);
-            gap: 24px;
-            margin: 24px 0;
-        }
-        
-        .col-span-3 { grid-column: span 3; }
-        .col-span-4 { grid-column: span 4; }
-        .col-span-6 { grid-column: span 6; }
-        .col-span-8 { grid-column: span 8; }
-        .col-span-12 { grid-column: span 12; }
-        
-        @media (max-width: 1024px) {
-            .dashboard-grid {
-                grid-template-columns: repeat(6, 1fr);
-            }
-            .col-span-3 { grid-column: span 6; }
-            .col-span-4 { grid-column: span 6; }
-            .col-span-8 { grid-column: span 6; }
-        }
-        
-        @media (max-width: 768px) {
-            .dashboard-grid {
-                grid-template-columns: repeat(1, 1fr);
-                gap: 16px;
-            }
-            .col-span-3,
-            .col-span-4,
-            .col-span-6,
-            .col-span-8,
-            .col-span-12 {
-                grid-column: span 1;
-            }
-        }
-        
-        .task-item {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 12px;
-            padding: 16px;
-            margin: 8px 0;
-            transition: all 0.3s ease;
-        }
-        
-        .task-item:hover {
-            background: rgba(255, 255, 255, 0.95);
-            transform: translateX(4px);
-        }
-        
-        .task-item.completed {
-            background: rgba(16, 185, 129, 0.1);
-            border-color: rgba(16, 185, 129, 0.3);
-        }
-        
-        .task-item.urgent {
-            border-left: 4px solid #ef4444;
-            background: rgba(239, 68, 68, 0.05);
-        }
-        
-        .task-item.priority-high {
-            border-left: 4px solid #f59e0b;
-            background: rgba(245, 158, 11, 0.05);
-        }
-        
-        .calendar-day {
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            border-radius: 8px;
-            transition: all 0.2s ease;
-            font-size: 14px;
-        }
-        
-        .calendar-day:hover {
-            background: rgba(102, 126, 234, 0.1);
-        }
-        
-        .calendar-day.today {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-        
-        .calendar-day.has-event {
-            background: rgba(245, 158, 11, 0.2);
-            border: 2px solid #f59e0b;
-        }
-        
-        .progress-ring {
-            transform: rotate(-90deg);
-        }
-        
-        .progress-ring-fill {
-            transition: stroke-dasharray 0.5s ease;
-        }
-        
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(5px);
-            z-index: 2000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
-        }
-        
-        .modal.show {
-            opacity: 1;
-            pointer-events: all;
-        }
-        
-        .modal-content {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 16px;
-            padding: 24px;
-            max-width: 90vw;
-            max-height: 90vh;
-            overflow-y: auto;
-            transform: scale(0.9);
-            transition: transform 0.3s ease;
-        }
-        
-        .modal.show .modal-content {
-            transform: scale(1);
-        }
-
-        .store-card {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 12px;
-            padding: 16px;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .store-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-        }
-
-        .store-card.top-performer {
-            border-left: 4px solid #10b981;
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(255, 255, 255, 0.7) 100%);
-        }
-
-        .store-card.needs-attention {
-            border-left: 4px solid #ef4444;
-            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(255, 255, 255, 0.7) 100%);
-        }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
@@ -440,15 +136,14 @@
                         id="passwordInput" 
                         class="input-field" 
                         placeholder="パスワードを入力してください"
-                        onkeypress="if(event.key==='Enter') directLogin()"
                     >
                 </div>
                 
-                <button type="button" onclick="directLogin()" class="btn btn-primary w-full">
+                <button id="loginButton" class="btn btn-primary w-full">
                     <i class="fas fa-sign-in-alt mr-2"></i>ログイン
                 </button>
                 
-                <button type="button" onclick="skipLogin()" class="btn btn-danger w-full">
+                <button id="skipButton" class="btn btn-danger w-full">
                     <i class="fas fa-unlock mr-2"></i>ログインをスキップ
                 </button>
             </div>
@@ -459,12 +154,16 @@
                     セキュアログイン・セッション管理・自動バックアップ
                 </div>
             </div>
+            
+            <!-- デバッグ情報 -->
+            <div class="mt-4 p-3 bg-gray-100 rounded text-xs">
+                <strong>デバッグ:</strong> ボタンをクリックするとコンソールにログが表示されます（F12で確認）
+            </div>
         </div>
     </div>
 
     <!-- メインダッシュボード -->
-    <div id="mainDashboard" style="display: none;" class="min-h-screen">
-        <!-- ヘッダー -->
+    <div id="mainDashboard" class="hidden min-h-screen">
         <div class="glass-card mx-4 mt-4 mb-6">
             <div class="p-6">
                 <div class="flex flex-col lg:flex-row justify-between items-center space-y-4 lg:space-y-0">
@@ -474,6 +173,7 @@
                             Rispondere 統合管理
                         </h1>
                         <p class="text-gray-600 mt-1">AI Secretary v4 - 全10店舗統合業務管理システム</p>
+                        <p class="text-sm text-green-600 mt-2">ログイン成功！システムが正常に動作しています</p>
                     </div>
                     
                     <div class="flex items-center space-x-4">
@@ -481,11 +181,7 @@
                             <div class="font-semibold text-gray-900" id="currentDate"></div>
                             <div class="text-sm text-gray-500" id="currentTime"></div>
                         </div>
-                        <button onclick="showNotifications()" class="btn btn-secondary">
-                            <i class="fas fa-bell mr-2"></i>
-                            <span id="notificationCount" class="bg-red-500 text-white text-xs rounded-full px-2 py-1 ml-1">0</span>
-                        </button>
-                        <button onclick="logout()" class="btn btn-danger">
+                        <button id="logoutButton" class="btn btn-danger">
                             <i class="fas fa-sign-out-alt mr-2"></i>ログアウト
                         </button>
                     </div>
@@ -493,741 +189,387 @@
             </div>
         </div>
 
-        <!-- ナビゲーション -->
-        <div class="mx-4 mb-6">
-            <div class="flex flex-wrap justify-center lg:justify-start gap-2">
-                <button class="nav-tab active" data-tab="dashboard" onclick="switchTab('dashboard')">
-                    <i class="fas fa-chart-line mr-2"></i>ダッシュボード
-                </button>
-                <button class="nav-tab" data-tab="stores" onclick="switchTab('stores')">
-                    <i class="fas fa-store mr-2"></i>店舗管理
-                </button>
-                <button class="nav-tab" data-tab="tasks" onclick="switchTab('tasks')">
-                    <i class="fas fa-tasks mr-2"></i>タスク管理
-                </button>
-                <button class="nav-tab" data-tab="schedule" onclick="switchTab('schedule')">
-                    <i class="fas fa-calendar mr-2"></i>スケジュール
-                </button>
-                <button class="nav-tab" data-tab="sales" onclick="switchTab('sales')">
-                    <i class="fas fa-chart-bar mr-2"></i>売上分析
-                </button>
-                <button class="nav-tab" data-tab="goals" onclick="switchTab('goals')">
-                    <i class="fas fa-target mr-2"></i>目標管理
-                </button>
-                <button class="nav-tab" data-tab="design" onclick="switchTab('design')">
-                    <i class="fas fa-palette mr-2"></i>デザイン部門
-                </button>
-                <button class="nav-tab" data-tab="tools" onclick="switchTab('tools')">
-                    <i class="fas fa-tools mr-2"></i>AI・ツール
-                </button>
-            </div>
-        </div>
-
-        <!-- ダッシュボードタブ -->
-        <div id="dashboardTab" class="tab-content mx-4">
-            <!-- 統計カード -->
-            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-6">
-                <div class="stats-card">
-                    <div class="text-2xl font-bold text-purple-600 mb-2" id="totalTasks">0</div>
-                    <div class="text-sm text-gray-600">総タスク数</div>
+        <!-- メイン機能エリア -->
+        <div class="mx-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <!-- 統計カード -->
+                <div class="glass-card p-6 text-center">
+                    <div class="text-3xl mb-2">🏪</div>
+                    <div class="text-2xl font-bold text-purple-600 mb-2">10</div>
+                    <div class="text-sm text-gray-600">運営店舗数</div>
                 </div>
-                <div class="stats-card">
-                    <div class="text-2xl font-bold text-green-600 mb-2" id="completedTasks">0</div>
-                    <div class="text-sm text-gray-600">完了済み</div>
+                
+                <div class="glass-card p-6 text-center">
+                    <div class="text-3xl mb-2">📋</div>
+                    <div class="text-2xl font-bold text-green-600 mb-2" id="taskCount">0</div>
+                    <div class="text-sm text-gray-600">管理タスク</div>
                 </div>
-                <div class="stats-card">
-                    <div class="text-2xl font-bold text-red-600 mb-2" id="urgentTasks">0</div>
-                    <div class="text-sm text-gray-600">緊急タスク</div>
+                
+                <div class="glass-card p-6 text-center">
+                    <div class="text-3xl mb-2">📊</div>
+                    <div class="text-2xl font-bold text-blue-600 mb-2">85%</div>
+                    <div class="text-sm text-gray-600">平均達成率</div>
                 </div>
-                <div class="stats-card">
-                    <div class="text-2xl font-bold text-blue-600 mb-2" id="totalEvents">0</div>
-                    <div class="text-sm text-gray-600">予定数</div>
-                </div>
-                <div class="stats-card">
-                    <div class="text-2xl font-bold text-yellow-600 mb-2">10</div>
-                    <div class="text-sm text-gray-600">運営店舗</div>
-                </div>
-                <div class="stats-card">
-                    <div class="text-2xl font-bold text-indigo-600 mb-2" id="designProjects">0</div>
-                    <div class="text-sm text-gray-600">デザイン案件</div>
+                
+                <div class="glass-card p-6 text-center">
+                    <div class="text-3xl mb-2">🤖</div>
+                    <div class="text-2xl font-bold text-indigo-600 mb-2" id="promptCount">5</div>
+                    <div class="text-sm text-gray-600">AIプロンプト</div>
                 </div>
             </div>
 
-            <!-- 全店舗概要 -->
-            <div class="dashboard-grid">
-                <div class="col-span-8">
-                    <div class="glass-card p-6">
-                        <h3 class="text-lg font-semibold mb-4 flex items-center">
-                            <i class="fas fa-store-alt mr-2 text-blue-600"></i>全店舗パフォーマンス概要
-                        </h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="storeOverview">
-                            <!-- 動的に生成される店舗カード -->
-                        </div>
+            <!-- 店舗一覧 -->
+            <div class="glass-card p-6">
+                <h3 class="text-lg font-semibold mb-4 flex items-center">
+                    <i class="fas fa-store mr-2 text-blue-600"></i>Rispondere 全店舗一覧
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                    <div class="p-4 bg-gradient-to-br from-purple-50 to-blue-50 rounded-lg border-l-4 border-purple-500">
+                        <h5 class="font-semibold text-sm mb-1">CLASSY四日市</h5>
+                        <p class="text-xs text-gray-600">CLASSYブランド</p>
+                        <div class="mt-2 text-green-600 font-bold">92%</div>
+                    </div>
+                    
+                    <div class="p-4 bg-gradient-to-br from-purple-50 to-blue-50 rounded-lg border-l-4 border-purple-500">
+                        <h5 class="font-semibold text-sm mb-1">CLASSY東京</h5>
+                        <p class="text-xs text-gray-600">CLASSYブランド</p>
+                        <div class="mt-2 text-yellow-600 font-bold">78%</div>
+                    </div>
+                    
+                    <div class="p-4 bg-gradient-to-br from-purple-50 to-blue-50 rounded-lg border-l-4 border-purple-500">
+                        <h5 class="font-semibold text-sm mb-1">CLASSY名古屋</h5>
+                        <p class="text-xs text-gray-600">CLASSYブランド</p>
+                        <div class="mt-2 text-green-600 font-bold">85%</div>
+                    </div>
+                    
+                    <div class="p-4 bg-gradient-to-br from-red-50 to-pink-50 rounded-lg border-l-4 border-red-500">
+                        <h5 class="font-semibold text-sm mb-1">GrandOpera東京</h5>
+                        <p class="text-xs text-gray-600">GrandOperaブランド</p>
+                        <div class="mt-2 text-green-600 font-bold">94%</div>
+                    </div>
+                    
+                    <div class="p-4 bg-gradient-to-br from-red-50 to-pink-50 rounded-lg border-l-4 border-red-500">
+                        <h5 class="font-semibold text-sm mb-1">GrandOpera横浜</h5>
+                        <p class="text-xs text-gray-600">GrandOperaブランド</p>
+                        <div class="mt-2 text-green-600 font-bold">87%</div>
+                    </div>
+                    
+                    <div class="p-4 bg-gradient-to-br from-red-50 to-pink-50 rounded-lg border-l-4 border-red-500">
+                        <h5 class="font-semibold text-sm mb-1">GrandOpera名古屋</h5>
+                        <p class="text-xs text-gray-600">GrandOperaブランド</p>
+                        <div class="mt-2 text-green-600 font-bold">91%</div>
+                    </div>
+                    
+                    <div class="p-4 bg-gradient-to-br from-red-50 to-pink-50 rounded-lg border-l-4 border-red-500">
+                        <h5 class="font-semibold text-sm mb-1">GrandOpera福岡</h5>
+                        <p class="text-xs text-gray-600">GrandOperaブランド</p>
+                        <div class="mt-2 text-green-600 font-bold">98%</div>
+                    </div>
+                    
+                    <div class="p-4 bg-gradient-to-br from-yellow-50 to-orange-50 rounded-lg border-l-4 border-yellow-500">
+                        <h5 class="font-semibold text-sm mb-1">オペラ錦</h5>
+                        <p class="text-xs text-gray-600">オペラブランド</p>
+                        <div class="mt-2 text-yellow-600 font-bold">82%</div>
+                    </div>
+                    
+                    <div class="p-4 bg-gradient-to-br from-green-50 to-teal-50 rounded-lg border-l-4 border-green-500">
+                        <h5 class="font-semibold text-sm mb-1">シャブール</h5>
+                        <p class="text-xs text-gray-600">シャブールブランド</p>
+                        <div class="mt-2 text-green-600 font-bold">89%</div>
+                    </div>
+                    
+                    <div class="p-4 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-lg border-l-4 border-indigo-500">
+                        <h5 class="font-semibold text-sm mb-1">ワンカラット</h5>
+                        <p class="text-xs text-gray-600">ワンカラットブランド</p>
+                        <div class="mt-2 text-green-600 font-bold">86%</div>
                     </div>
                 </div>
-
-                <div class="col-span-4">
-                    <div class="glass-card p-6">
-                        <h3 class="text-lg font-semibold mb-4 flex items-center">
-                            <i class="fas fa-chart-pie mr-2 text-purple-600"></i>今日の進捗
-                        </h3>
-                        <div class="flex items-center justify-center">
-                            <div class="relative w-32 h-32">
-                                <svg class="w-32 h-32 progress-ring">
-                                    <circle cx="64" cy="64" r="56" stroke="#e5e7eb" stroke-width="8" fill="none"/>
-                                    <circle id="progressCircle" cx="64" cy="64" r="56" stroke="#667eea" stroke-width="8" 
-                                            fill="none" stroke-linecap="round" class="progress-ring-fill"/>
-                                </svg>
-                                <div class="absolute inset-0 flex items-center justify-center">
-                                    <span id="progressText" class="text-xl font-bold text-gray-900">0%</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="text-center mt-4">
-                            <p class="text-sm text-gray-600">タスク完了率</p>
-                        </div>
-                    </div>
-                </div>
             </div>
 
-            <!-- 緊急・重要事項 -->
+            <!-- AI・分析ツール -->
             <div class="glass-card p-6 mt-6">
                 <h3 class="text-lg font-semibold mb-4 flex items-center">
-                    <i class="fas fa-exclamation-triangle mr-2 text-red-600"></i>緊急・重要事項
+                    <i class="fas fa-robot mr-2 text-purple-600"></i>ChatGPT分析プロンプト
                 </h3>
-                <div id="urgentItems" class="space-y-3">
-                    <p class="text-gray-500 text-center py-4">現在、緊急事項はありません</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- 店舗管理タブ -->
-        <div id="storesTab" class="tab-content mx-4 hidden">
-            <div class="dashboard-grid">
-                <div class="col-span-12">
-                    <div class="glass-card p-6">
-                        <div class="flex justify-between items-center mb-6">
-                            <h3 class="text-lg font-semibold flex items-center">
-                                <i class="fas fa-store mr-2 text-blue-600"></i>全店舗管理・分析
-                            </h3>
-                            <div class="flex space-x-2">
-                                <select id="storeAnalysisPeriod" class="input-field w-32" onchange="updateStoreAnalysis()">
-                                    <option value="7">1週間</option>
-                                    <option value="30" selected>1ヶ月</option>
-                                    <option value="90">3ヶ月</option>
-                                </select>
-                                <button onclick="generateStoreReport()" class="btn btn-primary">
-                                    <i class="fas fa-file-alt mr-2"></i>レポート生成
-                                </button>
-                            </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <button class="p-4 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 text-left transition-all" onclick="copyAnalysisPrompt()">
+                        <div class="font-semibold text-blue-800 mb-2">
+                            <i class="fas fa-chart-line mr-2"></i>売上データ分析
                         </div>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="detailedStoreList">
-                            <!-- 動的に生成される詳細店舗カード -->
+                        <p class="text-sm text-blue-600">店舗別売上データを分析し、改善点と戦略を提案</p>
+                    </button>
+                    
+                    <button class="p-4 bg-green-50 hover:bg-green-100 rounded-lg border border-green-200 text-left transition-all" onclick="copyReportPrompt()">
+                        <div class="font-semibold text-green-800 mb-2">
+                            <i class="fas fa-file-alt mr-2"></i>月次レポート作成
                         </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 店舗比較分析 -->
-            <div class="glass-card p-6 mt-6">
-                <h3 class="text-lg font-semibold mb-4 flex items-center">
-                    <i class="fas fa-chart-line mr-2 text-green-600"></i>店舗比較分析
-                </h3>
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div>
-                        <h4 class="font-semibold mb-4">売上ランキング（今月）</h4>
-                        <div id="salesRanking" class="space-y-3">
-                            <!-- 動的に生成される売上ランキング -->
+                        <p class="text-sm text-green-600">経営陣向けの月次レポートを自動生成</p>
+                    </button>
+                    
+                    <button class="p-4 bg-purple-50 hover:bg-purple-100 rounded-lg border border-purple-200 text-left transition-all" onclick="copyStrategyPrompt()">
+                        <div class="font-semibold text-purple-800 mb-2">
+                            <i class="fas fa-lightbulb mr-2"></i>店舗改善提案
                         </div>
-                    </div>
-                    <div>
-                        <h4 class="font-semibold mb-4">パフォーマンス指標</h4>
-                        <canvas id="storeComparisonChart" width="400" height="200"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- タスク管理タブ -->
-        <div id="tasksTab" class="tab-content mx-4 hidden">
-            <div class="dashboard-grid">
-                <div class="col-span-8">
-                    <div class="glass-card p-6">
-                        <div class="flex justify-between items-center mb-6">
-                            <h3 class="text-lg font-semibold flex items-center">
-                                <i class="fas fa-tasks mr-2 text-purple-600"></i>全社タスク管理
-                            </h3>
-                            <div class="flex space-x-2">
-                                <select id="taskFilter" class="input-field w-40" onchange="filterTasks()">
-                                    <option value="all">すべて</option>
-                                    <option value="urgent">緊急</option>
-                                    <option value="high">重要</option>
-                                    <option value="normal">通常</option>
-                                    <option value="completed">完了済み</option>
-                                </select>
-                                <select id="taskStore" class="input-field w-40" onchange="filterTasks()">
-                                    <option value="all">全店舗</option>
-                                    <option value="classy_yokkaichi">CLASSY四日市</option>
-                                    <option value="classy_tokyo">CLASSY東京</option>
-                                    <option value="classy_nagoya">CLASSY名古屋</option>
-                                    <option value="grandopera_tokyo">GrandOpera東京</option>
-                                    <option value="grandopera_yokohama">GrandOpera横浜</option>
-                                    <option value="grandopera_nagoya">GrandOpera名古屋</option>
-                                    <option value="grandopera_fukuoka">GrandOpera福岡</option>
-                                    <option value="opera_nishiki">オペラ錦</option>
-                                    <option value="shabour">シャブール</option>
-                                    <option value="wancarat">ワンカラット</option>
-                                    <option value="design">デザイン部門</option>
-                                    <option value="head_office">本社</option>
-                                </select>
-                            </div>
+                        <p class="text-sm text-purple-600">店舗パフォーマンス向上のための具体的提案</p>
+                    </button>
+                    
+                    <button class="p-4 bg-orange-50 hover:bg-orange-100 rounded-lg border border-orange-200 text-left transition-all" onclick="copyTrendPrompt()">
+                        <div class="font-semibold text-orange-800 mb-2">
+                            <i class="fas fa-trending-up mr-2"></i>トレンド分析・予測
                         </div>
-                        
-                        <div id="taskList" class="space-y-3 mb-6 max-h-96 overflow-y-auto"></div>
-                        
-                        <div class="border-t pt-4">
-                            <h4 class="font-semibold mb-3">新しいタスクを追加</h4>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
-                                <input id="newTaskTitle" type="text" class="input-field" placeholder="タスク名">
-                                <select id="newTaskStore" class="input-field">
-                                    <option value="head_office">本社</option>
-                                    <option value="classy_yokkaichi">CLASSY四日市</option>
-                                    <option value="classy_tokyo">CLASSY東京</option>
-                                    <option value="classy_nagoya">CLASSY名古屋</option>
-                                    <option value="grandopera_tokyo">GrandOpera東京</option>
-                                    <option value="grandopera_yokohama">GrandOpera横浜</option>
-                                    <option value="grandopera_nagoya">GrandOpera名古屋</option>
-                                    <option value="grandopera_fukuoka">GrandOpera福岡</option>
-                                    <option value="opera_nishiki">オペラ錦</option>
-                                    <option value="shabour">シャブール</option>
-                                    <option value="wancarat">ワンカラット</option>
-                                    <option value="design">デザイン部門</option>
-                                </select>
-                                <select id="newTaskPriority" class="input-field">
-                                    <option value="normal">通常</option>
-                                    <option value="high">重要</option>
-                                    <option value="urgent">緊急</option>
-                                </select>
-                                <input id="newTaskDue" type="date" class="input-field">
-                            </div>
-                            <textarea id="newTaskDescription" class="input-field mb-3" rows="2" placeholder="詳細説明"></textarea>
-                            <button onclick="addTask()" class="btn btn-primary w-full">
-                                <i class="fas fa-plus mr-2"></i>タスクを追加
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-span-4">
-                    <div class="glass-card p-6 mb-6">
-                        <h3 class="text-lg font-semibold mb-4 flex items-center">
-                            <i class="fas fa-chart-bar mr-2 text-green-600"></i>タスク統計
-                        </h3>
-                        <div class="space-y-4">
-                            <div class="flex justify-between">
-                                <span>完了率</span>
-                                <span id="taskCompletionRate">0%</span>
-                            </div>
-                            <div class="w-full bg-gray-200 rounded-full h-2">
-                                <div id="taskProgressBar" class="bg-green-500 h-2 rounded-full" style="width: 0%"></div>
-                            </div>
-                            <div class="grid grid-cols-2 gap-4 text-center">
-                                <div>
-                                    <div class="text-xl font-bold text-red-600" id="overdueCount">0</div>
-                                    <div class="text-xs text-gray-600">期限切れ</div>
-                                </div>
-                                <div>
-                                    <div class="text-xl font-bold text-yellow-600" id="dueTodayCount">0</div>
-                                    <div class="text-xs text-gray-600">今日期限</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- スケジュール管理タブ -->
-        <div id="scheduleTab" class="tab-content mx-4 hidden">
-            <div class="dashboard-grid">
-                <div class="col-span-8">
-                    <div class="glass-card p-6">
-                        <div class="flex justify-between items-center mb-6">
-                            <h3 class="text-lg font-semibold flex items-center">
-                                <i class="fas fa-calendar mr-2 text-blue-600"></i>カレンダー
-                            </h3>
-                            <div class="flex space-x-2">
-                                <button onclick="prevMonth()" class="btn btn-secondary">
-                                    <i class="fas fa-chevron-left"></i>
-                                </button>
-                                <span id="currentMonth" class="px-4 py-2 font-semibold"></span>
-                                <button onclick="nextMonth()" class="btn btn-secondary">
-                                    <i class="fas fa-chevron-right"></i>
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div id="calendar" class="grid grid-cols-7 gap-2 mb-6"></div>
-                        
-                        <div class="border-t pt-4">
-                            <h4 class="font-semibold mb-3">予定を追加</h4>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
-                                <input id="newEventTitle" type="text" class="input-field" placeholder="予定名">
-                                <input id="newEventDate" type="date" class="input-field">
-                                <input id="newEventTime" type="time" class="input-field">
-                                <select id="newEventType" class="input-field">
-                                    <option value="meeting">会議</option>
-                                    <option value="deadline">締切</option>
-                                    <option value="event">イベント</option>
-                                    <option value="reminder">リマインダー</option>
-                                    <option value="goal_setting">目標設定日</option>
-                                </select>
-                            </div>
-                            <textarea id="newEventDescription" class="input-field mb-3" rows="2" placeholder="詳細"></textarea>
-                            <button onclick="addEvent()" class="btn btn-primary w-full">
-                                <i class="fas fa-plus mr-2"></i>予定を追加
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-span-4">
-                    <div class="glass-card p-6">
-                        <h3 class="text-lg font-semibold mb-4 flex items-center">
-                            <i class="fas fa-list mr-2 text-green-600"></i>今日の予定
-                        </h3>
-                        <div id="todayEvents" class="space-y-3"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 売上分析タブ -->
-        <div id="salesTab" class="tab-content mx-4 hidden">
-            <div class="dashboard-grid">
-                <div class="col-span-12">
-                    <div class="glass-card p-6 mb-6">
-                        <div class="flex justify-between items-center mb-6">
-                            <h3 class="text-lg font-semibold flex items-center">
-                                <i class="fas fa-chart-line mr-2 text-green-600"></i>売上データ分析・業務管理
-                            </h3>
-                            <div class="flex space-x-2">
-                                <input type="file" id="salesFileInput" accept=".csv,.xlsx,.xls" class="hidden" onchange="uploadSalesData(event)">
-                                <button onclick="document.getElementById('salesFileInput').click()" class="btn btn-primary">
-                                    <i class="fas fa-upload mr-2"></i>Excel/CSV読込
-                                </button>
-                                <button onclick="downloadSalesTemplate()" class="btn btn-secondary">
-                                    <i class="fas fa-download mr-2"></i>テンプレート
-                                </button>
-                                <button onclick="loadSampleData()" class="btn btn-success">
-                                    <i class="fas fa-database mr-2"></i>サンプルデータ
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div id="salesUploadArea" class="text-center py-12 border-2 border-dashed border-gray-300 rounded-lg">
-                            <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4"></i>
-                            <p class="text-gray-600 mb-2">売上Excel/CSVファイルをアップロードしてください</p>
-                            <p class="text-sm text-gray-400">対応形式: .xlsx, .xls, .csv | ドラッグ&ドロップまたはクリック</p>
-                        </div>
-                        
-                        <div id="salesAnalysis" class="hidden">
-                            <!-- 全体統計 -->
-                            <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
-                                <div class="stats-card">
-                                    <div class="text-xl font-bold text-green-600 mb-2" id="totalSales">¥0</div>
-                                    <div class="text-sm text-gray-600">総売上</div>
-                                </div>
-                                <div class="stats-card">
-                                    <div class="text-xl font-bold text-blue-600 mb-2" id="averageSales">¥0</div>
-                                    <div class="text-sm text-gray-600">平均売上</div>
-                                </div>
-                                <div class="stats-card">
-                                    <div class="text-xl font-bold text-purple-600 mb-2" id="topStore">-</div>
-                                    <div class="text-sm text-gray-600">最高売上店舗</div>
-                                </div>
-                                <div class="stats-card">
-                                    <div class="text-xl font-bold text-orange-600 mb-2" id="growthRate">0%</div>
-                                    <div class="text-sm text-gray-600">成長率</div>
-                                </div>
-                                <div class="stats-card">
-                                    <div class="text-xl font-bold text-indigo-600 mb-2" id="totalDiary">0</div>
-                                    <div class="text-sm text-gray-600">写メ日記合計</div>
-                                </div>
-                            </div>
-                            
-                            <!-- 店舗別詳細分析 -->
-                            <div class="glass-card p-6 mb-6">
-                                <div class="flex justify-between items-center mb-6">
-                                    <h4 class="font-semibold flex items-center">
-                                        <i class="fas fa-store mr-2 text-blue-600"></i>店舗別詳細分析
-                                    </h4>
-                                    <select id="salesStoreFilter" class="input-field w-48" onchange="updateSalesStoreView()">
-                                        <option value="">全店舗概要</option>
-                                        <option value="CLASSY四日市">CLASSY四日市</option>
-                                        <option value="CLASSY東京">CLASSY東京</option>
-                                        <option value="CLASSY名古屋">CLASSY名古屋</option>
-                                        <option value="GrandOpera東京">GrandOpera東京</option>
-                                        <option value="GrandOpera横浜">GrandOpera横浜</option>
-                                        <option value="GrandOpera名古屋">GrandOpera名古屋</option>
-                                        <option value="GrandOpera福岡">GrandOpera福岡</option>
-                                        <option value="オペラ錦">オペラ錦</option>
-                                        <option value="シャブール">シャブール</option>
-                                        <option value="ワンカラット">ワンカラット</option>
-                                    </select>
-                                </div>
-                                
-                                <div id="salesChartContainer">
-                                    <canvas id="salesChart" width="800" height="400"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 目標管理タブ -->
-        <div id="goalsTab" class="tab-content mx-4 hidden">
-            <div class="dashboard-grid">
-                <div class="col-span-6">
-                    <div class="glass-card p-6">
-                        <div class="flex justify-between items-center mb-6">
-                            <h3 class="text-lg font-semibold flex items-center">
-                                <i class="fas fa-target mr-2 text-red-600"></i>月次目標設定
-                            </h3>
-                            <div class="text-sm text-gray-600">
-                                次回設定日: <span class="font-semibold">毎月2日</span>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-6">
-                            <div class="flex items-center justify-between mb-4">
-                                <label class="font-medium">対象月</label>
-                                <div class="flex space-x-2">
-                                    <input type="month" id="goalMonth" class="input-field w-48" value="2025-07" onchange="updateGoalSettings()">
-                                    <button onclick="copyPreviousMonthGoals()" class="btn btn-secondary">
-                                        <i class="fas fa-copy mr-2"></i>前月コピー
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div id="goalSettings" class="space-y-4 max-h-96 overflow-y-auto">
-                            <!-- 動的に生成される目標設定 -->
-                        </div>
-                        
-                        <div class="flex space-x-3 mt-6">
-                            <button onclick="saveGoals()" class="btn btn-primary flex-1">
-                                <i class="fas fa-save mr-2"></i>目標を保存
-                            </button>
-                            <button onclick="generateGoalReport()" class="btn btn-secondary">
-                                <i class="fas fa-file-alt mr-2"></i>レポート
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-span-6">
-                    <div class="glass-card p-6">
-                        <h3 class="text-lg font-semibold mb-4 flex items-center">
-                            <i class="fas fa-chart-pie mr-2 text-blue-600"></i>目標達成状況
-                        </h3>
-                        
-                        <!-- 全体進捗サマリー -->
-                        <div class="grid grid-cols-3 gap-4 mb-6">
-                            <div class="text-center p-4 bg-green-50 rounded-lg">
-                                <div class="text-2xl font-bold text-green-600" id="overallSalesAchievement">0%</div>
-                                <div class="text-sm text-gray-600">売上達成率</div>
-                            </div>
-                            <div class="text-center p-4 bg-purple-50 rounded-lg">
-                                <div class="text-2xl font-bold text-purple-600" id="overallDiaryAchievement">0%</div>
-                                <div class="text-sm text-gray-600">写メ日記達成率</div>
-                            </div>
-                            <div class="text-center p-4 bg-orange-50 rounded-lg">
-                                <div class="text-2xl font-bold text-orange-600" id="overallReviewAchievement">0%</div>
-                                <div class="text-sm text-gray-600">口コミ達成率</div>
-                            </div>
-                        </div>
-                        
-                        <div id="goalProgress" class="space-y-3 max-h-64 overflow-y-auto">
-                            <!-- 動的に生成される目標進捗 -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- デザイン部門タブ -->
-        <div id="designTab" class="tab-content mx-4 hidden">
-            <div class="dashboard-grid">
-                <div class="col-span-8">
-                    <div class="glass-card p-6">
-                        <div class="flex justify-between items-center mb-6">
-                            <h3 class="text-lg font-semibold flex items-center">
-                                <i class="fas fa-palette mr-2 text-pink-600"></i>デザイン案件管理
-                            </h3>
-                            <select id="designFilter" class="input-field w-40" onchange="filterDesignProjects()">
-                                <option value="all">すべて</option>
-                                <option value="planning">企画中</option>
-                                <option value="designing">デザイン中</option>
-                                <option value="review">レビュー中</option>
-                                <option value="completed">完了</option>
-                            </select>
-                        </div>
-                        
-                        <div id="designProjectList" class="space-y-3 mb-6 max-h-96 overflow-y-auto"></div>
-                        
-                        <div class="border-t pt-4">
-                            <h4 class="font-semibold mb-3">新しい案件を追加</h4>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
-                                <input id="newDesignTitle" type="text" class="input-field" placeholder="案件名">
-                                <select id="newDesignType" class="input-field">
-                                    <option value="logo">ロゴデザイン</option>
-                                    <option value="flyer">チラシ・フライヤー</option>
-                                    <option value="web">Webデザイン</option>
-                                    <option value="banner">バナー制作</option>
-                                    <option value="package">パッケージデザイン</option>
-                                    <option value="interior">店舗内装</option>
-                                    <option value="other">その他</option>
-                                </select>
-                                <select id="newDesignPriority" class="input-field">
-                                    <option value="normal">通常</option>
-                                    <option value="high">重要</option>
-                                    <option value="urgent">緊急</option>
-                                </select>
-                                <input id="newDesignDue" type="date" class="input-field">
-                                <input id="newDesignClient" type="text" class="input-field" placeholder="依頼者・店舗">
-                                <select id="newDesignStatus" class="input-field">
-                                    <option value="planning">企画中</option>
-                                    <option value="designing">デザイン中</option>
-                                    <option value="review">レビュー中</option>
-                                </select>
-                            </div>
-                            <textarea id="newDesignDescription" class="input-field mb-3" rows="3" placeholder="詳細・要件"></textarea>
-                            <button onclick="addDesignProject()" class="btn btn-primary w-full">
-                                <i class="fas fa-plus mr-2"></i>案件を追加
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-span-4">
-                    <div class="glass-card p-6 mb-6">
-                        <h3 class="text-lg font-semibold mb-4 flex items-center">
-                            <i class="fas fa-chart-doughnut mr-2 text-purple-600"></i>案件状況
-                        </h3>
-                        <div class="space-y-4">
-                            <div class="flex justify-between">
-                                <span class="text-sm">企画中</span>
-                                <span id="planningCount" class="font-bold text-blue-600">0</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-sm">デザイン中</span>
-                                <span id="designingCount" class="font-bold text-yellow-600">0</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-sm">レビュー中</span>
-                                <span id="reviewCount" class="font-bold text-purple-600">0</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-sm">完了</span>
-                                <span id="designCompletedCount" class="font-bold text-green-600">0</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="glass-card p-6">
-                        <h3 class="text-lg font-semibold mb-4 flex items-center">
-                            <i class="fas fa-clock mr-2 text-orange-600"></i>締切迫る案件
-                        </h3>
-                        <div id="urgentDesignProjects" class="space-y-3">
-                            <p class="text-gray-500 text-center py-4">締切迫る案件はありません</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- AI・ツールタブ -->
-        <div id="toolsTab" class="tab-content mx-4 hidden">
-            <div class="dashboard-grid">
-                <div class="col-span-6">
-                    <div class="glass-card p-6">
-                        <h3 class="text-lg font-semibold mb-4 flex items-center">
-                            <i class="fas fa-robot mr-2 text-purple-600"></i>ChatGPT分析プロンプト集
-                        </h3>
-                        
-                        <div class="flex flex-wrap gap-2 mb-4">
-                            <button class="nav-tab active" onclick="switchPromptCategory('all')">すべて</button>
-                            <button class="nav-tab" onclick="switchPromptCategory('analysis')">分析系</button>
-                            <button class="nav-tab" onclick="switchPromptCategory('report')">報告系</button>
-                            <button class="nav-tab" onclick="switchPromptCategory('communication')">コミュ系</button>
-                            <button class="nav-tab" onclick="switchPromptCategory('strategy')">戦略系</button>
-                        </div>
-
-                        <div id="promptList" class="space-y-3 mb-6 max-h-64 overflow-y-auto">
-                            <!-- 動的に生成されるプロンプト -->
-                        </div>
-                        
-                        <div class="border-t pt-4">
-                            <h4 class="font-semibold mb-3">カスタムプロンプトを追加</h4>
-                            <div class="grid grid-cols-2 gap-3 mb-3">
-                                <select id="newPromptCategory" class="input-field">
-                                    <option value="analysis">分析系</option>
-                                    <option value="report">報告系</option>
-                                    <option value="communication">コミュニケーション系</option>
-                                    <option value="strategy">戦略系</option>
-                                    <option value="other">その他</option>
-                                </select>
-                                <input id="newPromptLabel" type="text" class="input-field" placeholder="プロンプト名">
-                            </div>
-                            <textarea id="newPromptText" class="input-field mb-3" rows="3" placeholder="プロンプト内容"></textarea>
-                            <button onclick="addPrompt()" class="btn btn-primary w-full">
-                                <i class="fas fa-plus mr-2"></i>プロンプトを追加
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-span-6">
-                    <div class="glass-card p-6">
-                        <h3 class="text-lg font-semibold mb-4 flex items-center">
-                            <i class="fas fa-sticky-note mr-2 text-yellow-600"></i>メモ・ふせん
-                        </h3>
-                        
-                        <div class="flex justify-between items-center mb-4">
-                            <select id="memoDateSelector" class="input-field w-40" onchange="loadSelectedMemo()">
-                                <option value="">今日のメモ</option>
-                            </select>
-                            <button onclick="clearMemo()" class="btn btn-warning">
-                                <i class="fas fa-eraser mr-2"></i>クリア
-                            </button>
-                        </div>
-                        
-                        <div class="mb-3 text-sm text-gray-600">
-                            <i class="fas fa-clock mr-2"></i>
-                            <span id="memoSaveDate"></span>
-                        </div>
-                        
-                        <textarea id="memoArea" class="input-field resize-none" rows="12" 
-                                placeholder="気づき・指示事項・重要なポイントをメモ...
-
-🔍 分析ポイント:
-• 売上トレンド
-• 店舗パフォーマンス比較
-• 目標達成状況
-
-📋 ChatGPT活用メモ:
-• データ分析結果
-• 改善提案
-• 戦略アイデア"></textarea>
-                    </div>
-                </div>
-            </div>
-
-            <div class="dashboard-grid mt-6">
-                <div class="col-span-12">
-                    <div class="glass-card p-6">
-                        <h3 class="text-lg font-semibold mb-4 flex items-center">
-                            <i class="fas fa-cogs mr-2 text-gray-600"></i>システム管理
-                        </h3>
-                        
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            <button onclick="exportAllData()" class="btn btn-secondary">
-                                <i class="fas fa-download mr-2"></i>全データ出力
-                            </button>
-                            <button onclick="importAllData()" class="btn btn-secondary">
-                                <i class="fas fa-upload mr-2"></i>データ取込
-                            </button>
-                            <button onclick="clearAllData()" class="btn btn-danger">
-                                <i class="fas fa-trash mr-2"></i>全データ削除
-                            </button>
-                            <button onclick="generateReport()" class="btn btn-primary">
-                                <i class="fas fa-file-alt mr-2"></i>総合レポート
-                            </button>
-                        </div>
-                    </div>
+                        <p class="text-sm text-orange-600">業界トレンドを分析し、今後の戦略を提案</p>
+                    </button>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- モーダル -->
-    <div id="notificationModal" class="modal">
-        <div class="modal-content w-96">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-semibold">通知・アラート</h3>
-                <button onclick="closeModal('notificationModal')" class="text-gray-500 hover:text-gray-700">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div id="notificationList" class="space-y-3 max-h-64 overflow-y-auto">
-                <p class="text-gray-500 text-center py-4">通知はありません</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- 隠しファイル入力 -->
-    <input type="file" id="importFileInput" accept=".json" class="hidden" onchange="handleDataImport(event)">
 
     <script>
-        // グローバル変数
+        // === グローバル変数 ===
         const CORRECT_PASSWORD = 'iam1104JP';
         let isLoggedIn = false;
-        let currentTab = 'dashboard';
-        let currentPromptCategory = 'all';
-        let currentMonth = new Date();
-        let notifications = [];
-        
-        // データ配列
-        let tasks = [];
-        let events = [];
-        let designProjects = [];
-        let prompts = [];
-        let goals = {};
-        
-        // 売上分析・店舗別詳細分析
-        let currentSalesData = [];
-        let currentStoreStats = {};
 
-        // データ管理キー
-        const STORAGE_KEYS = {
-            tasks: 'rispondere_tasks',
-            events: 'rispondere_events',
-            prompts: 'rispondere_prompts',
-            designProjects: 'rispondere_design_projects',
-            goals: 'rispondere_goals',
-            salesData: 'rispondere_sales_data',
-            memos: 'rispondere_memos_'
-        };
+        // === メイン初期化処理 ===
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('=== Rispondere AI Secretary v4 起動 ===');
+            console.log('正しいパスワード:', CORRECT_PASSWORD);
+            
+            // 要素の取得
+            const passwordInput = document.getElementById('passwordInput');
+            const loginButton = document.getElementById('loginButton');
+            const skipButton = document.getElementById('skipButton');
+            const logoutButton = document.getElementById('logoutButton');
+            
+            // 要素確認
+            console.log('passwordInput:', passwordInput);
+            console.log('loginButton:', loginButton);
+            console.log('skipButton:', skipButton);
+            
+            // イベントリスナー設定
+            if (loginButton) {
+                loginButton.addEventListener('click', function() {
+                    console.log('ログインボタンがクリックされました');
+                    handleLogin();
+                });
+                console.log('ログインボタンのイベントリスナーを設定');
+            }
+            
+            if (skipButton) {
+                skipButton.addEventListener('click', function() {
+                    console.log('スキップボタンがクリックされました');
+                    handleSkipLogin();
+                });
+                console.log('スキップボタンのイベントリスナーを設定');
+            }
+            
+            if (logoutButton) {
+                logoutButton.addEventListener('click', function() {
+                    console.log('ログアウトボタンがクリックされました');
+                    handleLogout();
+                });
+            }
+            
+            // Enterキーでログイン
+            if (passwordInput) {
+                passwordInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        console.log('Enterキーが押されました');
+                        handleLogin();
+                    }
+                });
+                passwordInput.focus();
+                console.log('パスワードフィールドにフォーカスしました');
+            }
+            
+            // 時刻更新
+            updateDateTime();
+            setInterval(updateDateTime, 60000);
+            
+            // ログイン状態チェック
+            checkLoginStatus();
+            
+            console.log('初期化完了');
+        });
 
-        // 店舗リスト（有限会社Rispondereの10店舗）
-        const STORES = [
-            { id: 'classy_yokkaichi', name: 'CLASSY四日市', type: 'classy' },
-            { id: 'classy_tokyo', name: 'CLASSY東京', type: 'classy' },
-            { id: 'classy_nagoya', name: 'CLASSY名古屋', type: 'classy' },
-            { id: 'grandopera_tokyo', name: 'GrandOpera東京', type: 'grandopera' },
-            { id: 'grandopera_yokohama', name: 'GrandOpera横浜', type: 'grandopera' },
-            { id: 'grandopera_nagoya', name: 'GrandOpera名古屋', type: 'grandopera' },
-            { id: 'grandopera_fukuoka', name: 'GrandOpera福岡', type: 'grandopera' },
-            { id: 'opera_nishiki', name: 'オペラ錦', type: 'opera' },
-            { id: 'shabour', name: 'シャブール', type: 'shabour' },
-            { id: 'wancarat', name: 'ワンカラット', type: 'wancarat' }
-        ];
+        // === ログイン処理 ===
+        function handleLogin() {
+            console.log('=== ログイン処理開始 ===');
+            
+            const passwordInput = document.getElementById('passwordInput');
+            if (!passwordInput) {
+                console.error('パスワード入力フィールドが見つかりません');
+                alert('エラー: パスワード入力フィールドが見つかりません');
+                return;
+            }
+            
+            const password = passwordInput.value.trim();
+            console.log('入力されたパスワード:', password);
+            console.log('正しいパスワード:', CORRECT_PASSWORD);
+            console.log('パスワード一致:', password === CORRECT_PASSWORD);
+            
+            if (!password) {
+                console.log('パスワードが空です');
+                alert('パスワードを入力してください');
+                passwordInput.focus();
+                return;
+            }
+            
+            if (password === CORRECT_PASSWORD) {
+                console.log('✅ ログイン成功');
+                
+                // セッション保存
+                try {
+                    sessionStorage.setItem('isLoggedIn', 'true');
+                    sessionStorage.setItem('loginTime', Date.now().toString());
+                    isLoggedIn = true;
+                    console.log('セッション情報を保存しました');
+                } catch (error) {
+                    console.error('セッション保存エラー:', error);
+                }
+                
+                alert('✅ ログイン成功！\nRispondereシステムへようこそ');
+                
+                // ダッシュボード表示
+                showDashboard();
+                
+            } else {
+                console.log('❌ ログイン失敗');
+                alert('❌ パスワードが間違っています\n正しいパスワードを入力してください');
+                passwordInput.value = '';
+                passwordInput.focus();
+            }
+        }
 
-        // ChatGPT分析プロンプト集
-        const DEFAULT_PROMPTS = [
-            {
-                id: 1,
-                label: '売上データ分析',
-                category: 'analysis',
-                text: `以下の売上データを分析して、改善点と戦略を提案してください：
+        // === ログインスキップ処理 ===
+        function handleSkipLogin() {
+            console.log('=== ログインスキップ処理開始 ===');
+            
+            if (confirm('ログインをスキップしてデモモードで起動しますか？\n\n※ デモモードでは一部機能が制限されます')) {
+                try {
+                    sessionStorage.setItem('isLoggedIn', 'demo');
+                    sessionStorage.setItem('loginTime', Date.now().toString());
+                    isLoggedIn = true;
+                    console.log('デモモードでセッション情報を保存');
+                } catch (error) {
+                    console.error('セッション保存エラー:', error);
+                }
+                
+                alert('🔓 デモモードで起動しました');
+                showDashboard();
+            }
+        }
+
+        // === ログアウト処理 ===
+        function handleLogout() {
+            console.log('=== ログアウト処理開始 ===');
+            
+            if (confirm('ログアウトしますか？')) {
+                try {
+                    sessionStorage.removeItem('isLoggedIn');
+                    sessionStorage.removeItem('loginTime');
+                    isLoggedIn = false;
+                    console.log('セッション情報を削除');
+                } catch (error) {
+                    console.error('セッション削除エラー:', error);
+                }
+                
+                alert('ログアウトしました');
+                showLoginScreen();
+            }
+        }
+
+        // === ログイン状態チェック ===
+        function checkLoginStatus() {
+            console.log('=== ログイン状態チェック ===');
+            
+            try {
+                const loginStatus = sessionStorage.getItem('isLoggedIn');
+                console.log('保存されたログイン状態:', loginStatus);
+                
+                if (loginStatus === 'true' || loginStatus === 'demo') {
+                    console.log('既にログイン済み - ダッシュボードを表示');
+                    isLoggedIn = true;
+                    showDashboard();
+                } else {
+                    console.log('未ログイン - ログイン画面を表示');
+                    showLoginScreen();
+                }
+            } catch (error) {
+                console.error('ログイン状態チェックエラー:', error);
+                showLoginScreen();
+            }
+        }
+
+        // === 画面表示制御 ===
+        function showLoginScreen() {
+            console.log('ログイン画面を表示');
+            
+            const loginScreen = document.getElementById('loginScreen');
+            const mainDashboard = document.getElementById('mainDashboard');
+            const passwordInput = document.getElementById('passwordInput');
+            
+            if (loginScreen) loginScreen.classList.remove('hidden');
+            if (mainDashboard) mainDashboard.classList.add('hidden');
+            
+            if (passwordInput) {
+                passwordInput.value = '';
+                setTimeout(() => passwordInput.focus(), 100);
+            }
+        }
+
+        function showDashboard() {
+            console.log('ダッシュボードを表示');
+            
+            const loginScreen = document.getElementById('loginScreen');
+            const mainDashboard = document.getElementById('mainDashboard');
+            
+            if (loginScreen) loginScreen.classList.add('hidden');
+            if (mainDashboard) mainDashboard.classList.remove('hidden');
+            
+            // 統計更新
+            updateStats();
+        }
+
+        // === 統計更新 ===
+        function updateStats() {
+            console.log('統計を更新');
+            
+            const taskCount = document.getElementById('taskCount');
+            const promptCount = document.getElementById('promptCount');
+            
+            if (taskCount) taskCount.textContent = '12';
+            if (promptCount) promptCount.textContent = '8';
+        }
+
+        // === 日時更新 ===
+        function updateDateTime() {
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('ja-JP', { 
+                year: 'numeric', 
+                month: 'numeric', 
+                day: 'numeric',
+                weekday: 'short'
+            });
+            const timeStr = now.toLocaleTimeString('ja-JP', { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+            
+            const currentDate = document.getElementById('currentDate');
+            const currentTime = document.getElementById('currentTime');
+            
+            if (currentDate) currentDate.textContent = dateStr;
+            if (currentTime) currentTime.textContent = timeStr;
+        }
+
+        // === ChatGPTプロンプト機能 ===
+        function copyAnalysisPrompt() {
+            const prompt = `以下の売上データを分析して、改善点と戦略を提案してください：
 
 【分析対象】
+- 会社名：有限会社Rispondere
+- 店舗数：10店舗（CLASSY四日市、CLASSY東京、CLASSY名古屋、GrandOpera東京、GrandOpera横浜、GrandOpera名古屋、GrandOpera福岡、オペラ錦、シャブール、ワンカラット）
 - 期間：[期間を入力]
-- 店舗：[店舗名を入力]
 - データ：[売上、写メ日記、口コミ数等]
 
 【求める分析】
@@ -1236,18 +578,19 @@
 3. 改善ポイントの特定
 4. 具体的なアクションプラン
 
-データ：[ここにデータを貼り付け]`
-            },
-            {
-                id: 2,
-                label: '月次レポート作成',
-                category: 'report',
-                text: `以下の情報を基に、経営陣向けの月次レポートを作成してください：
+データ：[ここにデータを貼り付け]`;
+
+            copyToClipboard(prompt);
+            alert('📊 売上データ分析プロンプトをコピーしました！\nChatGPTに貼り付けてご利用ください');
+        }
+
+        function copyReportPrompt() {
+            const prompt = `以下の情報を基に、経営陣向けの月次レポートを作成してください：
 
 【会社情報】
 - 会社名：有限会社Rispondere
 - 店舗数：10店舗
-- 業種：[業種を入力]
+- 業種：サービス業
 
 【今月の実績】
 - 総売上：[金額]
@@ -1260,16 +603,18 @@
 - 課題と対策
 - 来月の施策提案
 
-形式：ビジネス文書として簡潔に`
-            },
-            {
-                id: 3,
-                label: '店舗改善提案',
-                category: 'strategy',
-                text: `店舗のパフォーマンス向上のための改善提案をお願いします：
+形式：ビジネス文書として簡潔に`;
+
+            copyToClipboard(prompt);
+            alert('📄 月次レポート作成プロンプトをコピーしました！\nChatGPTに貼り付けてご利用ください');
+        }
+
+        function copyStrategyPrompt() {
+            const prompt = `店舗のパフォーマンス向上のための改善提案をお願いします：
 
 【店舗情報】
-- 店舗名：[店舗名]
+- 会社名：有限会社Rispondere
+- 店舗名：[店舗名を選択]
 - 現在の課題：[具体的な課題]
 - 目標：[改善したい指標]
 
@@ -1284,38 +629,14 @@
 3. 投資対効果の予測
 4. 実行スケジュール
 
-実現可能で具体的な提案をお願いします。`
-            },
-            {
-                id: 4,
-                label: 'スタッフ向け指示書',
-                category: 'communication',
-                text: `スタッフ向けの分かりやすい指示書を作成してください：
+実現可能で具体的な提案をお願いします。`;
 
-【対象】
-- 対象スタッフ：[全店舗/特定店舗]
-- 内容：[指示内容]
-- 期限：[実施期限]
+            copyToClipboard(prompt);
+            alert('💡 店舗改善提案プロンプトをコピーしました！\nChatGPTに貼り付けてご利用ください');
+        }
 
-【指示事項】
-1. 背景・目的
-2. 具体的な行動指示
-3. 注意点・ポイント
-4. 報告方法
-
-【要求】
-- 分かりやすい表現
-- 具体的なアクション
-- モチベーション向上要素
-- 結果測定方法
-
-スタッフが迷わず実行できる内容で。`
-            },
-            {
-                id: 5,
-                label: 'トレンド分析・予測',
-                category: 'analysis',
-                text: `業界トレンドを分析し、今後の戦略を提案してください：
+        function copyTrendPrompt() {
+            const prompt = `業界トレンドを分析し、今後の戦略を提案してください：
 
 【分析項目】
 - 業界全体の動向
@@ -1324,6 +645,8 @@
 - 技術革新の影響
 
 【当社データ】
+- 会社名：有限会社Rispondere
+- 事業内容：10店舗運営
 - 売上推移：[データ]
 - 顧客層：[情報]
 - 強み・弱み：[分析]
@@ -1334,575 +657,52 @@
 3. 戦略的対応策
 4. 投資優先順位
 
-データドリブンな分析をお願いします。`
-            }
-        ];
+データドリブンな分析をお願いします。`;
 
-        // ページ読み込み時の初期化
-        window.addEventListener('DOMContentLoaded', function() {
-            console.log('=== Rispondere統合管理システム起動 ===');
-            console.log('パスワード:', CORRECT_PASSWORD);
-            
-            // 時刻更新を開始
-            updateDateTime();
-            setInterval(updateDateTime, 60000);
-            
-            // パスワードフィールドにフォーカス
-            const passwordInput = document.getElementById('passwordInput');
-            if (passwordInput) {
-                passwordInput.focus();
-                console.log('パスワードフィールドにフォーカスしました');
-            } else {
-                console.error('パスワードフィールドが見つかりません');
-            }
-            
-            // ログイン状態をチェック
-            checkLoginStatus();
-            
-            // デフォルトプロンプトの初期化
-            initializeDefaultPrompts();
-            
-            console.log('初期化完了');
-        });
-
-        // ログイン状態チェック
-        function checkLoginStatus() {
-            const loginStatus = sessionStorage.getItem('isLoggedIn');
-            if (loginStatus === 'true') {
-                showDashboard();
-            } else {
-                showLoginScreen();
-            }
+            copyToClipboard(prompt);
+            alert('📈 トレンド分析・予測プロンプトをコピーしました！\nChatGPTに貼り付けてご利用ください');
         }
 
-        // メインのログイン処理
-        function directLogin() {
-            console.log('directLogin関数が呼び出されました');
-            
-            const passwordInput = document.getElementById('passwordInput');
-            if (!passwordInput) {
-                alert('パスワード入力フィールドが見つかりません');
-                return;
-            }
-            
-            const password = passwordInput.value.trim();
-            console.log('入力されたパスワード:', password);
-            
-            if (!password) {
-                alert('パスワードを入力してください');
-                passwordInput.focus();
-                return;
-            }
-            
-            if (password === CORRECT_PASSWORD) {
-                // ログイン成功
-                console.log('ログイン成功');
-                sessionStorage.setItem('isLoggedIn', 'true');
-                sessionStorage.setItem('loginTime', Date.now().toString());
-                isLoggedIn = true;
-                
-                alert('ログイン成功！ダッシュボードを表示します');
-                
-                // 即座にダッシュボード表示
-                showDashboard();
-                
-            } else {
-                // ログイン失敗
-                console.log('ログイン失敗');
-                alert('パスワードが間違っています');
-                passwordInput.value = '';
-                passwordInput.focus();
-            }
-        }
-
-        // ログインスキップ機能
-        function skipLogin() {
-            console.log('skipLogin関数が呼び出されました');
-            
-            if (confirm('デモモードで起動しますか？')) {
-                sessionStorage.setItem('isLoggedIn', 'demo');
-                sessionStorage.setItem('loginTime', Date.now().toString());
-                isLoggedIn = true;
-                
-                alert('デモモードで起動しました');
-                
-                // 即座にダッシュボード表示
-                showDashboard();
-            }
-        }
-
-        // ログアウト処理
-        function logout() {
-            if (confirm('ログアウトしますか？')) {
-                sessionStorage.removeItem('isLoggedIn');
-                sessionStorage.removeItem('loginTime');
-                isLoggedIn = false;
-                
-                showNotification('ログアウトしました', 'info');
-                
-                setTimeout(() => {
-                    showLoginScreen();
-                }, 1000);
-            }
-        }
-
-        // ログイン画面表示
-        function showLoginScreen() {
-            document.getElementById('loginScreen').style.display = 'flex';
-            document.getElementById('mainDashboard').style.display = 'none';
-            
-            const passwordInput = document.getElementById('passwordInput');
-            if (passwordInput) {
-                passwordInput.value = '';
-                setTimeout(() => {
-                    passwordInput.focus();
-                }, 100);
-            }
-        }
-
-        // ダッシュボード表示
-        function showDashboard() {
-            document.getElementById('loginScreen').style.display = 'none';
-            document.getElementById('mainDashboard').style.display = 'block';
-            
-            // データを読み込み
-            loadAllData();
-            updateAllStats();
-            renderStoreOverview();
-        }
-
-        // タブ切り替え
-        function switchTab(tabName) {
-            // タブボタンの更新
-            document.querySelectorAll('.nav-tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
-            
-            // コンテンツの切り替え
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.classList.add('hidden');
-            });
-            document.getElementById(`${tabName}Tab`).classList.remove('hidden');
-            
-            currentTab = tabName;
-            
-            // タブ固有の初期化
-            switch(tabName) {
-                case 'stores':
-                    renderDetailedStoreList();
-                    updateStoreAnalysis();
-                    break;
-                case 'schedule':
-                    renderCalendar();
-                    loadTodayEvents();
-                    break;
-                case 'tasks':
-                    loadTasks();
-                    updateTaskStats();
-                    break;
-                case 'design':
-                    loadDesignProjects();
-                    updateDesignStats();
-                    break;
-                case 'goals':
-                    updateGoalSettings();
-                    loadGoalProgress();
-                    break;
-                case 'tools':
-                    loadPrompts();
-                    loadMemo();
-                    break;
-            }
-            
-            showNotification(`${getTabName(tabName)}に切り替えました`, 'info');
-        }
-
-        // タブ名取得
-        function getTabName(tabName) {
-            const names = {
-                'dashboard': 'ダッシュボード',
-                'stores': '店舗管理',
-                'tasks': 'タスク管理',
-                'schedule': 'スケジュール',
-                'sales': '売上分析',
-                'goals': '目標管理',
-                'design': 'デザイン部門',
-                'tools': 'AI・ツール'
-            };
-            return names[tabName] || tabName;
-        }
-
-        // 全データ読み込み
-        function loadAllData() {
-            tasks = JSON.parse(localStorage.getItem(STORAGE_KEYS.tasks) || '[]');
-            events = JSON.parse(localStorage.getItem(STORAGE_KEYS.events) || '[]');
-            designProjects = JSON.parse(localStorage.getItem(STORAGE_KEYS.designProjects) || '[]');
-            prompts = JSON.parse(localStorage.getItem(STORAGE_KEYS.prompts) || '[]');
-            goals = JSON.parse(localStorage.getItem(STORAGE_KEYS.goals) || '{}');
-            currentSalesData = JSON.parse(localStorage.getItem(STORAGE_KEYS.salesData) || '[]');
-            
-            if (prompts.length === 0) {
-                prompts = [...DEFAULT_PROMPTS];
-                localStorage.setItem(STORAGE_KEYS.prompts, JSON.stringify(prompts));
-            }
-            
-            loadTasks();
-            loadDesignProjects();
-            loadPrompts();
-        }
-
-        // 統計更新
-        function updateAllStats() {
-            const completedTasks = tasks.filter(task => task.completed).length;
-            const urgentTasks = tasks.filter(task => task.priority === 'urgent' && !task.completed).length;
-            
-            document.getElementById('totalTasks').textContent = tasks.length;
-            document.getElementById('completedTasks').textContent = completedTasks;
-            document.getElementById('urgentTasks').textContent = urgentTasks;
-            document.getElementById('totalEvents').textContent = events.length;
-            document.getElementById('designProjects').textContent = designProjects.length;
-            
-            updateProgressCircle();
-            updateUrgentItems();
-        }
-
-        // 店舗概要レンダリング
-        function renderStoreOverview() {
-            const container = document.getElementById('storeOverview');
-            if (!container) return;
-            
-            const storePerformance = generateStorePerformanceData();
-            
-            container.innerHTML = STORES.map(store => {
-                const performance = storePerformance[store.id] || { status: 'normal', score: 75, trend: 'stable' };
-                const statusClass = performance.status === 'top' ? 'top-performer' : 
-                                  performance.status === 'attention' ? 'needs-attention' : '';
-                const trendIcon = performance.trend === 'up' ? '📈' : 
-                                performance.trend === 'down' ? '📉' : '📊';
-                
-                return `
-                    <div class="store-card ${statusClass}" onclick="switchToStoreDetail('${store.id}')">
-                        <div class="flex justify-between items-center mb-2">
-                            <h5 class="font-semibold text-sm">${store.name}</h5>
-                            <span class="text-lg">${trendIcon}</span>
-                        </div>
-                        <div class="text-center">
-                            <div class="text-2xl font-bold mb-1" style="color: ${performance.status === 'top' ? '#10b981' : performance.status === 'attention' ? '#ef4444' : '#6b7280'}">${performance.score}%</div>
-                            <div class="text-xs text-gray-600">総合スコア</div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        // 店舗パフォーマンスデータ生成（サンプル）
-        function generateStorePerformanceData() {
-            return {
-                'classy_yokkaichi': { status: 'top', score: 92, trend: 'up' },
-                'classy_tokyo': { status: 'normal', score: 78, trend: 'stable' },
-                'classy_nagoya': { status: 'attention', score: 65, trend: 'down' },
-                'grandopera_tokyo': { status: 'top', score: 89, trend: 'up' },
-                'grandopera_yokohama': { status: 'normal', score: 81, trend: 'stable' },
-                'grandopera_nagoya': { status: 'top', score: 87, trend: 'up' },
-                'grandopera_fukuoka': { status: 'top', score: 94, trend: 'up' },
-                'opera_nishiki': { status: 'normal', score: 73, trend: 'stable' },
-                'shabour': { status: 'top', score: 88, trend: 'up' },
-                'wancarat': { status: 'normal', score: 79, trend: 'stable' }
-            };
-        }
-
-        // 詳細店舗リストレンダリング
-        function renderDetailedStoreList() {
-            const container = document.getElementById('detailedStoreList');
-            if (!container) return;
-            
-            const storePerformance = generateStorePerformanceData();
-            
-            container.innerHTML = STORES.map(store => {
-                const performance = storePerformance[store.id];
-                const statusClass = performance.status === 'top' ? 'border-green-400 bg-green-50' : 
-                                  performance.status === 'attention' ? 'border-red-400 bg-red-50' : 
-                                  'border-gray-300 bg-white';
-                
-                return `
-                    <div class="p-4 rounded-lg border-2 ${statusClass} transition-all hover:shadow-lg">
-                        <div class="flex justify-between items-center mb-3">
-                            <h5 class="font-semibold">${store.name}</h5>
-                            <span class="px-2 py-1 text-xs rounded-full ${performance.status === 'top' ? 'bg-green-100 text-green-800' : performance.status === 'attention' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800'}">
-                                ${performance.status === 'top' ? '優秀店舗' : performance.status === 'attention' ? '要注意' : '標準'}
-                            </span>
-                        </div>
-                        
-                        <div class="space-y-2 text-sm">
-                            <div class="flex justify-between">
-                                <span>総合スコア</span>
-                                <span class="font-bold">${performance.score}%</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span>トレンド</span>
-                                <span>${performance.trend === 'up' ? '📈 向上' : performance.trend === 'down' ? '📉 下降' : '📊 安定'}</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span>ランク</span>
-                                <span class="font-bold">#${Object.entries(storePerformance).sort(([,a], [,b]) => b.score - a.score).findIndex(([id,]) => id === store.id) + 1}</span>
-                            </div>
-                        </div>
-                        
-                        <div class="mt-3 pt-3 border-t">
-                            <button onclick="generateStoreAnalysis('${store.id}')" class="btn btn-primary w-full text-xs">
-                                <i class="fas fa-chart-bar mr-1"></i>詳細分析
-                            </button>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        // 店舗詳細分析生成
-        function generateStoreAnalysis(storeId) {
-            const store = STORES.find(s => s.id === storeId);
-            const analysis = `
-【${store.name} 店舗分析レポート】
-
-🎯 分析要請：
-ChatGPTに以下の内容で分析を依頼してください：
-
-"有限会社Rispondereの${store.name}について、以下の観点で分析・改善提案をお願いします：
-
-1. 現状パフォーマンス評価
-2. 他店舗との比較分析  
-3. 強み・弱みの特定
-4. 改善アクションプラン
-5. 短期・中期目標設定
-
-【店舗情報】
-- 店舗名：${store.name}
-- 店舗タイプ：${store.type}
-- 現在のスコア：[実際のデータを入力]
-
-【求める分析】
-・データドリブンな分析
-・実行可能な改善案
-・数値目標設定
-・タイムライン付き"
-
-このテキストをコピーしてChatGPTに貼り付けてください。
-            `;
-            
-            copyToClipboard(analysis);
-            showNotification(`${store.name}の分析プロンプトをコピーしました`, 'success');
-        }
-
-        // 緊急事項更新
-        function updateUrgentItems() {
-            const urgentContainer = document.getElementById('urgentItems');
-            if (!urgentContainer) return;
-            
-            const urgentList = [
-                ...tasks.filter(task => task.priority === 'urgent' && !task.completed).slice(0, 3),
-                ...designProjects.filter(project => project.priority === 'urgent' && project.status !== 'completed').slice(0, 2)
-            ];
-            
-            if (urgentList.length === 0) {
-                urgentContainer.innerHTML = '<p class="text-gray-500 text-center py-4">現在、緊急事項はありません</p>';
-            } else {
-                urgentContainer.innerHTML = urgentList.map(item => `
-                    <div class="flex items-center justify-between p-3 bg-red-50 border border-red-200 rounded-lg">
-                        <div>
-                            <div class="font-medium">${item.title}</div>
-                            <div class="text-sm text-gray-600">${item.store || item.client || ''}</div>
-                        </div>
-                        <div class="text-red-600">
-                            <i class="fas fa-exclamation-triangle"></i>
-                        </div>
-                    </div>
-                `).join('');
-            }
-        }
-
-        // 進捗円グラフ更新
-        function updateProgressCircle() {
-            const completed = tasks.filter(task => task.completed).length;
-            const total = tasks.length;
-            const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
-            
-            const circle = document.getElementById('progressCircle');
-            const text = document.getElementById('progressText');
-            
-            if (circle && text) {
-                const circumference = 2 * Math.PI * 56;
-                const offset = circumference - (percentage / 100) * circumference;
-                
-                circle.style.strokeDasharray = circumference;
-                circle.style.strokeDashoffset = offset;
-                text.textContent = percentage + '%';
-            }
-        }
-
-        // ChatGPTプロンプト初期化
-        function initializeDefaultPrompts() {
-            const existing = JSON.parse(localStorage.getItem(STORAGE_KEYS.prompts) || '[]');
-            if (existing.length === 0) {
-                localStorage.setItem(STORAGE_KEYS.prompts, JSON.stringify(DEFAULT_PROMPTS));
-            }
-        }
-
-        // クリップボードコピー
+        // === クリップボードコピー ===
         function copyToClipboard(text) {
-            navigator.clipboard.writeText(text).then(() => {
-                // 成功時の処理は呼び出し元で行う
-            }).catch(() => {
-                // フォールバック
-                const textArea = document.createElement('textarea');
-                textArea.value = text;
-                document.body.appendChild(textArea);
-                textArea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textArea);
-            });
-        }
-
-        // ===========================================
-        // 以下、個別機能の実装（タスク、イベント、デザイン等）
-        // ===========================================
-
-        // タスク管理
-        function addTask() {
-            const title = document.getElementById('newTaskTitle').value.trim();
-            const store = document.getElementById('newTaskStore').value;
-            const priority = document.getElementById('newTaskPriority').value;
-            const dueDate = document.getElementById('newTaskDue').value;
-            const description = document.getElementById('newTaskDescription').value.trim();
-            
-            if (!title) {
-                showNotification('タスク名を入力してください', 'error');
-                return;
-            }
-            
-            const newTask = {
-                id: Date.now(),
-                title,
-                store,
-                priority,
-                dueDate,
-                description,
-                completed: false,
-                createdAt: new Date().toISOString()
-            };
-            
-            tasks.push(newTask);
-            localStorage.setItem(STORAGE_KEYS.tasks, JSON.stringify(tasks));
-            
-            // フォームクリア
-            document.getElementById('newTaskTitle').value = '';
-            document.getElementById('newTaskDescription').value = '';
-            document.getElementById('newTaskDue').value = '';
-            
-            loadTasks();
-            updateAllStats();
-            showNotification('タスクを追加しました', 'success');
-        }
-
-        function loadTasks() {
-            const taskList = document.getElementById('taskList');
-            if (!taskList) return;
-            
-            const filter = document.getElementById('taskFilter')?.value || 'all';
-            const storeFilter = document.getElementById('taskStore')?.value || 'all';
-            
-            let filteredTasks = tasks;
-            
-            if (filter !== 'all') {
-                if (filter === 'completed') {
-                    filteredTasks = filteredTasks.filter(task => task.completed);
-                } else {
-                    filteredTasks = filteredTasks.filter(task => task.priority === filter && !task.completed);
-                }
-            }
-            
-            if (storeFilter !== 'all') {
-                filteredTasks = filteredTasks.filter(task => task.store === storeFilter);
-            }
-            
-            if (filteredTasks.length === 0) {
-                taskList.innerHTML = '<div class="text-center py-8 text-gray-500">タスクがありません</div>';
-                return;
-            }
-            
-            taskList.innerHTML = filteredTasks.map((task, index) => {
-                const originalIndex = tasks.findIndex(t => t.id === task.id);
-                const priorityClass = task.priority === 'urgent' ? 'urgent' : task.priority === 'high' ? 'priority-high' : '';
-                const storeInfo = STORES.find(s => s.id === task.store)?.name || task.store;
-                
-                return `
-                    <div class="task-item ${task.completed ? 'completed' : ''} ${priorityClass}">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center flex-1">
-                                <input type="checkbox" class="mr-3 w-5 h-5" ${task.completed ? 'checked' : ''} 
-                                       onchange="toggleTask(${originalIndex})">
-                                <div class="flex-1">
-                                    <div class="font-medium ${task.completed ? 'line-through text-gray-500' : ''}">${task.title}</div>
-                                    <div class="text-sm text-gray-600">
-                                        ${storeInfo} | ${getPriorityLabel(task.priority)}
-                                        ${task.dueDate ? ` | 期限: ${new Date(task.dueDate).toLocaleDateString('ja-JP')}` : ''}
-                                    </div>
-                                    ${task.description ? `<div class="text-sm text-gray-500 mt-1">${task.description}</div>` : ''}
-                                </div>
-                            </div>
-                            <button onclick="deleteTask(${originalIndex})" class="ml-3 p-2 text-red-500 hover:text-red-700">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function toggleTask(index) {
-            tasks[index].completed = !tasks[index].completed;
-            
-            if (tasks[index].completed) {
-                tasks[index].completedAt = new Date().toISOString();
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text).then(() => {
+                    console.log('クリップボードにコピー成功');
+                }).catch(err => {
+                    console.error('クリップボードコピー失敗:', err);
+                    fallbackCopy(text);
+                });
             } else {
-                delete tasks[index].completedAt;
-            }
-            
-            localStorage.setItem(STORAGE_KEYS.tasks, JSON.stringify(tasks));
-            loadTasks();
-            updateAllStats();
-        }
-
-        function deleteTask(index) {
-            if (confirm('このタスクを削除しますか？')) {
-                tasks.splice(index, 1);
-                localStorage.setItem(STORAGE_KEYS.tasks, JSON.stringify(tasks));
-                loadTasks();
-                updateAllStats();
-                showNotification('タスクを削除しました', 'info');
+                fallbackCopy(text);
             }
         }
 
-        function filterTasks() {
-            loadTasks();
+        function fallbackCopy(text) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            console.log('フォールバック方式でコピー');
         }
 
-        function updateTaskStats() {
-            const completed = tasks.filter(task => task.completed).length;
-            const total = tasks.length;
-            const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
-            
-            const today = new Date().toDateString();
-            const overdue = tasks.filter(task => 
-                !task.completed && task.dueDate && new Date(task.dueDate) < new Date(today)
-            ).length;
-            const dueToday = tasks.filter(task => 
-                !task.completed && task.dueDate && new Date(task.dueDate).toDateString() === today
-            ).length;
-            
-            const completionRate = document.getElementById('taskCompletionRate');
-            const progressBar = document.getElementById('taskProgressBar');
-            const overdueCount = document.getElementById('overdueCount');
-            const dueTodayCount = document.getElementById('dueTodayCount');
-            
-            if
+        // === デバッグ機能 ===
+        function debugInfo() {
+            console.log('=== デバッグ情報 ===');
+            console.log('ログイン状態:', isLoggedIn);
+            console.log('セッションストレージ:', sessionStorage.getItem('isLoggedIn'));
+            console.log('パスワード入力値:', document.getElementById('passwordInput')?.value);
+            console.log('正しいパスワード:', CORRECT_PASSWORD);
+        }
+
+        // グローバル関数として公開（デバッグ用）
+        window.debugInfo = debugInfo;
+        window.handleLogin = handleLogin;
+        window.handleSkipLogin = handleSkipLogin;
+
+        console.log('=== スクリプト読み込み完了 ===');
+        console.log('テスト用コマンド: debugInfo(), handleLogin(), handleSkipLogin()');
+    </script>
+</body>
+</html>
