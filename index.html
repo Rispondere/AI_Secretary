@@ -1340,7 +1340,8 @@
 
         // ページ読み込み時の初期化
         window.addEventListener('DOMContentLoaded', function() {
-            console.log('Rispondere統合管理システム起動');
+            console.log('=== Rispondere統合管理システム起動 ===');
+            console.log('パスワード:', CORRECT_PASSWORD);
             
             // 時刻更新を開始
             updateDateTime();
@@ -1350,6 +1351,9 @@
             const passwordInput = document.getElementById('passwordInput');
             if (passwordInput) {
                 passwordInput.focus();
+                console.log('パスワードフィールドにフォーカスしました');
+            } else {
+                console.error('パスワードフィールドが見つかりません');
             }
             
             // ログイン状態をチェック
@@ -1357,6 +1361,8 @@
             
             // デフォルトプロンプトの初期化
             initializeDefaultPrompts();
+            
+            console.log('初期化完了');
         });
 
         // ログイン状態チェック
@@ -1371,35 +1377,39 @@
 
         // メインのログイン処理
         function directLogin() {
+            console.log('directLogin関数が呼び出されました');
+            
             const passwordInput = document.getElementById('passwordInput');
             if (!passwordInput) {
-                showNotification('パスワード入力フィールドが見つかりません', 'error');
+                alert('パスワード入力フィールドが見つかりません');
                 return;
             }
             
             const password = passwordInput.value.trim();
+            console.log('入力されたパスワード:', password);
             
             if (!password) {
-                showNotification('パスワードを入力してください', 'warning');
+                alert('パスワードを入力してください');
                 passwordInput.focus();
                 return;
             }
             
             if (password === CORRECT_PASSWORD) {
                 // ログイン成功
+                console.log('ログイン成功');
                 sessionStorage.setItem('isLoggedIn', 'true');
                 sessionStorage.setItem('loginTime', Date.now().toString());
                 isLoggedIn = true;
                 
-                showNotification('Rispondereシステムにログインしました！', 'success');
+                alert('ログイン成功！ダッシュボードを表示します');
                 
-                setTimeout(() => {
-                    showDashboard();
-                }, 1000);
+                // 即座にダッシュボード表示
+                showDashboard();
                 
             } else {
                 // ログイン失敗
-                showNotification('パスワードが間違っています', 'error');
+                console.log('ログイン失敗');
+                alert('パスワードが間違っています');
                 passwordInput.value = '';
                 passwordInput.focus();
             }
@@ -1407,16 +1417,17 @@
 
         // ログインスキップ機能
         function skipLogin() {
+            console.log('skipLogin関数が呼び出されました');
+            
             if (confirm('デモモードで起動しますか？')) {
                 sessionStorage.setItem('isLoggedIn', 'demo');
                 sessionStorage.setItem('loginTime', Date.now().toString());
                 isLoggedIn = true;
                 
-                showNotification('デモモードで起動しました', 'info');
+                alert('デモモードで起動しました');
                 
-                setTimeout(() => {
-                    showDashboard();
-                }, 1000);
+                // 即座にダッシュボード表示
+                showDashboard();
             }
         }
 
