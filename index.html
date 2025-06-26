@@ -3,612 +3,901 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Secretary v4 - 有限会社Rispondere 統合業務管理システム</title>
+    <title>CLASSY業務ダッシュボード - 川満さん専用</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
+        :root {
+            --primary-blue: #3b82f6;
+            --secondary-blue: #60a5fa;
+            --light-blue: #dbeafe;
+            --cyan: #06b6d4;
+            --light-cyan: #cffafe;
+        }
+        
         body {
-            font-family: 'Inter', 'Noto Sans JP', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%);
-            background-size: 400% 400%;
-            animation: gradientShift 15s ease infinite;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
             min-height: 100vh;
         }
         
-        @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        .card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(148, 163, 184, 0.1);
         }
         
-        .glass-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
+        .card:hover {
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            transform: translateY(-2px);
         }
         
         .btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: 12px 20px;
+            padding: 12px 24px;
             font-weight: 500;
             border-radius: 12px;
             transition: all 0.3s ease;
             border: none;
             cursor: pointer;
             font-size: 14px;
-            min-height: 44px;
+            min-height: 48px;
+            min-width: 120px;
         }
         
         .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
             color: white;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
         }
         
         .btn-primary:hover {
-            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
         }
         
-        .btn-success {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        .btn-cyan {
+            background: linear-gradient(135deg, var(--cyan), #22d3ee);
             color: white;
+            box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3);
         }
         
-        .btn-danger {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-            color: white;
-        }
-
-        .btn-warning {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-            color: white;
-        }
-
-        .btn-secondary {
-            background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
-            color: white;
+        .btn-cyan:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(6, 182, 212, 0.4);
         }
         
-        .input-field {
-            width: 100%;
-            padding: 12px 16px;
-            border: 2px solid rgba(0, 0, 0, 0.1);
-            border-radius: 12px;
-            font-size: 14px;
-            transition: all 0.3s ease;
-            background: rgba(255, 255, 255, 0.9);
+        .btn-outline {
+            background: white;
+            color: var(--primary-blue);
+            border: 2px solid var(--light-blue);
         }
         
-        .input-field:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
-            background: rgba(255, 255, 255, 1);
+        .btn-outline:hover {
+            background: var(--light-blue);
+            border-color: var(--primary-blue);
         }
         
-        .login-container {
-            min-height: 100vh;
+        .nav-item {
             display: flex;
             align-items: center;
-            justify-content: center;
-            padding: 20px;
+            padding: 16px 20px;
+            margin: 4px 0;
+            border-radius: 12px;
+            color: #64748b;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-weight: 500;
         }
         
-        .login-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 24px;
-            padding: 40px;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
-            width: 100%;
-            max-width: 420px;
-            animation: slideUp 0.6s ease-out;
+        .nav-item:hover {
+            background: var(--light-blue);
+            color: var(--primary-blue);
+            transform: translateX(4px);
         }
         
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .nav-item.active {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
         }
         
-        .hidden { display: none !important; }
+        .stat-card {
+            padding: 24px;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-blue), var(--cyan));
+        }
+        
+        .stat-card:hover {
+            transform: scale(1.02);
+        }
+        
+        .progress-bar {
+            background: #e2e8f0;
+            border-radius: 8px;
+            height: 8px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            border-radius: 8px;
+            transition: width 0.5s ease;
+        }
+        
+        .progress-green { background: linear-gradient(90deg, #10b981, #34d399); }
+        .progress-yellow { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+        .progress-red { background: linear-gradient(90deg, #ef4444, #f87171); }
         
         .task-item {
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
             transition: all 0.3s ease;
-            border-left: 4px solid transparent;
+            background: white;
         }
         
         .task-item:hover {
-            background: rgba(102, 126, 234, 0.05);
-            border-left-color: #667eea;
+            border-color: var(--primary-blue);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
         }
         
         .task-completed {
             opacity: 0.6;
-            text-decoration: line-through;
+            background: #f8fafc;
         }
         
-        .priority-high { border-left-color: #ef4444 !important; }
-        .priority-medium { border-left-color: #f59e0b !important; }
-        .priority-low { border-left-color: #10b981 !important; }
-
-        .modal {
+        .task-completed .task-text {
+            text-decoration: line-through;
+            color: #64748b;
+        }
+        
+        .badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .badge-green { background: #dcfce7; color: #166534; }
+        .badge-yellow { background: #fef3c7; color: #92400e; }
+        .badge-red { background: #fecaca; color: #991b1b; }
+        .badge-blue { background: var(--light-blue); color: var(--primary-blue); }
+        .badge-cyan { background: var(--light-cyan); color: #0e7490; }
+        
+        .calendar-day {
+            min-height: 80px;
+            border: 1px solid #e2e8f0;
+            padding: 8px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        
+        .calendar-day:hover {
+            background: #f8fafc;
+            border-color: var(--primary-blue);
+        }
+        
+        .calendar-today {
+            background: var(--light-blue);
+            border-color: var(--primary-blue);
+            font-weight: 600;
+        }
+        
+        .event-item {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            margin: 2px 0;
+            font-weight: 500;
+        }
+        
+        .event-meeting { background: var(--light-blue); color: var(--primary-blue); }
+        .event-shooting { background: #dcfce7; color: #166534; }
+        .event-holiday { background: #fecaca; color: #991b1b; }
+        .event-deadline { background: #fed7aa; color: #9a3412; }
+        
+        .chart-container {
+            position: relative;
+            height: 350px;
+            width: 100%;
+        }
+        
+        .hidden { display: none !important; }
+        
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -320px;
+            width: 320px;
+            height: 100vh;
+            background: white;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: 4px 0 24px rgba(0, 0, 0, 0.1);
+        }
+        
+        .sidebar.active {
+            left: 0;
+        }
+        
+        .overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: 16px;
-            padding: 24px;
-            width: 90%;
-            max-width: 500px;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-
-        .tab-button {
-            padding: 12px 20px;
-            border: none;
-            background: transparent;
-            color: #6b7280;
-            font-weight: 500;
-            border-bottom: 2px solid transparent;
-            cursor: pointer;
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
             transition: all 0.3s ease;
         }
-
-        .tab-button.active {
-            color: #667eea;
-            border-bottom-color: #667eea;
+        
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
         }
-
-        .tab-content {
-            display: none;
+        
+        @media (min-width: 768px) {
+            .sidebar {
+                position: relative;
+                left: 0;
+                box-shadow: none;
+                border-right: 1px solid #e2e8f0;
+            }
         }
-
-        .tab-content.active {
-            display: block;
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .slide-in {
+            animation: slideIn 0.5s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
     </style>
 </head>
 <body>
-    <!-- ログイン画面 -->
-    <div id="loginScreen" class="login-container">
-        <div class="login-card">
-            <div class="text-center mb-8">
-                <div class="text-6xl mb-4">
-                    <i class="fas fa-building text-purple-600"></i>
-                </div>
-                <h1 class="text-2xl font-bold text-gray-900 mb-2">AI Secretary v4</h1>
-                <p class="text-gray-600">有限会社Rispondere<br>統合業務管理システム</p>
-                <p class="text-sm text-purple-600 mt-2">10店舗統合管理・AI分析対応</p>
-            </div>
-            
-            <div class="space-y-4">
+    <!-- オーバーレイ -->
+    <div id="overlay" class="overlay" onclick="closeSidebar()"></div>
+    
+    <!-- サイドバー -->
+    <div id="sidebar" class="sidebar">
+        <div class="p-6">
+            <div class="flex items-center justify-between mb-8">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                        <i class="fas fa-key mr-2"></i>パスワード
-                    </label>
-                    <input 
-                        type="password" 
-                        id="passwordInput" 
-                        class="input-field" 
-                        placeholder="パスワードを入力してください"
-                    >
+                    <h2 class="text-xl font-bold text-gray-900">CLASSY</h2>
+                    <p class="text-sm text-gray-600">業務ダッシュボード</p>
+                    <p class="text-xs text-blue-600 font-medium">川満さん専用</p>
                 </div>
-                
-                <button id="loginButton" class="btn btn-primary w-full">
-                    <i class="fas fa-sign-in-alt mr-2"></i>ログイン
-                </button>
-                
-                <button id="skipButton" class="btn btn-danger w-full">
-                    <i class="fas fa-unlock mr-2"></i>ログインをスキップ
+                <button onclick="closeSidebar()" class="md:hidden text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
             
-            <div class="mt-6 p-4 bg-blue-50 rounded-lg">
-                <div class="flex items-center text-blue-800 text-sm">
-                    <i class="fas fa-shield-alt mr-2"></i>
-                    セキュアログイン・セッション管理・自動バックアップ
+            <nav class="space-y-2">
+                <div class="nav-item active" onclick="showPage('dashboard')">
+                    <i class="fas fa-home mr-3 text-lg"></i>
+                    <span>ダッシュボード</span>
+                </div>
+                <div class="nav-item" onclick="showPage('sales')">
+                    <i class="fas fa-chart-line mr-3 text-lg"></i>
+                    <span>売上分析</span>
+                </div>
+                <div class="nav-item" onclick="showPage('reports')">
+                    <i class="fas fa-file-alt mr-3 text-lg"></i>
+                    <span>会議資料</span>
+                </div>
+                <div class="nav-item" onclick="showPage('calendar')">
+                    <i class="fas fa-calendar mr-3 text-lg"></i>
+                    <span>カレンダー</span>
+                </div>
+            </nav>
+            
+            <div class="mt-8 p-4 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-12 border border-blue-100">
+                <div class="text-center">
+                    <div class="text-2xl mb-2">📊</div>
+                    <p class="text-sm font-medium text-blue-800">データ最終更新</p>
+                    <p class="text-xs text-blue-600" id="lastUpdate">2024-06-26 14:30</p>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- メインダッシュボード -->
-    <div id="mainDashboard" class="hidden min-h-screen">
+    
+    <!-- メインコンテンツ -->
+    <div class="min-h-screen md:ml-320">
         <!-- ヘッダー -->
-        <div class="glass-card mx-4 mt-4 mb-6">
-            <div class="p-6">
-                <div class="flex flex-col lg:flex-row justify-between items-center space-y-4 lg:space-y-0">
+        <header class="card m-4 mb-6">
+            <div class="p-4 flex items-center justify-between">
+                <div class="flex items-center">
+                    <button onclick="toggleSidebar()" class="md:hidden mr-4 text-gray-600 hover:text-gray-800">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
                     <div>
-                        <h1 class="text-3xl font-bold text-gray-900 flex items-center">
-                            <i class="fas fa-building mr-3 text-purple-600"></i>
-                            Rispondere 統合管理
-                        </h1>
-                        <p class="text-gray-600 mt-1">AI Secretary v4 - 全10店舗統合業務管理システム</p>
-                        <p class="text-sm text-green-600 mt-2">システムが正常に動作しています</p>
-                    </div>
-                    
-                    <div class="flex items-center space-x-4">
-                        <div class="text-center">
-                            <div class="font-semibold text-gray-900" id="currentDate"></div>
-                            <div class="text-sm text-gray-500" id="currentTime"></div>
-                        </div>
-                        <button id="logoutButton" class="btn btn-danger">
-                            <i class="fas fa-sign-out-alt mr-2"></i>ログアウト
-                        </button>
+                        <h1 class="text-2xl font-bold text-gray-900">CLASSY業務ダッシュボード</h1>
+                        <p class="text-sm text-gray-600" id="currentPageTitle">ダッシュボード</p>
                     </div>
                 </div>
-            </div>
-        </div>
-
-        <!-- タブナビゲーション -->
-        <div class="mx-4 mb-6">
-            <div class="glass-card">
-                <div class="p-4">
-                    <div class="flex space-x-2 overflow-x-auto">
-                        <button class="tab-button active" onclick="showTab('dashboard')">
-                            <i class="fas fa-home mr-2"></i>ダッシュボード
-                        </button>
-                        <button class="tab-button" onclick="showTab('tasks')">
-                            <i class="fas fa-tasks mr-2"></i>タスク管理
-                        </button>
-                        <button class="tab-button" onclick="showTab('stores')">
-                            <i class="fas fa-store mr-2"></i>店舗管理
-                        </button>
-                        <button class="tab-button" onclick="showTab('reports')">
-                            <i class="fas fa-chart-bar mr-2"></i>レポート
-                        </button>
-                        <button class="tab-button" onclick="showTab('ai')">
-                            <i class="fas fa-robot mr-2"></i>AI分析
-                        </button>
+                
+                <div class="flex items-center space-x-4">
+                    <div class="text-right hidden sm:block">
+                        <div class="font-semibold text-gray-900" id="currentDate"></div>
+                        <div class="text-sm text-blue-600" id="currentTime"></div>
                     </div>
+                    <button class="btn btn-primary" onclick="syncGoogleData()">
+                        <i class="fas fa-sync-alt mr-2"></i>
+                        <span class="hidden sm:inline">Google同期</span>
+                    </button>
                 </div>
             </div>
-        </div>
-
-        <!-- ダッシュボードタブ -->
-        <div id="dashboardTab" class="tab-content active mx-4">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <div class="glass-card p-6 text-center cursor-pointer hover:shadow-lg" onclick="showTab('stores')">
-                    <div class="text-3xl mb-2">🏪</div>
-                    <div class="text-2xl font-bold text-purple-600 mb-2">10</div>
-                    <div class="text-sm text-gray-600">運営店舗数</div>
-                </div>
-                
-                <div class="glass-card p-6 text-center cursor-pointer hover:shadow-lg" onclick="showTab('tasks')">
-                    <div class="text-3xl mb-2">📋</div>
-                    <div class="text-2xl font-bold text-green-600 mb-2" id="taskCount">0</div>
-                    <div class="text-sm text-gray-600">管理タスク</div>
-                </div>
-                
-                <div class="glass-card p-6 text-center">
-                    <div class="text-3xl mb-2">📊</div>
-                    <div class="text-2xl font-bold text-blue-600 mb-2">85%</div>
-                    <div class="text-sm text-gray-600">平均達成率</div>
-                </div>
-                
-                <div class="glass-card p-6 text-center cursor-pointer hover:shadow-lg" onclick="showTab('ai')">
-                    <div class="text-3xl mb-2">🤖</div>
-                    <div class="text-2xl font-bold text-indigo-600 mb-2">5</div>
-                    <div class="text-sm text-gray-600">AIプロンプト</div>
-                </div>
-            </div>
-
-            <!-- 最近のタスク -->
-            <div class="glass-card p-6 mb-6">
-                <h3 class="text-lg font-semibold mb-4 flex items-center">
-                    <i class="fas fa-clock mr-2 text-green-600"></i>最近のタスク
-                </h3>
-                <div id="recentTasks" class="space-y-3">
-                    <p class="text-gray-500 text-center py-8">タスクがありません</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- タスク管理タブ -->
-        <div id="tasksTab" class="tab-content mx-4">
-            <div class="glass-card p-6 mb-6">
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0 mb-6">
-                    <h3 class="text-lg font-semibold flex items-center">
-                        <i class="fas fa-tasks mr-2 text-blue-600"></i>タスク管理
+        </header>
+        
+        <!-- ダッシュボードページ -->
+        <div id="dashboardPage" class="page-content px-4 fade-in">
+            <!-- 本日のやることリスト -->
+            <div class="card p-6 mb-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-semibold text-gray-900 flex items-center">
+                        <i class="fas fa-tasks mr-3 text-blue-600"></i>本日のやることリスト
                     </h3>
-                    <div class="flex flex-wrap gap-2">
-                        <button class="btn btn-primary" onclick="openTaskModal()">
-                            <i class="fas fa-plus mr-2"></i>新しいタスク
-                        </button>
-                        <button class="btn btn-secondary" onclick="exportTasks()">
-                            <i class="fas fa-download mr-2"></i>エクスポート
-                        </button>
-                        <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importTasks(event)">
-                        <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">
-                            <i class="fas fa-upload mr-2"></i>インポート
-                        </button>
-                    </div>
-                </div>
-
-                <!-- フィルター -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                    <input type="text" id="taskSearch" placeholder="タスクを検索..." class="input-field" onkeyup="filterTasks()">
-                    <select id="storeFilter" class="input-field" onchange="filterTasks()">
-                        <option value="">全店舗</option>
-                        <option value="CLASSY四日市">CLASSY四日市</option>
-                        <option value="CLASSY東京">CLASSY東京</option>
-                        <option value="CLASSY名古屋">CLASSY名古屋</option>
-                        <option value="GrandOpera東京">GrandOpera東京</option>
-                        <option value="GrandOpera横浜">GrandOpera横浜</option>
-                        <option value="GrandOpera名古屋">GrandOpera名古屋</option>
-                        <option value="GrandOpera福岡">GrandOpera福岡</option>
-                        <option value="オペラ錦">オペラ錦</option>
-                        <option value="シャブール">シャブール</option>
-                        <option value="ワンカラット">ワンカラット</option>
-                    </select>
-                    <select id="priorityFilter" class="input-field" onchange="filterTasks()">
-                        <option value="">全優先度</option>
-                        <option value="高">高優先度</option>
-                        <option value="中">中優先度</option>
-                        <option value="低">低優先度</option>
-                    </select>
-                    <select id="statusFilter" class="input-field" onchange="filterTasks()">
-                        <option value="">全ステータス</option>
-                        <option value="未完了">未完了</option>
-                        <option value="完了">完了</option>
-                    </select>
-                </div>
-
-                <!-- タスクリスト -->
-                <div id="taskList" class="space-y-3">
-                    <p class="text-gray-500 text-center py-8">タスクがありません。「新しいタスク」ボタンでタスクを追加してください。</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- 店舗管理タブ -->
-        <div id="storesTab" class="tab-content mx-4">
-            <div class="glass-card p-6">
-                <h3 class="text-lg font-semibold mb-4 flex items-center">
-                    <i class="fas fa-store mr-2 text-blue-600"></i>Rispondere 全店舗一覧
-                </h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-                    <div class="p-4 bg-gradient-to-br from-purple-50 to-blue-50 rounded-lg border-l-4 border-purple-500">
-                        <h5 class="font-semibold text-sm mb-1">CLASSY四日市</h5>
-                        <p class="text-xs text-gray-600">CLASSYブランド</p>
-                        <div class="mt-2 text-green-600 font-bold">92%</div>
-                    </div>
-                    
-                    <div class="p-4 bg-gradient-to-br from-purple-50 to-blue-50 rounded-lg border-l-4 border-purple-500">
-                        <h5 class="font-semibold text-sm mb-1">CLASSY東京</h5>
-                        <p class="text-xs text-gray-600">CLASSYブランド</p>
-                        <div class="mt-2 text-yellow-600 font-bold">78%</div>
-                    </div>
-                    
-                    <div class="p-4 bg-gradient-to-br from-purple-50 to-blue-50 rounded-lg border-l-4 border-purple-500">
-                        <h5 class="font-semibold text-sm mb-1">CLASSY名古屋</h5>
-                        <p class="text-xs text-gray-600">CLASSYブランド</p>
-                        <div class="mt-2 text-green-600 font-bold">85%</div>
-                    </div>
-                    
-                    <div class="p-4 bg-gradient-to-br from-red-50 to-pink-50 rounded-lg border-l-4 border-red-500">
-                        <h5 class="font-semibold text-sm mb-1">GrandOpera東京</h5>
-                        <p class="text-xs text-gray-600">GrandOperaブランド</p>
-                        <div class="mt-2 text-green-600 font-bold">94%</div>
-                    </div>
-                    
-                    <div class="p-4 bg-gradient-to-br from-red-50 to-pink-50 rounded-lg border-l-4 border-red-500">
-                        <h5 class="font-semibold text-sm mb-1">GrandOpera横浜</h5>
-                        <p class="text-xs text-gray-600">GrandOperaブランド</p>
-                        <div class="mt-2 text-green-600 font-bold">87%</div>
-                    </div>
-                    
-                    <div class="p-4 bg-gradient-to-br from-red-50 to-pink-50 rounded-lg border-l-4 border-red-500">
-                        <h5 class="font-semibold text-sm mb-1">GrandOpera名古屋</h5>
-                        <p class="text-xs text-gray-600">GrandOperaブランド</p>
-                        <div class="mt-2 text-green-600 font-bold">91%</div>
-                    </div>
-                    
-                    <div class="p-4 bg-gradient-to-br from-red-50 to-pink-50 rounded-lg border-l-4 border-red-500">
-                        <h5 class="font-semibold text-sm mb-1">GrandOpera福岡</h5>
-                        <p class="text-xs text-gray-600">GrandOperaブランド</p>
-                        <div class="mt-2 text-green-600 font-bold">98%</div>
-                    </div>
-                    
-                    <div class="p-4 bg-gradient-to-br from-yellow-50 to-orange-50 rounded-lg border-l-4 border-yellow-500">
-                        <h5 class="font-semibold text-sm mb-1">オペラ錦</h5>
-                        <p class="text-xs text-gray-600">オペラブランド</p>
-                        <div class="mt-2 text-yellow-600 font-bold">82%</div>
-                    </div>
-                    
-                    <div class="p-4 bg-gradient-to-br from-green-50 to-teal-50 rounded-lg border-l-4 border-green-500">
-                        <h5 class="font-semibold text-sm mb-1">シャブール</h5>
-                        <p class="text-xs text-gray-600">シャブールブランド</p>
-                        <div class="mt-2 text-green-600 font-bold">89%</div>
-                    </div>
-                    
-                    <div class="p-4 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-lg border-l-4 border-indigo-500">
-                        <h5 class="font-semibold text-sm mb-1">ワンカラット</h5>
-                        <p class="text-xs text-gray-600">ワンカラットブランド</p>
-                        <div class="mt-2 text-green-600 font-bold">86%</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- レポートタブ -->
-        <div id="reportsTab" class="tab-content mx-4">
-            <div class="glass-card p-6">
-                <h3 class="text-lg font-semibold mb-4 flex items-center">
-                    <i class="fas fa-chart-bar mr-2 text-green-600"></i>レポート機能
-                </h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <button class="p-6 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 text-left transition-all" onclick="generateReport('task')">
-                        <div class="font-semibold text-blue-800 mb-2">
-                            <i class="fas fa-tasks mr-2"></i>タスクレポート
-                        </div>
-                        <p class="text-sm text-blue-600">完了済みタスク、進行中タスクの詳細レポート</p>
-                    </button>
-                    
-                    <button class="p-6 bg-green-50 hover:bg-green-100 rounded-lg border border-green-200 text-left transition-all" onclick="generateReport('store')">
-                        <div class="font-semibold text-green-800 mb-2">
-                            <i class="fas fa-store mr-2"></i>店舗パフォーマンス
-                        </div>
-                        <p class="text-sm text-green-600">各店舗の達成率と分析レポート</p>
-                    </button>
-                    
-                    <button class="p-6 bg-purple-50 hover:bg-purple-100 rounded-lg border border-purple-200 text-left transition-all" onclick="generateReport('monthly')">
-                        <div class="font-semibold text-purple-800 mb-2">
-                            <i class="fas fa-calendar mr-2"></i>月次サマリー
-                        </div>
-                        <p class="text-sm text-purple-600">月別の業績とタスク完了状況</p>
-                    </button>
-                    
-                    <button class="p-6 bg-orange-50 hover:bg-orange-100 rounded-lg border border-orange-200 text-left transition-all" onclick="generateReport('export')">
-                        <div class="font-semibold text-orange-800 mb-2">
-                            <i class="fas fa-download mr-2"></i>データエクスポート
-                        </div>
-                        <p class="text-sm text-orange-600">全データをExcel形式で出力</p>
+                    <button class="btn btn-outline" onclick="refreshTasks()">
+                        <i class="fas fa-refresh mr-2"></i>更新
                     </button>
                 </div>
-                
-                <div id="reportOutput" class="mt-6 hidden">
-                    <div class="border-t pt-6">
-                        <h4 class="font-semibold mb-4">生成されたレポート</h4>
-                        <div id="reportContent" class="bg-gray-50 p-4 rounded-lg"></div>
+                <div id="todayTasks" class="space-y-3">
+                    <div class="task-item">
+                        <div class="flex items-center">
+                            <input type="checkbox" class="mr-4 w-5 h-5 text-blue-600 rounded" onchange="toggleTask(this)">
+                            <div class="flex-1">
+                                <div class="task-text font-medium">寮の退去確認（田中さん）</div>
+                                <div class="text-sm text-gray-500">10:00 - 優先度：高</div>
+                            </div>
+                            <span class="badge badge-red">重要</span>
+                        </div>
+                    </div>
+                    <div class="task-item">
+                        <div class="flex items-center">
+                            <input type="checkbox" class="mr-4 w-5 h-5 text-blue-600 rounded" onchange="toggleTask(this)">
+                            <div class="flex-1">
+                                <div class="task-text font-medium">名古屋店売上確認・分析</div>
+                                <div class="text-sm text-gray-500">15:00 - スプレッドシート更新</div>
+                            </div>
+                            <span class="badge badge-yellow">通常</span>
+                        </div>
+                    </div>
+                    <div class="task-item task-completed">
+                        <div class="flex items-center">
+                            <input type="checkbox" class="mr-4 w-5 h-5 text-blue-600 rounded" checked onchange="toggleTask(this)">
+                            <div class="flex-1">
+                                <div class="task-text font-medium">投稿状況チェック（全店舗）</div>
+                                <div class="text-sm text-gray-500">09:00 - 完了済み</div>
+                            </div>
+                            <span class="badge badge-green">完了</span>
+                        </div>
+                    </div>
+                    <div class="task-item">
+                        <div class="flex items-center">
+                            <input type="checkbox" class="mr-4 w-5 h-5 text-blue-600 rounded" onchange="toggleTask(this)">
+                            <div class="flex-1">
+                                <div class="task-text font-medium">会議資料準備（月次レポート）</div>
+                                <div class="text-sm text-gray-500">17:00 - 明日の会議用</div>
+                            </div>
+                            <span class="badge badge-blue">会議</span>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
-
-        <!-- AI分析タブ -->
-        <div id="aiTab" class="tab-content mx-4">
-            <div class="glass-card p-6">
-                <h3 class="text-lg font-semibold mb-4 flex items-center">
-                    <i class="fas fa-robot mr-2 text-purple-600"></i>ChatGPT分析プロンプト
-                </h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <button class="p-4 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 text-left transition-all" onclick="copyAnalysisPrompt()">
-                        <div class="font-semibold text-blue-800 mb-2">
-                            <i class="fas fa-chart-line mr-2"></i>売上データ分析
-                        </div>
-                        <p class="text-sm text-blue-600">店舗別売上データを分析し、改善点と戦略を提案</p>
-                    </button>
-                    
-                    <button class="p-4 bg-green-50 hover:bg-green-100 rounded-lg border border-green-200 text-left transition-all" onclick="copyReportPrompt()">
-                        <div class="font-semibold text-green-800 mb-2">
-                            <i class="fas fa-file-alt mr-2"></i>月次レポート作成
-                        </div>
-                        <p class="text-sm text-green-600">経営陣向けの月次レポートを自動生成</p>
-                    </button>
-                    
-                    <button class="p-4 bg-purple-50 hover:bg-purple-100 rounded-lg border border-purple-200 text-left transition-all" onclick="copyStrategyPrompt()">
-                        <div class="font-semibold text-purple-800 mb-2">
-                            <i class="fas fa-lightbulb mr-2"></i>店舗改善提案
-                        </div>
-                        <p class="text-sm text-purple-600">店舗パフォーマンス向上のための具体的提案</p>
-                    </button>
-                    
-                    <button class="p-4 bg-orange-50 hover:bg-orange-100 rounded-lg border border-orange-200 text-left transition-all" onclick="copyTrendPrompt()">
-                        <div class="font-semibold text-orange-800 mb-2">
-                            <i class="fas fa-trending-up mr-2"></i>トレンド分析・予測
-                        </div>
-                        <p class="text-sm text-orange-600">業界トレンドを分析し、今後の戦略を提案</p>
-                    </button>
-
-                    <button class="p-4 bg-red-50 hover:bg-red-100 rounded-lg border border-red-200 text-left transition-all" onclick="copyTaskAnalysisPrompt()">
-                        <div class="font-semibold text-red-800 mb-2">
-                            <i class="fas fa-tasks mr-2"></i>タスク効率分析
-                        </div>
-                        <p class="text-sm text-red-600">タスク管理データから業務効率を分析</p>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- タスク追加/編集モーダル -->
-    <div id="taskModal" class="modal hidden">
-        <div class="modal-content">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-lg font-semibold" id="modalTitle">新しいタスクを追加</h3>
-                <button onclick="closeTaskModal()" class="text-gray-500 hover:text-gray-700">
-                    <i class="fas fa-times"></i>
-                </button>
             </div>
             
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">タスク名</label>
-                    <input type="text" id="taskTitle" class="input-field" placeholder="タスク名を入力">
+            <!-- 店舗別投稿状況・売上速報 -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <div class="card p-6">
+                    <h3 class="text-lg font-semibold mb-6 text-gray-900 flex items-center">
+                        <i class="fas fa-camera mr-3 text-green-600"></i>店舗別投稿状況
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-12 border border-green-100">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-semibold text-gray-900">名古屋店</span>
+                                <span class="text-green-600 font-bold">24/30</span>
+                            </div>
+                            <div class="progress-bar mb-2">
+                                <div class="progress-fill progress-green" style="width: 80%"></div>
+                            </div>
+                            <div class="text-sm text-gray-600">達成率: 80% | 目標まで6件</div>
+                        </div>
+                        
+                        <div class="p-4 bg-gradient-to-r from-yellow-50 to-amber-50 rounded-12 border border-yellow-100">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-semibold text-gray-900">錦店</span>
+                                <span class="text-yellow-600 font-bold">18/30</span>
+                            </div>
+                            <div class="progress-bar mb-2">
+                                <div class="progress-fill progress-yellow" style="width: 60%"></div>
+                            </div>
+                            <div class="text-sm text-gray-600">達成率: 60% | 目標まで12件</div>
+                        </div>
+                        
+                        <div class="p-4 bg-gradient-to-r from-red-50 to-rose-50 rounded-12 border border-red-100">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-semibold text-gray-900">横浜店</span>
+                                <span class="text-red-600 font-bold">12/30</span>
+                            </div>
+                            <div class="progress-bar mb-2">
+                                <div class="progress-fill progress-red" style="width: 40%"></div>
+                            </div>
+                            <div class="text-sm text-gray-600">達成率: 40% | 目標まで18件</div>
+                        </div>
+                    </div>
                 </div>
                 
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">説明</label>
-                    <textarea id="taskDescription" class="input-field" rows="3" placeholder="タスクの詳細説明"></textarea>
+                <!-- 売上速報 -->
+                <div class="card p-6">
+                    <h3 class="text-lg font-semibold mb-6 text-gray-900 flex items-center">
+                        <i class="fas fa-yen-sign mr-3 text-blue-600"></i>本日の売上速報
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="stat-card bg-gradient-to-br from-blue-50 to-cyan-50 rounded-12 border border-blue-100">
+                            <div class="text-3xl font-bold text-blue-600">¥2,680,000</div>
+                            <div class="text-sm text-blue-800 font-medium">本日の総売上</div>
+                            <div class="text-xs text-green-600 mt-2 flex items-center justify-center">
+                                <i class="fas fa-arrow-up mr-1"></i>昨日比 +15.2%
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card bg-gradient-to-br from-green-50 to-emerald-50 rounded-12 border border-green-100">
+                            <div class="text-2xl font-bold text-green-600">¥82,500,000</div>
+                            <div class="text-sm text-green-800 font-medium">今月累計</div>
+                            <div class="text-xs text-green-600 mt-2">目標達成率: 92.1%</div>
+                        </div>
+                        
+                        <div class="grid grid-cols-3 gap-2 text-center">
+                            <div class="p-3 bg-white rounded-lg border border-gray-100">
+                                <div class="text-lg font-bold text-purple-600">¥950K</div>
+                                <div class="text-xs text-gray-600">名古屋</div>
+                            </div>
+                            <div class="p-3 bg-white rounded-lg border border-gray-100">
+                                <div class="text-lg font-bold text-indigo-600">¥820K</div>
+                                <div class="text-xs text-gray-600">錦</div>
+                            </div>
+                            <div class="p-3 bg-white rounded-lg border border-gray-100">
+                                <div class="text-lg font-bold text-pink-600">¥910K</div>
+                                <div class="text-xs text-gray-600">横浜</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 今週の予定 -->
+            <div class="card p-6">
+                <h3 class="text-lg font-semibold mb-6 text-gray-900 flex items-center">
+                    <i class="fas fa-calendar mr-3 text-indigo-600"></i>今週の予定
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-7 gap-3">
+                    <div class="calendar-day calendar-today rounded-12">
+                        <div class="font-semibold text-blue-800 mb-2">月 26</div>
+                        <div class="event-item event-meeting">月次会議</div>
+                        <div class="event-item event-deadline">売上報告</div>
+                    </div>
+                    <div class="calendar-day rounded-12">
+                        <div class="font-semibold text-gray-800 mb-2">火 27</div>
+                        <div class="text-sm text-gray-500">予定なし</div>
+                    </div>
+                    <div class="calendar-day rounded-12">
+                        <div class="font-semibold text-gray-800 mb-2">水 28</div>
+                        <div class="event-item event-shooting">撮影</div>
+                        <div class="event-item event-meeting">店長会議</div>
+                    </div>
+                    <div class="calendar-day rounded-12">
+                        <div class="font-semibold text-gray-800 mb-2">木 29</div>
+                        <div class="event-item event-deadline">給与処理</div>
+                    </div>
+                    <div class="calendar-day rounded-12">
+                        <div class="font-semibold text-gray-800 mb-2">金 30</div>
+                        <div class="event-item event-meeting">監査</div>
+                    </div>
+                    <div class="calendar-day rounded-12">
+                        <div class="font-semibold text-red-800 mb-2">土 1</div>
+                        <div class="event-item event-holiday">休業日</div>
+                    </div>
+                    <div class="calendar-day rounded-12">
+                        <div class="font-semibold text-red-800 mb-2">日 2</div>
+                        <div class="event-item event-holiday">休業日</div>
+                    </div>
                 </div>
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">担当店舗</label>
-                        <select id="taskStore" class="input-field">
-                            <option value="">店舗を選択</option>
-                            <option value="CLASSY四日市">CLASSY四日市</option>
-                            <option value="CLASSY東京">CLASSY東京</option>
-                            <option value="CLASSY名古屋">CLASSY名古屋</option>
-                            <option value="GrandOpera東京">GrandOpera東京</option>
-                            <option value="GrandOpera横浜">GrandOpera横浜</option>
-                            <option value="GrandOpera名古屋">GrandOpera名古屋</option>
-                            <option value="GrandOpera福岡">GrandOpera福岡</option>
-                            <option value="オペラ錦">オペラ錦</option>
-                            <option value="シャブール">シャブール</option>
-                            <option value="ワンカラット">ワンカラット</option>
-                        </select>
+                <div class="mt-6 flex flex-wrap gap-4 text-sm">
+                    <div class="flex items-center">
+                        <div class="w-3 h-3 bg-blue-400 rounded mr-2"></div>
+                        <span>会議</span>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="w-3 h-3 bg-green-400 rounded mr-2"></div>
+                        <span>撮影</span>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="w-3 h-3 bg-red-400 rounded mr-2"></div>
+                        <span>休業</span>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="w-3 h-3 bg-orange-400 rounded mr-2"></div>
+                        <span>提出期限</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 売上分析ページ -->
+        <div id="salesPage" class="page-content px-4 hidden">
+            <!-- 統計カード -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                <div class="card stat-card bg-gradient-to-br from-blue-50 to-cyan-50">
+                    <div class="text-3xl font-bold text-blue-600">¥280M</div>
+                    <div class="text-sm text-blue-800 font-medium">今月売上</div>
+                    <div class="text-xs text-green-600 mt-2 flex items-center justify-center">
+                        <i class="fas fa-arrow-up mr-1"></i>前年同期比 +12.5%
+                    </div>
+                </div>
+                <div class="card stat-card bg-gradient-to-br from-green-50 to-emerald-50">
+                    <div class="text-3xl font-bold text-green-600">96.2%</div>
+                    <div class="text-sm text-green-800 font-medium">目標達成率</div>
+                    <div class="text-xs text-green-600 mt-2">目標: ¥291M</div>
+                </div>
+                <div class="card stat-card bg-gradient-to-br from-purple-50 to-violet-50">
+                    <div class="text-3xl font-bold text-purple-600">3/3</div>
+                    <div class="text-sm text-purple-800 font-medium">目標達成店舗</div>
+                    <div class="text-xs text-purple-600 mt-2">全店舗達成中</div>
+                </div>
+                <div class="card stat-card bg-gradient-to-br from-orange-50 to-amber-50">
+                    <div class="text-3xl font-bold text-orange-600">¥93.3M</div>
+                    <div class="text-sm text-orange-800 font-medium">店舗平均売上</div>
+                    <div class="text-xs text-orange-600 mt-2">月平均</div>
+                </div>
+            </div>
+            
+            <!-- グラフセクション -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <div class="card p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h4 class="text-lg font-semibold text-gray-900">月別・週別売上推移</h4>
+                        <div class="flex space-x-2">
+                            <button class="btn btn-outline" onclick="toggleChartType('line')" id="lineChartBtn">線グラフ</button>
+                            <button class="btn btn-primary" onclick="toggleChartType('bar')" id="barChartBtn">棒グラフ</button>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="salesChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="card p-6">
+                    <h4 class="text-lg font-semibold text-gray-900 mb-6">店舗別ランキング（当月売上）</h4>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between p-4 bg-gradient-to-r from-yellow-50 to-amber-50 rounded-12 border-l-4 border-yellow-400">
+                            <div class="flex items-center">
+                                <div class="text-2xl mr-3">🥇</div>
+                                <div>
+                                    <div class="font-semibold text-gray-900">名古屋店</div>
+                                    <div class="text-sm text-gray-600">達成率: 105.2%</div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="font-bold text-yellow-600 text-lg">¥105.2M</div>
+                                <div class="text-xs text-green-600">+5.2%</div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-slate-50 rounded-12 border-l-4 border-gray-400">
+                            <div class="flex items-center">
+                                <div class="text-2xl mr-3">🥈</div>
+                                <div>
+                                    <div class="font-semibold text-gray-900">横浜店</div>
+                                    <div class="text-sm text-gray-600">達成率: 98.1%</div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="font-bold text-gray-600 text-lg">¥98.1M</div>
+                                <div class="text-xs text-yellow-600">-1.9%</div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center justify-between p-4 bg-gradient-to-r from-orange-50 to-amber-50 rounded-12 border-l-4 border-orange-400">
+                            <div class="flex items-center">
+                                <div class="text-2xl mr-3">🥉</div>
+                                <div>
+                                    <div class="font-semibold text-gray-900">錦店</div>
+                                    <div class="text-sm text-gray-600">達成率: 88.7%</div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="font-bold text-orange-600 text-lg">¥88.7M</div>
+                                <div class="text-xs text-red-600">-11.3%</div>
+                            </div>
+                        </div>
                     </div>
                     
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">優先度</label>
-                        <select id="taskPriority" class="input-field">
-                            <option value="低">低優先度</option>
-                            <option value="中" selected>中優先度</option>
-                            <option value="高">高優先度</option>
-                        </select>
+                    <div class="mt-6 p-4 bg-blue-50 rounded-12 border border-blue-100">
+                        <div class="text-sm font-medium text-blue-800 mb-2">前年同期比較</div>
+                        <div class="text-xs text-blue-600">
+                            <i class="fas fa-arrow-up mr-1"></i>全店舗合計: +12.5% (前年同月: ¥249M)
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 売上目標達成率 -->
+            <div class="card p-6">
+                <h4 class="text-lg font-semibold text-gray-900 mb-6">売上目標達成率（色分け表示）</h4>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="p-6 bg-gradient-to-br from-green-50 to-emerald-50 rounded-16 border-2 border-green-200">
+                        <div class="text-center">
+                            <div class="text-3xl font-bold text-green-600">105.2%</div>
+                            <div class="text-lg font-semibold text-gray-900 mt-2">名古屋店</div>
+                            <div class="badge badge-green mt-3">目標達成</div>
+                            <div class="text-sm text-gray-600 mt-2">目標: ¥100M / 実績: ¥105.2M</div>
+                        </div>
+                    </div>
+                    
+                    <div class="p-6 bg-gradient-to-br from-yellow-50 to-amber-50 rounded-16 border-2 border-yellow-200">
+                        <div class="text-center">
+                            <div class="text-3xl font-bold text-yellow-600">88.7%</div>
+                            <div class="text-lg font-semibold text-gray-900 mt-2">錦店</div>
+                            <div class="badge badge-yellow mt-3">要注意</div>
+                            <div class="text-sm text-gray-600 mt-2">目標: ¥100M / 実績: ¥88.7M</div>
+                        </div>
+                    </div>
+                    
+                    <div class="p-6 bg-gradient-to-br from-green-50 to-emerald-50 rounded-16 border-2 border-green-200">
+                        <div class="text-center">
+                            <div class="text-3xl font-bold text-green-600">98.1%</div>
+                            <div class="text-lg font-semibold text-gray-900 mt-2">横浜店</div>
+                            <div class="badge badge-green mt-3">順調</div>
+                            <div class="text-sm text-gray-600 mt-2">目標: ¥100M / 実績: ¥98.1M</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 会議資料ページ -->
+        <div id="reportsPage" class="page-content px-4 hidden">
+            <div class="card p-6 mb-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-6">会議資料ダウンロード</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="card p-6 text-center hover:shadow-lg transition-all">
+                        <div class="text-5xl mb-4">📊</div>
+                        <h4 class="font-semibold text-lg mb-2">売上まとめ資料</h4>
+                        <p class="text-sm text-gray-600 mb-4">月別・店舗別売上データと分析</p>
+                        <div class="space-y-2">
+                            <button class="btn btn-primary w-full" onclick="downloadReport('sales', 'excel')">
+                                <i class="fas fa-file-excel mr-2"></i>Excel形式
+                            </button>
+                            <button class="btn btn-outline w-full" onclick="downloadReport('sales', 'pdf')">
+                                <i class="fas fa-file-pdf mr-2"></i>PDF形式
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="card p-6 text-center hover:shadow-lg transition-all">
+                        <div class="text-5xl mb-4">🏠</div>
+                        <h4 class="font-semibold text-lg mb-2">寮管理資料</h4>
+                        <p class="text-sm text-gray-600 mb-4">入居状況・退去予定・管理状況</p>
+                        <div class="space-y-2">
+                            <button class="btn btn-primary w-full" onclick="downloadReport('dormitory', 'excel')">
+                                <i class="fas fa-file-excel mr-2"></i>Excel形式
+                            </button>
+                            <button class="btn btn-outline w-full" onclick="downloadReport('dormitory', 'pdf')">
+                                <i class="fas fa-file-pdf mr-2"></i>PDF形式
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="card p-6 text-center hover:shadow-lg transition-all">
+                        <div class="text-5xl mb-4">📱</div>
+                        <h4 class="font-semibold text-lg mb-2">投稿まとめ資料</h4>
+                        <p class="text-sm text-gray-600 mb-4">投稿数・達成率・分析データ</p>
+                        <div class="space-y-2">
+                            <button class="btn btn-primary w-full" onclick="downloadReport('posts', 'excel')">
+                                <i class="fas fa-file-excel mr-2"></i>Excel形式
+                            </button>
+                            <button class="btn btn-outline w-full" onclick="downloadReport('posts', 'pdf')">
+                                <i class="fas fa-file-pdf mr-2"></i>PDF形式
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="card p-6 text-center hover:shadow-lg transition-all">
+                        <div class="text-5xl mb-4">📋</div>
+                        <h4 class="font-semibold text-lg mb-2">総合レポート</h4>
+                        <p class="text-sm text-gray-600 mb-4">全業務統合・経営会議用</p>
+                        <div class="space-y-2">
+                            <button class="btn btn-cyan w-full" onclick="downloadReport('comprehensive', 'excel')">
+                                <i class="fas fa-file-excel mr-2"></i>Excel形式
+                            </button>
+                            <button class="btn btn-outline w-full" onclick="downloadReport('comprehensive', 'pdf')">
+                                <i class="fas fa-file-pdf mr-2"></i>PDF形式
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="card p-6 text-center hover:shadow-lg transition-all">
+                        <div class="text-5xl mb-4">📅</div>
+                        <h4 class="font-semibold text-lg mb-2">スケジュール資料</h4>
+                        <p class="text-sm text-gray-600 mb-4">予定表・会議・撮影スケジュール</p>
+                        <div class="space-y-2">
+                            <button class="btn btn-primary w-full" onclick="downloadReport('schedule', 'excel')">
+                                <i class="fas fa-file-excel mr-2"></i>Excel形式
+                            </button>
+                            <button class="btn btn-outline w-full" onclick="downloadReport('schedule', 'pdf')">
+                                <i class="fas fa-file-pdf mr-2"></i>PDF形式
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="card p-6 text-center hover:shadow-lg transition-all">
+                        <div class="text-5xl mb-4">🎯</div>
+                        <h4 class="font-semibold text-lg mb-2">月末データ</h4>
+                        <p class="text-sm text-gray-600 mb-4">月末締め・全データ一括出力</p>
+                        <div class="space-y-2">
+                            <button class="btn btn-cyan w-full" onclick="downloadMonthEndReport()">
+                                <i class="fas fa-download mr-2"></i>一括ダウンロード
+                            </button>
+                            <div class="text-xs text-gray-500 mt-2">
+                                売上・寮・投稿・スケジュール
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 最近のダウンロード履歴 -->
+            <div class="card p-6">
+                <h4 class="text-lg font-semibold text-gray-900 mb-4">最近のダウンロード履歴</h4>
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div class="flex items-center">
+                            <i class="fas fa-file-excel text-green-600 mr-3"></i>
+                            <div>
+                                <div class="font-medium">売上まとめ資料_2024年6月.xlsx</div>
+                                <div class="text-sm text-gray-500">2024-06-26 14:30</div>
+                            </div>
+                        </div>
+                        <button class="text-blue-600 hover:text-blue-800">
+                            <i class="fas fa-download"></i>
+                        </button>
+                    </div>
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div class="flex items-center">
+                            <i class="fas fa-file-pdf text-red-600 mr-3"></i>
+                            <div>
+                                <div class="font-medium">総合レポート_2024年6月.pdf</div>
+                                <div class="text-sm text-gray-500">2024-06-25 16:45</div>
+                            </div>
+                        </div>
+                        <button class="text-blue-600 hover:text-blue-800">
+                            <i class="fas fa-download"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- カレンダーページ -->
+        <div id="calendarPage" class="page-content px-4 hidden">
+            <div class="card p-6 mb-6">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4 md:mb-0">カレンダー</h3>
+                    <div class="flex flex-wrap gap-2">
+                        <button class="btn btn-primary" onclick="addEvent()">
+                            <i class="fas fa-plus mr-2"></i>予定追加
+                        </button>
+                        <button class="btn btn-outline" onclick="filterEvents('all')" id="filterAll">全予定</button>
+                        <button class="btn btn-outline" onclick="filterEvents('common')" id="filterCommon">共通予定</button>
+                        <button class="btn btn-outline" onclick="filterEvents('individual')" id="filterIndividual">個別予定</button>
+                        <button class="btn btn-cyan" onclick="syncGoogleCalendar()">
+                            <i class="fas fa-sync mr-2"></i>Google同期
+                        </button>
                     </div>
                 </div>
                 
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">期限</label>
-                    <input type="datetime-local" id="taskDueDate" class="input-field">
+                <!-- カレンダー表示 -->
+                <div class="mb-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h4 class="text-xl font-semibold text-gray-900">2024年6月</h4>
+                        <div class="flex space-x-2">
+                            <button class="btn btn-outline" onclick="previousMonth()">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <button class="btn btn-outline" onclick="nextMonth()">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-7 gap-1 mb-2">
+                        <div class="p-3 text-center font-semibold bg-red-50 text-red-800 rounded-lg">日</div>
+                        <div class="p-3 text-center font-semibold bg-gray-50 rounded-lg">月</div>
+                        <div class="p-3 text-center font-semibold bg-gray-50 rounded-lg">火</div>
+                        <div class="p-3 text-center font-semibold bg-gray-50 rounded-lg">水</div>
+                        <div class="p-3 text-center font-semibold bg-gray-50 rounded-lg">木</div>
+                        <div class="p-3 text-center font-semibold bg-gray-50 rounded-lg">金</div>
+                        <div class="p-3 text-center font-semibold bg-blue-50 text-blue-800 rounded-lg">土</div>
+                    </div>
+                    
+                    <div class="grid grid-cols-7 gap-1" id="calendarGrid">
+                        <!-- カレンダーの日付を動的に生成 -->
+                    </div>
                 </div>
-                
-                <div class="flex space-x-3 pt-4">
-                    <button id="saveTaskButton" class="btn btn-primary flex-1" onclick="saveTask()">
-                        <i class="fas fa-save mr-2"></i>保存
-                    </button>
-                    <button class="btn btn-secondary" onclick="closeTaskModal()">
-                        キャンセル
-                    </button>
+            </div>
+            
+            <!-- 今日の予定詳細 -->
+            <div class="card p-6">
+                <h4 class="text-lg font-semibold text-gray-900 mb-4">今日の予定詳細</h4>
+                <div class="space-y-4">
+                    <div class="p-4 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-12 border-l-4 border-blue-400">
+                        <div class="flex items-center justify-between">
+                            <div class="flex-1">
+                                <div class="font-semibold text-gray-900">月次会議</div>
+                                <div class="text-sm text-gray-600">10:00 - 12:00 | 会議室A</div>
+                                <div class="text-xs text-blue-600 mt-1">参加者: 川満さん、店長3名</div>
+                            </div>
+                            <span class="badge badge-blue">会議</span>
+                        </div>
+                    </div>
+                    
+                    <div class="p-4 bg-gradient-to-r from-orange-50 to-amber-50 rounded-12 border-l-4 border-orange-400">
+                        <div class="flex items-center justify-between">
+                            <div class="flex-1">
+                                <div class="font-semibold text-gray-900">売上報告提出期限</div>
+                                <div class="text-sm text-gray-600">17:00まで | 各店舗</div>
+                                <div class="text-xs text-orange-600 mt-1">名古屋・錦・横浜店</div>
+                            </div>
+                            <span class="badge badge-yellow">提出期限</span>
+                        </div>
+                    </div>
+                    
+                    <div class="p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-12 border-l-4 border-green-400">
+                        <div class="flex items-center justify-between">
+                            <div class="flex-1">
+                                <div class="font-semibold text-gray-900">プロモーション撮影確認</div>
+                                <div class="text-sm text-gray-600">15:00 - 16:00 | 名古屋店</div>
+                                <div class="text-xs text-green-600 mt-1">カメラマン: 田中さん</div>
+                            </div>
+                            <span class="badge badge-green">撮影</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -616,649 +905,101 @@
 
     <script>
         // === グローバル変数 ===
-        const CORRECT_PASSWORD = 'iam1104JP';
-        let isLoggedIn = false;
-        let tasks = [];
-        let editingTaskId = null;
-        let currentTab = 'dashboard';
-
-        // === メイン初期化処理 ===
+        let currentPage = 'dashboard';
+        let sidebarOpen = false;
+        let salesChart = null;
+        let currentChartType = 'bar';
+        
+        // === 初期化 ===
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('=== Rispondere AI Secretary v4 起動 ===');
-            
-            // 要素の取得とイベントリスナー設定
-            setupEventListeners();
+            console.log('CLASSY業務ダッシュボード起動');
             
             // 時刻更新
             updateDateTime();
             setInterval(updateDateTime, 60000);
             
-            // ログイン状態チェック
-            checkLoginStatus();
+            // チャート初期化
+            initializeSalesChart();
             
-            // タスクデータの読み込み
-            loadTasks();
+            // カレンダー初期化
+            generateCalendar();
+            
+            // デフォルトページ表示
+            showPage('dashboard');
             
             console.log('初期化完了');
         });
-
-        // === イベントリスナー設定 ===
-        function setupEventListeners() {
-            const passwordInput = document.getElementById('passwordInput');
-            const loginButton = document.getElementById('loginButton');
-            const skipButton = document.getElementById('skipButton');
-            const logoutButton = document.getElementById('logoutButton');
+        
+        // === ナビゲーション ===
+        function toggleSidebar() {
+            sidebarOpen = !sidebarOpen;
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
             
-            if (loginButton) {
-                loginButton.addEventListener('click', handleLogin);
-            }
-            
-            if (skipButton) {
-                skipButton.addEventListener('click', handleSkipLogin);
-            }
-            
-            if (logoutButton) {
-                logoutButton.addEventListener('click', handleLogout);
-            }
-            
-            if (passwordInput) {
-                passwordInput.addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter') {
-                        handleLogin();
-                    }
-                });
-                passwordInput.focus();
-            }
-        }
-
-        // === ログイン処理 ===
-        function handleLogin() {
-            const passwordInput = document.getElementById('passwordInput');
-            if (!passwordInput) {
-                alert('エラー: パスワード入力フィールドが見つかりません');
-                return;
-            }
-            
-            const password = passwordInput.value.trim();
-            
-            if (!password) {
-                alert('パスワードを入力してください');
-                passwordInput.focus();
-                return;
-            }
-            
-            if (password === CORRECT_PASSWORD) {
-                sessionStorage.setItem('isLoggedIn', 'true');
-                sessionStorage.setItem('loginTime', Date.now().toString());
-                isLoggedIn = true;
-                
-                alert('✅ ログイン成功！\nRispondereシステムへようこそ');
-                showDashboard();
+            if (sidebarOpen) {
+                sidebar.classList.add('active');
+                overlay.classList.add('active');
             } else {
-                alert('❌ パスワードが間違っています');
-                passwordInput.value = '';
-                passwordInput.focus();
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
             }
         }
-
-        function handleSkipLogin() {
-            if (confirm('ログインをスキップしてデモモードで起動しますか？')) {
-                sessionStorage.setItem('isLoggedIn', 'demo');
-                sessionStorage.setItem('loginTime', Date.now().toString());
-                isLoggedIn = true;
-                
-                alert('🔓 デモモードで起動しました');
-                showDashboard();
-            }
+        
+        function closeSidebar() {
+            sidebarOpen = false;
+            document.getElementById('sidebar').classList.remove('active');
+            document.getElementById('overlay').classList.remove('active');
         }
-
-        function handleLogout() {
-            if (confirm('ログアウトしますか？')) {
-                sessionStorage.removeItem('isLoggedIn');
-                sessionStorage.removeItem('loginTime');
-                isLoggedIn = false;
-                
-                alert('ログアウトしました');
-                showLoginScreen();
-            }
-        }
-
-        function checkLoginStatus() {
-            const loginStatus = sessionStorage.getItem('isLoggedIn');
-            
-            if (loginStatus === 'true' || loginStatus === 'demo') {
-                isLoggedIn = true;
-                showDashboard();
-            } else {
-                showLoginScreen();
-            }
-        }
-
-        // === 画面表示制御 ===
-        function showLoginScreen() {
-            document.getElementById('loginScreen').classList.remove('hidden');
-            document.getElementById('mainDashboard').classList.add('hidden');
-            
-            const passwordInput = document.getElementById('passwordInput');
-            if (passwordInput) {
-                passwordInput.value = '';
-                setTimeout(() => passwordInput.focus(), 100);
-            }
-        }
-
-        function showDashboard() {
-            document.getElementById('loginScreen').classList.add('hidden');
-            document.getElementById('mainDashboard').classList.remove('hidden');
-            
-            updateStats();
-            updateRecentTasks();
-        }
-
-        // === タブ管理 ===
-        function showTab(tabName) {
-            // 全てのタブコンテンツを非表示
-            const tabs = ['dashboard', 'tasks', 'stores', 'reports', 'ai'];
-            tabs.forEach(tab => {
-                document.getElementById(tab + 'Tab').classList.remove('active');
-            });
-            
-            // 全てのタブボタンからactiveクラスを削除
-            document.querySelectorAll('.tab-button').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            
-            // 選択されたタブを表示
-            document.getElementById(tabName + 'Tab').classList.add('active');
-            
-            // 対応するタブボタンにactiveクラスを追加
-            const buttons = document.querySelectorAll('.tab-button');
-            const tabTexts = ['ダッシュボード', 'タスク管理', '店舗管理', 'レポート', 'AI分析'];
-            const tabIndex = tabs.indexOf(tabName);
-            if (tabIndex !== -1 && buttons[tabIndex]) {
-                buttons[tabIndex].classList.add('active');
-            }
-            
-            currentTab = tabName;
-            
-            // タスクタブの場合、タスクリストを更新
-            if (tabName === 'tasks') {
-                renderTasks();
-            }
-        }
-
-        // === タスク管理機能 ===
-        function loadTasks() {
-            const savedTasks = localStorage.getItem('rispondere_tasks');
-            if (savedTasks) {
-                tasks = JSON.parse(savedTasks);
-            } else {
-                // サンプルタスクを作成
-                tasks = [
-                    {
-                        id: 1,
-                        title: '月次売上レポート作成',
-                        description: '各店舗の月次売上データをまとめ、分析レポートを作成する',
-                        store: 'CLASSY四日市',
-                        priority: '高',
-                        dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-                        completed: false,
-                        createdAt: new Date().toISOString()
-                    },
-                    {
-                        id: 2,
-                        title: 'スタッフ研修資料準備',
-                        description: '新人スタッフ向けの研修資料を準備し、研修スケジュールを調整する',
-                        store: 'GrandOpera東京',
-                        priority: '中',
-                        dueDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
-                        completed: false,
-                        createdAt: new Date().toISOString()
-                    },
-                    {
-                        id: 3,
-                        title: '在庫管理システム更新',
-                        description: '在庫管理システムのデータを最新状態に更新し、不足商品をチェックする',
-                        store: 'シャブール',
-                        priority: '中',
-                        dueDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
-                        completed: true,
-                        createdAt: new Date().toISOString()
-                    }
-                ];
-                saveTasks();
-            }
-        }
-
-        function saveTasks() {
-            localStorage.setItem('rispondere_tasks', JSON.stringify(tasks));
-        }
-
-        function renderTasks() {
-            const taskList = document.getElementById('taskList');
-            const filteredTasks = getFilteredTasks();
-            
-            if (filteredTasks.length === 0) {
-                taskList.innerHTML = '<p class="text-gray-500 text-center py-8">条件に一致するタスクがありません</p>';
-                return;
-            }
-            
-            taskList.innerHTML = filteredTasks.map(task => `
-                <div class="task-item p-4 bg-white rounded-lg border ${task.completed ? 'task-completed' : ''} priority-${task.priority === '高' ? 'high' : task.priority === '中' ? 'medium' : 'low'}">
-                    <div class="flex items-start justify-between">
-                        <div class="flex-1">
-                            <div class="flex items-center space-x-3 mb-2">
-                                <input type="checkbox" ${task.completed ? 'checked' : ''} 
-                                       onchange="toggleTaskComplete(${task.id})" 
-                                       class="w-4 h-4 text-blue-600 rounded">
-                                <h4 class="font-semibold ${task.completed ? 'line-through' : ''}">${task.title}</h4>
-                                <span class="px-2 py-1 text-xs rounded-full ${getPriorityColor(task.priority)}">${task.priority}</span>
-                                ${task.store ? `<span class="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded-full">${task.store}</span>` : ''}
-                            </div>
-                            <p class="text-gray-600 text-sm mb-2">${task.description}</p>
-                            <div class="flex items-center space-x-4 text-xs text-gray-500">
-                                <span><i class="fas fa-calendar mr-1"></i>${formatDate(task.dueDate)}</span>
-                                <span><i class="fas fa-plus mr-1"></i>${formatDate(task.createdAt)}</span>
-                            </div>
-                        </div>
-                        <div class="flex space-x-2 ml-4">
-                            <button onclick="editTask(${task.id})" class="text-blue-600 hover:text-blue-800">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button onclick="deleteTask(${task.id})" class="text-red-600 hover:text-red-800">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function getFilteredTasks() {
-            const search = document.getElementById('taskSearch')?.value.toLowerCase() || '';
-            const storeFilter = document.getElementById('storeFilter')?.value || '';
-            const priorityFilter = document.getElementById('priorityFilter')?.value || '';
-            const statusFilter = document.getElementById('statusFilter')?.value || '';
-            
-            return tasks.filter(task => {
-                const matchesSearch = task.title.toLowerCase().includes(search) || 
-                                    task.description.toLowerCase().includes(search);
-                const matchesStore = !storeFilter || task.store === storeFilter;
-                const matchesPriority = !priorityFilter || task.priority === priorityFilter;
-                const matchesStatus = !statusFilter || 
-                                    (statusFilter === '完了' && task.completed) ||
-                                    (statusFilter === '未完了' && !task.completed);
-                
-                return matchesSearch && matchesStore && matchesPriority && matchesStatus;
-            });
-        }
-
-        function filterTasks() {
-            renderTasks();
-        }
-
-        function getPriorityColor(priority) {
-            switch(priority) {
-                case '高': return 'bg-red-100 text-red-800';
-                case '中': return 'bg-yellow-100 text-yellow-800';
-                case '低': return 'bg-green-100 text-green-800';
-                default: return 'bg-gray-100 text-gray-800';
-            }
-        }
-
-        function formatDate(dateString) {
-            if (!dateString) return '未設定';
-            const date = new Date(dateString);
-            return date.toLocaleDateString('ja-JP', { 
-                year: 'numeric', 
-                month: 'numeric', 
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-        }
-
-        function openTaskModal(taskId = null) {
-            editingTaskId = taskId;
-            const modal = document.getElementById('taskModal');
-            const modalTitle = document.getElementById('modalTitle');
-            
-            if (taskId) {
-                const task = tasks.find(t => t.id === taskId);
-                if (task) {
-                    modalTitle.textContent = 'タスクを編集';
-                    document.getElementById('taskTitle').value = task.title;
-                    document.getElementById('taskDescription').value = task.description;
-                    document.getElementById('taskStore').value = task.store || '';
-                    document.getElementById('taskPriority').value = task.priority;
-                    document.getElementById('taskDueDate').value = task.dueDate ? new Date(task.dueDate).toISOString().slice(0, 16) : '';
+        
+        function showPage(pageName) {
+            // すべてのページを非表示
+            const pages = ['dashboard', 'sales', 'reports', 'calendar'];
+            pages.forEach(page => {
+                const pageElement = document.getElementById(page + 'Page');
+                if (pageElement) {
+                    pageElement.classList.add('hidden');
                 }
-            } else {
-                modalTitle.textContent = '新しいタスクを追加';
-                document.getElementById('taskTitle').value = '';
-                document.getElementById('taskDescription').value = '';
-                document.getElementById('taskStore').value = '';
-                document.getElementById('taskPriority').value = '中';
-                document.getElementById('taskDueDate').value = '';
+            });
+            
+            // ナビゲーションのアクティブ状態をリセット
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // 選択されたページを表示
+            const targetPage = document.getElementById(pageName + 'Page');
+            if (targetPage) {
+                targetPage.classList.remove('hidden');
+                targetPage.classList.add('fade-in');
             }
             
-            modal.classList.remove('hidden');
-        }
-
-        function closeTaskModal() {
-            document.getElementById('taskModal').classList.add('hidden');
-            editingTaskId = null;
-        }
-
-        function saveTask() {
-            const title = document.getElementById('taskTitle').value.trim();
-            const description = document.getElementById('taskDescription').value.trim();
-            const store = document.getElementById('taskStore').value;
-            const priority = document.getElementById('taskPriority').value;
-            const dueDate = document.getElementById('taskDueDate').value;
-            
-            if (!title) {
-                alert('タスク名を入力してください');
-                return;
+            // 対応するナビゲーションアイテムをアクティブに
+            const navItems = document.querySelectorAll('.nav-item');
+            const pageIndex = pages.indexOf(pageName);
+            if (pageIndex !== -1 && navItems[pageIndex]) {
+                navItems[pageIndex].classList.add('active');
             }
             
-            if (editingTaskId) {
-                // 編集モード
-                const taskIndex = tasks.findIndex(t => t.id === editingTaskId);
-                if (taskIndex !== -1) {
-                    tasks[taskIndex] = {
-                        ...tasks[taskIndex],
-                        title,
-                        description,
-                        store,
-                        priority,
-                        dueDate: dueDate || null,
-                        updatedAt: new Date().toISOString()
-                    };
-                }
-            } else {
-                // 新規作成モード
-                const newTask = {
-                    id: Date.now(),
-                    title,
-                    description,
-                    store,
-                    priority,
-                    dueDate: dueDate || null,
-                    completed: false,
-                    createdAt: new Date().toISOString()
-                };
-                tasks.unshift(newTask);
-            }
-            
-            saveTasks();
-            renderTasks();
-            updateStats();
-            updateRecentTasks();
-            closeTaskModal();
-            
-            alert(editingTaskId ? 'タスクを更新しました' : 'タスクを追加しました');
-        }
-
-        function editTask(taskId) {
-            openTaskModal(taskId);
-        }
-
-        function deleteTask(taskId) {
-            if (confirm('このタスクを削除しますか？')) {
-                tasks = tasks.filter(t => t.id !== taskId);
-                saveTasks();
-                renderTasks();
-                updateStats();
-                updateRecentTasks();
-                alert('タスクを削除しました');
-            }
-        }
-
-        function toggleTaskComplete(taskId) {
-            const task = tasks.find(t => t.id === taskId);
-            if (task) {
-                task.completed = !task.completed;
-                task.completedAt = task.completed ? new Date().toISOString() : null;
-                saveTasks();
-                renderTasks();
-                updateStats();
-                updateRecentTasks();
-            }
-        }
-
-        // === 統計更新 ===
-        function updateStats() {
-            const taskCount = document.getElementById('taskCount');
-            if (taskCount) {
-                const incompleteTasks = tasks.filter(t => !t.completed).length;
-                taskCount.textContent = incompleteTasks;
-            }
-        }
-
-        function updateRecentTasks() {
-            const recentTasksContainer = document.getElementById('recentTasks');
-            if (!recentTasksContainer) return;
-            
-            const recentTasks = tasks
-                .filter(t => !t.completed)
-                .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-                .slice(0, 5);
-            
-            if (recentTasks.length === 0) {
-                recentTasksContainer.innerHTML = '<p class="text-gray-500 text-center py-8">最近のタスクがありません</p>';
-                return;
-            }
-            
-            recentTasksContainer.innerHTML = recentTasks.map(task => `
-                <div class="p-3 bg-white rounded-lg border border-gray-200 hover:shadow-md transition-all cursor-pointer" onclick="showTab('tasks')">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h5 class="font-medium text-sm">${task.title}</h5>
-                            <p class="text-xs text-gray-500">${task.store || '店舗未指定'} • ${task.priority}優先度</p>
-                        </div>
-                        <span class="px-2 py-1 text-xs rounded-full ${getPriorityColor(task.priority)}">${task.priority}</span>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // === データ管理 ===
-        function exportTasks() {
-            const dataStr = JSON.stringify(tasks, null, 2);
-            const dataBlob = new Blob([dataStr], {type: 'application/json'});
-            
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(dataBlob);
-            link.download = `rispondere_tasks_${new Date().toISOString().split('T')[0]}.json`;
-            link.click();
-            
-            alert('タスクデータをエクスポートしました');
-        }
-
-        function importTasks(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const importedTasks = JSON.parse(e.target.result);
-                    if (Array.isArray(importedTasks)) {
-                        if (confirm('既存のタスクに追加しますか？（キャンセルすると既存タスクは削除されます）')) {
-                            tasks = [...tasks, ...importedTasks];
-                        } else {
-                            tasks = importedTasks;
-                        }
-                        saveTasks();
-                        renderTasks();
-                        updateStats();
-                        updateRecentTasks();
-                        alert('タスクデータをインポートしました');
-                    } else {
-                        alert('無効なファイル形式です');
-                    }
-                } catch (error) {
-                    alert('ファイルの読み込みに失敗しました');
-                }
+            // ページタイトルを更新
+            const pageTitles = {
+                'dashboard': 'ダッシュボード',
+                'sales': '売上分析',
+                'reports': '会議資料',
+                'calendar': 'カレンダー'
             };
-            reader.readAsText(file);
-            
-            // ファイル入力をリセット
-            event.target.value = '';
-        }
-
-        // === レポート機能 ===
-        function generateReport(type) {
-            const reportOutput = document.getElementById('reportOutput');
-            const reportContent = document.getElementById('reportContent');
-            
-            let report = '';
-            
-            switch(type) {
-                case 'task':
-                    report = generateTaskReport();
-                    break;
-                case 'store':
-                    report = generateStoreReport();
-                    break;
-                case 'monthly':
-                    report = generateMonthlyReport();
-                    break;
-                case 'export':
-                    exportToExcel();
-                    return;
-                default:
-                    report = '不明なレポートタイプです';
+            const titleElement = document.getElementById('currentPageTitle');
+            if (titleElement) {
+                titleElement.textContent = pageTitles[pageName];
             }
             
-            reportContent.innerHTML = report;
-            reportOutput.classList.remove('hidden');
+            currentPage = pageName;
+            
+            // モバイルでサイドバーを閉じる
+            if (window.innerWidth < 768) {
+                closeSidebar();
+            }
         }
-
-        function generateTaskReport() {
-            const totalTasks = tasks.length;
-            const completedTasks = tasks.filter(t => t.completed).length;
-            const pendingTasks = totalTasks - completedTasks;
-            const completionRate = totalTasks > 0 ? ((completedTasks / totalTasks) * 100).toFixed(1) : 0;
-            
-            const priorityStats = {
-                '高': tasks.filter(t => t.priority === '高').length,
-                '中': tasks.filter(t => t.priority === '中').length,
-                '低': tasks.filter(t => t.priority === '低').length
-            };
-            
-            return `
-                <h5 class="font-semibold mb-3">タスクレポート</h5>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                    <div class="text-center p-3 bg-blue-50 rounded">
-                        <div class="text-2xl font-bold text-blue-600">${totalTasks}</div>
-                        <div class="text-sm text-blue-800">総タスク数</div>
-                    </div>
-                    <div class="text-center p-3 bg-green-50 rounded">
-                        <div class="text-2xl font-bold text-green-600">${completedTasks}</div>
-                        <div class="text-sm text-green-800">完了済み</div>
-                    </div>
-                    <div class="text-center p-3 bg-yellow-50 rounded">
-                        <div class="text-2xl font-bold text-yellow-600">${pendingTasks}</div>
-                        <div class="text-sm text-yellow-800">未完了</div>
-                    </div>
-                    <div class="text-center p-3 bg-purple-50 rounded">
-                        <div class="text-2xl font-bold text-purple-600">${completionRate}%</div>
-                        <div class="text-sm text-purple-800">完了率</div>
-                    </div>
-                </div>
-                <div class="mt-4">
-                    <h6 class="font-medium mb-2">優先度別統計</h6>
-                    <div class="space-y-2">
-                        <div class="flex justify-between"><span>高優先度:</span> <span>${priorityStats['高']}件</span></div>
-                        <div class="flex justify-between"><span>中優先度:</span> <span>${priorityStats['中']}件</span></div>
-                        <div class="flex justify-between"><span>低優先度:</span> <span>${priorityStats['低']}件</span></div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function generateStoreReport() {
-            const stores = ['CLASSY四日市', 'CLASSY東京', 'CLASSY名古屋', 'GrandOpera東京', 'GrandOpera横浜', 'GrandOpera名古屋', 'GrandOpera福岡', 'オペラ錦', 'シャブール', 'ワンカラット'];
-            const storePerformance = [92, 78, 85, 94, 87, 91, 98, 82, 89, 86];
-            
-            let reportContent = '<h5 class="font-semibold mb-3">店舗パフォーマンスレポート</h5>';
-            reportContent += '<div class="space-y-3">';
-            
-            stores.forEach((store, index) => {
-                const performance = storePerformance[index];
-                const taskCount = tasks.filter(t => t.store === store).length;
-                const completedCount = tasks.filter(t => t.store === store && t.completed).length;
-                
-                reportContent += `
-                    <div class="p-3 border rounded-lg">
-                        <div class="flex justify-between items-center">
-                            <span class="font-medium">${store}</span>
-                            <span class="text-lg font-bold ${performance >= 90 ? 'text-green-600' : performance >= 80 ? 'text-yellow-600' : 'text-red-600'}">${performance}%</span>
-                        </div>
-                        <div class="text-sm text-gray-600 mt-1">
-                            タスク: ${completedCount}/${taskCount}完了
-                        </div>
-                    </div>
-                `;
-            });
-            
-            reportContent += '</div>';
-            return reportContent;
-        }
-
-        function generateMonthlyReport() {
-            const now = new Date();
-            const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-            const monthTasks = tasks.filter(t => new Date(t.createdAt) >= monthStart);
-            const completedThisMonth = monthTasks.filter(t => t.completed).length;
-            
-            return `
-                <h5 class="font-semibold mb-3">月次サマリーレポート (${now.getFullYear()}年${now.getMonth() + 1}月)</h5>
-                <div class="grid grid-cols-2 gap-4 mb-4">
-                    <div class="text-center p-3 bg-blue-50 rounded">
-                        <div class="text-2xl font-bold text-blue-600">${monthTasks.length}</div>
-                        <div class="text-sm text-blue-800">今月のタスク</div>
-                    </div>
-                    <div class="text-center p-3 bg-green-50 rounded">
-                        <div class="text-2xl font-bold text-green-600">${completedThisMonth}</div>
-                        <div class="text-sm text-green-800">完了済み</div>
-                    </div>
-                </div>
-                <div class="text-sm text-gray-600">
-                    <p>• 平均店舗達成率: 87.2%</p>
-                    <p>• 最高パフォーマンス: GrandOpera福岡 (98%)</p>
-                    <p>• 改善が必要: CLASSY東京 (78%)</p>
-                </div>
-            `;
-        }
-
-        function exportToExcel() {
-            // 簡易的なCSV出力
-            const headers = ['ID', 'タスク名', '説明', '店舗', '優先度', '期限', 'ステータス', '作成日'];
-            const csvContent = [
-                headers.join(','),
-                ...tasks.map(task => [
-                    task.id,
-                    `"${task.title}"`,
-                    `"${task.description}"`,
-                    task.store || '',
-                    task.priority,
-                    task.dueDate ? formatDate(task.dueDate) : '',
-                    task.completed ? '完了' : '未完了',
-                    formatDate(task.createdAt)
-                ].join(','))
-            ].join('\n');
-            
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `rispondere_report_${new Date().toISOString().split('T')[0]}.csv`;
-            link.click();
-            
-            alert('レポートをCSVファイルとしてエクスポートしました');
-        }
-
+        
         // === 日時更新 ===
         function updateDateTime() {
             const now = new Date();
@@ -1278,169 +1019,364 @@
             
             if (currentDate) currentDate.textContent = dateStr;
             if (currentTime) currentTime.textContent = timeStr;
-        }
-
-        // === ChatGPTプロンプト機能 ===
-        function copyAnalysisPrompt() {
-            const prompt = `以下の売上データを分析して、改善点と戦略を提案してください：
-
-【分析対象】
-- 会社名：有限会社Rispondere
-- 店舗数：10店舗（CLASSY四日市、CLASSY東京、CLASSY名古屋、GrandOpera東京、GrandOpera横浜、GrandOpera名古屋、GrandOpera福岡、オペラ錦、シャブール、ワンカラット）
-- 期間：[期間を入力]
-- データ：[売上、写メ日記、口コミ数等]
-
-【求める分析】
-1. 売上トレンドの分析
-2. 店舗間比較
-3. 改善ポイントの特定
-4. 具体的なアクションプラン
-
-データ：[ここにデータを貼り付け]`;
-
-            copyToClipboard(prompt);
-            alert('📊 売上データ分析プロンプトをコピーしました！');
-        }
-
-        function copyReportPrompt() {
-            const prompt = `以下の情報を基に、経営陣向けの月次レポートを作成してください：
-
-【会社情報】
-- 会社名：有限会社Rispondere
-- 店舗数：10店舗
-- 業種：サービス業
-
-【今月の実績】
-- 総売上：[金額]
-- 目標達成率：[パーセンテージ]
-- 各店舗状況：[詳細]
-
-【要求事項】
-- エグゼクティブサマリー
-- 数値分析
-- 課題と対策
-- 来月の施策提案
-
-形式：ビジネス文書として簡潔に`;
-
-            copyToClipboard(prompt);
-            alert('📄 月次レポート作成プロンプトをコピーしました！');
-        }
-
-        function copyStrategyPrompt() {
-            const prompt = `店舗のパフォーマンス向上のための改善提案をお願いします：
-
-【店舗情報】
-- 会社名：有限会社Rispondere
-- 店舗名：[店舗名を選択]
-- 現在の課題：[具体的な課題]
-- 目標：[改善したい指標]
-
-【現状データ】
-- 売上推移：[データ]
-- 顧客動向：[データ]
-- 競合状況：[情報]
-
-【提案内容】
-1. 短期改善策（1-3ヶ月）
-2. 中期戦略（3-6ヶ月）
-3. 投資対効果の予測
-4. 実行スケジュール
-
-実現可能で具体的な提案をお願いします。`;
-
-            copyToClipboard(prompt);
-            alert('💡 店舗改善提案プロンプトをコピーしました！');
-        }
-
-        function copyTrendPrompt() {
-            const prompt = `業界トレンドを分析し、今後の戦略を提案してください：
-
-【分析項目】
-- 業界全体の動向
-- 顧客行動の変化
-- 競合他社の動き
-- 技術革新の影響
-
-【当社データ】
-- 会社名：有限会社Rispondere
-- 事業内容：10店舗運営
-- 売上推移：[データ]
-- 顧客層：[情報]
-- 強み・弱み：[分析]
-
-【求める提案】
-1. 今後6ヶ月の予測
-2. 機会とリスク
-3. 戦略的対応策
-4. 投資優先順位
-
-データドリブンな分析をお願いします。`;
-
-            copyToClipboard(prompt);
-            alert('📈 トレンド分析・予測プロンプトをコピーしました！');
-        }
-
-        function copyTaskAnalysisPrompt() {
-            const taskData = tasks.map(task => ({
-                title: task.title,
-                store: task.store,
-                priority: task.priority,
-                completed: task.completed,
-                dueDate: task.dueDate
-            }));
-
-            const prompt = `以下のタスク管理データを分析して、業務効率改善の提案をお願いします：
-
-【分析対象】
-- 会社名：有限会社Rispondere
-- タスクデータ：${JSON.stringify(taskData, null, 2)}
-
-【求める分析】
-1. タスク完了率の分析
-2. 店舗別業務負荷の評価
-3. 優先度設定の適切性
-4. 業務効率改善の提案
-5. タスク管理プロセスの最適化
-
-【提案内容】
-- 具体的な改善策
-- 優先順位の見直し
-- 作業分散の提案
-- 効率化ツールの活用
-
-実用的で実装可能な提案をお願いします。`;
-
-            copyToClipboard(prompt);
-            alert('📊 タスク効率分析プロンプトをコピーしました！');
-        }
-
-        function copyToClipboard(text) {
-            if (navigator.clipboard) {
-                navigator.clipboard.writeText(text).then(() => {
-                    console.log('クリップボードにコピー成功');
-                }).catch(err => {
-                    console.error('クリップボードコピー失敗:', err);
-                    fallbackCopy(text);
+            
+            // 最終更新時刻も更新
+            const lastUpdate = document.getElementById('lastUpdate');
+            if (lastUpdate) {
+                lastUpdate.textContent = now.toLocaleString('ja-JP', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit'
                 });
-            } else {
-                fallbackCopy(text);
             }
         }
-
-        function fallbackCopy(text) {
-            const textArea = document.createElement('textarea');
-            textArea.value = text;
-            document.body.appendChild(textArea);
-            textArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textArea);
+        
+        // === タスク管理 ===
+        function toggleTask(checkbox) {
+            const taskItem = checkbox.closest('.task-item');
+            const taskText = taskItem.querySelector('.task-text');
+            const badge = taskItem.querySelector('.badge');
+            
+            if (checkbox.checked) {
+                taskItem.classList.add('task-completed');
+                badge.textContent = '完了';
+                badge.className = 'badge badge-green';
+            } else {
+                taskItem.classList.remove('task-completed');
+                // 元のバッジ状態に戻す（簡易実装）
+                badge.textContent = '進行中';
+                badge.className = 'badge badge-yellow';
+            }
         }
-
-        // === 初期化時にダッシュボードタブを表示 ===
-        window.addEventListener('load', function() {
-            showTab('dashboard');
+        
+        function refreshTasks() {
+            // Google Sheets からタスクデータを更新
+            const btn = event.target;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>更新中...';
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                alert('タスクリストを更新しました');
+            }, 1500);
+        }
+        
+        // === Google連携 ===
+        function syncGoogleData() {
+            const btn = event.target;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>同期中...';
+            btn.disabled = true;
+            
+            // Google Sheets & Calendar 同期の模擬処理
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                
+                // 成功メッセージ
+                showNotification('Google データの同期が完了しました', 'success');
+                
+                // データ更新
+                updateDateTime();
+            }, 2000);
+        }
+        
+        function syncGoogleCalendar() {
+            const btn = event.target;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>同期中...';
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                showNotification('Googleカレンダーと同期しました', 'success');
+            }, 1500);
+        }
+        
+        // === チャート機能 ===
+        function initializeSalesChart() {
+            const ctx = document.getElementById('salesChart');
+            if (!ctx) return;
+            
+            const data = {
+                labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
+                datasets: [{
+                    label: '売上（百万円）',
+                    data: [245, 268, 225, 298, 275, 280],
+                    backgroundColor: 'rgba(59, 130, 246, 0.8)',
+                    borderColor: '#3b82f6',
+                    borderWidth: 2,
+                    tension: 0.3
+                }, {
+                    label: '前年同期',
+                    data: [220, 235, 210, 265, 245, 249],
+                    backgroundColor: 'rgba(6, 182, 212, 0.6)',
+                    borderColor: '#06b6d4',
+                    borderWidth: 2,
+                    tension: 0.3
+                }]
+            };
+            
+            salesChart = new Chart(ctx, {
+                type: 'bar',
+                data: data,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    }
+                }
+            });
+        }
+        
+        function toggleChartType(type) {
+            if (!salesChart) return;
+            
+            // ボタンの状態更新
+            document.getElementById('lineChartBtn').className = type === 'line' ? 'btn btn-primary' : 'btn btn-outline';
+            document.getElementById('barChartBtn').className = type === 'bar' ? 'btn btn-primary' : 'btn btn-outline';
+            
+            // チャートタイプ変更
+            salesChart.config.type = type;
+            salesChart.update('active');
+            currentChartType = type;
+        }
+        
+        // === レポート機能 ===
+        function downloadReport(reportType, format) {
+            // レポートデータの生成
+            let data = [];
+            let filename = '';
+            
+            switch(reportType) {
+                case 'sales':
+                    data = [
+                        ['店舗名', '1月', '2月', '3月', '4月', '5月', '6月', '累計', '達成率'],
+                        ['名古屋店', '105,200,000', '112,300,000', '98,500,000', '118,700,000', '108,900,000', '105,200,000', '648,800,000', '105.2%'],
+                        ['錦店', '82,500,000', '88,700,000', '75,200,000', '95,100,000', '85,300,000', '88,700,000', '515,500,000', '88.7%'],
+                        ['横浜店', '92,800,000', '98,100,000', '89,300,000', '102,500,000', '95,700,000', '98,100,000', '576,500,000', '98.1%'],
+                        ['', '', '', '', '', '', '', '', ''],
+                        ['合計', '280,500,000', '299,100,000', '263,000,000', '316,300,000', '289,900,000', '291,900,000', '1,740,700,000', '96.2%']
+                    ];
+                    filename = `売上まとめ資料_${new Date().getFullYear()}年${new Date().getMonth() + 1}月`;
+                    break;
+                    
+                case 'dormitory':
+                    data = [
+                        ['部屋番号', '入居者名', '入居日', '退去予定', '清掃状況', 'ステータス', '備考'],
+                        ['101', '田中 美咲', '2024-01-15', '2024-07-15', '完了', '退去予定', '7月中旬退去'],
+                        ['102', '佐藤 花音', '2024-03-01', '-', '完了', '入居中', '長期入居'],
+                        ['103', '鈴木 愛子', '2024-02-10', '-', '未完了', '入居中', '清掃要'],
+                        ['201', '高橋 麗奈', '2024-04-01', '-', '完了', '入居中', '新規入居'],
+                        ['202', '', '', '', '', '空室', '募集中']
+                    ];
+                    filename = `寮管理資料_${new Date().getFullYear()}年${new Date().getMonth() + 1}月`;
+                    break;
+                    
+                case 'posts':
+                    data = [
+                        ['店舗名', '目標投稿数', '実投稿数', '達成率', '前月比', '未達成者数'],
+                        ['名古屋店', '30', '24', '80%', '+5%', '2名'],
+                        ['錦店', '30', '18', '60%', '-10%', '4名'],
+                        ['横浜店', '30', '12', '40%', '-15%', '6名'],
+                        ['', '', '', '', '', ''],
+                        ['合計', '90', '54', '60%', '-7%', '12名']
+                    ];
+                    filename = `投稿まとめ資料_${new Date().getFullYear()}年${new Date().getMonth() + 1}月`;
+                    break;
+                    
+                case 'comprehensive':
+                    data = [
+                        ['項目', '目標', '実績', '達成率', '前月比', '状況'],
+                        ['売上（名古屋）', '100,000,000', '105,200,000', '105.2%', '+3.2%', '目標達成'],
+                        ['売上（錦）', '100,000,000', '88,700,000', '88.7%', '-5.1%', '要改善'],
+                        ['売上（横浜）', '100,000,000', '98,100,000', '98.1%', '+2.8%', '順調'],
+                        ['投稿（名古屋）', '30', '24', '80%', '+5%', '良好'],
+                        ['投稿（錦）', '30', '18', '60%', '-10%', '要注意'],
+                        ['投稿（横浜）', '30', '12', '40%', '-15%', '要改善'],
+                        ['寮稼働率', '95%', '80%', '84.2%', '-2%', '空室有']
+                    ];
+                    filename = `総合レポート_${new Date().getFullYear()}年${new Date().getMonth() + 1}月`;
+                    break;
+                    
+                case 'schedule':
+                    data = [
+                        ['日付', '曜日', '時間', '予定', 'カテゴリ', '場所', '参加者'],
+                        ['6/26', '月', '10:00-12:00', '月次会議', '会議', '会議室A', '川満さん、店長3名'],
+                        ['6/26', '月', '17:00', '売上報告提出期限', '提出期限', '各店舗', '全店舗'],
+                        ['6/28', '水', '15:00-16:00', 'プロモーション撮影', '撮影', '名古屋店', '田中カメラマン'],
+                        ['6/29', '木', '14:00-15:00', '給与処理確認', '業務', '本社', '経理担当'],
+                        ['6/30', '金', '10:00-12:00', '監査対応', '会議', '全店舗', '監査法人']
+                    ];
+                    filename = `スケジュール_${new Date().getFullYear()}年${new Date().getMonth() + 1}月`;
+                    break;
+                    
+                default:
+                    data = [['データなし']];
+                    filename = 'データ';
+            }
+            
+            if (format === 'excel') {
+                // Excel形式でダウンロード
+                const ws = XLSX.utils.aoa_to_sheet(data);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, 'データ');
+                XLSX.writeFile(wb, `${filename}.xlsx`);
+            } else {
+                // PDF形式の場合は簡易的にCSVでダウンロード
+                const csvContent = data.map(row => row.join(',')).join('\n');
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `${filename}.csv`;
+                link.click();
+            }
+            
+            showNotification(`${filename}をダウンロードしました`, 'success');
+        }
+        
+        function downloadMonthEndReport() {
+            // 月末データ一括出力
+            const reports = ['sales', 'dormitory', 'posts', 'schedule'];
+            
+            showNotification('月末データを一括ダウンロード中...', 'info');
+            
+            reports.forEach((report, index) => {
+                setTimeout(() => {
+                    downloadReport(report, 'excel');
+                    if (index === reports.length - 1) {
+                        setTimeout(() => {
+                            showNotification('月末データの一括ダウンロードが完了しました', 'success');
+                        }, 500);
+                    }
+                }, index * 500);
+            });
+        }
+        
+        // === カレンダー機能 ===
+        function generateCalendar() {
+            const calendarGrid = document.getElementById('calendarGrid');
+            if (!calendarGrid) return;
+            
+            // 2024年6月のカレンダーを生成
+            const days = [];
+            for (let i = 1; i <= 30; i++) {
+                const isToday = i === 26; // 今日は26日として設定
+                const events = getEventsForDay(i);
+                
+                days.push(`
+                    <div class="calendar-day ${isToday ? 'calendar-today' : ''} rounded-lg min-h-20">
+                        <div class="font-semibold ${isToday ? 'text-blue-800' : 'text-gray-800'} mb-1">${i}</div>
+                        ${events.map(event => `<div class="event-item ${event.class}">${event.text}</div>`).join('')}
+                    </div>
+                `);
+            }
+            
+            calendarGrid.innerHTML = days.join('');
+        }
+        
+        function getEventsForDay(day) {
+            const events = {
+                26: [
+                    { text: '月次会議', class: 'event-meeting' },
+                    { text: '売上報告', class: 'event-deadline' }
+                ],
+                28: [
+                    { text: '撮影', class: 'event-shooting' },
+                    { text: '店長会議', class: 'event-meeting' }
+                ],
+                29: [
+                    { text: '給与処理', class: 'event-deadline' }
+                ],
+                30: [
+                    { text: '監査', class: 'event-meeting' }
+                ],
+                1: [
+                    { text: '休業日', class: 'event-holiday' }
+                ],
+                2: [
+                    { text: '休業日', class: 'event-holiday' }
+                ]
+            };
+            
+            return events[day] || [];
+        }
+        
+        function addEvent() {
+            alert('予定追加機能（Google Calendar連携で実装予定）');
+        }
+        
+        function filterEvents(type) {
+            // フィルターボタンの状態更新
+            document.querySelectorAll('[id^="filter"]').forEach(btn => {
+                btn.className = 'btn btn-outline';
+            });
+            document.getElementById(`filter${type.charAt(0).toUpperCase() + type.slice(1)}`).className = 'btn btn-primary';
+            
+            // イベントフィルタリング（実装例）
+            showNotification(`${type === 'all' ? '全予定' : type === 'common' ? '共通予定' : '個別予定'}を表示中`, 'info');
+        }
+        
+        function previousMonth() {
+            showNotification('前月表示（実装予定）', 'info');
+        }
+        
+        function nextMonth() {
+            showNotification('翌月表示（実装予定）', 'info');
+        }
+        
+        // === 通知システム ===
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${
+                type === 'success' ? 'bg-green-100 text-green-800 border border-green-200' :
+                type === 'error' ? 'bg-red-100 text-red-800 border border-red-200' :
+                'bg-blue-100 text-blue-800 border border-blue-200'
+            }`;
+            
+            notification.innerHTML = `
+                <div class="flex items-center">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'} mr-2"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+        
+        // === レスポンシブ対応 ===
+        window.addEventListener('resize', function() {
+            if (window.innerWidth >= 768) {
+                closeSidebar();
+            }
         });
+        
+        console.log('CLASSY業務ダッシュボード - 初期化完了');
     </script>
 </body>
 </html>
