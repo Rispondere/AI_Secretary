@@ -565,6 +565,31 @@
         
         <!-- ダッシュボードページ -->
         <div id="dashboardPage" class="page-content p-4 lg:p-6 fade-in">
+            <!-- データアップロード -->
+            <div class="glass-card p-6 mb-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-bold text-gray-900">売上データアップロード</h3>
+                    <button class="btn btn-success" onclick="downloadSalesTemplate()">
+                        <i class="fas fa-download mr-2"></i>テンプレートDL
+                    </button>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <div>
+                        <input type="file" id="salesFileInput" accept=".xlsx,.xls,.csv" class="input-field" onchange="handleSalesUpload(event)">
+                        <div class="text-sm text-gray-600 mt-2">
+                            <i class="fas fa-info-circle mr-1"></i>
+                            Excel形式 (.xlsx, .xls) またはCSV形式のファイルをアップロード
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <button class="btn btn-primary" onclick="processSalesData()">
+                            <i class="fas fa-upload mr-2"></i>データ反映
+                        </button>
+                        <div id="uploadStatus" class="text-sm text-gray-500"></div>
+                    </div>
+                </div>
+            </div>
+            
             <!-- 今日の概要 -->
             <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-6 mb-6">
                 <div class="stat-card">
@@ -603,66 +628,8 @@
             </div>
             
             <!-- 店舗状況 -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6 mb-6">
-                <div class="glass-card p-6" onclick="showStoreDetails('nagoya')">
-                    <div class="flex items-center justify-between mb-4">
-                        <h4 class="text-lg font-semibold text-gray-900">名古屋店</h4>
-                        <div class="text-2xl">🏪</div>
-                    </div>
-                    <div class="space-y-3">
-                        <div class="flex justify-between">
-                            <span>投稿数</span>
-                            <span class="font-bold text-green-600">24/30</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>売上</span>
-                            <span class="font-bold text-blue-600">¥950K</span>
-                        </div>
-                        <div class="w-full bg-gray-200 rounded-full h-2">
-                            <div class="bg-green-500 h-2 rounded-full" style="width: 80%"></div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="glass-card p-6" onclick="showStoreDetails('nishiki')">
-                    <div class="flex items-center justify-between mb-4">
-                        <h4 class="text-lg font-semibold text-gray-900">錦店</h4>
-                        <div class="text-2xl">🏪</div>
-                    </div>
-                    <div class="space-y-3">
-                        <div class="flex justify-between">
-                            <span>投稿数</span>
-                            <span class="font-bold text-yellow-600">18/30</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>売上</span>
-                            <span class="font-bold text-blue-600">¥820K</span>
-                        </div>
-                        <div class="w-full bg-gray-200 rounded-full h-2">
-                            <div class="bg-yellow-500 h-2 rounded-full" style="width: 60%"></div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="glass-card p-6" onclick="showStoreDetails('yokohama')">
-                    <div class="flex items-center justify-between mb-4">
-                        <h4 class="text-lg font-semibold text-gray-900">横浜店</h4>
-                        <div class="text-2xl">🏪</div>
-                    </div>
-                    <div class="space-y-3">
-                        <div class="flex justify-between">
-                            <span>投稿数</span>
-                            <span class="font-bold text-red-600">12/30</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>売上</span>
-                            <span class="font-bold text-blue-600">¥910K</span>
-                        </div>
-                        <div class="w-full bg-gray-200 rounded-full h-2">
-                            <div class="bg-red-500 h-2 rounded-full" style="width: 40%"></div>
-                        </div>
-                    </div>
-                </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6 mb-6" id="storesOverview">
+                <!-- 店舗カードが動的に生成されます -->
             </div>
             
             <!-- 今週の予定 -->
@@ -705,9 +672,16 @@
                     </select>
                     <select id="storeFilter" class="input-field" onchange="filterTasks()">
                         <option value="">すべての店舗</option>
-                        <option value="nagoya">名古屋店</option>
-                        <option value="nishiki">錦店</option>
-                        <option value="yokohama">横浜店</option>
+                        <option value="shabour">シャブール</option>
+                        <option value="onecarat">ワンカラット</option>
+                        <option value="go_nagoya">GrandOpera名古屋</option>
+                        <option value="cl_nagoya">CLASSY名古屋</option>
+                        <option value="cl_nishiki">CLASSY錦</option>
+                        <option value="go_fukuoka">GrandOpera福岡</option>
+                        <option value="cl_yokkaichi">CLASSY四日市</option>
+                        <option value="cl_tokyo">CLASSY東京</option>
+                        <option value="go_tokyo">GrandOpera東京</option>
+                        <option value="go_yokohama">GrandOpera横浜</option>
                     </select>
                 </div>
                 
@@ -955,9 +929,16 @@
                         <label class="block text-sm font-semibold text-gray-700 mb-2">担当店舗</label>
                         <select id="taskStore" class="input-field">
                             <option value="">選択してください</option>
-                            <option value="nagoya">名古屋店</option>
-                            <option value="nishiki">錦店</option>
-                            <option value="yokohama">横浜店</option>
+                            <option value="shabour">シャブール</option>
+                            <option value="onecarat">ワンカラット</option>
+                            <option value="go_nagoya">GrandOpera名古屋</option>
+                            <option value="cl_nagoya">CLASSY名古屋</option>
+                            <option value="cl_nishiki">CLASSY錦</option>
+                            <option value="go_fukuoka">GrandOpera福岡</option>
+                            <option value="cl_yokkaichi">CLASSY四日市</option>
+                            <option value="cl_tokyo">CLASSY東京</option>
+                            <option value="go_tokyo">GrandOpera東京</option>
+                            <option value="go_yokohama">GrandOpera横浜</option>
                         </select>
                     </div>
                     
@@ -1049,12 +1030,334 @@
         let editingEventId = null;
         let salesChart = null;
         let postsChart = null;
+        let uploadedSalesData = null;
         
         // データ管理
         let tasks = [];
         let events = [];
         let salesData = [];
         let postsData = [];
+        
+        // 10店舗情報
+        const storeInfo = {
+            'shabour': { name: 'シャブール', region: '名古屋', brand: 'シャブール' },
+            'onecarat': { name: 'ワンカラット', region: '名古屋', brand: 'ワンカラット' },
+            'go_nagoya': { name: 'GrandOpera名古屋', region: '名古屋', brand: 'GrandOpera' },
+            'cl_nagoya': { name: 'CLASSY名古屋', region: '名古屋', brand: 'CLASSY' },
+            'cl_nishiki': { name: 'CLASSY錦', region: '名古屋', brand: 'CLASSY' },
+            'go_fukuoka': { name: 'GrandOpera福岡', region: '福岡', brand: 'GrandOpera' },
+            'cl_yokkaichi': { name: 'CLASSY四日市', region: '四日市', brand: 'CLASSY' },
+            'cl_tokyo': { name: 'CLASSY東京', region: '東京', brand: 'CLASSY' },
+            'go_tokyo': { name: 'GrandOpera東京', region: '東京', brand: 'GrandOpera' },
+            'go_yokohama': { name: 'GrandOpera横浜', region: '横浜', brand: 'GrandOpera' }
+        };
+        
+        // 売上テンプレートダウンロード
+        function downloadSalesTemplate() {
+            const currentDate = new Date();
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth() + 1;
+            
+            // テンプレートデータ作成
+            const templateData = [
+                // ヘッダー行
+                ['店舗コード', '店舗名', '地域', 'ブランド', '年', '月', '日', '売上金額', '客数', '客単価', '備考'],
+                // サンプルデータ（各店舗）
+                ...Object.entries(storeInfo).map(([code, info]) => [
+                    code,
+                    info.name,
+                    info.region,
+                    info.brand,
+                    year,
+                    month,
+                    1, // 日
+                    '', // 売上金額（入力用）
+                    '', // 客数（入力用）
+                    '', // 客単価（入力用）
+                    '' // 備考（入力用）
+                ])
+            ];
+            
+            // 月間分のテンプレート作成（1日〜月末まで）
+            const daysInMonth = new Date(year, month, 0).getDate();
+            const fullTemplateData = [templateData[0]]; // ヘッダー
+            
+            for (let day = 1; day <= daysInMonth; day++) {
+                Object.entries(storeInfo).forEach(([code, info]) => {
+                    fullTemplateData.push([
+                        code,
+                        info.name,
+                        info.region,
+                        info.brand,
+                        year,
+                        month,
+                        day,
+                        '', // 売上金額
+                        '', // 客数
+                        '', // 客単価
+                        '' // 備考
+                    ]);
+                });
+            }
+            
+            // Excel作成
+            const ws = XLSX.utils.aoa_to_sheet(fullTemplateData);
+            
+            // 列幅設定
+            ws['!cols'] = [
+                { wch: 12 }, // 店舗コード
+                { wch: 20 }, // 店舗名
+                { wch: 10 }, // 地域
+                { wch: 15 }, // ブランド
+                { wch: 8 },  // 年
+                { wch: 6 },  // 月
+                { wch: 6 },  // 日
+                { wch: 15 }, // 売上金額
+                { wch: 10 }, // 客数
+                { wch: 12 }, // 客単価
+                { wch: 20 }  // 備考
+            ];
+            
+            // ヘッダー行のスタイル設定
+            const headerRange = XLSX.utils.decode_range(ws['!ref']);
+            for (let col = headerRange.s.c; col <= headerRange.e.c; col++) {
+                const cellAddress = XLSX.utils.encode_cell({ r: 0, c: col });
+                if (!ws[cellAddress]) continue;
+                ws[cellAddress].s = {
+                    font: { bold: true },
+                    fill: { fgColor: { rgb: "DDDDDD" } },
+                    alignment: { horizontal: "center" }
+                };
+            }
+            
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, '売上データ');
+            
+            // メタデータシート追加
+            const metaData = [
+                ['売上データテンプレート'],
+                ['作成日時', new Date().toLocaleString('ja-JP')],
+                ['対象期間', `${year}年${month}月`],
+                [''],
+                ['店舗一覧'],
+                ['店舗コード', '店舗名', '地域', 'ブランド'],
+                ...Object.entries(storeInfo).map(([code, info]) => [code, info.name, info.region, info.brand]),
+                [''],
+                ['入力方法'],
+                ['1. 売上金額は数値のみ入力（カンマ不要）'],
+                ['2. 客数は整数で入力'],
+                ['3. 客単価は自動計算または手動入力'],
+                ['4. 日付は年月日すべて入力'],
+                ['5. 店舗コードは変更しないでください']
+            ];
+            
+            const metaWs = XLSX.utils.aoa_to_sheet(metaData);
+            metaWs['!cols'] = [{ wch: 15 }, { wch: 25 }, { wch: 15 }, { wch: 15 }];
+            XLSX.utils.book_append_sheet(wb, metaWs, '入力説明');
+            
+            const filename = `売上データテンプレート_${year}年${month}月_${currentDate.toISOString().split('T')[0]}.xlsx`;
+            XLSX.writeFile(wb, filename);
+            
+            showNotification('売上データテンプレートをダウンロードしました', 'success');
+        }
+        
+        // 売上データアップロード処理
+        function handleSalesUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const statusElement = document.getElementById('uploadStatus');
+            statusElement.textContent = 'ファイルを読み込み中...';
+            statusElement.className = 'text-sm text-blue-600';
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    let data;
+                    
+                    if (file.name.endsWith('.csv')) {
+                        // CSV処理
+                        const text = e.target.result;
+                        data = text.split('\n').map(row => row.split(','));
+                    } else {
+                        // Excel処理
+                        const workbook = XLSX.read(e.target.result, { type: 'binary' });
+                        const sheetName = workbook.SheetNames[0];
+                        const worksheet = workbook.Sheets[sheetName];
+                        data = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                    }
+                    
+                    uploadedSalesData = data;
+                    statusElement.textContent = `✅ ${data.length}行のデータを読み込みました`;
+                    statusElement.className = 'text-sm text-green-600';
+                    
+                    // データプレビュー表示
+                    showDataPreview(data);
+                    
+                } catch (error) {
+                    console.error('ファイル読み込みエラー:', error);
+                    statusElement.textContent = '❌ ファイルの読み込みに失敗しました';
+                    statusElement.className = 'text-sm text-red-600';
+                }
+            };
+            
+            if (file.name.endsWith('.csv')) {
+                reader.readAsText(file);
+            } else {
+                reader.readAsBinaryString(file);
+            }
+        }
+        
+        // データプレビュー表示
+        function showDataPreview(data) {
+            if (!data || data.length === 0) return;
+            
+            const previewData = data.slice(0, 6); // ヘッダー + 5行
+            const previewHTML = `
+                <div class="mt-4 p-4 bg-gray-50 rounded-lg">
+                    <h4 class="font-semibold mb-3">データプレビュー</h4>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            ${previewData.map((row, i) => `
+                                <tr class="${i === 0 ? 'bg-gray-100 font-semibold' : 'hover:bg-gray-50'}">
+                                    ${row.map(cell => `<td class="border p-2">${cell || ''}</td>`).join('')}
+                                </tr>
+                            `).join('')}
+                        </table>
+                    </div>
+                    <div class="mt-2 text-xs text-gray-600">
+                        表示: ${previewData.length}行 / 総データ: ${data.length}行
+                    </div>
+                </div>
+            `;
+            
+            const uploadSection = document.querySelector('.glass-card');
+            const existingPreview = uploadSection.querySelector('.mt-4');
+            if (existingPreview) {
+                existingPreview.remove();
+            }
+            uploadSection.insertAdjacentHTML('beforeend', previewHTML);
+        }
+        
+        // 売上データ処理・反映
+        function processSalesData() {
+            if (!uploadedSalesData) {
+                showNotification('先にファイルをアップロードしてください', 'error');
+                return;
+            }
+            
+            try {
+                const headers = uploadedSalesData[0];
+                const dataRows = uploadedSalesData.slice(1);
+                
+                // データ検証
+                const requiredColumns = ['店舗コード', '店舗名', '年', '月', '日', '売上金額'];
+                const missingColumns = requiredColumns.filter(col => !headers.includes(col));
+                
+                if (missingColumns.length > 0) {
+                    showNotification(`必要な列が不足しています: ${missingColumns.join(', ')}`, 'error');
+                    return;
+                }
+                
+                // データ変換
+                const processedData = dataRows.map(row => {
+                    const rowData = {};
+                    headers.forEach((header, index) => {
+                        rowData[header] = row[index];
+                    });
+                    return rowData;
+                }).filter(row => row['店舗コード'] && row['売上金額']);
+                
+                // 売上データをグローバル変数に保存
+                salesData = processedData;
+                saveData();
+                
+                // チャート更新
+                updateSalesCharts();
+                
+                // ダッシュボード更新
+                renderDashboard();
+                
+                showNotification(`${processedData.length}件の売上データを反映しました`, 'success');
+                
+                // アップロード関連をリセット
+                document.getElementById('salesFileInput').value = '';
+                document.getElementById('uploadStatus').textContent = '';
+                uploadedSalesData = null;
+                
+                // プレビュー削除
+                const existingPreview = document.querySelector('.glass-card .mt-4');
+                if (existingPreview) {
+                    existingPreview.remove();
+                }
+                
+            } catch (error) {
+                console.error('データ処理エラー:', error);
+                showNotification('データの処理中にエラーが発生しました', 'error');
+            }
+        }
+        
+        // 売上チャート更新
+        function updateSalesCharts() {
+            if (!salesChart || !salesData.length) return;
+            
+            // 月別売上集計
+            const monthlySales = {};
+            const storeSales = {};
+            
+            salesData.forEach(row => {
+                const month = `${row['年']}年${row['月']}月`;
+                const store = row['店舗名'];
+                const amount = parseFloat(row['売上金額']) || 0;
+                
+                if (!monthlySales[month]) monthlySales[month] = 0;
+                if (!storeSales[store]) storeSales[store] = 0;
+                
+                monthlySales[month] += amount;
+                storeSales[store] += amount;
+            });
+            
+            // チャートデータ更新
+            const months = Object.keys(monthlySales).sort();
+            const amounts = months.map(month => monthlySales[month] / 1000000); // 百万円単位
+            
+            salesChart.data.labels = months;
+            salesChart.data.datasets[0].data = amounts;
+            salesChart.update();
+            
+            // 店舗ランキング更新
+            updateStoreRanking(storeSales);
+        }
+        
+        // 店舗ランキング更新
+        function updateStoreRanking(storeSales) {
+            const storeRanking = document.getElementById('storeRanking');
+            if (!storeRanking) return;
+            
+            const sortedStores = Object.entries(storeSales)
+                .sort(([,a], [,b]) => b - a)
+                .slice(0, 10);
+            
+            storeRanking.innerHTML = sortedStores.map((([store, sales]), index) => `
+                <div class="p-4 bg-gradient-to-r ${getRankingGradient(index + 1)} rounded-16 border-l-4 ${getRankingBorder(index + 1)}">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="text-2xl mr-3">${getRankingEmoji(index + 1)}</div>
+                            <div>
+                                <div class="font-semibold text-gray-900">${store}</div>
+                                <div class="text-sm text-gray-600">順位: ${index + 1}位</div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="font-bold text-lg ${getRankingColor(index + 1)}">¥${(sales/1000000).toFixed(1)}M</div>
+                            <div class="text-xs text-gray-600">
+                                ${((sales / Object.values(storeSales).reduce((a, b) => a + b, 0)) * 100).toFixed(1)}%
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
         
         // 初期化
         document.addEventListener('DOMContentLoaded', function() {
@@ -1066,6 +1369,7 @@
             
             initializeCharts();
             renderDashboard();
+            renderStoresOverview();
             generateCalendar();
             
             // サンプルデータの作成（初回のみ）
@@ -1073,7 +1377,7 @@
                 createSampleData();
             }
             
-            console.log('初期化完了');
+            console.log('初期化完了 - 10店舗対応');
         });
         
         // データの読み込み
@@ -1109,7 +1413,7 @@
                     title: '月次売上レポート作成',
                     description: '6月の売上データをまとめてレポート作成',
                     priority: 'high',
-                    store: 'nagoya',
+                    store: 'cl_nagoya',
                     dueDate: today.toISOString().split('T')[0],
                     completed: false,
                     createdAt: today.toISOString()
@@ -1119,7 +1423,7 @@
                     title: '新人研修準備',
                     description: '来週の新人研修資料準備',
                     priority: 'medium',
-                    store: '',
+                    store: 'go_tokyo',
                     dueDate: tomorrow.toISOString().split('T')[0],
                     completed: false,
                     createdAt: today.toISOString()
@@ -1132,6 +1436,26 @@
                     store: '',
                     dueDate: today.toISOString().split('T')[0],
                     completed: true,
+                    createdAt: today.toISOString()
+                },
+                {
+                    id: Date.now() + 4,
+                    title: 'シャブール店舗改善ミーティング',
+                    description: 'シャブールの売上向上策について話し合い',
+                    priority: 'high',
+                    store: 'shabour',
+                    dueDate: tomorrow.toISOString().split('T')[0],
+                    completed: false,
+                    createdAt: today.toISOString()
+                },
+                {
+                    id: Date.now() + 5,
+                    title: 'ワンカラット新キャンペーン企画',
+                    description: '7月のキャンペーン企画書作成',
+                    priority: 'medium',
+                    store: 'onecarat',
+                    dueDate: tomorrow.toISOString().split('T')[0],
+                    completed: false,
                     createdAt: today.toISOString()
                 }
             ];
@@ -1154,6 +1478,15 @@
                     date: tomorrow.toISOString().split('T')[0],
                     startTime: '14:00',
                     endTime: '16:00'
+                },
+                {
+                    id: Date.now() + 12,
+                    title: 'GrandOpera福岡 監査',
+                    description: '月次監査実施',
+                    type: 'meeting',
+                    date: new Date(today.getTime() + 2*24*60*60*1000).toISOString().split('T')[0],
+                    startTime: '13:00',
+                    endTime: '17:00'
                 }
             ];
             
@@ -1289,6 +1622,9 @@
             document.getElementById('completedTasksCount').textContent = `${completedTasks.length}件完了`;
             document.getElementById('upcomingEvents').textContent = upcomingEvents.length;
             
+            // 店舗概要描画
+            renderStoresOverview();
+            
             // 今日のタスク描画
             const todayTasksList = document.getElementById('todayTasksList');
             if (todayTasksList) {
@@ -1349,6 +1685,84 @@
                 }
                 weeklySchedule.innerHTML = weekHTML;
             }
+        }
+        
+        // 店舗概要描画
+        function renderStoresOverview() {
+            const storesOverview = document.getElementById('storesOverview');
+            if (!storesOverview) return;
+            
+            // 各店舗のサンプルデータ（実際の売上データがある場合はそれを使用）
+            const storeStatus = {};
+            
+            // 売上データから最新の売上を取得
+            if (salesData.length > 0) {
+                Object.keys(storeInfo).forEach(storeCode => {
+                    const storeData = salesData.filter(data => data['店舗コード'] === storeCode);
+                    const totalSales = storeData.reduce((sum, data) => sum + (parseFloat(data['売上金額']) || 0), 0);
+                    const avgSales = storeData.length > 0 ? totalSales / storeData.length : 0;
+                    
+                    storeStatus[storeCode] = {
+                        sales: avgSales,
+                        posts: Math.floor(Math.random() * 20) + 15, // サンプル投稿数
+                        target: 30
+                    };
+                });
+            } else {
+                // サンプルデータ
+                Object.keys(storeInfo).forEach(storeCode => {
+                    storeStatus[storeCode] = {
+                        sales: Math.floor(Math.random() * 500000) + 500000,
+                        posts: Math.floor(Math.random() * 20) + 15,
+                        target: 30
+                    };
+                });
+            }
+            
+            // 店舗カード生成
+            const storeCards = Object.entries(storeInfo).map(([storeCode, info]) => {
+                const status = storeStatus[storeCode];
+                const postRate = Math.round((status.posts / status.target) * 100);
+                const rateColor = postRate >= 80 ? 'green' : postRate >= 60 ? 'yellow' : 'red';
+                
+                return `
+                    <div class="glass-card p-6 cursor-pointer" onclick="showStoreDetails('${storeCode}')">
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="text-lg font-semibold text-gray-900">${info.name}</h4>
+                            <div class="text-2xl">${getBrandEmoji(info.brand)}</div>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="flex justify-between">
+                                <span>投稿数</span>
+                                <span class="font-bold text-${rateColor}-600">${status.posts}/${status.target}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>売上</span>
+                                <span class="font-bold text-blue-600">¥${Math.round(status.sales/1000)}K</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-${rateColor}-500 h-2 rounded-full" style="width: ${postRate}%"></div>
+                            </div>
+                            <div class="text-xs text-gray-600 text-center">
+                                ${info.region} • ${info.brand}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            storesOverview.innerHTML = storeCards;
+        }
+        
+        // ブランド絵文字取得
+        function getBrandEmoji(brand) {
+            const emojis = {
+                'CLASSY': '💎',
+                'GrandOpera': '🎭',
+                'シャブール': '🌟',
+                'ワンカラット': '💍'
+            };
+            return emojis[brand] || '🏪';
         }
         
         // タスク管理
@@ -2035,12 +2449,7 @@
         }
         
         function getStoreName(storeCode) {
-            const storeNames = {
-                nagoya: '名古屋店',
-                nishiki: '錦店',
-                yokohama: '横浜店'
-            };
-            return storeNames[storeCode] || storeCode;
+            return storeInfo[storeCode]?.name || storeCode;
         }
         
         function getPriorityText(priority) {
@@ -2139,53 +2548,59 @@
         
         // 店舗詳細表示
         function showStoreDetails(storeCode) {
-            const storeData = {
-                nagoya: {
-                    name: '名古屋店',
-                    posts: 24,
-                    target: 30,
-                    sales: 950000,
-                    staff: 8,
-                    issues: ['投稿数がやや少ない', '新人研修が必要']
-                },
-                nishiki: {
-                    name: '錦店',
-                    posts: 18,
-                    target: 30,
-                    sales: 820000,
-                    staff: 6,
-                    issues: ['投稿数が大幅に不足', 'スタッフのモチベーション低下']
-                },
-                yokohama: {
-                    name: '横浜店',
-                    posts: 12,
-                    target: 30,
-                    sales: 910000,
-                    staff: 7,
-                    issues: ['投稿システムのトラブル', '管理体制の見直しが必要']
-                }
-            };
-            
-            const store = storeData[storeCode];
+            const store = storeInfo[storeCode];
             if (!store) return;
+            
+            // 売上データから該当店舗のデータを取得
+            const storeData = salesData.filter(data => data['店舗コード'] === storeCode);
+            const totalSales = storeData.reduce((sum, data) => sum + (parseFloat(data['売上金額']) || 0), 0);
+            const avgSales = storeData.length > 0 ? totalSales / storeData.length : Math.floor(Math.random() * 500000) + 500000;
+            
+            // サンプル投稿データ
+            const posts = Math.floor(Math.random() * 20) + 15;
+            const target = 30;
+            
+            // 課題設定
+            const issues = {
+                'shabour': ['名古屋エリアでの競合対策', '新人スタッフの教育体制強化'],
+                'onecarat': ['高級路線でのブランディング強化', 'VIP顧客の獲得'],
+                'go_nagoya': ['GrandOperaブランドの認知度向上', '他店舗との差別化'],
+                'cl_nagoya': ['CLASSYブランドの統一感強化', '売上目標達成への取り組み'],
+                'cl_nishiki': ['錦エリアでの集客力向上', 'イベント企画の改善'],
+                'go_fukuoka': ['福岡エリアでの市場開拓', '地域密着型サービス展開'],
+                'cl_yokkaichi': ['地方都市での安定運営', 'スタッフのモチベーション向上'],
+                'cl_tokyo': ['東京激戦区での競争力強化', '高単価顧客の獲得'],
+                'go_tokyo': ['東京でのGrandOpera展開戦略', 'ブランド価値の向上'],
+                'go_yokohama': ['横浜エリアでの地位確立', '新規顧客開拓']
+            };
             
             const content = `
                 <div class="space-y-6">
+                    <div class="text-center">
+                        <div class="text-4xl mb-3">${getBrandEmoji(store.brand)}</div>
+                        <h3 class="text-xl font-bold text-gray-900">${store.name}</h3>
+                        <p class="text-gray-600">${store.region} • ${store.brand}</p>
+                    </div>
+                    
                     <div class="grid grid-cols-2 gap-4">
                         <div class="stat-card">
-                            <div class="text-2xl font-bold text-blue-600">${store.posts}/${store.target}</div>
+                            <div class="text-2xl font-bold text-blue-600">${posts}/${target}</div>
                             <div class="text-sm text-gray-600">投稿数</div>
+                            <div class="text-xs ${posts >= 24 ? 'text-green-600' : 'text-red-600'} mt-1">
+                                達成率: ${Math.round((posts/target)*100)}%
+                            </div>
                         </div>
                         <div class="stat-card">
-                            <div class="text-2xl font-bold text-green-600">¥${(store.sales/1000).toFixed(0)}K</div>
-                            <div class="text-sm text-gray-600">本日売上</div>
+                            <div class="text-2xl font-bold text-green-600">¥${Math.round(avgSales/1000)}K</div>
+                            <div class="text-sm text-gray-600">平均売上</div>
+                            <div class="text-xs text-gray-600 mt-1">日次平均</div>
                         </div>
                     </div>
                     
                     <div>
                         <h4 class="font-semibold mb-3">課題・改善点</h4>
                         <div class="space-y-2">
-                            ${store.issues.map(issue => `
+                            ${(issues[storeCode] || ['一般的な改善事項', '顧客満足度向上']).map(issue => `
                                 <div class="p-3 bg-yellow-50 border-l-4 border-yellow-400 rounded text-sm">
                                     <i class="fas fa-exclamation-triangle text-yellow-600 mr-2"></i>
                                     ${issue}
@@ -2196,10 +2611,10 @@
                     
                     <div class="flex space-x-3">
                         <button class="btn btn-primary flex-1" onclick="createTaskForStore('${storeCode}')">
-                            タスク作成
+                            <i class="fas fa-plus mr-2"></i>タスク作成
                         </button>
                         <button class="btn btn-outline flex-1" onclick="showPage('sales')">
-                            詳細分析
+                            <i class="fas fa-chart-line mr-2"></i>詳細分析
                         </button>
                     </div>
                 </div>
@@ -2214,7 +2629,7 @@
             
             setTimeout(() => {
                 document.getElementById('taskStore').value = storeCode;
-                document.getElementById('taskTitle').value = `${getStoreName(storeCode)}の改善対応`;
+                document.getElementById('taskTitle').value = `${storeInfo[storeCode]?.name}の改善対応`;
                 document.getElementById('taskPriority').value = 'high';
             }, 100);
         }
@@ -2322,9 +2737,9 @@
                         <label class="block text-sm font-semibold text-gray-700 mb-2">店舗</label>
                         <select id="postStore" class="input-field">
                             <option value="">選択してください</option>
-                            <option value="nagoya">名古屋店</option>
-                            <option value="nishiki">錦店</option>
-                            <option value="yokohama">横浜店</option>
+                            ${Object.entries(storeInfo).map(([code, info]) => 
+                                `<option value="${code}">${info.name}</option>`
+                            ).join('')}
                         </select>
                     </div>
                     
