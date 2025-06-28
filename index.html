@@ -2024,4 +2024,510 @@
         }
         
         // ユーティリティ関数
-        function format
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('ja-JP', {
+                year: 'numeric',
+                month: 'numeric',
+                day: 'numeric'
+            });
+        }
+        
+        function getStoreName(storeCode) {
+            const storeNames = {
+                nagoya: '名古屋店',
+                nishiki: '錦店',
+                yokohama: '横浜店'
+            };
+            return storeNames[storeCode] || storeCode;
+        }
+        
+        function getPriorityText(priority) {
+            const priorities = {
+                high: '高',
+                medium: '中',
+                low: '低'
+            };
+            return priorities[priority] || priority;
+        }
+        
+        function getPriorityClass(priority) {
+            const classes = {
+                high: 'bg-red-100 text-red-800',
+                medium: 'bg-yellow-100 text-yellow-800',
+                low: 'bg-green-100 text-green-800'
+            };
+            return classes[priority] || 'bg-gray-100 text-gray-800';
+        }
+        
+        function getEventClass(eventType) {
+            const classes = {
+                meeting: 'bg-blue-100 text-blue-800',
+                shooting: 'bg-green-100 text-green-800',
+                holiday: 'bg-red-100 text-red-800',
+                deadline: 'bg-orange-100 text-orange-800'
+            };
+            return classes[eventType] || 'bg-gray-100 text-gray-800';
+        }
+        
+        function getEventTypeName(eventType) {
+            const names = {
+                meeting: '会議',
+                shooting: '撮影',
+                holiday: '休業',
+                deadline: '締切'
+            };
+            return names[eventType] || eventType;
+        }
+        
+        function getRankingEmoji(rank) {
+            return rank === 1 ? '🥇' : rank === 2 ? '🥈' : '🥉';
+        }
+        
+        function getRankingGradient(rank) {
+            return rank === 1 ? 'from-yellow-50 to-amber-50' :
+                   rank === 2 ? 'from-gray-50 to-slate-50' :
+                   'from-orange-50 to-amber-50';
+        }
+        
+        function getRankingBorder(rank) {
+            return rank === 1 ? 'border-yellow-400' :
+                   rank === 2 ? 'border-gray-400' :
+                   'border-orange-400';
+        }
+        
+        function getRankingColor(rank) {
+            return rank === 1 ? 'text-yellow-600' :
+                   rank === 2 ? 'text-gray-600' :
+                   'text-orange-600';
+        }
+        
+        function getPostStatusGradient(rate) {
+            return rate >= 80 ? 'from-green-50 to-emerald-50' :
+                   rate >= 60 ? 'from-yellow-50 to-amber-50' :
+                   'from-red-50 to-rose-50';
+        }
+        
+        function getPostStatusBorder(rate) {
+            return rate >= 80 ? 'border-green-400' :
+                   rate >= 60 ? 'border-yellow-400' :
+                   'border-red-400';
+        }
+        
+        function getPostStatusColor(rate) {
+            return rate >= 80 ? 'text-green-600' :
+                   rate >= 60 ? 'text-yellow-600' :
+                   'text-red-600';
+        }
+        
+        function getPostStatusProgress(rate) {
+            return rate >= 80 ? 'bg-green-500' :
+                   rate >= 60 ? 'bg-yellow-500' :
+                   'bg-red-500';
+        }
+        
+        function getCountClass(count) {
+            return count >= 3 ? 'bg-green-100 text-green-800' :
+                   count >= 2 ? 'bg-yellow-100 text-yellow-800' :
+                   'bg-red-100 text-red-800';
+        }
+        
+        function getPostEntryStatusClass(status) {
+            return status === 'completed' ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800';
+        }
+        
+        // 店舗詳細表示
+        function showStoreDetails(storeCode) {
+            const storeData = {
+                nagoya: {
+                    name: '名古屋店',
+                    posts: 24,
+                    target: 30,
+                    sales: 950000,
+                    staff: 8,
+                    issues: ['投稿数がやや少ない', '新人研修が必要']
+                },
+                nishiki: {
+                    name: '錦店',
+                    posts: 18,
+                    target: 30,
+                    sales: 820000,
+                    staff: 6,
+                    issues: ['投稿数が大幅に不足', 'スタッフのモチベーション低下']
+                },
+                yokohama: {
+                    name: '横浜店',
+                    posts: 12,
+                    target: 30,
+                    sales: 910000,
+                    staff: 7,
+                    issues: ['投稿システムのトラブル', '管理体制の見直しが必要']
+                }
+            };
+            
+            const store = storeData[storeCode];
+            if (!store) return;
+            
+            const content = `
+                <div class="space-y-6">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="stat-card">
+                            <div class="text-2xl font-bold text-blue-600">${store.posts}/${store.target}</div>
+                            <div class="text-sm text-gray-600">投稿数</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="text-2xl font-bold text-green-600">¥${(store.sales/1000).toFixed(0)}K</div>
+                            <div class="text-sm text-gray-600">本日売上</div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-semibold mb-3">課題・改善点</h4>
+                        <div class="space-y-2">
+                            ${store.issues.map(issue => `
+                                <div class="p-3 bg-yellow-50 border-l-4 border-yellow-400 rounded text-sm">
+                                    <i class="fas fa-exclamation-triangle text-yellow-600 mr-2"></i>
+                                    ${issue}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    
+                    <div class="flex space-x-3">
+                        <button class="btn btn-primary flex-1" onclick="createTaskForStore('${storeCode}')">
+                            タスク作成
+                        </button>
+                        <button class="btn btn-outline flex-1" onclick="showPage('sales')">
+                            詳細分析
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            showCustomModal(`${store.name} 詳細`, content);
+        }
+        
+        function createTaskForStore(storeCode) {
+            document.querySelector('.modal').remove();
+            openTaskModal();
+            
+            setTimeout(() => {
+                document.getElementById('taskStore').value = storeCode;
+                document.getElementById('taskTitle').value = `${getStoreName(storeCode)}の改善対応`;
+                document.getElementById('taskPriority').value = 'high';
+            }, 100);
+        }
+        
+        // 日付詳細表示
+        function showDayDetails(dateStr) {
+            const dayEvents = events.filter(event => event.date === dateStr);
+            const dayTasks = tasks.filter(task => task.dueDate === dateStr);
+            const date = new Date(dateStr);
+            
+            const content = `
+                <div class="space-y-6">
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-gray-900 mb-2">
+                            ${date.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' })}
+                        </div>
+                    </div>
+                    
+                    ${dayEvents.length > 0 ? `
+                        <div>
+                            <h4 class="font-semibold mb-3">予定</h4>
+                            <div class="space-y-2">
+                                ${dayEvents.map(event => `
+                                    <div class="p-3 ${getEventClass(event.type)} rounded-lg cursor-pointer"
+                                         onclick="editEvent(${event.id})">
+                                        <div class="font-medium">${event.title}</div>
+                                        <div class="text-sm mt-1">
+                                            ${event.startTime ? `${event.startTime} - ${event.endTime}` : '終日'}
+                                        </div>
+                                        ${event.description ? `<div class="text-xs mt-1">${event.description}</div>` : ''}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+                    
+                    ${dayTasks.length > 0 ? `
+                        <div>
+                            <h4 class="font-semibold mb-3">タスク</h4>
+                            <div class="space-y-2">
+                                ${dayTasks.map(task => `
+                                    <div class="p-3 bg-gray-50 rounded-lg cursor-pointer"
+                                         onclick="editTask(${task.id})">
+                                        <div class="font-medium ${task.completed ? 'line-through text-gray-500' : ''}">${task.title}</div>
+                                        <div class="text-sm text-gray-600 mt-1">${task.description}</div>
+                                        <div class="flex items-center mt-2">
+                                            <span class="px-2 py-1 text-xs rounded ${getPriorityClass(task.priority)}">${getPriorityText(task.priority)}</span>
+                                            ${task.store ? `<span class="ml-2 text-xs text-blue-600">${getStoreName(task.store)}</span>` : ''}
+                                            ${task.completed ? '<span class="ml-2 text-xs text-green-600">完了</span>' : ''}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+                    
+                    ${dayEvents.length === 0 && dayTasks.length === 0 ? `
+                        <div class="text-center text-gray-500 py-8">
+                            この日の予定・タスクはありません
+                        </div>
+                    ` : ''}
+                    
+                    <div class="flex space-x-3">
+                        <button class="btn btn-primary flex-1" onclick="addEventForDate('${dateStr}')">
+                            予定追加
+                        </button>
+                        <button class="btn btn-outline flex-1" onclick="addTaskForDate('${dateStr}')">
+                            タスク追加
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            showCustomModal('詳細', content);
+        }
+        
+        function addEventForDate(dateStr) {
+            document.querySelector('.modal').remove();
+            openEventModal();
+            
+            setTimeout(() => {
+                document.getElementById('eventDate').value = dateStr;
+            }, 100);
+        }
+        
+        function addTaskForDate(dateStr) {
+            document.querySelector('.modal').remove();
+            openTaskModal();
+            
+            setTimeout(() => {
+                document.getElementById('taskDueDate').value = dateStr;
+            }, 100);
+        }
+        
+        function editEvent(eventId) {
+            document.querySelector('.modal').remove();
+            openEventModal(eventId);
+        }
+        
+        // 投稿記録追加
+        function addPostEntry() {
+            const content = `
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">店舗</label>
+                        <select id="postStore" class="input-field">
+                            <option value="">選択してください</option>
+                            <option value="nagoya">名古屋店</option>
+                            <option value="nishiki">錦店</option>
+                            <option value="yokohama">横浜店</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">投稿者</label>
+                        <input type="text" id="postAuthor" class="input-field" placeholder="投稿者名">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">投稿数</label>
+                        <input type="number" id="postCount" class="input-field" min="0" placeholder="投稿数">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">日付</label>
+                        <input type="date" id="postDate" class="input-field" value="${new Date().toISOString().split('T')[0]}">
+                    </div>
+                    
+                    <div class="flex space-x-3">
+                        <button class="btn btn-primary flex-1" onclick="savePostEntry()">
+                            保存
+                        </button>
+                        <button class="btn btn-outline" onclick="document.querySelector('.modal').remove()">
+                            キャンセル
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            showCustomModal('投稿記録追加', content);
+        }
+        
+        function savePostEntry() {
+            const store = document.getElementById('postStore').value;
+            const author = document.getElementById('postAuthor').value.trim();
+            const count = parseInt(document.getElementById('postCount').value);
+            const date = document.getElementById('postDate').value;
+            
+            if (!store || !author || !count || !date) {
+                showNotification('すべての項目を入力してください', 'error');
+                return;
+            }
+            
+            showNotification('投稿記録を保存しました', 'success');
+            document.querySelector('.modal').remove();
+            
+            if (currentPage === 'posts') {
+                renderPosts();
+            }
+        }
+        
+        // カレンダー機能拡張
+        function changeCalendarView(view) {
+            showNotification(`${view === 'month' ? '月' : '週'}表示に変更しました`, 'info');
+        }
+        
+        function previousPeriod() {
+            showNotification('前の期間を表示中...', 'info');
+        }
+        
+        function nextPeriod() {
+            showNotification('次の期間を表示中...', 'info');
+        }
+        
+        function goToToday() {
+            generateCalendar();
+            showNotification('今日の日付に移動しました', 'info');
+        }
+        
+        // 売上チャート機能拡張
+        function changeChartPeriod(period) {
+            if (!salesChart) return;
+            
+            const weekData = {
+                labels: ['月', '火', '水', '木', '金', '土', '日'],
+                datasets: [{
+                    label: '今週',
+                    data: [380, 420, 350, 480, 390, 520, 290],
+                    backgroundColor: 'rgba(59, 130, 246, 0.8)',
+                    borderColor: '#3b82f6',
+                    borderWidth: 2
+                }, {
+                    label: '先週',
+                    data: [350, 390, 320, 450, 360, 480, 270],
+                    backgroundColor: 'rgba(6, 182, 212, 0.6)',
+                    borderColor: '#06b6d4',
+                    borderWidth: 2
+                }]
+            };
+            
+            const monthData = {
+                labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
+                datasets: [{
+                    label: '今年',
+                    data: [245, 268, 225, 298, 275, 280],
+                    backgroundColor: 'rgba(59, 130, 246, 0.8)',
+                    borderColor: '#3b82f6',
+                    borderWidth: 2
+                }, {
+                    label: '前年',
+                    data: [220, 235, 210, 265, 245, 249],
+                    backgroundColor: 'rgba(6, 182, 212, 0.6)',
+                    borderColor: '#06b6d4',
+                    borderWidth: 2
+                }]
+            };
+            
+            salesChart.data = period === 'week' ? weekData : monthData;
+            salesChart.update();
+            
+            showNotification(`${period === 'week' ? '週別' : '月別'}表示に変更しました`, 'info');
+        }
+        
+        // レスポンシブ対応
+        window.addEventListener('resize', function() {
+            if (window.innerWidth >= 1024) {
+                closeSidebar();
+            }
+        });
+        
+        // キーボードショートカット
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key) {
+                    case 'k':
+                        e.preventDefault();
+                        openTaskModal();
+                        break;
+                    case 'e':
+                        e.preventDefault();
+                        openEventModal();
+                        break;
+                    case 's':
+                        e.preventDefault();
+                        syncAllData();
+                        break;
+                }
+            }
+            
+            if (e.key === 'Escape') {
+                const modals = document.querySelectorAll('.modal');
+                modals.forEach(modal => modal.remove());
+                closeSidebar();
+            }
+        });
+        
+        // タッチイベント対応（スマホ）
+        let touchStartX = 0;
+        let touchStartY = 0;
+        
+        document.addEventListener('touchstart', function(e) {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+        });
+        
+        document.addEventListener('touchend', function(e) {
+            if (!touchStartX || !touchStartY) return;
+            
+            const touchEndX = e.changedTouches[0].clientX;
+            const touchEndY = e.changedTouches[0].clientY;
+            
+            const diffX = touchStartX - touchEndX;
+            const diffY = touchStartY - touchEndY;
+            
+            // 水平スワイプ（サイドバー操作）
+            if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 100) {
+                if (diffX > 0 && touchStartX < 50) {
+                    // 左端から右スワイプ
+                    toggleSidebar();
+                } else if (diffX < 0 && sidebarOpen) {
+                    // 右スワイプでサイドバー閉じる
+                    closeSidebar();
+                }
+            }
+            
+            touchStartX = 0;
+            touchStartY = 0;
+        });
+        
+        // セーフエリア対応（iPhone X以降）
+        if (window.CSS && CSS.supports('padding-top: env(safe-area-inset-top)')) {
+            document.documentElement.style.setProperty('--safe-area-top', 'env(safe-area-inset-top)');
+            document.documentElement.style.setProperty('--safe-area-bottom', 'env(safe-area-inset-bottom)');
+        }
+        
+        // PWA対応
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').catch(function(error) {
+                console.log('ServiceWorker registration failed: ', error);
+            });
+        }
+        
+        // オフライン対応
+        window.addEventListener('online', function() {
+            showNotification('オンラインに戻りました', 'success');
+        });
+        
+        window.addEventListener('offline', function() {
+            showNotification('オフラインモードです', 'warning');
+        });
+        
+        console.log('CLASSY業務管理システム - 完全版初期化完了');
+        console.log('キーボードショートカット: Ctrl+K (タスク追加), Ctrl+E (予定追加), Ctrl+S (同期)');
+    </script>
+</body>
+</html>
