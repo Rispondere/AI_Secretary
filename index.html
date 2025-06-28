@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CLASSY業務ダッシュボード - 川満さん専用</title>
+    <title>CLASSY業務管理システム</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -11,109 +11,184 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --primary-blue: #3b82f6;
-            --secondary-blue: #60a5fa;
-            --light-blue: #dbeafe;
-            --cyan: #06b6d4;
-            --light-cyan: #cffafe;
+            --primary: #3b82f6;
+            --secondary: #06b6d4;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-primary: #f8fafc;
+            --bg-secondary: #f1f5f9;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
         
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
             min-height: 100vh;
+            overflow-x: hidden;
         }
         
-        .card {
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
             transition: all 0.3s ease;
-            border: 1px solid rgba(148, 163, 184, 0.1);
         }
         
-        .card:hover {
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-            transform: translateY(-2px);
+        .glass-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.15);
         }
         
         .btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: 12px 24px;
-            font-weight: 500;
-            border-radius: 12px;
+            padding: 16px 24px;
+            font-weight: 600;
+            border-radius: 16px;
             transition: all 0.3s ease;
             border: none;
             cursor: pointer;
-            font-size: 14px;
-            min-height: 48px;
+            font-size: 16px;
+            min-height: 56px;
             min-width: 120px;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn:hover::before {
+            left: 100%;
         }
         
         .btn-primary {
-            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            background: linear-gradient(135deg, var(--primary), #1d4ed8);
             color: white;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
         }
         
         .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.5);
         }
         
-        .btn-cyan {
-            background: linear-gradient(135deg, var(--cyan), #22d3ee);
+        .btn-success {
+            background: linear-gradient(135deg, var(--success), #047857);
             color: white;
-            box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
         }
         
-        .btn-cyan:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(6, 182, 212, 0.4);
+        .btn-warning {
+            background: linear-gradient(135deg, var(--warning), #d97706);
+            color: white;
+            box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger), #dc2626);
+            color: white;
+            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
         }
         
         .btn-outline {
-            background: white;
-            color: var(--primary-blue);
-            border: 2px solid var(--light-blue);
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--primary);
+            border: 2px solid rgba(59, 130, 246, 0.3);
         }
         
         .btn-outline:hover {
-            background: var(--light-blue);
-            border-color: var(--primary-blue);
+            background: rgba(59, 130, 246, 0.1);
+            border-color: var(--primary);
         }
         
-        .nav-item {
-            display: flex;
-            align-items: center;
+        .input-field {
+            width: 100%;
             padding: 16px 20px;
-            margin: 4px 0;
-            border-radius: 12px;
-            color: #64748b;
-            text-decoration: none;
+            border: 2px solid rgba(59, 130, 246, 0.2);
+            border-radius: 16px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.1);
+            background: white;
+        }
+        
+        .task-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 12px 0;
+            border-left: 6px solid var(--primary);
             transition: all 0.3s ease;
             cursor: pointer;
-            font-weight: 500;
         }
         
-        .nav-item:hover {
-            background: var(--light-blue);
-            color: var(--primary-blue);
-            transform: translateX(4px);
+        .task-card:hover {
+            transform: translateX(8px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
         }
         
-        .nav-item.active {
-            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
-            color: white;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        .task-card.completed {
+            opacity: 0.7;
+            border-left-color: var(--success);
+            background: rgba(16, 185, 129, 0.05);
+        }
+        
+        .task-card.high-priority {
+            border-left-color: var(--danger);
+        }
+        
+        .task-card.medium-priority {
+            border-left-color: var(--warning);
+        }
+        
+        .task-card.low-priority {
+            border-left-color: var(--success);
+        }
+        
+        .progress-ring {
+            transform: rotate(-90deg);
+        }
+        
+        .progress-ring-circle {
+            stroke-dasharray: 251.2;
+            stroke-dashoffset: 251.2;
+            transition: stroke-dashoffset 0.5s ease-in-out;
         }
         
         .stat-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(255,255,255,0.8));
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
             padding: 24px;
             text-align: center;
             transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.3);
             position: relative;
             overflow: hidden;
         }
@@ -125,122 +200,147 @@
             left: 0;
             right: 0;
             height: 4px;
-            background: linear-gradient(90deg, var(--primary-blue), var(--cyan));
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
         }
         
-        .stat-card:hover {
-            transform: scale(1.02);
-        }
-        
-        .progress-bar {
-            background: #e2e8f0;
-            border-radius: 8px;
-            height: 8px;
-            overflow: hidden;
-        }
-        
-        .progress-fill {
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
             height: 100%;
-            border-radius: 8px;
-            transition: width 0.5s ease;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(4px);
         }
         
-        .progress-green { background: linear-gradient(90deg, #10b981, #34d399); }
-        .progress-yellow { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
-        .progress-red { background: linear-gradient(90deg, #ef4444, #f87171); }
-        
-        .task-item {
-            padding: 16px;
-            border-radius: 12px;
-            border: 1px solid #e2e8f0;
-            transition: all 0.3s ease;
+        .modal-content {
             background: white;
-        }
-        
-        .task-item:hover {
-            border-color: var(--primary-blue);
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
-        }
-        
-        .task-completed {
-            opacity: 0.6;
-            background: #f8fafc;
-        }
-        
-        .task-completed .task-text {
-            text-decoration: line-through;
-            color: #64748b;
-        }
-        
-        .badge {
-            padding: 6px 12px;
             border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            padding: 32px;
+            width: 95%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+            animation: modalSlideIn 0.3s ease-out;
         }
         
-        .badge-green { background: #dcfce7; color: #166534; }
-        .badge-yellow { background: #fef3c7; color: #92400e; }
-        .badge-red { background: #fecaca; color: #991b1b; }
-        .badge-blue { background: var(--light-blue); color: var(--primary-blue); }
-        .badge-cyan { background: var(--light-cyan); color: #0e7490; }
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            z-index: 1001;
+            animation: slideInRight 0.3s ease-out;
+            max-width: 350px;
+        }
+        
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
         
         .calendar-day {
-            min-height: 80px;
-            border: 1px solid #e2e8f0;
-            padding: 8px;
+            min-height: 100px;
+            border: 1px solid rgba(59, 130, 246, 0.1);
+            border-radius: 12px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.8);
             transition: all 0.3s ease;
-            background: white;
+            cursor: pointer;
         }
         
         .calendar-day:hover {
-            background: #f8fafc;
-            border-color: var(--primary-blue);
+            background: rgba(59, 130, 246, 0.05);
+            border-color: var(--primary);
+            transform: scale(1.02);
         }
         
-        .calendar-today {
-            background: var(--light-blue);
-            border-color: var(--primary-blue);
+        .calendar-day.today {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(6, 182, 212, 0.1));
+            border-color: var(--primary);
             font-weight: 600;
         }
         
-        .event-item {
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 11px;
-            margin: 2px 0;
-            font-weight: 500;
+        .event-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin: 2px;
         }
         
-        .event-meeting { background: var(--light-blue); color: var(--primary-blue); }
-        .event-shooting { background: #dcfce7; color: #166534; }
-        .event-holiday { background: #fecaca; color: #991b1b; }
-        .event-deadline { background: #fed7aa; color: #9a3412; }
-        
-        .chart-container {
-            position: relative;
-            height: 350px;
-            width: 100%;
-        }
-        
-        .hidden { display: none !important; }
+        .event-meeting { background: var(--primary); }
+        .event-shooting { background: var(--success); }
+        .event-holiday { background: var(--danger); }
+        .event-deadline { background: var(--warning); }
         
         .sidebar {
             position: fixed;
             top: 0;
-            left: -320px;
-            width: 320px;
+            left: -350px;
+            width: 350px;
             height: 100vh;
-            background: white;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
             transition: all 0.3s ease;
-            z-index: 1000;
-            box-shadow: 4px 0 24px rgba(0, 0, 0, 0.1);
+            z-index: 999;
+            box-shadow: 4px 0 30px rgba(0, 0, 0, 0.1);
+            border-right: 1px solid rgba(255, 255, 255, 0.3);
         }
         
         .sidebar.active {
             left: 0;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 20px 24px;
+            margin: 8px 16px;
+            border-radius: 16px;
+            color: #64748b;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 16px;
+        }
+        
+        .nav-item:hover {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--primary);
+            transform: translateX(8px);
+        }
+        
+        .nav-item.active {
+            background: linear-gradient(135deg, var(--primary), #1d4ed8);
+            color: white;
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
         }
         
         .overlay {
@@ -250,7 +350,7 @@
             width: 100%;
             height: 100%;
             background: rgba(0, 0, 0, 0.5);
-            z-index: 999;
+            z-index: 998;
             opacity: 0;
             visibility: hidden;
             transition: all 0.3s ease;
@@ -261,31 +361,119 @@
             visibility: visible;
         }
         
-        @media (min-width: 768px) {
-            .sidebar {
-                position: relative;
-                left: 0;
-                box-shadow: none;
-                border-right: 1px solid #e2e8f0;
-            }
-        }
+        .hidden { display: none !important; }
         
         .fade-in {
             animation: fadeIn 0.5s ease-in;
         }
         
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
+            from { opacity: 0; transform: translateY(30px); }
             to { opacity: 1; transform: translateY(0); }
         }
         
-        .slide-in {
-            animation: slideIn 0.5s ease-out;
+        @media (max-width: 768px) {
+            .btn {
+                padding: 20px 24px;
+                font-size: 18px;
+                min-height: 64px;
+                border-radius: 20px;
+            }
+            
+            .input-field {
+                padding: 20px;
+                font-size: 18px;
+                border-radius: 20px;
+            }
+            
+            .task-card {
+                padding: 24px;
+                margin: 16px 0;
+            }
+            
+            .stat-card {
+                padding: 32px 24px;
+            }
+            
+            .glass-card {
+                margin: 12px;
+                border-radius: 24px;
+            }
+            
+            .modal-content {
+                padding: 24px;
+                border-radius: 24px;
+            }
         }
         
-        @keyframes slideIn {
-            from { transform: translateX(-20px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+        @media (min-width: 1024px) {
+            .sidebar {
+                position: relative;
+                left: 0;
+                width: 320px;
+                box-shadow: none;
+                border-right: 1px solid rgba(59, 130, 246, 0.1);
+            }
+            
+            .main-content {
+                margin-left: 320px;
+            }
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 400px;
+            width: 100%;
+        }
+        
+        .dropdown {
+            position: relative;
+        }
+        
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+        
+        .dropdown.active .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .floating-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), #1d4ed8);
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 8px 30px rgba(59, 130, 246, 0.4);
+            transition: all 0.3s ease;
+            z-index: 500;
+        }
+        
+        .floating-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 40px rgba(59, 130, 246, 0.6);
         }
     </style>
 </head>
@@ -293,61 +481,72 @@
     <!-- オーバーレイ -->
     <div id="overlay" class="overlay" onclick="closeSidebar()"></div>
     
+    <!-- フローティングアクションボタン -->
+    <button class="floating-btn lg:hidden" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+    </button>
+    
     <!-- サイドバー -->
     <div id="sidebar" class="sidebar">
-        <div class="p-6">
-            <div class="flex items-center justify-between mb-8">
-                <div>
-                    <h2 class="text-xl font-bold text-gray-900">CLASSY</h2>
-                    <p class="text-sm text-gray-600">業務ダッシュボード</p>
-                    <p class="text-xs text-blue-600 font-medium">川満さん専用</p>
-                </div>
-                <button onclick="closeSidebar()" class="md:hidden text-gray-500 hover:text-gray-700">
-                    <i class="fas fa-times text-xl"></i>
-                </button>
+        <div class="p-8">
+            <div class="text-center mb-8">
+                <div class="text-3xl font-bold text-gray-900 mb-2">CLASSY</div>
+                <div class="text-sm text-gray-600">業務管理システム</div>
+                <div class="text-xs text-blue-600 font-medium">川満さん専用</div>
             </div>
             
             <nav class="space-y-2">
                 <div class="nav-item active" onclick="showPage('dashboard')">
-                    <i class="fas fa-home mr-3 text-lg"></i>
+                    <i class="fas fa-home mr-4 text-xl"></i>
                     <span>ダッシュボード</span>
                 </div>
+                <div class="nav-item" onclick="showPage('tasks')">
+                    <i class="fas fa-tasks mr-4 text-xl"></i>
+                    <span>タスク管理</span>
+                </div>
                 <div class="nav-item" onclick="showPage('sales')">
-                    <i class="fas fa-chart-line mr-3 text-lg"></i>
+                    <i class="fas fa-chart-line mr-4 text-xl"></i>
                     <span>売上分析</span>
                 </div>
-                <div class="nav-item" onclick="showPage('reports')">
-                    <i class="fas fa-file-alt mr-3 text-lg"></i>
-                    <span>会議資料</span>
+                <div class="nav-item" onclick="showPage('posts')">
+                    <i class="fas fa-camera mr-4 text-xl"></i>
+                    <span>投稿管理</span>
                 </div>
                 <div class="nav-item" onclick="showPage('calendar')">
-                    <i class="fas fa-calendar mr-3 text-lg"></i>
+                    <i class="fas fa-calendar mr-4 text-xl"></i>
                     <span>カレンダー</span>
+                </div>
+                <div class="nav-item" onclick="showPage('reports')">
+                    <i class="fas fa-file-alt mr-4 text-xl"></i>
+                    <span>レポート</span>
                 </div>
             </nav>
             
-            <div class="mt-8 p-4 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-12 border border-blue-100">
+            <div class="mt-8 p-6 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-20 border border-blue-100">
                 <div class="text-center">
-                    <div class="text-2xl mb-2">📊</div>
-                    <p class="text-sm font-medium text-blue-800">データ最終更新</p>
-                    <p class="text-xs text-blue-600" id="lastUpdate">2024-06-26 14:30</p>
+                    <div class="text-3xl mb-3">📊</div>
+                    <div class="text-sm font-medium text-blue-800">データ同期</div>
+                    <div class="text-xs text-blue-600 mb-4" id="lastSync">未同期</div>
+                    <button class="btn btn-primary w-full" onclick="syncAllData()">
+                        <i class="fas fa-sync-alt mr-2"></i>同期
+                    </button>
                 </div>
             </div>
         </div>
     </div>
     
     <!-- メインコンテンツ -->
-    <div class="min-h-screen md:ml-320">
+    <div class="main-content">
         <!-- ヘッダー -->
-        <header class="card m-4 mb-6">
-            <div class="p-4 flex items-center justify-between">
+        <header class="glass-card m-4 lg:m-6">
+            <div class="p-6 flex items-center justify-between">
                 <div class="flex items-center">
-                    <button onclick="toggleSidebar()" class="md:hidden mr-4 text-gray-600 hover:text-gray-800">
+                    <button onclick="toggleSidebar()" class="lg:hidden mr-4 p-3 text-gray-600 hover:text-gray-800 rounded-full hover:bg-gray-100">
                         <i class="fas fa-bars text-xl"></i>
                     </button>
                     <div>
-                        <h1 class="text-2xl font-bold text-gray-900">CLASSY業務ダッシュボード</h1>
-                        <p class="text-sm text-gray-600" id="currentPageTitle">ダッシュボード</p>
+                        <h1 class="text-2xl lg:text-3xl font-bold text-gray-900">CLASSY業務管理</h1>
+                        <p class="text-sm lg:text-base text-gray-600" id="currentPageTitle">ダッシュボード</p>
                     </div>
                 </div>
                 
@@ -356,245 +555,203 @@
                         <div class="font-semibold text-gray-900" id="currentDate"></div>
                         <div class="text-sm text-blue-600" id="currentTime"></div>
                     </div>
-                    <button class="btn btn-primary" onclick="syncGoogleData()">
-                        <i class="fas fa-sync-alt mr-2"></i>
-                        <span class="hidden sm:inline">Google同期</span>
+                    <button class="btn btn-primary" onclick="showQuickActions()">
+                        <i class="fas fa-plus mr-2"></i>
+                        <span class="hidden sm:inline">クイック</span>
                     </button>
                 </div>
             </div>
         </header>
         
         <!-- ダッシュボードページ -->
-        <div id="dashboardPage" class="page-content px-4 fade-in">
-            <!-- 本日のやることリスト -->
-            <div class="card p-6 mb-6">
-                <div class="flex items-center justify-between mb-6">
-                    <h3 class="text-xl font-semibold text-gray-900 flex items-center">
-                        <i class="fas fa-tasks mr-3 text-blue-600"></i>本日のやることリスト
-                    </h3>
-                    <button class="btn btn-outline" onclick="refreshTasks()">
-                        <i class="fas fa-refresh mr-2"></i>更新
-                    </button>
+        <div id="dashboardPage" class="page-content p-4 lg:p-6 fade-in">
+            <!-- 今日の概要 -->
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-6 mb-6">
+                <div class="stat-card">
+                    <div class="text-4xl font-bold text-blue-600 mb-2" id="todayTasksCount">0</div>
+                    <div class="text-sm text-gray-600">今日のタスク</div>
+                    <div class="text-xs text-green-600 mt-2" id="completedTasksCount">0件完了</div>
                 </div>
-                <div id="todayTasks" class="space-y-3">
-                    <div class="task-item">
-                        <div class="flex items-center">
-                            <input type="checkbox" class="mr-4 w-5 h-5 text-blue-600 rounded" onchange="toggleTask(this)">
-                            <div class="flex-1">
-                                <div class="task-text font-medium">寮の退去確認（田中さん）</div>
-                                <div class="text-sm text-gray-500">10:00 - 優先度：高</div>
-                            </div>
-                            <span class="badge badge-red">重要</span>
-                        </div>
-                    </div>
-                    <div class="task-item">
-                        <div class="flex items-center">
-                            <input type="checkbox" class="mr-4 w-5 h-5 text-blue-600 rounded" onchange="toggleTask(this)">
-                            <div class="flex-1">
-                                <div class="task-text font-medium">名古屋店売上確認・分析</div>
-                                <div class="text-sm text-gray-500">15:00 - スプレッドシート更新</div>
-                            </div>
-                            <span class="badge badge-yellow">通常</span>
-                        </div>
-                    </div>
-                    <div class="task-item task-completed">
-                        <div class="flex items-center">
-                            <input type="checkbox" class="mr-4 w-5 h-5 text-blue-600 rounded" checked onchange="toggleTask(this)">
-                            <div class="flex-1">
-                                <div class="task-text font-medium">投稿状況チェック（全店舗）</div>
-                                <div class="text-sm text-gray-500">09:00 - 完了済み</div>
-                            </div>
-                            <span class="badge badge-green">完了</span>
-                        </div>
-                    </div>
-                    <div class="task-item">
-                        <div class="flex items-center">
-                            <input type="checkbox" class="mr-4 w-5 h-5 text-blue-600 rounded" onchange="toggleTask(this)">
-                            <div class="flex-1">
-                                <div class="task-text font-medium">会議資料準備（月次レポート）</div>
-                                <div class="text-sm text-gray-500">17:00 - 明日の会議用</div>
-                            </div>
-                            <span class="badge badge-blue">会議</span>
-                        </div>
-                    </div>
+                <div class="stat-card">
+                    <div class="text-4xl font-bold text-green-600 mb-2">¥2.8M</div>
+                    <div class="text-sm text-gray-600">本日売上</div>
+                    <div class="text-xs text-green-600 mt-2">+15% 昨日比</div>
+                </div>
+                <div class="stat-card">
+                    <div class="text-4xl font-bold text-purple-600 mb-2">87%</div>
+                    <div class="text-sm text-gray-600">投稿達成率</div>
+                    <div class="text-xs text-orange-600 mt-2">全店平均</div>
+                </div>
+                <div class="stat-card">
+                    <div class="text-4xl font-bold text-cyan-600 mb-2" id="upcomingEvents">0</div>
+                    <div class="text-sm text-gray-600">今週の予定</div>
+                    <div class="text-xs text-blue-600 mt-2">予定あり</div>
                 </div>
             </div>
             
-            <!-- 店舗別投稿状況・売上速報 -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                <div class="card p-6">
-                    <h3 class="text-lg font-semibold mb-6 text-gray-900 flex items-center">
-                        <i class="fas fa-camera mr-3 text-green-600"></i>店舗別投稿状況
-                    </h3>
-                    <div class="space-y-4">
-                        <div class="p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-12 border border-green-100">
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="font-semibold text-gray-900">名古屋店</span>
-                                <span class="text-green-600 font-bold">24/30</span>
-                            </div>
-                            <div class="progress-bar mb-2">
-                                <div class="progress-fill progress-green" style="width: 80%"></div>
-                            </div>
-                            <div class="text-sm text-gray-600">達成率: 80% | 目標まで6件</div>
+            <!-- 今日のタスク -->
+            <div class="glass-card p-6 mb-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-bold text-gray-900">今日のタスク</h3>
+                    <button class="btn btn-outline" onclick="openTaskModal()">
+                        <i class="fas fa-plus mr-2"></i>追加
+                    </button>
+                </div>
+                <div id="todayTasksList" class="space-y-4">
+                    <!-- タスクがここに動的に表示されます -->
+                </div>
+            </div>
+            
+            <!-- 店舗状況 -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6 mb-6">
+                <div class="glass-card p-6" onclick="showStoreDetails('nagoya')">
+                    <div class="flex items-center justify-between mb-4">
+                        <h4 class="text-lg font-semibold text-gray-900">名古屋店</h4>
+                        <div class="text-2xl">🏪</div>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex justify-between">
+                            <span>投稿数</span>
+                            <span class="font-bold text-green-600">24/30</span>
                         </div>
-                        
-                        <div class="p-4 bg-gradient-to-r from-yellow-50 to-amber-50 rounded-12 border border-yellow-100">
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="font-semibold text-gray-900">錦店</span>
-                                <span class="text-yellow-600 font-bold">18/30</span>
-                            </div>
-                            <div class="progress-bar mb-2">
-                                <div class="progress-fill progress-yellow" style="width: 60%"></div>
-                            </div>
-                            <div class="text-sm text-gray-600">達成率: 60% | 目標まで12件</div>
+                        <div class="flex justify-between">
+                            <span>売上</span>
+                            <span class="font-bold text-blue-600">¥950K</span>
                         </div>
-                        
-                        <div class="p-4 bg-gradient-to-r from-red-50 to-rose-50 rounded-12 border border-red-100">
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="font-semibold text-gray-900">横浜店</span>
-                                <span class="text-red-600 font-bold">12/30</span>
-                            </div>
-                            <div class="progress-bar mb-2">
-                                <div class="progress-fill progress-red" style="width: 40%"></div>
-                            </div>
-                            <div class="text-sm text-gray-600">達成率: 40% | 目標まで18件</div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-green-500 h-2 rounded-full" style="width: 80%"></div>
                         </div>
                     </div>
                 </div>
                 
-                <!-- 売上速報 -->
-                <div class="card p-6">
-                    <h3 class="text-lg font-semibold mb-6 text-gray-900 flex items-center">
-                        <i class="fas fa-yen-sign mr-3 text-blue-600"></i>本日の売上速報
-                    </h3>
-                    <div class="space-y-4">
-                        <div class="stat-card bg-gradient-to-br from-blue-50 to-cyan-50 rounded-12 border border-blue-100">
-                            <div class="text-3xl font-bold text-blue-600">¥2,680,000</div>
-                            <div class="text-sm text-blue-800 font-medium">本日の総売上</div>
-                            <div class="text-xs text-green-600 mt-2 flex items-center justify-center">
-                                <i class="fas fa-arrow-up mr-1"></i>昨日比 +15.2%
-                            </div>
+                <div class="glass-card p-6" onclick="showStoreDetails('nishiki')">
+                    <div class="flex items-center justify-between mb-4">
+                        <h4 class="text-lg font-semibold text-gray-900">錦店</h4>
+                        <div class="text-2xl">🏪</div>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex justify-between">
+                            <span>投稿数</span>
+                            <span class="font-bold text-yellow-600">18/30</span>
                         </div>
-                        
-                        <div class="stat-card bg-gradient-to-br from-green-50 to-emerald-50 rounded-12 border border-green-100">
-                            <div class="text-2xl font-bold text-green-600">¥82,500,000</div>
-                            <div class="text-sm text-green-800 font-medium">今月累計</div>
-                            <div class="text-xs text-green-600 mt-2">目標達成率: 92.1%</div>
+                        <div class="flex justify-between">
+                            <span>売上</span>
+                            <span class="font-bold text-blue-600">¥820K</span>
                         </div>
-                        
-                        <div class="grid grid-cols-3 gap-2 text-center">
-                            <div class="p-3 bg-white rounded-lg border border-gray-100">
-                                <div class="text-lg font-bold text-purple-600">¥950K</div>
-                                <div class="text-xs text-gray-600">名古屋</div>
-                            </div>
-                            <div class="p-3 bg-white rounded-lg border border-gray-100">
-                                <div class="text-lg font-bold text-indigo-600">¥820K</div>
-                                <div class="text-xs text-gray-600">錦</div>
-                            </div>
-                            <div class="p-3 bg-white rounded-lg border border-gray-100">
-                                <div class="text-lg font-bold text-pink-600">¥910K</div>
-                                <div class="text-xs text-gray-600">横浜</div>
-                            </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-yellow-500 h-2 rounded-full" style="width: 60%"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="glass-card p-6" onclick="showStoreDetails('yokohama')">
+                    <div class="flex items-center justify-between mb-4">
+                        <h4 class="text-lg font-semibold text-gray-900">横浜店</h4>
+                        <div class="text-2xl">🏪</div>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex justify-between">
+                            <span>投稿数</span>
+                            <span class="font-bold text-red-600">12/30</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>売上</span>
+                            <span class="font-bold text-blue-600">¥910K</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-red-500 h-2 rounded-full" style="width: 40%"></div>
                         </div>
                     </div>
                 </div>
             </div>
             
             <!-- 今週の予定 -->
-            <div class="card p-6">
-                <h3 class="text-lg font-semibold mb-6 text-gray-900 flex items-center">
-                    <i class="fas fa-calendar mr-3 text-indigo-600"></i>今週の予定
-                </h3>
-                <div class="grid grid-cols-1 md:grid-cols-7 gap-3">
-                    <div class="calendar-day calendar-today rounded-12">
-                        <div class="font-semibold text-blue-800 mb-2">月 26</div>
-                        <div class="event-item event-meeting">月次会議</div>
-                        <div class="event-item event-deadline">売上報告</div>
-                    </div>
-                    <div class="calendar-day rounded-12">
-                        <div class="font-semibold text-gray-800 mb-2">火 27</div>
-                        <div class="text-sm text-gray-500">予定なし</div>
-                    </div>
-                    <div class="calendar-day rounded-12">
-                        <div class="font-semibold text-gray-800 mb-2">水 28</div>
-                        <div class="event-item event-shooting">撮影</div>
-                        <div class="event-item event-meeting">店長会議</div>
-                    </div>
-                    <div class="calendar-day rounded-12">
-                        <div class="font-semibold text-gray-800 mb-2">木 29</div>
-                        <div class="event-item event-deadline">給与処理</div>
-                    </div>
-                    <div class="calendar-day rounded-12">
-                        <div class="font-semibold text-gray-800 mb-2">金 30</div>
-                        <div class="event-item event-meeting">監査</div>
-                    </div>
-                    <div class="calendar-day rounded-12">
-                        <div class="font-semibold text-red-800 mb-2">土 1</div>
-                        <div class="event-item event-holiday">休業日</div>
-                    </div>
-                    <div class="calendar-day rounded-12">
-                        <div class="font-semibold text-red-800 mb-2">日 2</div>
-                        <div class="event-item event-holiday">休業日</div>
+            <div class="glass-card p-6">
+                <h3 class="text-xl font-bold text-gray-900 mb-6">今週の予定</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-7 gap-3" id="weeklySchedule">
+                    <!-- 週間スケジュールがここに表示されます -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- タスク管理ページ -->
+        <div id="tasksPage" class="page-content p-4 lg:p-6 hidden">
+            <div class="glass-card p-6 mb-6">
+                <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between mb-6">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4 lg:mb-0">タスク管理</h3>
+                    <div class="flex flex-wrap gap-3">
+                        <button class="btn btn-primary" onclick="openTaskModal()">
+                            <i class="fas fa-plus mr-2"></i>新規タスク
+                        </button>
+                        <button class="btn btn-outline" onclick="exportTasks()">
+                            <i class="fas fa-download mr-2"></i>エクスポート
+                        </button>
                     </div>
                 </div>
                 
-                <div class="mt-6 flex flex-wrap gap-4 text-sm">
-                    <div class="flex items-center">
-                        <div class="w-3 h-3 bg-blue-400 rounded mr-2"></div>
-                        <span>会議</span>
-                    </div>
-                    <div class="flex items-center">
-                        <div class="w-3 h-3 bg-green-400 rounded mr-2"></div>
-                        <span>撮影</span>
-                    </div>
-                    <div class="flex items-center">
-                        <div class="w-3 h-3 bg-red-400 rounded mr-2"></div>
-                        <span>休業</span>
-                    </div>
-                    <div class="flex items-center">
-                        <div class="w-3 h-3 bg-orange-400 rounded mr-2"></div>
-                        <span>提出期限</span>
-                    </div>
+                <!-- フィルターとソート -->
+                <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6">
+                    <input type="text" id="taskSearch" placeholder="タスクを検索..." class="input-field" oninput="filterTasks()">
+                    <select id="priorityFilter" class="input-field" onchange="filterTasks()">
+                        <option value="">すべての優先度</option>
+                        <option value="high">高優先度</option>
+                        <option value="medium">中優先度</option>
+                        <option value="low">低優先度</option>
+                    </select>
+                    <select id="statusFilter" class="input-field" onchange="filterTasks()">
+                        <option value="">すべてのステータス</option>
+                        <option value="pending">未完了</option>
+                        <option value="completed">完了済み</option>
+                    </select>
+                    <select id="storeFilter" class="input-field" onchange="filterTasks()">
+                        <option value="">すべての店舗</option>
+                        <option value="nagoya">名古屋店</option>
+                        <option value="nishiki">錦店</option>
+                        <option value="yokohama">横浜店</option>
+                    </select>
+                </div>
+                
+                <!-- タスクリスト -->
+                <div id="tasksList" class="space-y-4">
+                    <!-- タスクがここに動的に表示されます -->
                 </div>
             </div>
         </div>
         
         <!-- 売上分析ページ -->
-        <div id="salesPage" class="page-content px-4 hidden">
-            <!-- 統計カード -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-                <div class="card stat-card bg-gradient-to-br from-blue-50 to-cyan-50">
-                    <div class="text-3xl font-bold text-blue-600">¥280M</div>
-                    <div class="text-sm text-blue-800 font-medium">今月売上</div>
-                    <div class="text-xs text-green-600 mt-2 flex items-center justify-center">
-                        <i class="fas fa-arrow-up mr-1"></i>前年同期比 +12.5%
-                    </div>
+        <div id="salesPage" class="page-content p-4 lg:p-6 hidden">
+            <!-- 売上統計 -->
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-6 mb-6">
+                <div class="stat-card">
+                    <div class="text-4xl font-bold text-blue-600 mb-2">¥280M</div>
+                    <div class="text-sm text-gray-600">今月売上</div>
+                    <div class="text-xs text-green-600 mt-2">+12.5% 前年比</div>
                 </div>
-                <div class="card stat-card bg-gradient-to-br from-green-50 to-emerald-50">
-                    <div class="text-3xl font-bold text-green-600">96.2%</div>
-                    <div class="text-sm text-green-800 font-medium">目標達成率</div>
+                <div class="stat-card">
+                    <div class="text-4xl font-bold text-green-600 mb-2">96.2%</div>
+                    <div class="text-sm text-gray-600">目標達成率</div>
                     <div class="text-xs text-green-600 mt-2">目標: ¥291M</div>
                 </div>
-                <div class="card stat-card bg-gradient-to-br from-purple-50 to-violet-50">
-                    <div class="text-3xl font-bold text-purple-600">3/3</div>
-                    <div class="text-sm text-purple-800 font-medium">目標達成店舗</div>
-                    <div class="text-xs text-purple-600 mt-2">全店舗達成中</div>
+                <div class="stat-card">
+                    <div class="text-4xl font-bold text-purple-600 mb-2">3/3</div>
+                    <div class="text-sm text-gray-600">達成店舗</div>
+                    <div class="text-xs text-purple-600 mt-2">全店舗順調</div>
                 </div>
-                <div class="card stat-card bg-gradient-to-br from-orange-50 to-amber-50">
-                    <div class="text-3xl font-bold text-orange-600">¥93.3M</div>
-                    <div class="text-sm text-orange-800 font-medium">店舗平均売上</div>
-                    <div class="text-xs text-orange-600 mt-2">月平均</div>
+                <div class="stat-card">
+                    <div class="text-4xl font-bold text-orange-600 mb-2">¥93.3M</div>
+                    <div class="text-sm text-gray-600">平均売上</div>
+                    <div class="text-xs text-orange-600 mt-2">店舗平均</div>
                 </div>
             </div>
             
-            <!-- グラフセクション -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                <div class="card p-6">
+            <!-- グラフエリア -->
+            <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
+                <div class="glass-card p-6">
                     <div class="flex items-center justify-between mb-6">
-                        <h4 class="text-lg font-semibold text-gray-900">月別・週別売上推移</h4>
+                        <h4 class="text-lg font-bold text-gray-900">売上推移</h4>
                         <div class="flex space-x-2">
-                            <button class="btn btn-outline" onclick="toggleChartType('line')" id="lineChartBtn">線グラフ</button>
-                            <button class="btn btn-primary" onclick="toggleChartType('bar')" id="barChartBtn">棒グラフ</button>
+                            <button class="btn btn-outline" onclick="changeChartPeriod('week')">週別</button>
+                            <button class="btn btn-primary" onclick="changeChartPeriod('month')">月別</button>
                         </div>
                     </div>
                     <div class="chart-container">
@@ -602,335 +759,431 @@
                     </div>
                 </div>
                 
-                <div class="card p-6">
-                    <h4 class="text-lg font-semibold text-gray-900 mb-6">店舗別ランキング（当月売上）</h4>
-                    <div class="space-y-4">
-                        <div class="flex items-center justify-between p-4 bg-gradient-to-r from-yellow-50 to-amber-50 rounded-12 border-l-4 border-yellow-400">
-                            <div class="flex items-center">
-                                <div class="text-2xl mr-3">🥇</div>
-                                <div>
-                                    <div class="font-semibold text-gray-900">名古屋店</div>
-                                    <div class="text-sm text-gray-600">達成率: 105.2%</div>
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <div class="font-bold text-yellow-600 text-lg">¥105.2M</div>
-                                <div class="text-xs text-green-600">+5.2%</div>
-                            </div>
-                        </div>
-                        
-                        <div class="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-slate-50 rounded-12 border-l-4 border-gray-400">
-                            <div class="flex items-center">
-                                <div class="text-2xl mr-3">🥈</div>
-                                <div>
-                                    <div class="font-semibold text-gray-900">横浜店</div>
-                                    <div class="text-sm text-gray-600">達成率: 98.1%</div>
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <div class="font-bold text-gray-600 text-lg">¥98.1M</div>
-                                <div class="text-xs text-yellow-600">-1.9%</div>
-                            </div>
-                        </div>
-                        
-                        <div class="flex items-center justify-between p-4 bg-gradient-to-r from-orange-50 to-amber-50 rounded-12 border-l-4 border-orange-400">
-                            <div class="flex items-center">
-                                <div class="text-2xl mr-3">🥉</div>
-                                <div>
-                                    <div class="font-semibold text-gray-900">錦店</div>
-                                    <div class="text-sm text-gray-600">達成率: 88.7%</div>
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <div class="font-bold text-orange-600 text-lg">¥88.7M</div>
-                                <div class="text-xs text-red-600">-11.3%</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="mt-6 p-4 bg-blue-50 rounded-12 border border-blue-100">
-                        <div class="text-sm font-medium text-blue-800 mb-2">前年同期比較</div>
-                        <div class="text-xs text-blue-600">
-                            <i class="fas fa-arrow-up mr-1"></i>全店舗合計: +12.5% (前年同月: ¥249M)
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- 売上目標達成率 -->
-            <div class="card p-6">
-                <h4 class="text-lg font-semibold text-gray-900 mb-6">売上目標達成率（色分け表示）</h4>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="p-6 bg-gradient-to-br from-green-50 to-emerald-50 rounded-16 border-2 border-green-200">
-                        <div class="text-center">
-                            <div class="text-3xl font-bold text-green-600">105.2%</div>
-                            <div class="text-lg font-semibold text-gray-900 mt-2">名古屋店</div>
-                            <div class="badge badge-green mt-3">目標達成</div>
-                            <div class="text-sm text-gray-600 mt-2">目標: ¥100M / 実績: ¥105.2M</div>
-                        </div>
-                    </div>
-                    
-                    <div class="p-6 bg-gradient-to-br from-yellow-50 to-amber-50 rounded-16 border-2 border-yellow-200">
-                        <div class="text-center">
-                            <div class="text-3xl font-bold text-yellow-600">88.7%</div>
-                            <div class="text-lg font-semibold text-gray-900 mt-2">錦店</div>
-                            <div class="badge badge-yellow mt-3">要注意</div>
-                            <div class="text-sm text-gray-600 mt-2">目標: ¥100M / 実績: ¥88.7M</div>
-                        </div>
-                    </div>
-                    
-                    <div class="p-6 bg-gradient-to-br from-green-50 to-emerald-50 rounded-16 border-2 border-green-200">
-                        <div class="text-center">
-                            <div class="text-3xl font-bold text-green-600">98.1%</div>
-                            <div class="text-lg font-semibold text-gray-900 mt-2">横浜店</div>
-                            <div class="badge badge-green mt-3">順調</div>
-                            <div class="text-sm text-gray-600 mt-2">目標: ¥100M / 実績: ¥98.1M</div>
-                        </div>
+                <div class="glass-card p-6">
+                    <h4 class="text-lg font-bold text-gray-900 mb-6">店舗別ランキング</h4>
+                    <div class="space-y-4" id="storeRanking">
+                        <!-- ランキングがここに表示されます -->
                     </div>
                 </div>
             </div>
         </div>
         
-        <!-- 会議資料ページ -->
-        <div id="reportsPage" class="page-content px-4 hidden">
-            <div class="card p-6 mb-6">
-                <h3 class="text-lg font-semibold text-gray-900 mb-6">会議資料ダウンロード</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <div class="card p-6 text-center hover:shadow-lg transition-all">
-                        <div class="text-5xl mb-4">📊</div>
-                        <h4 class="font-semibold text-lg mb-2">売上まとめ資料</h4>
-                        <p class="text-sm text-gray-600 mb-4">月別・店舗別売上データと分析</p>
-                        <div class="space-y-2">
-                            <button class="btn btn-primary w-full" onclick="downloadReport('sales', 'excel')">
-                                <i class="fas fa-file-excel mr-2"></i>Excel形式
-                            </button>
-                            <button class="btn btn-outline w-full" onclick="downloadReport('sales', 'pdf')">
-                                <i class="fas fa-file-pdf mr-2"></i>PDF形式
-                            </button>
-                        </div>
+        <!-- 投稿管理ページ -->
+        <div id="postsPage" class="page-content p-4 lg:p-6 hidden">
+            <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
+                <div class="glass-card p-6">
+                    <h4 class="text-lg font-bold text-gray-900 mb-6">投稿達成率</h4>
+                    <div class="chart-container">
+                        <canvas id="postsChart"></canvas>
                     </div>
-                    
-                    <div class="card p-6 text-center hover:shadow-lg transition-all">
-                        <div class="text-5xl mb-4">🏠</div>
-                        <h4 class="font-semibold text-lg mb-2">寮管理資料</h4>
-                        <p class="text-sm text-gray-600 mb-4">入居状況・退去予定・管理状況</p>
-                        <div class="space-y-2">
-                            <button class="btn btn-primary w-full" onclick="downloadReport('dormitory', 'excel')">
-                                <i class="fas fa-file-excel mr-2"></i>Excel形式
-                            </button>
-                            <button class="btn btn-outline w-full" onclick="downloadReport('dormitory', 'pdf')">
-                                <i class="fas fa-file-pdf mr-2"></i>PDF形式
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="card p-6 text-center hover:shadow-lg transition-all">
-                        <div class="text-5xl mb-4">📱</div>
-                        <h4 class="font-semibold text-lg mb-2">投稿まとめ資料</h4>
-                        <p class="text-sm text-gray-600 mb-4">投稿数・達成率・分析データ</p>
-                        <div class="space-y-2">
-                            <button class="btn btn-primary w-full" onclick="downloadReport('posts', 'excel')">
-                                <i class="fas fa-file-excel mr-2"></i>Excel形式
-                            </button>
-                            <button class="btn btn-outline w-full" onclick="downloadReport('posts', 'pdf')">
-                                <i class="fas fa-file-pdf mr-2"></i>PDF形式
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="card p-6 text-center hover:shadow-lg transition-all">
-                        <div class="text-5xl mb-4">📋</div>
-                        <h4 class="font-semibold text-lg mb-2">総合レポート</h4>
-                        <p class="text-sm text-gray-600 mb-4">全業務統合・経営会議用</p>
-                        <div class="space-y-2">
-                            <button class="btn btn-cyan w-full" onclick="downloadReport('comprehensive', 'excel')">
-                                <i class="fas fa-file-excel mr-2"></i>Excel形式
-                            </button>
-                            <button class="btn btn-outline w-full" onclick="downloadReport('comprehensive', 'pdf')">
-                                <i class="fas fa-file-pdf mr-2"></i>PDF形式
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="card p-6 text-center hover:shadow-lg transition-all">
-                        <div class="text-5xl mb-4">📅</div>
-                        <h4 class="font-semibold text-lg mb-2">スケジュール資料</h4>
-                        <p class="text-sm text-gray-600 mb-4">予定表・会議・撮影スケジュール</p>
-                        <div class="space-y-2">
-                            <button class="btn btn-primary w-full" onclick="downloadReport('schedule', 'excel')">
-                                <i class="fas fa-file-excel mr-2"></i>Excel形式
-                            </button>
-                            <button class="btn btn-outline w-full" onclick="downloadReport('schedule', 'pdf')">
-                                <i class="fas fa-file-pdf mr-2"></i>PDF形式
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="card p-6 text-center hover:shadow-lg transition-all">
-                        <div class="text-5xl mb-4">🎯</div>
-                        <h4 class="font-semibold text-lg mb-2">月末データ</h4>
-                        <p class="text-sm text-gray-600 mb-4">月末締め・全データ一括出力</p>
-                        <div class="space-y-2">
-                            <button class="btn btn-cyan w-full" onclick="downloadMonthEndReport()">
-                                <i class="fas fa-download mr-2"></i>一括ダウンロード
-                            </button>
-                            <div class="text-xs text-gray-500 mt-2">
-                                売上・寮・投稿・スケジュール
-                            </div>
-                        </div>
+                </div>
+                
+                <div class="glass-card p-6">
+                    <h4 class="text-lg font-bold text-gray-900 mb-6">店舗別投稿状況</h4>
+                    <div class="space-y-4" id="postStatus">
+                        <!-- 投稿状況がここに表示されます -->
                     </div>
                 </div>
             </div>
             
-            <!-- 最近のダウンロード履歴 -->
-            <div class="card p-6">
-                <h4 class="text-lg font-semibold text-gray-900 mb-4">最近のダウンロード履歴</h4>
-                <div class="space-y-3">
-                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <div class="flex items-center">
-                            <i class="fas fa-file-excel text-green-600 mr-3"></i>
-                            <div>
-                                <div class="font-medium">売上まとめ資料_2024年6月.xlsx</div>
-                                <div class="text-sm text-gray-500">2024-06-26 14:30</div>
-                            </div>
-                        </div>
-                        <button class="text-blue-600 hover:text-blue-800">
-                            <i class="fas fa-download"></i>
-                        </button>
-                    </div>
-                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <div class="flex items-center">
-                            <i class="fas fa-file-pdf text-red-600 mr-3"></i>
-                            <div>
-                                <div class="font-medium">総合レポート_2024年6月.pdf</div>
-                                <div class="text-sm text-gray-500">2024-06-25 16:45</div>
-                            </div>
-                        </div>
-                        <button class="text-blue-600 hover:text-blue-800">
-                            <i class="fas fa-download"></i>
-                        </button>
-                    </div>
+            <!-- 投稿管理テーブル -->
+            <div class="glass-card p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h4 class="text-lg font-bold text-gray-900">投稿管理</h4>
+                    <button class="btn btn-primary" onclick="addPostEntry()">
+                        <i class="fas fa-plus mr-2"></i>投稿記録
+                    </button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="bg-gray-50">
+                                <th class="text-left p-4 font-semibold">日付</th>
+                                <th class="text-left p-4 font-semibold">店舗</th>
+                                <th class="text-left p-4 font-semibold">投稿者</th>
+                                <th class="text-left p-4 font-semibold">投稿数</th>
+                                <th class="text-left p-4 font-semibold">ステータス</th>
+                                <th class="text-left p-4 font-semibold">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="postsTable">
+                            <!-- 投稿データがここに表示されます -->
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
         
         <!-- カレンダーページ -->
-        <div id="calendarPage" class="page-content px-4 hidden">
-            <div class="card p-6 mb-6">
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4 md:mb-0">カレンダー</h3>
-                    <div class="flex flex-wrap gap-2">
-                        <button class="btn btn-primary" onclick="addEvent()">
+        <div id="calendarPage" class="page-content p-4 lg:p-6 hidden">
+            <div class="glass-card p-6 mb-6">
+                <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between mb-6">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4 lg:mb-0">カレンダー</h3>
+                    <div class="flex flex-wrap gap-3">
+                        <button class="btn btn-primary" onclick="openEventModal()">
                             <i class="fas fa-plus mr-2"></i>予定追加
                         </button>
-                        <button class="btn btn-outline" onclick="filterEvents('all')" id="filterAll">全予定</button>
-                        <button class="btn btn-outline" onclick="filterEvents('common')" id="filterCommon">共通予定</button>
-                        <button class="btn btn-outline" onclick="filterEvents('individual')" id="filterIndividual">個別予定</button>
-                        <button class="btn btn-cyan" onclick="syncGoogleCalendar()">
-                            <i class="fas fa-sync mr-2"></i>Google同期
-                        </button>
+                        <button class="btn btn-outline" onclick="changeCalendarView('month')">月表示</button>
+                        <button class="btn btn-outline" onclick="changeCalendarView('week')">週表示</button>
                     </div>
                 </div>
                 
-                <!-- カレンダー表示 -->
-                <div class="mb-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <h4 class="text-xl font-semibold text-gray-900">2024年6月</h4>
-                        <div class="flex space-x-2">
-                            <button class="btn btn-outline" onclick="previousMonth()">
-                                <i class="fas fa-chevron-left"></i>
-                            </button>
-                            <button class="btn btn-outline" onclick="nextMonth()">
-                                <i class="fas fa-chevron-right"></i>
-                            </button>
-                        </div>
+                <!-- カレンダーナビゲーション -->
+                <div class="flex items-center justify-between mb-6">
+                    <h4 class="text-2xl font-bold text-gray-900" id="calendarTitle">2024年6月</h4>
+                    <div class="flex space-x-2">
+                        <button class="btn btn-outline" onclick="previousPeriod()">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button class="btn btn-outline" onclick="nextPeriod()">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                        <button class="btn btn-outline" onclick="goToToday()">今日</button>
                     </div>
-                    
-                    <div class="grid grid-cols-7 gap-1 mb-2">
-                        <div class="p-3 text-center font-semibold bg-red-50 text-red-800 rounded-lg">日</div>
-                        <div class="p-3 text-center font-semibold bg-gray-50 rounded-lg">月</div>
-                        <div class="p-3 text-center font-semibold bg-gray-50 rounded-lg">火</div>
-                        <div class="p-3 text-center font-semibold bg-gray-50 rounded-lg">水</div>
-                        <div class="p-3 text-center font-semibold bg-gray-50 rounded-lg">木</div>
-                        <div class="p-3 text-center font-semibold bg-gray-50 rounded-lg">金</div>
-                        <div class="p-3 text-center font-semibold bg-blue-50 text-blue-800 rounded-lg">土</div>
+                </div>
+                
+                <!-- カレンダーグリッド -->
+                <div id="calendarGrid" class="grid grid-cols-7 gap-2 mb-6">
+                    <!-- カレンダーがここに表示されます -->
+                </div>
+                
+                <!-- イベント凡例 -->
+                <div class="flex flex-wrap gap-4 text-sm">
+                    <div class="flex items-center">
+                        <div class="event-dot event-meeting mr-2"></div>
+                        <span>会議</span>
                     </div>
-                    
-                    <div class="grid grid-cols-7 gap-1" id="calendarGrid">
-                        <!-- カレンダーの日付を動的に生成 -->
+                    <div class="flex items-center">
+                        <div class="event-dot event-shooting mr-2"></div>
+                        <span>撮影</span>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="event-dot event-holiday mr-2"></div>
+                        <span>休業</span>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="event-dot event-deadline mr-2"></div>
+                        <span>締切</span>
                     </div>
                 </div>
             </div>
+        </div>
+        
+        <!-- レポートページ -->
+        <div id="reportsPage" class="page-content p-4 lg:p-6 hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                <div class="glass-card p-6 text-center">
+                    <div class="text-5xl mb-4">📊</div>
+                    <h4 class="text-lg font-bold mb-2">売上レポート</h4>
+                    <p class="text-gray-600 mb-4">月別・店舗別売上分析</p>
+                    <button class="btn btn-primary w-full" onclick="generateReport('sales')">
+                        <i class="fas fa-download mr-2"></i>ダウンロード
+                    </button>
+                </div>
+                
+                <div class="glass-card p-6 text-center">
+                    <div class="text-5xl mb-4">📱</div>
+                    <h4 class="text-lg font-bold mb-2">投稿レポート</h4>
+                    <p class="text-gray-600 mb-4">投稿数・達成率分析</p>
+                    <button class="btn btn-primary w-full" onclick="generateReport('posts')">
+                        <i class="fas fa-download mr-2"></i>ダウンロード
+                    </button>
+                </div>
+                
+                <div class="glass-card p-6 text-center">
+                    <div class="text-5xl mb-4">📋</div>
+                    <h4 class="text-lg font-bold mb-2">総合レポート</h4>
+                    <p class="text-gray-600 mb-4">全業務統合レポート</p>
+                    <button class="btn btn-primary w-full" onclick="generateReport('comprehensive')">
+                        <i class="fas fa-download mr-2"></i>ダウンロード
+                    </button>
+                </div>
+                
+                <div class="glass-card p-6 text-center">
+                    <div class="text-5xl mb-4">📅</div>
+                    <h4 class="text-lg font-bold mb-2">スケジュール</h4>
+                    <p class="text-gray-600 mb-4">予定・会議一覧</p>
+                    <button class="btn btn-primary w-full" onclick="generateReport('schedule')">
+                        <i class="fas fa-download mr-2"></i>ダウンロード
+                    </button>
+                </div>
+                
+                <div class="glass-card p-6 text-center">
+                    <div class="text-5xl mb-4">🎯</div>
+                    <h4 class="text-lg font-bold mb-2">月末締めデータ</h4>
+                    <p class="text-gray-600 mb-4">全データ一括出力</p>
+                    <button class="btn btn-success w-full" onclick="generateMonthEndReport()">
+                        <i class="fas fa-file-archive mr-2"></i>一括DL
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- タスクモーダル -->
+    <div id="taskModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-bold text-gray-900" id="taskModalTitle">新しいタスク</h3>
+                <button onclick="closeTaskModal()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
             
-            <!-- 今日の予定詳細 -->
-            <div class="card p-6">
-                <h4 class="text-lg font-semibold text-gray-900 mb-4">今日の予定詳細</h4>
-                <div class="space-y-4">
-                    <div class="p-4 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-12 border-l-4 border-blue-400">
-                        <div class="flex items-center justify-between">
-                            <div class="flex-1">
-                                <div class="font-semibold text-gray-900">月次会議</div>
-                                <div class="text-sm text-gray-600">10:00 - 12:00 | 会議室A</div>
-                                <div class="text-xs text-blue-600 mt-1">参加者: 川満さん、店長3名</div>
-                            </div>
-                            <span class="badge badge-blue">会議</span>
-                        </div>
+            <div class="space-y-6">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">タスク名</label>
+                    <input type="text" id="taskTitle" class="input-field" placeholder="タスク名を入力">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">説明</label>
+                    <textarea id="taskDescription" class="input-field" rows="3" placeholder="詳細説明"></textarea>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">優先度</label>
+                        <select id="taskPriority" class="input-field">
+                            <option value="low">低</option>
+                            <option value="medium" selected>中</option>
+                            <option value="high">高</option>
+                        </select>
                     </div>
                     
-                    <div class="p-4 bg-gradient-to-r from-orange-50 to-amber-50 rounded-12 border-l-4 border-orange-400">
-                        <div class="flex items-center justify-between">
-                            <div class="flex-1">
-                                <div class="font-semibold text-gray-900">売上報告提出期限</div>
-                                <div class="text-sm text-gray-600">17:00まで | 各店舗</div>
-                                <div class="text-xs text-orange-600 mt-1">名古屋・錦・横浜店</div>
-                            </div>
-                            <span class="badge badge-yellow">提出期限</span>
-                        </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">担当店舗</label>
+                        <select id="taskStore" class="input-field">
+                            <option value="">選択してください</option>
+                            <option value="nagoya">名古屋店</option>
+                            <option value="nishiki">錦店</option>
+                            <option value="yokohama">横浜店</option>
+                        </select>
                     </div>
                     
-                    <div class="p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-12 border-l-4 border-green-400">
-                        <div class="flex items-center justify-between">
-                            <div class="flex-1">
-                                <div class="font-semibold text-gray-900">プロモーション撮影確認</div>
-                                <div class="text-sm text-gray-600">15:00 - 16:00 | 名古屋店</div>
-                                <div class="text-xs text-green-600 mt-1">カメラマン: 田中さん</div>
-                            </div>
-                            <span class="badge badge-green">撮影</span>
-                        </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">期限</label>
+                        <input type="date" id="taskDueDate" class="input-field">
                     </div>
+                </div>
+                
+                <div class="flex space-x-4">
+                    <button class="btn btn-primary flex-1" onclick="saveTask()">
+                        <i class="fas fa-save mr-2"></i>保存
+                    </button>
+                    <button class="btn btn-outline" onclick="closeTaskModal()">
+                        キャンセル
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- イベントモーダル -->
+    <div id="eventModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-bold text-gray-900">予定追加</h3>
+                <button onclick="closeEventModal()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="space-y-6">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">予定名</label>
+                    <input type="text" id="eventTitle" class="input-field" placeholder="予定名を入力">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">説明</label>
+                    <textarea id="eventDescription" class="input-field" rows="3" placeholder="詳細説明"></textarea>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">種類</label>
+                        <select id="eventType" class="input-field">
+                            <option value="meeting">会議</option>
+                            <option value="shooting">撮影</option>
+                            <option value="holiday">休業</option>
+                            <option value="deadline">締切</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">日付</label>
+                        <input type="date" id="eventDate" class="input-field">
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">開始時間</label>
+                        <input type="time" id="eventStartTime" class="input-field">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">終了時間</label>
+                        <input type="time" id="eventEndTime" class="input-field">
+                    </div>
+                </div>
+                
+                <div class="flex space-x-4">
+                    <button class="btn btn-primary flex-1" onclick="saveEvent()">
+                        <i class="fas fa-save mr-2"></i>保存
+                    </button>
+                    <button class="btn btn-outline" onclick="closeEventModal()">
+                        キャンセル
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // === グローバル変数 ===
+        // グローバル変数
         let currentPage = 'dashboard';
         let sidebarOpen = false;
+        let editingTaskId = null;
+        let editingEventId = null;
         let salesChart = null;
-        let currentChartType = 'bar';
+        let postsChart = null;
         
-        // === 初期化 ===
+        // データ管理
+        let tasks = [];
+        let events = [];
+        let salesData = [];
+        let postsData = [];
+        
+        // 初期化
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('CLASSY業務ダッシュボード起動');
+            console.log('CLASSY業務管理システム起動');
             
-            // 時刻更新
+            loadData();
             updateDateTime();
             setInterval(updateDateTime, 60000);
             
-            // チャート初期化
-            initializeSalesChart();
-            
-            // カレンダー初期化
+            initializeCharts();
+            renderDashboard();
             generateCalendar();
             
-            // デフォルトページ表示
-            showPage('dashboard');
+            // サンプルデータの作成（初回のみ）
+            if (tasks.length === 0) {
+                createSampleData();
+            }
             
             console.log('初期化完了');
         });
         
-        // === ナビゲーション ===
+        // データの読み込み
+        function loadData() {
+            const savedTasks = localStorage.getItem('classy_tasks');
+            const savedEvents = localStorage.getItem('classy_events');
+            const savedSalesData = localStorage.getItem('classy_sales');
+            const savedPostsData = localStorage.getItem('classy_posts');
+            
+            if (savedTasks) tasks = JSON.parse(savedTasks);
+            if (savedEvents) events = JSON.parse(savedEvents);
+            if (savedSalesData) salesData = JSON.parse(savedSalesData);
+            if (savedPostsData) postsData = JSON.parse(savedPostsData);
+        }
+        
+        // データの保存
+        function saveData() {
+            localStorage.setItem('classy_tasks', JSON.stringify(tasks));
+            localStorage.setItem('classy_events', JSON.stringify(events));
+            localStorage.setItem('classy_sales', JSON.stringify(salesData));
+            localStorage.setItem('classy_posts', JSON.stringify(postsData));
+        }
+        
+        // サンプルデータ作成
+        function createSampleData() {
+            const today = new Date();
+            const tomorrow = new Date(today);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            
+            tasks = [
+                {
+                    id: Date.now() + 1,
+                    title: '月次売上レポート作成',
+                    description: '6月の売上データをまとめてレポート作成',
+                    priority: 'high',
+                    store: 'nagoya',
+                    dueDate: today.toISOString().split('T')[0],
+                    completed: false,
+                    createdAt: today.toISOString()
+                },
+                {
+                    id: Date.now() + 2,
+                    title: '新人研修準備',
+                    description: '来週の新人研修資料準備',
+                    priority: 'medium',
+                    store: '',
+                    dueDate: tomorrow.toISOString().split('T')[0],
+                    completed: false,
+                    createdAt: today.toISOString()
+                },
+                {
+                    id: Date.now() + 3,
+                    title: '投稿確認',
+                    description: '各店舗の投稿状況確認',
+                    priority: 'medium',
+                    store: '',
+                    dueDate: today.toISOString().split('T')[0],
+                    completed: true,
+                    createdAt: today.toISOString()
+                }
+            ];
+            
+            events = [
+                {
+                    id: Date.now() + 10,
+                    title: '月次会議',
+                    description: '6月の振り返りと7月の計画',
+                    type: 'meeting',
+                    date: today.toISOString().split('T')[0],
+                    startTime: '10:00',
+                    endTime: '12:00'
+                },
+                {
+                    id: Date.now() + 11,
+                    title: 'プロモーション撮影',
+                    description: '新キャンペーン用の撮影',
+                    type: 'shooting',
+                    date: tomorrow.toISOString().split('T')[0],
+                    startTime: '14:00',
+                    endTime: '16:00'
+                }
+            ];
+            
+            saveData();
+        }
+        
+        // 日時更新
+        function updateDateTime() {
+            const now = new Date();
+            const dateElement = document.getElementById('currentDate');
+            const timeElement = document.getElementById('currentTime');
+            
+            if (dateElement) {
+                dateElement.textContent = now.toLocaleDateString('ja-JP', {
+                    year: 'numeric',
+                    month: 'numeric',
+                    day: 'numeric',
+                    weekday: 'short'
+                });
+            }
+            
+            if (timeElement) {
+                timeElement.textContent = now.toLocaleTimeString('ja-JP', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            }
+        }
+        
+        // ナビゲーション
         function toggleSidebar() {
             sidebarOpen = !sidebarOpen;
             const sidebar = document.getElementById('sidebar');
@@ -946,47 +1199,50 @@
         }
         
         function closeSidebar() {
-            sidebarOpen = false;
-            document.getElementById('sidebar').classList.remove('active');
-            document.getElementById('overlay').classList.remove('active');
+            if (window.innerWidth < 1024) {
+                sidebarOpen = false;
+                document.getElementById('sidebar').classList.remove('active');
+                document.getElementById('overlay').classList.remove('active');
+            }
         }
         
         function showPage(pageName) {
-            // すべてのページを非表示
-            const pages = ['dashboard', 'sales', 'reports', 'calendar'];
+            // 全ページ非表示
+            const pages = ['dashboard', 'tasks', 'sales', 'posts', 'calendar', 'reports'];
             pages.forEach(page => {
-                const pageElement = document.getElementById(page + 'Page');
-                if (pageElement) {
-                    pageElement.classList.add('hidden');
-                }
+                const element = document.getElementById(page + 'Page');
+                if (element) element.classList.add('hidden');
             });
             
-            // ナビゲーションのアクティブ状態をリセット
+            // ナビゲーション状態リセット
             document.querySelectorAll('.nav-item').forEach(item => {
                 item.classList.remove('active');
             });
             
-            // 選択されたページを表示
+            // 選択ページ表示
             const targetPage = document.getElementById(pageName + 'Page');
             if (targetPage) {
                 targetPage.classList.remove('hidden');
                 targetPage.classList.add('fade-in');
             }
             
-            // 対応するナビゲーションアイテムをアクティブに
+            // ナビゲーション状態更新
             const navItems = document.querySelectorAll('.nav-item');
             const pageIndex = pages.indexOf(pageName);
             if (pageIndex !== -1 && navItems[pageIndex]) {
                 navItems[pageIndex].classList.add('active');
             }
             
-            // ページタイトルを更新
+            // ページタイトル更新
             const pageTitles = {
-                'dashboard': 'ダッシュボード',
-                'sales': '売上分析',
-                'reports': '会議資料',
-                'calendar': 'カレンダー'
+                dashboard: 'ダッシュボード',
+                tasks: 'タスク管理',
+                sales: '売上分析',
+                posts: '投稿管理',
+                calendar: 'カレンダー',
+                reports: 'レポート'
             };
+            
             const titleElement = document.getElementById('currentPageTitle');
             if (titleElement) {
                 titleElement.textContent = pageTitles[pageName];
@@ -994,389 +1250,778 @@
             
             currentPage = pageName;
             
-            // モバイルでサイドバーを閉じる
-            if (window.innerWidth < 768) {
-                closeSidebar();
-            }
-        }
-        
-        // === 日時更新 ===
-        function updateDateTime() {
-            const now = new Date();
-            const dateStr = now.toLocaleDateString('ja-JP', { 
-                year: 'numeric', 
-                month: 'numeric', 
-                day: 'numeric',
-                weekday: 'short'
-            });
-            const timeStr = now.toLocaleTimeString('ja-JP', { 
-                hour: '2-digit', 
-                minute: '2-digit' 
-            });
-            
-            const currentDate = document.getElementById('currentDate');
-            const currentTime = document.getElementById('currentTime');
-            
-            if (currentDate) currentDate.textContent = dateStr;
-            if (currentTime) currentTime.textContent = timeStr;
-            
-            // 最終更新時刻も更新
-            const lastUpdate = document.getElementById('lastUpdate');
-            if (lastUpdate) {
-                lastUpdate.textContent = now.toLocaleString('ja-JP', {
-                    year: 'numeric',
-                    month: '2-digit',
-                    day: '2-digit',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
-            }
-        }
-        
-        // === タスク管理 ===
-        function toggleTask(checkbox) {
-            const taskItem = checkbox.closest('.task-item');
-            const taskText = taskItem.querySelector('.task-text');
-            const badge = taskItem.querySelector('.badge');
-            
-            if (checkbox.checked) {
-                taskItem.classList.add('task-completed');
-                badge.textContent = '完了';
-                badge.className = 'badge badge-green';
-            } else {
-                taskItem.classList.remove('task-completed');
-                // 元のバッジ状態に戻す（簡易実装）
-                badge.textContent = '進行中';
-                badge.className = 'badge badge-yellow';
-            }
-        }
-        
-        function refreshTasks() {
-            // Google Sheets からタスクデータを更新
-            const btn = event.target;
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>更新中...';
-            btn.disabled = true;
-            
-            setTimeout(() => {
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-                alert('タスクリストを更新しました');
-            }, 1500);
-        }
-        
-        // === Google連携 ===
-        function syncGoogleData() {
-            const btn = event.target;
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>同期中...';
-            btn.disabled = true;
-            
-            // Google Sheets & Calendar 同期の模擬処理
-            setTimeout(() => {
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-                
-                // 成功メッセージ
-                showNotification('Google データの同期が完了しました', 'success');
-                
-                // データ更新
-                updateDateTime();
-            }, 2000);
-        }
-        
-        function syncGoogleCalendar() {
-            const btn = event.target;
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>同期中...';
-            btn.disabled = true;
-            
-            setTimeout(() => {
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-                showNotification('Googleカレンダーと同期しました', 'success');
-            }, 1500);
-        }
-        
-        // === チャート機能 ===
-        function initializeSalesChart() {
-            const ctx = document.getElementById('salesChart');
-            if (!ctx) return;
-            
-            const data = {
-                labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
-                datasets: [{
-                    label: '売上（百万円）',
-                    data: [245, 268, 225, 298, 275, 280],
-                    backgroundColor: 'rgba(59, 130, 246, 0.8)',
-                    borderColor: '#3b82f6',
-                    borderWidth: 2,
-                    tension: 0.3
-                }, {
-                    label: '前年同期',
-                    data: [220, 235, 210, 265, 245, 249],
-                    backgroundColor: 'rgba(6, 182, 212, 0.6)',
-                    borderColor: '#06b6d4',
-                    borderWidth: 2,
-                    tension: 0.3
-                }]
-            };
-            
-            salesChart = new Chart(ctx, {
-                type: 'bar',
-                data: data,
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.05)'
-                            }
-                        },
-                        x: {
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.05)'
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            position: 'top'
-                        }
-                    }
-                }
-            });
-        }
-        
-        function toggleChartType(type) {
-            if (!salesChart) return;
-            
-            // ボタンの状態更新
-            document.getElementById('lineChartBtn').className = type === 'line' ? 'btn btn-primary' : 'btn btn-outline';
-            document.getElementById('barChartBtn').className = type === 'bar' ? 'btn btn-primary' : 'btn btn-outline';
-            
-            // チャートタイプ変更
-            salesChart.config.type = type;
-            salesChart.update('active');
-            currentChartType = type;
-        }
-        
-        // === レポート機能 ===
-        function downloadReport(reportType, format) {
-            // レポートデータの生成
-            let data = [];
-            let filename = '';
-            
-            switch(reportType) {
+            // ページ固有の初期化
+            switch(pageName) {
+                case 'dashboard':
+                    renderDashboard();
+                    break;
+                case 'tasks':
+                    renderTasks();
+                    break;
                 case 'sales':
-                    data = [
-                        ['店舗名', '1月', '2月', '3月', '4月', '5月', '6月', '累計', '達成率'],
-                        ['名古屋店', '105,200,000', '112,300,000', '98,500,000', '118,700,000', '108,900,000', '105,200,000', '648,800,000', '105.2%'],
-                        ['錦店', '82,500,000', '88,700,000', '75,200,000', '95,100,000', '85,300,000', '88,700,000', '515,500,000', '88.7%'],
-                        ['横浜店', '92,800,000', '98,100,000', '89,300,000', '102,500,000', '95,700,000', '98,100,000', '576,500,000', '98.1%'],
-                        ['', '', '', '', '', '', '', '', ''],
-                        ['合計', '280,500,000', '299,100,000', '263,000,000', '316,300,000', '289,900,000', '291,900,000', '1,740,700,000', '96.2%']
-                    ];
-                    filename = `売上まとめ資料_${new Date().getFullYear()}年${new Date().getMonth() + 1}月`;
+                    renderSales();
                     break;
-                    
-                case 'dormitory':
-                    data = [
-                        ['部屋番号', '入居者名', '入居日', '退去予定', '清掃状況', 'ステータス', '備考'],
-                        ['101', '田中 美咲', '2024-01-15', '2024-07-15', '完了', '退去予定', '7月中旬退去'],
-                        ['102', '佐藤 花音', '2024-03-01', '-', '完了', '入居中', '長期入居'],
-                        ['103', '鈴木 愛子', '2024-02-10', '-', '未完了', '入居中', '清掃要'],
-                        ['201', '高橋 麗奈', '2024-04-01', '-', '完了', '入居中', '新規入居'],
-                        ['202', '', '', '', '', '空室', '募集中']
-                    ];
-                    filename = `寮管理資料_${new Date().getFullYear()}年${new Date().getMonth() + 1}月`;
-                    break;
-                    
                 case 'posts':
-                    data = [
-                        ['店舗名', '目標投稿数', '実投稿数', '達成率', '前月比', '未達成者数'],
-                        ['名古屋店', '30', '24', '80%', '+5%', '2名'],
-                        ['錦店', '30', '18', '60%', '-10%', '4名'],
-                        ['横浜店', '30', '12', '40%', '-15%', '6名'],
-                        ['', '', '', '', '', ''],
-                        ['合計', '90', '54', '60%', '-7%', '12名']
-                    ];
-                    filename = `投稿まとめ資料_${new Date().getFullYear()}年${new Date().getMonth() + 1}月`;
+                    renderPosts();
                     break;
-                    
-                case 'comprehensive':
-                    data = [
-                        ['項目', '目標', '実績', '達成率', '前月比', '状況'],
-                        ['売上（名古屋）', '100,000,000', '105,200,000', '105.2%', '+3.2%', '目標達成'],
-                        ['売上（錦）', '100,000,000', '88,700,000', '88.7%', '-5.1%', '要改善'],
-                        ['売上（横浜）', '100,000,000', '98,100,000', '98.1%', '+2.8%', '順調'],
-                        ['投稿（名古屋）', '30', '24', '80%', '+5%', '良好'],
-                        ['投稿（錦）', '30', '18', '60%', '-10%', '要注意'],
-                        ['投稿（横浜）', '30', '12', '40%', '-15%', '要改善'],
-                        ['寮稼働率', '95%', '80%', '84.2%', '-2%', '空室有']
-                    ];
-                    filename = `総合レポート_${new Date().getFullYear()}年${new Date().getMonth() + 1}月`;
+                case 'calendar':
+                    generateCalendar();
                     break;
-                    
-                case 'schedule':
-                    data = [
-                        ['日付', '曜日', '時間', '予定', 'カテゴリ', '場所', '参加者'],
-                        ['6/26', '月', '10:00-12:00', '月次会議', '会議', '会議室A', '川満さん、店長3名'],
-                        ['6/26', '月', '17:00', '売上報告提出期限', '提出期限', '各店舗', '全店舗'],
-                        ['6/28', '水', '15:00-16:00', 'プロモーション撮影', '撮影', '名古屋店', '田中カメラマン'],
-                        ['6/29', '木', '14:00-15:00', '給与処理確認', '業務', '本社', '経理担当'],
-                        ['6/30', '金', '10:00-12:00', '監査対応', '会議', '全店舗', '監査法人']
-                    ];
-                    filename = `スケジュール_${new Date().getFullYear()}年${new Date().getMonth() + 1}月`;
-                    break;
-                    
-                default:
-                    data = [['データなし']];
-                    filename = 'データ';
             }
             
-            if (format === 'excel') {
-                // Excel形式でダウンロード
-                const ws = XLSX.utils.aoa_to_sheet(data);
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, 'データ');
-                XLSX.writeFile(wb, `${filename}.xlsx`);
-            } else {
-                // PDF形式の場合は簡易的にCSVでダウンロード
-                const csvContent = data.map(row => row.join(',')).join('\n');
-                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.download = `${filename}.csv`;
-                link.click();
-            }
-            
-            showNotification(`${filename}をダウンロードしました`, 'success');
+            closeSidebar();
         }
         
-        function downloadMonthEndReport() {
-            // 月末データ一括出力
-            const reports = ['sales', 'dormitory', 'posts', 'schedule'];
+        // ダッシュボード描画
+        function renderDashboard() {
+            const today = new Date().toISOString().split('T')[0];
+            const todayTasks = tasks.filter(task => task.dueDate === today);
+            const completedTasks = todayTasks.filter(task => task.completed);
+            const upcomingEvents = events.filter(event => {
+                const eventDate = new Date(event.date);
+                const weekLater = new Date();
+                weekLater.setDate(weekLater.getDate() + 7);
+                return eventDate <= weekLater && eventDate >= new Date();
+            });
             
-            showNotification('月末データを一括ダウンロード中...', 'info');
+            // 統計更新
+            document.getElementById('todayTasksCount').textContent = todayTasks.length;
+            document.getElementById('completedTasksCount').textContent = `${completedTasks.length}件完了`;
+            document.getElementById('upcomingEvents').textContent = upcomingEvents.length;
             
-            reports.forEach((report, index) => {
-                setTimeout(() => {
-                    downloadReport(report, 'excel');
-                    if (index === reports.length - 1) {
-                        setTimeout(() => {
-                            showNotification('月末データの一括ダウンロードが完了しました', 'success');
-                        }, 500);
-                    }
-                }, index * 500);
+            // 今日のタスク描画
+            const todayTasksList = document.getElementById('todayTasksList');
+            if (todayTasksList) {
+                if (todayTasks.length === 0) {
+                    todayTasksList.innerHTML = '<div class="text-center text-gray-500 py-8">今日のタスクはありません</div>';
+                } else {
+                    todayTasksList.innerHTML = todayTasks.map(task => `
+                        <div class="task-card ${task.completed ? 'completed' : ''} ${task.priority}-priority">
+                            <div class="flex items-center">
+                                <input type="checkbox" ${task.completed ? 'checked' : ''} 
+                                       onchange="toggleTaskComplete(${task.id})"
+                                       class="mr-4 w-5 h-5 text-blue-600 rounded">
+                                <div class="flex-1">
+                                    <div class="font-semibold text-gray-900 ${task.completed ? 'line-through' : ''}">
+                                        ${task.title}
+                                    </div>
+                                    <div class="text-sm text-gray-600 mt-1">${task.description}</div>
+                                    ${task.store ? `<div class="text-xs text-blue-600 mt-1">${getStoreName(task.store)}</div>` : ''}
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <span class="px-3 py-1 text-xs rounded-full ${getPriorityClass(task.priority)}">${getPriorityText(task.priority)}</span>
+                                    <button onclick="editTask(${task.id})" class="text-blue-600 hover:text-blue-800 p-2">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            }
+            
+            // 週間スケジュール描画
+            const weeklySchedule = document.getElementById('weeklySchedule');
+            if (weeklySchedule) {
+                const weekDays = ['日', '月', '火', '水', '木', '金', '土'];
+                const today = new Date();
+                const startOfWeek = new Date(today);
+                startOfWeek.setDate(today.getDate() - today.getDay());
+                
+                let weekHTML = '';
+                for (let i = 0; i < 7; i++) {
+                    const currentDay = new Date(startOfWeek);
+                    currentDay.setDate(startOfWeek.getDate() + i);
+                    const dateStr = currentDay.toISOString().split('T')[0];
+                    const dayEvents = events.filter(event => event.date === dateStr);
+                    const isToday = dateStr === today.toISOString().split('T')[0];
+                    
+                    weekHTML += `
+                        <div class="calendar-day ${isToday ? 'today' : ''}" onclick="showDayDetails('${dateStr}')">
+                            <div class="font-semibold mb-2">${weekDays[i]} ${currentDay.getDate()}</div>
+                            ${dayEvents.map(event => `
+                                <div class="text-xs p-1 rounded mb-1 ${getEventClass(event.type)}">
+                                    ${event.title}
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                }
+                weeklySchedule.innerHTML = weekHTML;
+            }
+        }
+        
+        // タスク管理
+        function renderTasks() {
+            const filteredTasks = getFilteredTasks();
+            const tasksList = document.getElementById('tasksList');
+            
+            if (!tasksList) return;
+            
+            if (filteredTasks.length === 0) {
+                tasksList.innerHTML = '<div class="text-center text-gray-500 py-8">条件に一致するタスクがありません</div>';
+                return;
+            }
+            
+            tasksList.innerHTML = filteredTasks.map(task => `
+                <div class="task-card ${task.completed ? 'completed' : ''} ${task.priority}-priority">
+                    <div class="flex items-center">
+                        <input type="checkbox" ${task.completed ? 'checked' : ''} 
+                               onchange="toggleTaskComplete(${task.id})"
+                               class="mr-4 w-5 h-5 text-blue-600 rounded">
+                        <div class="flex-1">
+                            <div class="font-semibold text-gray-900 ${task.completed ? 'line-through' : ''}">
+                                ${task.title}
+                            </div>
+                            <div class="text-sm text-gray-600 mt-1">${task.description}</div>
+                            <div class="flex items-center space-x-4 mt-2 text-xs text-gray-500">
+                                ${task.store ? `<span>店舗: ${getStoreName(task.store)}</span>` : ''}
+                                ${task.dueDate ? `<span>期限: ${formatDate(task.dueDate)}</span>` : ''}
+                                <span>作成: ${formatDate(task.createdAt.split('T')[0])}</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="px-3 py-1 text-xs rounded-full ${getPriorityClass(task.priority)}">${getPriorityText(task.priority)}</span>
+                            <button onclick="editTask(${task.id})" class="text-blue-600 hover:text-blue-800 p-2">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="deleteTask(${task.id})" class="text-red-600 hover:text-red-800 p-2">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function getFilteredTasks() {
+            const searchTerm = document.getElementById('taskSearch')?.value.toLowerCase() || '';
+            const priorityFilter = document.getElementById('priorityFilter')?.value || '';
+            const statusFilter = document.getElementById('statusFilter')?.value || '';
+            const storeFilter = document.getElementById('storeFilter')?.value || '';
+            
+            return tasks.filter(task => {
+                const matchesSearch = task.title.toLowerCase().includes(searchTerm) || 
+                                    task.description.toLowerCase().includes(searchTerm);
+                const matchesPriority = !priorityFilter || task.priority === priorityFilter;
+                const matchesStatus = !statusFilter || 
+                                    (statusFilter === 'completed' && task.completed) ||
+                                    (statusFilter === 'pending' && !task.completed);
+                const matchesStore = !storeFilter || task.store === storeFilter;
+                
+                return matchesSearch && matchesPriority && matchesStatus && matchesStore;
             });
         }
         
-        // === カレンダー機能 ===
+        function filterTasks() {
+            renderTasks();
+        }
+        
+        function openTaskModal(taskId = null) {
+            editingTaskId = taskId;
+            const modal = document.getElementById('taskModal');
+            const title = document.getElementById('taskModalTitle');
+            
+            if (taskId) {
+                const task = tasks.find(t => t.id === taskId);
+                if (task) {
+                    title.textContent = 'タスク編集';
+                    document.getElementById('taskTitle').value = task.title;
+                    document.getElementById('taskDescription').value = task.description;
+                    document.getElementById('taskPriority').value = task.priority;
+                    document.getElementById('taskStore').value = task.store;
+                    document.getElementById('taskDueDate').value = task.dueDate;
+                }
+            } else {
+                title.textContent = '新しいタスク';
+                document.getElementById('taskTitle').value = '';
+                document.getElementById('taskDescription').value = '';
+                document.getElementById('taskPriority').value = 'medium';
+                document.getElementById('taskStore').value = '';
+                document.getElementById('taskDueDate').value = '';
+            }
+            
+            modal.classList.remove('hidden');
+        }
+        
+        function closeTaskModal() {
+            document.getElementById('taskModal').classList.add('hidden');
+            editingTaskId = null;
+        }
+        
+        function saveTask() {
+            const title = document.getElementById('taskTitle').value.trim();
+            const description = document.getElementById('taskDescription').value.trim();
+            const priority = document.getElementById('taskPriority').value;
+            const store = document.getElementById('taskStore').value;
+            const dueDate = document.getElementById('taskDueDate').value;
+            
+            if (!title) {
+                showNotification('タスク名を入力してください', 'error');
+                return;
+            }
+            
+            if (editingTaskId) {
+                const taskIndex = tasks.findIndex(t => t.id === editingTaskId);
+                if (taskIndex !== -1) {
+                    tasks[taskIndex] = {
+                        ...tasks[taskIndex],
+                        title,
+                        description,
+                        priority,
+                        store,
+                        dueDate
+                    };
+                }
+            } else {
+                const newTask = {
+                    id: Date.now(),
+                    title,
+                    description,
+                    priority,
+                    store,
+                    dueDate,
+                    completed: false,
+                    createdAt: new Date().toISOString()
+                };
+                tasks.unshift(newTask);
+            }
+            
+            saveData();
+            closeTaskModal();
+            
+            if (currentPage === 'tasks') {
+                renderTasks();
+            } else if (currentPage === 'dashboard') {
+                renderDashboard();
+            }
+            
+            showNotification(editingTaskId ? 'タスクを更新しました' : 'タスクを追加しました', 'success');
+        }
+        
+        function editTask(taskId) {
+            openTaskModal(taskId);
+        }
+        
+        function deleteTask(taskId) {
+            if (confirm('このタスクを削除しますか？')) {
+                tasks = tasks.filter(t => t.id !== taskId);
+                saveData();
+                
+                if (currentPage === 'tasks') {
+                    renderTasks();
+                } else if (currentPage === 'dashboard') {
+                    renderDashboard();
+                }
+                
+                showNotification('タスクを削除しました', 'success');
+            }
+        }
+        
+        function toggleTaskComplete(taskId) {
+            const task = tasks.find(t => t.id === taskId);
+            if (task) {
+                task.completed = !task.completed;
+                saveData();
+                
+                if (currentPage === 'tasks') {
+                    renderTasks();
+                } else if (currentPage === 'dashboard') {
+                    renderDashboard();
+                }
+            }
+        }
+        
+        // イベント管理
+        function openEventModal(eventId = null) {
+            editingEventId = eventId;
+            const modal = document.getElementById('eventModal');
+            
+            if (eventId) {
+                const event = events.find(e => e.id === eventId);
+                if (event) {
+                    document.getElementById('eventTitle').value = event.title;
+                    document.getElementById('eventDescription').value = event.description;
+                    document.getElementById('eventType').value = event.type;
+                    document.getElementById('eventDate').value = event.date;
+                    document.getElementById('eventStartTime').value = event.startTime;
+                    document.getElementById('eventEndTime').value = event.endTime;
+                }
+            } else {
+                document.getElementById('eventTitle').value = '';
+                document.getElementById('eventDescription').value = '';
+                document.getElementById('eventType').value = 'meeting';
+                document.getElementById('eventDate').value = '';
+                document.getElementById('eventStartTime').value = '';
+                document.getElementById('eventEndTime').value = '';
+            }
+            
+            modal.classList.remove('hidden');
+        }
+        
+        function closeEventModal() {
+            document.getElementById('eventModal').classList.add('hidden');
+            editingEventId = null;
+        }
+        
+        function saveEvent() {
+            const title = document.getElementById('eventTitle').value.trim();
+            const description = document.getElementById('eventDescription').value.trim();
+            const type = document.getElementById('eventType').value;
+            const date = document.getElementById('eventDate').value;
+            const startTime = document.getElementById('eventStartTime').value;
+            const endTime = document.getElementById('eventEndTime').value;
+            
+            if (!title || !date) {
+                showNotification('予定名と日付を入力してください', 'error');
+                return;
+            }
+            
+            if (editingEventId) {
+                const eventIndex = events.findIndex(e => e.id === editingEventId);
+                if (eventIndex !== -1) {
+                    events[eventIndex] = {
+                        ...events[eventIndex],
+                        title,
+                        description,
+                        type,
+                        date,
+                        startTime,
+                        endTime
+                    };
+                }
+            } else {
+                const newEvent = {
+                    id: Date.now(),
+                    title,
+                    description,
+                    type,
+                    date,
+                    startTime,
+                    endTime
+                };
+                events.push(newEvent);
+            }
+            
+            saveData();
+            closeEventModal();
+            
+            if (currentPage === 'calendar') {
+                generateCalendar();
+            } else if (currentPage === 'dashboard') {
+                renderDashboard();
+            }
+            
+            showNotification(editingEventId ? '予定を更新しました' : '予定を追加しました', 'success');
+        }
+        
+        // カレンダー機能
         function generateCalendar() {
             const calendarGrid = document.getElementById('calendarGrid');
             if (!calendarGrid) return;
             
-            // 2024年6月のカレンダーを生成
-            const days = [];
-            for (let i = 1; i <= 30; i++) {
-                const isToday = i === 26; // 今日は26日として設定
-                const events = getEventsForDay(i);
+            const today = new Date();
+            const currentYear = today.getFullYear();
+            const currentMonth = today.getMonth();
+            const firstDay = new Date(currentYear, currentMonth, 1);
+            const lastDay = new Date(currentYear, currentMonth + 1, 0);
+            const startDate = new Date(firstDay);
+            startDate.setDate(startDate.getDate() - firstDay.getDay());
+            
+            // ヘッダー
+            const headers = ['日', '月', '火', '水', '木', '金', '土'];
+            let calendarHTML = headers.map(header => `
+                <div class="text-center font-semibold p-3 bg-gray-100 rounded-lg">${header}</div>
+            `).join('');
+            
+            // カレンダーの日付
+            for (let i = 0; i < 42; i++) {
+                const currentDate = new Date(startDate);
+                currentDate.setDate(startDate.getDate() + i);
+                const dateStr = currentDate.toISOString().split('T')[0];
+                const isCurrentMonth = currentDate.getMonth() === currentMonth;
+                const isToday = dateStr === today.toISOString().split('T')[0];
+                const dayEvents = events.filter(event => event.date === dateStr);
                 
-                days.push(`
-                    <div class="calendar-day ${isToday ? 'calendar-today' : ''} rounded-lg min-h-20">
-                        <div class="font-semibold ${isToday ? 'text-blue-800' : 'text-gray-800'} mb-1">${i}</div>
-                        ${events.map(event => `<div class="event-item ${event.class}">${event.text}</div>`).join('')}
+                calendarHTML += `
+                    <div class="calendar-day ${isToday ? 'today' : ''} ${!isCurrentMonth ? 'opacity-30' : ''}" 
+                         onclick="showDayDetails('${dateStr}')">
+                        <div class="font-semibold mb-2">${currentDate.getDate()}</div>
+                        ${dayEvents.map(event => `
+                            <div class="text-xs p-1 rounded mb-1 cursor-pointer ${getEventClass(event.type)}"
+                                 onclick="event.stopPropagation(); editEvent(${event.id})">
+                                ${event.title}
+                            </div>
+                        `).join('')}
                     </div>
-                `);
+                `;
             }
             
-            calendarGrid.innerHTML = days.join('');
+            calendarGrid.innerHTML = calendarHTML;
         }
         
-        function getEventsForDay(day) {
-            const events = {
-                26: [
-                    { text: '月次会議', class: 'event-meeting' },
-                    { text: '売上報告', class: 'event-deadline' }
-                ],
-                28: [
-                    { text: '撮影', class: 'event-shooting' },
-                    { text: '店長会議', class: 'event-meeting' }
-                ],
-                29: [
-                    { text: '給与処理', class: 'event-deadline' }
-                ],
-                30: [
-                    { text: '監査', class: 'event-meeting' }
-                ],
-                1: [
-                    { text: '休業日', class: 'event-holiday' }
-                ],
-                2: [
-                    { text: '休業日', class: 'event-holiday' }
-                ]
+        // チャート初期化
+        function initializeCharts() {
+            // 売上チャート
+            const salesCtx = document.getElementById('salesChart');
+            if (salesCtx) {
+                salesChart = new Chart(salesCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
+                        datasets: [{
+                            label: '今年',
+                            data: [245, 268, 225, 298, 275, 280],
+                            backgroundColor: 'rgba(59, 130, 246, 0.8)',
+                            borderColor: '#3b82f6',
+                            borderWidth: 2
+                        }, {
+                            label: '前年',
+                            data: [220, 235, 210, 265, 245, 249],
+                            backgroundColor: 'rgba(6, 182, 212, 0.6)',
+                            borderColor: '#06b6d4',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // 投稿チャート
+            const postsCtx = document.getElementById('postsChart');
+            if (postsCtx) {
+                postsChart = new Chart(postsCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['名古屋店', '錦店', '横浜店'],
+                        datasets: [{
+                            data: [80, 60, 40],
+                            backgroundColor: [
+                                'rgba(16, 185, 129, 0.8)',
+                                'rgba(245, 158, 11, 0.8)',
+                                'rgba(239, 68, 68, 0.8)'
+                            ],
+                            borderColor: [
+                                '#10b981',
+                                '#f59e0b',
+                                '#ef4444'
+                            ],
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+            }
+        }
+        
+        // 売上分析描画
+        function renderSales() {
+            const storeRanking = document.getElementById('storeRanking');
+            if (storeRanking) {
+                const rankings = [
+                    { name: '名古屋店', sales: 105.2, achievement: 105.2, rank: 1 },
+                    { name: '横浜店', sales: 98.1, achievement: 98.1, rank: 2 },
+                    { name: '錦店', sales: 88.7, achievement: 88.7, rank: 3 }
+                ];
+                
+                storeRanking.innerHTML = rankings.map(store => `
+                    <div class="p-4 bg-gradient-to-r ${getRankingGradient(store.rank)} rounded-16 border-l-4 ${getRankingBorder(store.rank)}">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="text-2xl mr-3">${getRankingEmoji(store.rank)}</div>
+                                <div>
+                                    <div class="font-semibold text-gray-900">${store.name}</div>
+                                    <div class="text-sm text-gray-600">達成率: ${store.achievement}%</div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="font-bold text-lg ${getRankingColor(store.rank)}">¥${store.sales}M</div>
+                                <div class="text-xs ${store.achievement >= 100 ? 'text-green-600' : 'text-red-600'}">
+                                    ${store.achievement >= 100 ? '+' : ''}${(store.achievement - 100).toFixed(1)}%
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+        
+        // 投稿管理描画
+        function renderPosts() {
+            const postStatus = document.getElementById('postStatus');
+            if (postStatus) {
+                const stores = [
+                    { name: '名古屋店', posts: 24, target: 30, rate: 80 },
+                    { name: '錦店', posts: 18, target: 30, rate: 60 },
+                    { name: '横浜店', posts: 12, target: 30, rate: 40 }
+                ];
+                
+                postStatus.innerHTML = stores.map(store => `
+                    <div class="p-4 bg-gradient-to-r ${getPostStatusGradient(store.rate)} rounded-16 border-l-4 ${getPostStatusBorder(store.rate)}">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="font-semibold text-gray-900">${store.name}</span>
+                            <span class="font-bold ${getPostStatusColor(store.rate)}">${store.posts}/${store.target}</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2 mb-2">
+                            <div class="${getPostStatusProgress(store.rate)} h-2 rounded-full" style="width: ${store.rate}%"></div>
+                        </div>
+                        <div class="text-sm text-gray-600">達成率: ${store.rate}% | 残り${store.target - store.posts}件</div>
+                    </div>
+                `).join('');
+            }
+            
+            const postsTable = document.getElementById('postsTable');
+            if (postsTable) {
+                const postEntries = [
+                    { date: '2024-06-26', store: '名古屋店', author: '田中美咲', count: 3, status: 'completed' },
+                    { date: '2024-06-26', store: '錦店', author: '佐藤花音', count: 2, status: 'completed' },
+                    { date: '2024-06-26', store: '横浜店', author: '鈴木愛子', count: 1, status: 'pending' }
+                ];
+                
+                postsTable.innerHTML = postEntries.map(entry => `
+                    <tr class="hover:bg-gray-50">
+                        <td class="p-4">${formatDate(entry.date)}</td>
+                        <td class="p-4">${getStoreName(entry.store.replace('店', ''))}</td>
+                        <td class="p-4">${entry.author}</td>
+                        <td class="p-4">
+                            <span class="px-3 py-1 text-sm rounded-full ${getCountClass(entry.count)}">
+                                ${entry.count}件
+                            </span>
+                        </td>
+                        <td class="p-4">
+                            <span class="px-3 py-1 text-xs rounded-full ${getPostEntryStatusClass(entry.status)}">
+                                ${entry.status === 'completed' ? '確認済み' : '未確認'}
+                            </span>
+                        </td>
+                        <td class="p-4">
+                            <button class="text-blue-600 hover:text-blue-800 mr-2">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        }
+        
+        // レポート生成
+        function generateReport(type) {
+            const reportTypes = {
+                sales: '売上レポート',
+                posts: '投稿レポート',
+                comprehensive: '総合レポート',
+                schedule: 'スケジュールレポート'
             };
             
-            return events[day] || [];
-        }
-        
-        function addEvent() {
-            alert('予定追加機能（Google Calendar連携で実装予定）');
-        }
-        
-        function filterEvents(type) {
-            // フィルターボタンの状態更新
-            document.querySelectorAll('[id^="filter"]').forEach(btn => {
-                btn.className = 'btn btn-outline';
-            });
-            document.getElementById(`filter${type.charAt(0).toUpperCase() + type.slice(1)}`).className = 'btn btn-primary';
+            let data = [];
+            const filename = `${reportTypes[type]}_${new Date().toISOString().split('T')[0]}`;
             
-            // イベントフィルタリング（実装例）
-            showNotification(`${type === 'all' ? '全予定' : type === 'common' ? '共通予定' : '個別予定'}を表示中`, 'info');
+            switch(type) {
+                case 'sales':
+                    data = [
+                        ['店舗名', '今月売上', '目標', '達成率', '前年同月', '前年比'],
+                        ['名古屋店', '105,200,000', '100,000,000', '105.2%', '95,000,000', '+10.7%'],
+                        ['錦店', '88,700,000', '100,000,000', '88.7%', '85,000,000', '+4.4%'],
+                        ['横浜店', '98,100,000', '100,000,000', '98.1%', '92,000,000', '+6.6%'],
+                        ['合計', '291,900,000', '300,000,000', '97.3%', '272,000,000', '+7.3%']
+                    ];
+                    break;
+                case 'posts':
+                    data = [
+                        ['店舗名', '目標投稿数', '実投稿数', '達成率', '未達成者数'],
+                        ['名古屋店', '30', '24', '80%', '2'],
+                        ['錦店', '30', '18', '60%', '4'],
+                        ['横浜店', '30', '12', '40%', '6'],
+                        ['合計', '90', '54', '60%', '12']
+                    ];
+                    break;
+                case 'comprehensive':
+                    data = [
+                        ['項目', '目標', '実績', '達成率', '状況'],
+                        ['売上合計', '300,000,000', '291,900,000', '97.3%', '順調'],
+                        ['投稿合計', '90', '54', '60%', '要改善'],
+                        ['タスク完了率', '100%', '67%', '67%', '要注意'],
+                        ['予定消化率', '100%', '85%', '85%', '良好']
+                    ];
+                    break;
+                case 'schedule':
+                    data = [
+                        ['日付', '時間', '予定', '種類', '場所'],
+                        ...events.map(event => [
+                            event.date,
+                            `${event.startTime || ''}-${event.endTime || ''}`,
+                            event.title,
+                            getEventTypeName(event.type),
+                            event.description
+                        ])
+                    ];
+                    break;
+            }
+            
+            // Excel形式でダウンロード
+            const ws = XLSX.utils.aoa_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, reportTypes[type]);
+            XLSX.writeFile(wb, `${filename}.xlsx`);
+            
+            showNotification(`${reportTypes[type]}をダウンロードしました`, 'success');
         }
         
-        function previousMonth() {
-            showNotification('前月表示（実装予定）', 'info');
+        function generateMonthEndReport() {
+            showNotification('月末データを一括ダウンロード中...', 'info');
+            
+            const reports = ['sales', 'posts', 'comprehensive', 'schedule'];
+            let downloadCount = 0;
+            
+            reports.forEach((report, index) => {
+                setTimeout(() => {
+                    generateReport(report);
+                    downloadCount++;
+                    
+                    if (downloadCount === reports.length) {
+                        setTimeout(() => {
+                            showNotification('月末データの一括ダウンロードが完了しました', 'success');
+                        }, 500);
+                    }
+                }, index * 1000);
+            });
         }
         
-        function nextMonth() {
-            showNotification('翌月表示（実装予定）', 'info');
+        // エクスポート機能
+        function exportTasks() {
+            const data = [
+                ['ID', 'タスク名', '説明', '優先度', '店舗', '期限', 'ステータス', '作成日'],
+                ...tasks.map(task => [
+                    task.id,
+                    task.title,
+                    task.description,
+                    getPriorityText(task.priority),
+                    task.store ? getStoreName(task.store) : '',
+                    task.dueDate || '',
+                    task.completed ? '完了' : '未完了',
+                    formatDate(task.createdAt.split('T')[0])
+                ])
+            ];
+            
+            const ws = XLSX.utils.aoa_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'タスク一覧');
+            
+            const filename = `タスク一覧_${new Date().toISOString().split('T')[0]}.xlsx`;
+            XLSX.writeFile(wb, filename);
+            
+            showNotification('タスクデータをエクスポートしました', 'success');
         }
         
-        // === 通知システム ===
+        // データ同期
+        function syncAllData() {
+            const btn = event.target;
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>同期中...';
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                btn.innerHTML = originalHTML;
+                btn.disabled = false;
+                
+                const lastSync = document.getElementById('lastSync');
+                if (lastSync) {
+                    lastSync.textContent = new Date().toLocaleString('ja-JP');
+                }
+                
+                showNotification('データ同期が完了しました', 'success');
+            }, 2000);
+        }
+        
+        // クイックアクション
+        function showQuickActions() {
+            const actions = [
+                { name: '新しいタスク', action: () => openTaskModal() },
+                { name: '予定追加', action: () => openEventModal() },
+                { name: '売上確認', action: () => showPage('sales') },
+                { name: 'レポート作成', action: () => showPage('reports') }
+            ];
+            
+            let actionHTML = '<div class="space-y-2">';
+            actions.forEach(action => {
+                actionHTML += `<button class="btn btn-outline w-full" onclick="${action.action.toString().slice(6, -1)}">${action.name}</button>`;
+            });
+            actionHTML += '</div>';
+            
+            showCustomModal('クイックアクション', actionHTML);
+        }
+        
+        // 通知システム
         function showNotification(message, type = 'info') {
             const notification = document.createElement('div');
-            notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${
-                type === 'success' ? 'bg-green-100 text-green-800 border border-green-200' :
-                type === 'error' ? 'bg-red-100 text-red-800 border border-red-200' :
-                'bg-blue-100 text-blue-800 border border-blue-200'
+            notification.className = `notification border-l-4 ${
+                type === 'success' ? 'border-green-500 bg-green-50 text-green-800' :
+                type === 'error' ? 'border-red-500 bg-red-50 text-red-800' :
+                type === 'warning' ? 'border-yellow-500 bg-yellow-50 text-yellow-800' :
+                'border-blue-500 bg-blue-50 text-blue-800'
             }`;
+            
+            const icon = type === 'success' ? 'check-circle' :
+                        type === 'error' ? 'exclamation-circle' :
+                        type === 'warning' ? 'exclamation-triangle' : 'info-circle';
             
             notification.innerHTML = `
                 <div class="flex items-center">
-                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'} mr-2"></i>
-                    <span>${message}</span>
+                    <i class="fas fa-${icon} mr-3 text-lg"></i>
+                    <span class="font-medium">${message}</span>
+                    <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times"></i>
+                    </button>
                 </div>
             `;
             
             document.body.appendChild(notification);
             
             setTimeout(() => {
-                notification.remove();
-            }, 3000);
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 5000);
         }
         
-        // === レスポンシブ対応 ===
-        window.addEventListener('resize', function() {
-            if (window.innerWidth >= 768) {
-                closeSidebar();
-            }
-        });
+        function showCustomModal(title, content) {
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-bold text-gray-900">${title}</h3>
+                        <button onclick="this.closest('.modal').remove()" class="text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+                    ${content}
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.remove();
+                }
+            });
+        }
         
-        console.log('CLASSY業務ダッシュボード - 初期化完了');
-    </script>
-</body>
-</html>
+        // ユーティリティ関数
+        function format
