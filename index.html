@@ -24,6 +24,54 @@
             min-height: 100vh;
         }
         
+        /* メインレイアウト */
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* サイドバー */
+        .sidebar {
+            width: 320px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 4px 0 30px rgba(0, 0, 0, 0.1);
+            position: relative;
+            transition: all 0.3s ease;
+            z-index: 999;
+        }
+        
+        /* メインコンテンツエリア */
+        .main-content {
+            flex: 1;
+            overflow-x: hidden;
+        }
+        
+        /* モバイル対応 */
+        @media (max-width: 1023px) {
+            .app-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: -320px;
+                width: 320px;
+                height: 100vh;
+                z-index: 999;
+            }
+            
+            .sidebar.active {
+                left: 0;
+            }
+            
+            .main-content {
+                width: 100%;
+            }
+        }
+        
         .glass-card {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
@@ -181,21 +229,6 @@
             to { transform: translateX(0); opacity: 1; }
         }
         
-        .sidebar {
-            position: fixed;
-            top: 0;
-            left: -350px;
-            width: 350px;
-            height: 100vh;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            transition: all 0.3s ease;
-            z-index: 999;
-            box-shadow: 4px 0 30px rgba(0, 0, 0, 0.1);
-        }
-        
-        .sidebar.active { left: 0; }
-        
         .nav-item {
             display: flex;
             align-items: center;
@@ -296,11 +329,6 @@
             .modal-content { padding: 24px; }
         }
         
-        @media (min-width: 1024px) {
-            .sidebar { position: relative; left: 0; width: 320px; box-shadow: none; }
-            .main-content { margin-left: 320px; }
-        }
-        
         .chart-container { position: relative; height: 400px; width: 100%; }
         .fade-in { animation: fadeIn 0.5s ease-in; }
         
@@ -311,415 +339,418 @@
     </style>
 </head>
 <body>
-    <!-- オーバーレイ -->
-    <div id="overlay" class="overlay"></div>
-    
-    <!-- フローティングボタン -->
-    <button class="floating-btn lg:hidden" onclick="toggleSidebar()">
-        <i class="fas fa-bars"></i>
-    </button>
-    
-    <!-- サイドバー -->
-    <div id="sidebar" class="sidebar">
-        <div class="p-8">
-            <div class="text-center mb-8">
-                <div class="text-3xl font-bold text-gray-900 mb-2">CLASSY</div>
-                <div class="text-sm text-gray-600">業務管理システム</div>
-                <div class="text-xs text-blue-600 font-medium">川満さん専用</div>
-            </div>
-            
-            <nav class="space-y-2">
-                <div class="nav-item active" data-page="dashboard">
-                    <i class="fas fa-home mr-4 text-xl"></i>
-                    <span>ダッシュボード</span>
+    <!-- アプリケーションコンテナ -->
+    <div class="app-container">
+        <!-- オーバーレイ -->
+        <div id="overlay" class="overlay lg:hidden"></div>
+        
+        <!-- フローティングボタン -->
+        <button class="floating-btn lg:hidden" onclick="toggleSidebar()">
+            <i class="fas fa-bars"></i>
+        </button>
+        
+        <!-- サイドバー -->
+        <div id="sidebar" class="sidebar">
+            <div class="p-8">
+                <div class="text-center mb-8">
+                    <div class="text-3xl font-bold text-gray-900 mb-2">CLASSY</div>
+                    <div class="text-sm text-gray-600">業務管理システム</div>
+                    <div class="text-xs text-blue-600 font-medium">川満さん専用</div>
                 </div>
-                <div class="nav-item" data-page="tasks">
-                    <i class="fas fa-tasks mr-4 text-xl"></i>
-                    <span>タスク管理</span>
-                </div>
-                <div class="nav-item" data-page="sales">
-                    <i class="fas fa-chart-line mr-4 text-xl"></i>
-                    <span>売上分析</span>
-                </div>
-                <div class="nav-item" data-page="posts">
-                    <i class="fas fa-camera mr-4 text-xl"></i>
-                    <span>投稿管理</span>
-                </div>
-                <div class="nav-item" data-page="calendar">
-                    <i class="fas fa-calendar mr-4 text-xl"></i>
-                    <span>カレンダー</span>
-                </div>
-                <div class="nav-item" data-page="reports">
-                    <i class="fas fa-file-alt mr-4 text-xl"></i>
-                    <span>レポート</span>
-                </div>
-            </nav>
-            
-            <div class="mt-8 p-6 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-20">
-                <div class="text-center">
-                    <div class="text-3xl mb-3">📊</div>
-                    <div class="text-sm font-medium text-blue-800">データ同期</div>
-                    <div class="text-xs text-blue-600 mb-4" id="lastSync">未同期</div>
-                    <button class="btn btn-primary w-full" onclick="syncAllData()">
-                        <i class="fas fa-sync-alt mr-2"></i>同期
-                    </button>
+                
+                <nav class="space-y-2">
+                    <div class="nav-item active" data-page="dashboard">
+                        <i class="fas fa-home mr-4 text-xl"></i>
+                        <span>ダッシュボード</span>
+                    </div>
+                    <div class="nav-item" data-page="tasks">
+                        <i class="fas fa-tasks mr-4 text-xl"></i>
+                        <span>タスク管理</span>
+                    </div>
+                    <div class="nav-item" data-page="sales">
+                        <i class="fas fa-chart-line mr-4 text-xl"></i>
+                        <span>売上分析</span>
+                    </div>
+                    <div class="nav-item" data-page="posts">
+                        <i class="fas fa-camera mr-4 text-xl"></i>
+                        <span>投稿管理</span>
+                    </div>
+                    <div class="nav-item" data-page="calendar">
+                        <i class="fas fa-calendar mr-4 text-xl"></i>
+                        <span>カレンダー</span>
+                    </div>
+                    <div class="nav-item" data-page="reports">
+                        <i class="fas fa-file-alt mr-4 text-xl"></i>
+                        <span>レポート</span>
+                    </div>
+                </nav>
+                
+                <div class="mt-8 p-6 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-20">
+                    <div class="text-center">
+                        <div class="text-3xl mb-3">📊</div>
+                        <div class="text-sm font-medium text-blue-800">データ同期</div>
+                        <div class="text-xs text-blue-600 mb-4" id="lastSync">未同期</div>
+                        <button class="btn btn-primary w-full" onclick="syncAllData()">
+                            <i class="fas fa-sync-alt mr-2"></i>同期
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    
-    <!-- メインコンテンツ -->
-    <div class="main-content">
-        <!-- ヘッダー -->
-        <header class="glass-card m-4 lg:m-6">
-            <div class="p-6 flex items-center justify-between">
-                <div class="flex items-center">
-                    <button onclick="toggleSidebar()" class="lg:hidden mr-4 p-3 text-gray-600 hover:text-gray-800 rounded-full hover:bg-gray-100">
-                        <i class="fas fa-bars text-xl"></i>
-                    </button>
-                    <div>
-                        <h1 class="text-2xl lg:text-3xl font-bold text-gray-900">CLASSY業務管理</h1>
-                        <p class="text-sm lg:text-base text-gray-600" id="currentPageTitle">ダッシュボード</p>
-                    </div>
-                </div>
-                
-                <div class="flex items-center space-x-4">
-                    <div class="text-right hidden sm:block">
-                        <div class="font-semibold text-gray-900" id="currentDate"></div>
-                        <div class="text-sm text-blue-600" id="currentTime"></div>
-                    </div>
-                    <button class="btn btn-primary" onclick="showQuickActions()">
-                        <i class="fas fa-plus mr-2"></i>
-                        <span class="hidden sm:inline">クイック</span>
-                    </button>
-                </div>
-            </div>
-        </header>
         
-        <!-- ダッシュボードページ -->
-        <div id="dashboardPage" class="page-content p-4 lg:p-6 fade-in">
-            <!-- データアップロード -->
-            <div class="glass-card p-6 mb-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-bold text-gray-900">売上データアップロード</h3>
-                    <button class="btn btn-success" onclick="downloadSalesTemplate()">
-                        <i class="fas fa-download mr-2"></i>テンプレートDL
-                    </button>
-                </div>
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    <div>
-                        <input type="file" id="salesFileInput" accept=".xlsx,.xls,.csv" class="input-field">
-                        <div class="text-sm text-gray-600 mt-2">
-                            <i class="fas fa-info-circle mr-1"></i>
-                            Excel形式 (.xlsx, .xls) またはCSV形式のファイルをアップロード
+        <!-- メインコンテンツ -->
+        <div class="main-content">
+            <!-- ヘッダー -->
+            <header class="glass-card m-4 lg:m-6">
+                <div class="p-6 flex items-center justify-between">
+                    <div class="flex items-center">
+                        <button onclick="toggleSidebar()" class="lg:hidden mr-4 p-3 text-gray-600 hover:text-gray-800 rounded-full hover:bg-gray-100">
+                            <i class="fas fa-bars text-xl"></i>
+                        </button>
+                        <div>
+                            <h1 class="text-2xl lg:text-3xl font-bold text-gray-900">CLASSY業務管理</h1>
+                            <p class="text-sm lg:text-base text-gray-600" id="currentPageTitle">ダッシュボード</p>
                         </div>
                     </div>
-                    <div class="flex items-center space-x-3">
-                        <button class="btn btn-primary" onclick="processSalesData()">
-                            <i class="fas fa-upload mr-2"></i>データ反映
+                    
+                    <div class="flex items-center space-x-4">
+                        <div class="text-right hidden sm:block">
+                            <div class="font-semibold text-gray-900" id="currentDate"></div>
+                            <div class="text-sm text-blue-600" id="currentTime"></div>
+                        </div>
+                        <button class="btn btn-primary" onclick="showQuickActions()">
+                            <i class="fas fa-plus mr-2"></i>
+                            <span class="hidden sm:inline">クイック</span>
                         </button>
-                        <div id="uploadStatus" class="text-sm text-gray-500"></div>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- ダッシュボードページ -->
+            <div id="dashboardPage" class="page-content p-4 lg:p-6 fade-in">
+                <!-- データアップロード -->
+                <div class="glass-card p-6 mb-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-bold text-gray-900">売上データアップロード</h3>
+                        <button class="btn btn-success" onclick="downloadSalesTemplate()">
+                            <i class="fas fa-download mr-2"></i>テンプレートDL
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        <div>
+                            <input type="file" id="salesFileInput" accept=".xlsx,.xls,.csv" class="input-field">
+                            <div class="text-sm text-gray-600 mt-2">
+                                <i class="fas fa-info-circle mr-1"></i>
+                                Excel形式 (.xlsx, .xls) またはCSV形式のファイルをアップロード
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <button class="btn btn-primary" onclick="processSalesData()">
+                                <i class="fas fa-upload mr-2"></i>データ反映
+                            </button>
+                            <div id="uploadStatus" class="text-sm text-gray-500"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 今日の概要 -->
+                <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-6 mb-6">
+                    <div class="glass-card p-6 text-center">
+                        <div class="text-4xl font-bold text-blue-600 mb-2" id="todayTasksCount">0</div>
+                        <div class="text-sm text-gray-600">今日のタスク</div>
+                        <div class="text-xs text-green-600 mt-2" id="completedTasksCount">0件完了</div>
+                    </div>
+                    <div class="glass-card p-6 text-center">
+                        <div class="text-4xl font-bold text-green-600 mb-2">¥2.8M</div>
+                        <div class="text-sm text-gray-600">本日売上</div>
+                        <div class="text-xs text-green-600 mt-2">+15% 昨日比</div>
+                    </div>
+                    <div class="glass-card p-6 text-center">
+                        <div class="text-4xl font-bold text-purple-600 mb-2">87%</div>
+                        <div class="text-sm text-gray-600">投稿達成率</div>
+                        <div class="text-xs text-orange-600 mt-2">全店平均</div>
+                    </div>
+                    <div class="glass-card p-6 text-center">
+                        <div class="text-4xl font-bold text-cyan-600 mb-2" id="upcomingEvents">0</div>
+                        <div class="text-sm text-gray-600">今週の予定</div>
+                        <div class="text-xs text-blue-600 mt-2">予定あり</div>
+                    </div>
+                </div>
+                
+                <!-- 今日のタスク -->
+                <div class="glass-card p-6 mb-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-bold text-gray-900">今日のタスク</h3>
+                        <button class="btn btn-outline" onclick="openTaskModal()">
+                            <i class="fas fa-plus mr-2"></i>追加
+                        </button>
+                    </div>
+                    <div id="todayTasksList" class="space-y-4">
+                        <!-- タスクが動的に表示されます -->
+                    </div>
+                </div>
+                
+                <!-- 店舗状況 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6 mb-6" id="storesOverview">
+                    <!-- 店舗カードが動的に生成されます -->
+                </div>
+                
+                <!-- 今週の予定 -->
+                <div class="glass-card p-6">
+                    <h3 class="text-xl font-bold text-gray-900 mb-6">今週の予定</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-7 gap-3" id="weeklySchedule">
+                        <!-- 週間スケジュールがここに表示されます -->
                     </div>
                 </div>
             </div>
             
-            <!-- 今日の概要 -->
-            <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-6 mb-6">
-                <div class="glass-card p-6 text-center">
-                    <div class="text-4xl font-bold text-blue-600 mb-2" id="todayTasksCount">0</div>
-                    <div class="text-sm text-gray-600">今日のタスク</div>
-                    <div class="text-xs text-green-600 mt-2" id="completedTasksCount">0件完了</div>
-                </div>
-                <div class="glass-card p-6 text-center">
-                    <div class="text-4xl font-bold text-green-600 mb-2">¥2.8M</div>
-                    <div class="text-sm text-gray-600">本日売上</div>
-                    <div class="text-xs text-green-600 mt-2">+15% 昨日比</div>
-                </div>
-                <div class="glass-card p-6 text-center">
-                    <div class="text-4xl font-bold text-purple-600 mb-2">87%</div>
-                    <div class="text-sm text-gray-600">投稿達成率</div>
-                    <div class="text-xs text-orange-600 mt-2">全店平均</div>
-                </div>
-                <div class="glass-card p-6 text-center">
-                    <div class="text-4xl font-bold text-cyan-600 mb-2" id="upcomingEvents">0</div>
-                    <div class="text-sm text-gray-600">今週の予定</div>
-                    <div class="text-xs text-blue-600 mt-2">予定あり</div>
+            <!-- タスク管理ページ -->
+            <div id="tasksPage" class="page-content p-4 lg:p-6 hidden">
+                <div class="glass-card p-6 mb-6">
+                    <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between mb-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4 lg:mb-0">タスク管理</h3>
+                        <div class="flex flex-wrap gap-3">
+                            <button class="btn btn-primary" onclick="openTaskModal()">
+                                <i class="fas fa-plus mr-2"></i>新規タスク
+                            </button>
+                            <button class="btn btn-outline" onclick="exportTasks()">
+                                <i class="fas fa-download mr-2"></i>エクスポート
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- フィルターとソート -->
+                    <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6">
+                        <input type="text" id="taskSearch" placeholder="タスクを検索..." class="input-field">
+                        <select id="priorityFilter" class="input-field">
+                            <option value="">すべての優先度</option>
+                            <option value="high">高優先度</option>
+                            <option value="medium">中優先度</option>
+                            <option value="low">低優先度</option>
+                        </select>
+                        <select id="statusFilter" class="input-field">
+                            <option value="">すべてのステータス</option>
+                            <option value="pending">未完了</option>
+                            <option value="completed">完了済み</option>
+                        </select>
+                        <select id="storeFilter" class="input-field">
+                            <option value="">すべての店舗</option>
+                            <option value="shabour">シャブール</option>
+                            <option value="onecarat">ワンカラット</option>
+                            <option value="go_nagoya">GrandOpera名古屋</option>
+                            <option value="cl_nagoya">CLASSY名古屋</option>
+                            <option value="cl_nishiki">CLASSY錦</option>
+                            <option value="go_fukuoka">GrandOpera福岡</option>
+                            <option value="cl_yokkaichi">CLASSY四日市</option>
+                            <option value="cl_tokyo">CLASSY東京</option>
+                            <option value="go_tokyo">GrandOpera東京</option>
+                            <option value="go_yokohama">GrandOpera横浜</option>
+                        </select>
+                    </div>
+                    
+                    <!-- タスクリスト -->
+                    <div id="tasksList" class="space-y-4">
+                        <!-- タスクが動的に表示されます -->
+                    </div>
                 </div>
             </div>
             
-            <!-- 今日のタスク -->
-            <div class="glass-card p-6 mb-6">
-                <div class="flex items-center justify-between mb-6">
-                    <h3 class="text-xl font-bold text-gray-900">今日のタスク</h3>
-                    <button class="btn btn-outline" onclick="openTaskModal()">
-                        <i class="fas fa-plus mr-2"></i>追加
-                    </button>
-                </div>
-                <div id="todayTasksList" class="space-y-4">
-                    <!-- タスクが動的に表示されます -->
-                </div>
-            </div>
-            
-            <!-- 店舗状況 -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6 mb-6" id="storesOverview">
-                <!-- 店舗カードが動的に生成されます -->
-            </div>
-            
-            <!-- 今週の予定 -->
-            <div class="glass-card p-6">
-                <h3 class="text-xl font-bold text-gray-900 mb-6">今週の予定</h3>
-                <div class="grid grid-cols-1 sm:grid-cols-7 gap-3" id="weeklySchedule">
-                    <!-- 週間スケジュールがここに表示されます -->
-                </div>
-            </div>
-        </div>
-        
-        <!-- タスク管理ページ -->
-        <div id="tasksPage" class="page-content p-4 lg:p-6 hidden">
-            <div class="glass-card p-6 mb-6">
-                <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between mb-6">
-                    <h3 class="text-xl font-bold text-gray-900 mb-4 lg:mb-0">タスク管理</h3>
-                    <div class="flex flex-wrap gap-3">
-                        <button class="btn btn-primary" onclick="openTaskModal()">
-                            <i class="fas fa-plus mr-2"></i>新規タスク
-                        </button>
-                        <button class="btn btn-outline" onclick="exportTasks()">
-                            <i class="fas fa-download mr-2"></i>エクスポート
-                        </button>
+            <!-- 売上分析ページ -->
+            <div id="salesPage" class="page-content p-4 lg:p-6 hidden">
+                <!-- 売上統計 -->
+                <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-6 mb-6">
+                    <div class="glass-card p-6 text-center">
+                        <div class="text-4xl font-bold text-blue-600 mb-2">¥280M</div>
+                        <div class="text-sm text-gray-600">今月売上</div>
+                        <div class="text-xs text-green-600 mt-2">+12.5% 前年比</div>
+                    </div>
+                    <div class="glass-card p-6 text-center">
+                        <div class="text-4xl font-bold text-green-600 mb-2">96.2%</div>
+                        <div class="text-sm text-gray-600">目標達成率</div>
+                        <div class="text-xs text-green-600 mt-2">目標: ¥291M</div>
+                    </div>
+                    <div class="glass-card p-6 text-center">
+                        <div class="text-4xl font-bold text-purple-600 mb-2">10/10</div>
+                        <div class="text-sm text-gray-600">運営店舗</div>
+                        <div class="text-xs text-purple-600 mt-2">全店舗稼働</div>
+                    </div>
+                    <div class="glass-card p-6 text-center">
+                        <div class="text-4xl font-bold text-orange-600 mb-2">¥28.0M</div>
+                        <div class="text-sm text-gray-600">平均売上</div>
+                        <div class="text-xs text-orange-600 mt-2">店舗平均</div>
                     </div>
                 </div>
                 
-                <!-- フィルターとソート -->
-                <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6">
-                    <input type="text" id="taskSearch" placeholder="タスクを検索..." class="input-field">
-                    <select id="priorityFilter" class="input-field">
-                        <option value="">すべての優先度</option>
-                        <option value="high">高優先度</option>
-                        <option value="medium">中優先度</option>
-                        <option value="low">低優先度</option>
-                    </select>
-                    <select id="statusFilter" class="input-field">
-                        <option value="">すべてのステータス</option>
-                        <option value="pending">未完了</option>
-                        <option value="completed">完了済み</option>
-                    </select>
-                    <select id="storeFilter" class="input-field">
-                        <option value="">すべての店舗</option>
-                        <option value="shabour">シャブール</option>
-                        <option value="onecarat">ワンカラット</option>
-                        <option value="go_nagoya">GrandOpera名古屋</option>
-                        <option value="cl_nagoya">CLASSY名古屋</option>
-                        <option value="cl_nishiki">CLASSY錦</option>
-                        <option value="go_fukuoka">GrandOpera福岡</option>
-                        <option value="cl_yokkaichi">CLASSY四日市</option>
-                        <option value="cl_tokyo">CLASSY東京</option>
-                        <option value="go_tokyo">GrandOpera東京</option>
-                        <option value="go_yokohama">GrandOpera横浜</option>
-                    </select>
-                </div>
-                
-                <!-- タスクリスト -->
-                <div id="tasksList" class="space-y-4">
-                    <!-- タスクが動的に表示されます -->
-                </div>
-            </div>
-        </div>
-        
-        <!-- 売上分析ページ -->
-        <div id="salesPage" class="page-content p-4 lg:p-6 hidden">
-            <!-- 売上統計 -->
-            <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-6 mb-6">
-                <div class="glass-card p-6 text-center">
-                    <div class="text-4xl font-bold text-blue-600 mb-2">¥280M</div>
-                    <div class="text-sm text-gray-600">今月売上</div>
-                    <div class="text-xs text-green-600 mt-2">+12.5% 前年比</div>
-                </div>
-                <div class="glass-card p-6 text-center">
-                    <div class="text-4xl font-bold text-green-600 mb-2">96.2%</div>
-                    <div class="text-sm text-gray-600">目標達成率</div>
-                    <div class="text-xs text-green-600 mt-2">目標: ¥291M</div>
-                </div>
-                <div class="glass-card p-6 text-center">
-                    <div class="text-4xl font-bold text-purple-600 mb-2">10/10</div>
-                    <div class="text-sm text-gray-600">運営店舗</div>
-                    <div class="text-xs text-purple-600 mt-2">全店舗稼働</div>
-                </div>
-                <div class="glass-card p-6 text-center">
-                    <div class="text-4xl font-bold text-orange-600 mb-2">¥28.0M</div>
-                    <div class="text-sm text-gray-600">平均売上</div>
-                    <div class="text-xs text-orange-600 mt-2">店舗平均</div>
+                <!-- グラフエリア -->
+                <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
+                    <div class="glass-card p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <h4 class="text-lg font-bold text-gray-900">売上推移</h4>
+                            <div class="flex space-x-2">
+                                <button class="btn btn-outline" onclick="changeChartPeriod('week')">週別</button>
+                                <button class="btn btn-primary" onclick="changeChartPeriod('month')">月別</button>
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="salesChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="glass-card p-6">
+                        <h4 class="text-lg font-bold text-gray-900 mb-6">店舗別ランキング</h4>
+                        <div class="space-y-4" id="storeRanking">
+                            <!-- ランキングが動的に表示されます -->
+                        </div>
+                    </div>
                 </div>
             </div>
             
-            <!-- グラフエリア -->
-            <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
+            <!-- 投稿管理ページ -->
+            <div id="postsPage" class="page-content p-4 lg:p-6 hidden">
+                <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
+                    <div class="glass-card p-6">
+                        <h4 class="text-lg font-bold text-gray-900 mb-6">投稿達成率</h4>
+                        <div class="chart-container">
+                            <canvas id="postsChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="glass-card p-6">
+                        <h4 class="text-lg font-bold text-gray-900 mb-6">店舗別投稿状況</h4>
+                        <div class="space-y-4" id="postStatus">
+                            <!-- 投稿状況が動的に表示されます -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 投稿管理機能 -->
                 <div class="glass-card p-6">
                     <div class="flex items-center justify-between mb-6">
-                        <h4 class="text-lg font-bold text-gray-900">売上推移</h4>
-                        <div class="flex space-x-2">
-                            <button class="btn btn-outline" onclick="changeChartPeriod('week')">週別</button>
-                            <button class="btn btn-primary" onclick="changeChartPeriod('month')">月別</button>
-                        </div>
+                        <h4 class="text-lg font-bold text-gray-900">投稿管理</h4>
+                        <button class="btn btn-primary" onclick="addPostEntry()">
+                            <i class="fas fa-plus mr-2"></i>投稿記録
+                        </button>
                     </div>
-                    <div class="chart-container">
-                        <canvas id="salesChart"></canvas>
-                    </div>
-                </div>
-                
-                <div class="glass-card p-6">
-                    <h4 class="text-lg font-bold text-gray-900 mb-6">店舗別ランキング</h4>
-                    <div class="space-y-4" id="storeRanking">
-                        <!-- ランキングが動的に表示されます -->
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- 投稿管理ページ -->
-        <div id="postsPage" class="page-content p-4 lg:p-6 hidden">
-            <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
-                <div class="glass-card p-6">
-                    <h4 class="text-lg font-bold text-gray-900 mb-6">投稿達成率</h4>
-                    <div class="chart-container">
-                        <canvas id="postsChart"></canvas>
-                    </div>
-                </div>
-                
-                <div class="glass-card p-6">
-                    <h4 class="text-lg font-bold text-gray-900 mb-6">店舗別投稿状況</h4>
-                    <div class="space-y-4" id="postStatus">
-                        <!-- 投稿状況が動的に表示されます -->
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="bg-gray-50">
+                                    <th class="text-left p-4 font-semibold">日付</th>
+                                    <th class="text-left p-4 font-semibold">店舗</th>
+                                    <th class="text-left p-4 font-semibold">投稿者</th>
+                                    <th class="text-left p-4 font-semibold">投稿数</th>
+                                    <th class="text-left p-4 font-semibold">ステータス</th>
+                                    <th class="text-left p-4 font-semibold">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="postsTable">
+                                <!-- 投稿データが動的に表示されます -->
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
             
-            <!-- 投稿管理機能 -->
-            <div class="glass-card p-6">
-                <div class="flex items-center justify-between mb-6">
-                    <h4 class="text-lg font-bold text-gray-900">投稿管理</h4>
-                    <button class="btn btn-primary" onclick="addPostEntry()">
-                        <i class="fas fa-plus mr-2"></i>投稿記録
-                    </button>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full">
-                        <thead>
-                            <tr class="bg-gray-50">
-                                <th class="text-left p-4 font-semibold">日付</th>
-                                <th class="text-left p-4 font-semibold">店舗</th>
-                                <th class="text-left p-4 font-semibold">投稿者</th>
-                                <th class="text-left p-4 font-semibold">投稿数</th>
-                                <th class="text-left p-4 font-semibold">ステータス</th>
-                                <th class="text-left p-4 font-semibold">操作</th>
-                            </tr>
-                        </thead>
-                        <tbody id="postsTable">
-                            <!-- 投稿データが動的に表示されます -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-        
-        <!-- カレンダーページ -->
-        <div id="calendarPage" class="page-content p-4 lg:p-6 hidden">
-            <div class="glass-card p-6 mb-6">
-                <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between mb-6">
-                    <h3 class="text-xl font-bold text-gray-900 mb-4 lg:mb-0">カレンダー</h3>
-                    <div class="flex flex-wrap gap-3">
-                        <button class="btn btn-primary" onclick="openEventModal()">
-                            <i class="fas fa-plus mr-2"></i>予定追加
-                        </button>
-                        <button class="btn btn-outline" onclick="goToToday()">今日</button>
+            <!-- カレンダーページ -->
+            <div id="calendarPage" class="page-content p-4 lg:p-6 hidden">
+                <div class="glass-card p-6 mb-6">
+                    <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between mb-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4 lg:mb-0">カレンダー</h3>
+                        <div class="flex flex-wrap gap-3">
+                            <button class="btn btn-primary" onclick="openEventModal()">
+                                <i class="fas fa-plus mr-2"></i>予定追加
+                            </button>
+                            <button class="btn btn-outline" onclick="goToToday()">今日</button>
+                        </div>
                     </div>
-                </div>
-                
-                <!-- カレンダーナビゲーション -->
-                <div class="flex items-center justify-between mb-6">
-                    <h4 class="text-2xl font-bold text-gray-900" id="calendarTitle">2024年6月</h4>
-                    <div class="flex space-x-2">
-                        <button class="btn btn-outline" onclick="previousMonth()">
-                            <i class="fas fa-chevron-left"></i>
-                        </button>
-                        <button class="btn btn-outline" onclick="nextMonth()">
-                            <i class="fas fa-chevron-right"></i>
-                        </button>
+                    
+                    <!-- カレンダーナビゲーション -->
+                    <div class="flex items-center justify-between mb-6">
+                        <h4 class="text-2xl font-bold text-gray-900" id="calendarTitle">2024年6月</h4>
+                        <div class="flex space-x-2">
+                            <button class="btn btn-outline" onclick="previousMonth()">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <button class="btn btn-outline" onclick="nextMonth()">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
                     </div>
-                </div>
-                
-                <!-- カレンダーグリッド -->
-                <div id="calendarGrid" class="grid grid-cols-7 gap-2 mb-6">
-                    <!-- カレンダーが動的に表示されます -->
-                </div>
-                
-                <!-- イベント凡例 -->
-                <div class="flex flex-wrap gap-4 text-sm">
-                    <div class="flex items-center">
-                        <div class="w-3 h-3 bg-blue-400 rounded mr-2"></div>
-                        <span>会議</span>
+                    
+                    <!-- カレンダーグリッド -->
+                    <div id="calendarGrid" class="grid grid-cols-7 gap-2 mb-6">
+                        <!-- カレンダーが動的に表示されます -->
                     </div>
-                    <div class="flex items-center">
-                        <div class="w-3 h-3 bg-green-400 rounded mr-2"></div>
-                        <span>撮影</span>
-                    </div>
-                    <div class="flex items-center">
-                        <div class="w-3 h-3 bg-red-400 rounded mr-2"></div>
-                        <span>休業</span>
-                    </div>
-                    <div class="flex items-center">
-                        <div class="w-3 h-3 bg-orange-400 rounded mr-2"></div>
-                        <span>締切</span>
+                    
+                    <!-- イベント凡例 -->
+                    <div class="flex flex-wrap gap-4 text-sm">
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 bg-blue-400 rounded mr-2"></div>
+                            <span>会議</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 bg-green-400 rounded mr-2"></div>
+                            <span>撮影</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 bg-red-400 rounded mr-2"></div>
+                            <span>休業</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 bg-orange-400 rounded mr-2"></div>
+                            <span>締切</span>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        
-        <!-- レポートページ -->
-        <div id="reportsPage" class="page-content p-4 lg:p-6 hidden">
-            <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                <div class="glass-card p-6 text-center">
-                    <div class="text-5xl mb-4">📊</div>
-                    <h4 class="text-lg font-bold mb-2">売上レポート</h4>
-                    <p class="text-gray-600 mb-4">月別・店舗別売上分析</p>
-                    <button class="btn btn-primary w-full" onclick="generateReport('sales')">
-                        <i class="fas fa-download mr-2"></i>ダウンロード
-                    </button>
-                </div>
-                
-                <div class="glass-card p-6 text-center">
-                    <div class="text-5xl mb-4">📱</div>
-                    <h4 class="text-lg font-bold mb-2">投稿レポート</h4>
-                    <p class="text-gray-600 mb-4">投稿数・達成率分析</p>
-                    <button class="btn btn-primary w-full" onclick="generateReport('posts')">
-                        <i class="fas fa-download mr-2"></i>ダウンロード
-                    </button>
-                </div>
-                
-                <div class="glass-card p-6 text-center">
-                    <div class="text-5xl mb-4">📋</div>
-                    <h4 class="text-lg font-bold mb-2">総合レポート</h4>
-                    <p class="text-gray-600 mb-4">全業務統合レポート</p>
-                    <button class="btn btn-primary w-full" onclick="generateReport('comprehensive')">
-                        <i class="fas fa-download mr-2"></i>ダウンロード
-                    </button>
-                </div>
-                
-                <div class="glass-card p-6 text-center">
-                    <div class="text-5xl mb-4">📅</div>
-                    <h4 class="text-lg font-bold mb-2">スケジュール</h4>
-                    <p class="text-gray-600 mb-4">予定・会議一覧</p>
-                    <button class="btn btn-primary w-full" onclick="generateReport('schedule')">
-                        <i class="fas fa-download mr-2"></i>ダウンロード
-                    </button>
-                </div>
-                
-                <div class="glass-card p-6 text-center">
-                    <div class="text-5xl mb-4">🎯</div>
-                    <h4 class="text-lg font-bold mb-2">月末締めデータ</h4>
-                    <p class="text-gray-600 mb-4">全データ一括出力</p>
-                    <button class="btn btn-success w-full" onclick="generateMonthEndReport()">
-                        <i class="fas fa-file-archive mr-2"></i>一括DL
-                    </button>
+            
+            <!-- レポートページ -->
+            <div id="reportsPage" class="page-content p-4 lg:p-6 hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                    <div class="glass-card p-6 text-center">
+                        <div class="text-5xl mb-4">📊</div>
+                        <h4 class="text-lg font-bold mb-2">売上レポート</h4>
+                        <p class="text-gray-600 mb-4">月別・店舗別売上分析</p>
+                        <button class="btn btn-primary w-full" onclick="generateReport('sales')">
+                            <i class="fas fa-download mr-2"></i>ダウンロード
+                        </button>
+                    </div>
+                    
+                    <div class="glass-card p-6 text-center">
+                        <div class="text-5xl mb-4">📱</div>
+                        <h4 class="text-lg font-bold mb-2">投稿レポート</h4>
+                        <p class="text-gray-600 mb-4">投稿数・達成率分析</p>
+                        <button class="btn btn-primary w-full" onclick="generateReport('posts')">
+                            <i class="fas fa-download mr-2"></i>ダウンロード
+                        </button>
+                    </div>
+                    
+                    <div class="glass-card p-6 text-center">
+                        <div class="text-5xl mb-4">📋</div>
+                        <h4 class="text-lg font-bold mb-2">総合レポート</h4>
+                        <p class="text-gray-600 mb-4">全業務統合レポート</p>
+                        <button class="btn btn-primary w-full" onclick="generateReport('comprehensive')">
+                            <i class="fas fa-download mr-2"></i>ダウンロード
+                        </button>
+                    </div>
+                    
+                    <div class="glass-card p-6 text-center">
+                        <div class="text-5xl mb-4">📅</div>
+                        <h4 class="text-lg font-bold mb-2">スケジュール</h4>
+                        <p class="text-gray-600 mb-4">予定・会議一覧</p>
+                        <button class="btn btn-primary w-full" onclick="generateReport('schedule')">
+                            <i class="fas fa-download mr-2"></i>ダウンロード
+                        </button>
+                    </div>
+                    
+                    <div class="glass-card p-6 text-center">
+                        <div class="text-5xl mb-4">🎯</div>
+                        <h4 class="text-lg font-bold mb-2">月末締めデータ</h4>
+                        <p class="text-gray-600 mb-4">全データ一括出力</p>
+                        <button class="btn btn-success w-full" onclick="generateMonthEndReport()">
+                            <i class="fas fa-file-archive mr-2"></i>一括DL
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -960,18 +991,14 @@
             });
         }
         
-        // データの読み込み
+        // データの読み込み（localStorage使用廃止）
         function loadData() {
             try {
-                const savedTasks = localStorage.getItem('classy_tasks');
-                const savedEvents = localStorage.getItem('classy_events');
-                const savedSalesData = localStorage.getItem('classy_sales');
-                const savedPostsData = localStorage.getItem('classy_posts');
-                
-                if (savedTasks) tasks = JSON.parse(savedTasks);
-                if (savedEvents) events = JSON.parse(savedEvents);
-                if (savedSalesData) salesData = JSON.parse(savedSalesData);
-                if (savedPostsData) postsData = JSON.parse(savedPostsData);
+                // ブラウザストレージの代わりにメモリ内で管理
+                tasks = tasks || [];
+                events = events || [];
+                salesData = salesData || [];
+                postsData = postsData || [];
                 
                 console.log('データ読み込み完了:', { tasks: tasks.length, events: events.length });
             } catch (error) {
@@ -979,14 +1006,11 @@
             }
         }
         
-        // データの保存
+        // データの保存（localStorage使用廃止）
         function saveData() {
             try {
-                localStorage.setItem('classy_tasks', JSON.stringify(tasks));
-                localStorage.setItem('classy_events', JSON.stringify(events));
-                localStorage.setItem('classy_sales', JSON.stringify(salesData));
-                localStorage.setItem('classy_posts', JSON.stringify(postsData));
-                console.log('データ保存完了');
+                // ブラウザストレージの代わりにメモリ内で管理
+                console.log('データ保存完了（メモリ内）');
             } catch (error) {
                 console.error('データ保存エラー:', error);
             }
@@ -1640,12 +1664,10 @@
         }
         
         function previousMonth() {
-            // 前月表示の実装（簡易版）
             showNotification('前月表示機能は開発中です', 'info');
         }
         
         function nextMonth() {
-            // 翌月表示の実装（簡易版）
             showNotification('翌月表示機能は開発中です', 'info');
         }
         
@@ -2625,7 +2647,7 @@
             }
         });
         
-        console.log('CLASSY業務管理システム - 完全動作版初期化完了');
+        console.log('CLASSY業務管理システム - 横並びレイアウト版初期化完了');
         console.log('キーボードショートカット: Ctrl+K (タスク追加), Ctrl+E (予定追加), Ctrl+S (同期)');
     </script>
 </body>
