@@ -431,24 +431,24 @@
                 <!-- データアップロード -->
                 <div class="glass-card p-6 mb-6">
                     <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-bold text-gray-900">売上データアップロード</h3>
-                        <button class="btn btn-success" onclick="downloadSalesTemplate()">
+                        <h3 class="text-lg font-bold text-gray-900">業務データアップロード</h3>
+                        <button class="btn btn-success" onclick="downloadBusinessTemplate()">
                             <i class="fas fa-download mr-2"></i>テンプレートDL
                         </button>
                     </div>
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                         <div>
-                            <input type="file" id="salesFileInput" accept=".xlsx,.xls,.csv" class="input-field">
+                            <input type="file" id="businessFileInput" accept=".xlsx,.xls,.csv" class="input-field">
                             <div class="text-sm text-gray-600 mt-2">
                                 <i class="fas fa-info-circle mr-1"></i>
-                                Excel形式 (.xlsx, .xls) またはCSV形式のファイルをアップロード
+                                日次売上・出勤・アクセス状況データをアップロード
                             </div>
                         </div>
                         <div class="flex items-center space-x-3">
-                            <button class="btn btn-primary" onclick="processSalesData()">
+                            <button class="btn btn-primary" onclick="processBusinessData()">
                                 <i class="fas fa-upload mr-2"></i>データ反映
                             </button>
-                            <div id="uploadStatus" class="text-sm text-gray-500"></div>
+                            <div id="businessUploadStatus" class="text-sm text-gray-500"></div>
                         </div>
                     </div>
                 </div>
@@ -466,9 +466,9 @@
                         <div class="text-xs text-green-600 mt-2">+15% 昨日比</div>
                     </div>
                     <div class="glass-card p-6 text-center">
-                        <div class="text-4xl font-bold text-purple-600 mb-2">87%</div>
-                        <div class="text-sm text-gray-600">投稿達成率</div>
-                        <div class="text-xs text-orange-600 mt-2">全店平均</div>
+                        <div class="text-4xl font-bold text-purple-600 mb-2">95%</div>
+                        <div class="text-sm text-gray-600">出勤率</div>
+                        <div class="text-xs text-green-600 mt-2">今月平均</div>
                     </div>
                     <div class="glass-card p-6 text-center">
                         <div class="text-4xl font-bold text-cyan-600 mb-2" id="upcomingEvents">0</div>
@@ -605,46 +605,109 @@
                 </div>
             </div>
             
-            <!-- 投稿管理ページ -->
-            <div id="postsPage" class="page-content p-4 lg:p-6 hidden">
+            <!-- 出勤管理ページ -->
+            <div id="attendancePage" class="page-content p-4 lg:p-6 hidden">
+                <!-- データアップロード -->
+                <div class="glass-card p-6 mb-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-bold text-gray-900">業務データアップロード</h3>
+                        <button class="btn btn-success" onclick="downloadBusinessTemplate()">
+                            <i class="fas fa-download mr-2"></i>テンプレートDL
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        <div>
+                            <input type="file" id="businessFileInput" accept=".xlsx,.xls,.csv" class="input-field">
+                            <div class="text-sm text-gray-600 mt-2">
+                                <i class="fas fa-info-circle mr-1"></i>
+                                日次売上・出勤・アクセス状況データをアップロード
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <button class="btn btn-primary" onclick="processBusinessData()">
+                                <i class="fas fa-upload mr-2"></i>データ反映
+                            </button>
+                            <div id="businessUploadStatus" class="text-sm text-gray-500"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 月次サマリー -->
+                <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-6 mb-6">
+                    <div class="glass-card p-6 text-center">
+                        <div class="text-4xl font-bold text-blue-600 mb-2" id="totalSales">¥0</div>
+                        <div class="text-sm text-gray-600">今月売上</div>
+                        <div class="text-xs text-green-600 mt-2" id="salesGrowth">+0% 前月比</div>
+                    </div>
+                    <div class="glass-card p-6 text-center">
+                        <div class="text-4xl font-bold text-green-600 mb-2" id="attendanceRate">0%</div>
+                        <div class="text-sm text-gray-600">出勤率</div>
+                        <div class="text-xs text-blue-600 mt-2" id="attendanceCount">0/0日</div>
+                    </div>
+                    <div class="glass-card p-6 text-center">
+                        <div class="text-4xl font-bold text-purple-600 mb-2" id="totalAccess">0</div>
+                        <div class="text-sm text-gray-600">総アクセス数</div>
+                        <div class="text-xs text-purple-600 mt-2">今月累計</div>
+                    </div>
+                    <div class="glass-card p-6 text-center">
+                        <div class="text-4xl font-bold text-orange-600 mb-2" id="avgDailySales">¥0</div>
+                        <div class="text-sm text-gray-600">平均日商</div>
+                        <div class="text-xs text-orange-600 mt-2">営業日平均</div>
+                    </div>
+                </div>
+
+                <!-- グラフエリア -->
                 <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
                     <div class="glass-card p-6">
-                        <h4 class="text-lg font-bold text-gray-900 mb-6">投稿達成率</h4>
+                        <div class="flex items-center justify-between mb-6">
+                            <h4 class="text-lg font-bold text-gray-900">日次売上推移</h4>
+                            <div class="flex space-x-2">
+                                <button class="btn btn-outline" onclick="changeSalesPeriod('week')">週別</button>
+                                <button class="btn btn-primary" onclick="changeSalesPeriod('month')">月別</button>
+                            </div>
+                        </div>
                         <div class="chart-container">
-                            <canvas id="postsChart"></canvas>
+                            <canvas id="dailySalesChart"></canvas>
                         </div>
                     </div>
                     
                     <div class="glass-card p-6">
-                        <h4 class="text-lg font-bold text-gray-900 mb-6">店舗別投稿状況</h4>
-                        <div class="space-y-4" id="postStatus">
-                            <!-- 投稿状況が動的に表示されます -->
+                        <h4 class="text-lg font-bold text-gray-900 mb-6">アクセス状況</h4>
+                        <div class="chart-container">
+                            <canvas id="accessChart"></canvas>
                         </div>
                     </div>
                 </div>
-                
-                <!-- 投稿管理機能 -->
+
+                <!-- 日次データテーブル -->
                 <div class="glass-card p-6">
                     <div class="flex items-center justify-between mb-6">
-                        <h4 class="text-lg font-bold text-gray-900">投稿管理</h4>
-                        <button class="btn btn-primary" onclick="addPostEntry()">
-                            <i class="fas fa-plus mr-2"></i>投稿記録
-                        </button>
+                        <h4 class="text-lg font-bold text-gray-900">日次データ</h4>
+                        <div class="flex space-x-3">
+                            <button class="btn btn-outline" onclick="exportBusinessData()">
+                                <i class="fas fa-download mr-2"></i>エクスポート
+                            </button>
+                            <button class="btn btn-primary" onclick="addDailyRecord()">
+                                <i class="fas fa-plus mr-2"></i>手動入力
+                            </button>
+                        </div>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full">
                             <thead>
                                 <tr class="bg-gray-50">
                                     <th class="text-left p-4 font-semibold">日付</th>
-                                    <th class="text-left p-4 font-semibold">店舗</th>
-                                    <th class="text-left p-4 font-semibold">投稿者</th>
-                                    <th class="text-left p-4 font-semibold">投稿数</th>
-                                    <th class="text-left p-4 font-semibold">ステータス</th>
+                                    <th class="text-left p-4 font-semibold">出勤</th>
+                                    <th class="text-left p-4 font-semibold">欠勤</th>
+                                    <th class="text-left p-4 font-semibold">売上</th>
+                                    <th class="text-left p-4 font-semibold">現金</th>
+                                    <th class="text-left p-4 font-semibold">カード</th>
+                                    <th class="text-left p-4 font-semibold">アクセス数</th>
                                     <th class="text-left p-4 font-semibold">操作</th>
                                 </tr>
                             </thead>
-                            <tbody id="postsTable">
-                                <!-- 投稿データが動的に表示されます -->
+                            <tbody id="businessDataTable">
+                                <!-- データが動的に表示されます -->
                             </tbody>
                         </table>
                     </div>
@@ -717,10 +780,10 @@
                     </div>
                     
                     <div class="glass-card p-6 text-center">
-                        <div class="text-5xl mb-4">📱</div>
-                        <h4 class="text-lg font-bold mb-2">投稿レポート</h4>
-                        <p class="text-gray-600 mb-4">投稿数・達成率分析</p>
-                        <button class="btn btn-primary w-full" onclick="generateReport('posts')">
+                        <div class="text-5xl mb-4">👥</div>
+                        <h4 class="text-lg font-bold mb-2">出勤レポート</h4>
+                        <p class="text-gray-600 mb-4">出勤率・勤怠状況分析</p>
+                        <button class="btn btn-primary w-full" onclick="generateReport('attendance')">
                             <i class="fas fa-download mr-2"></i>ダウンロード
                         </button>
                     </div>
@@ -891,14 +954,13 @@
         let editingTaskId = null;
         let editingEventId = null;
         let salesChart = null;
-        let postsChart = null;
-        let uploadedSalesData = null;
+        let uploadedBusinessData = null;
         
         // データ管理
         let tasks = [];
         let events = [];
-        let salesData = [];
-        let postsData = [];
+        let businessData = []; // 売上・出勤・アクセスデータ
+        let uploadedBusinessData = null;
         
         // 10店舗情報
         const storeInfo = {
@@ -960,9 +1022,9 @@
             if (storeFilter) storeFilter.addEventListener('change', filterTasks);
             
             // ファイルアップロード
-            const salesFileInput = document.getElementById('salesFileInput');
-            if (salesFileInput) {
-                salesFileInput.addEventListener('change', handleSalesUpload);
+            const businessFileInput = document.getElementById('businessFileInput');
+            if (businessFileInput) {
+                businessFileInput.addEventListener('change', handleBusinessUpload);
             }
             
             // キーボードショートカット
@@ -997,10 +1059,9 @@
                 // ブラウザストレージの代わりにメモリ内で管理
                 tasks = tasks || [];
                 events = events || [];
-                salesData = salesData || [];
-                postsData = postsData || [];
+                businessData = businessData || [];
                 
-                console.log('データ読み込み完了:', { tasks: tasks.length, events: events.length });
+                console.log('データ読み込み完了:', { tasks: tasks.length, events: events.length, businessData: businessData.length });
             } catch (error) {
                 console.error('データ読み込みエラー:', error);
             }
@@ -1127,7 +1188,7 @@
         
         function showPage(pageName) {
             // 全ページ非表示
-            const pages = ['dashboard', 'tasks', 'sales', 'posts', 'calendar', 'reports'];
+            const pages = ['dashboard', 'tasks', 'sales', 'attendance', 'calendar', 'reports'];
             pages.forEach(page => {
                 const element = document.getElementById(page + 'Page');
                 if (element) element.classList.add('hidden');
@@ -1156,7 +1217,7 @@
                 dashboard: 'ダッシュボード',
                 tasks: 'タスク管理',
                 sales: '売上分析',
-                posts: '投稿管理',
+                attendance: '出勤管理',
                 calendar: 'カレンダー',
                 reports: 'レポート'
             };
@@ -1179,8 +1240,8 @@
                 case 'sales':
                     renderSales();
                     break;
-                case 'posts':
-                    renderPosts();
+                case 'attendance':
+                    renderAttendance();
                     break;
                 case 'calendar':
                     generateCalendar();
@@ -1254,20 +1315,20 @@
             const storesOverview = document.getElementById('storesOverview');
             if (!storesOverview) return;
             
-            // 各店舗のサンプルデータ
+            // 各店舗のサンプルデータ（実際のシステムでは店舗ごとの業務データを使用）
             const storeStatus = {};
             
-            // 売上データから最新の売上を取得
-            if (salesData.length > 0) {
+            // 業務データから最新の売上を取得（実際には店舗別データが必要）
+            if (businessData.length > 0) {
                 Object.keys(storeInfo).forEach(storeCode => {
-                    const storeData = salesData.filter(data => data['店舗コード'] === storeCode);
-                    const totalSales = storeData.reduce((sum, data) => sum + (parseFloat(data['売上金額']) || 0), 0);
-                    const avgSales = storeData.length > 0 ? totalSales / storeData.length : 0;
+                    // サンプル：全データの平均を各店舗に割り当て
+                    const avgSales = businessData.reduce((sum, data) => sum + data.sales, 0) / businessData.length;
+                    const avgAttendance = businessData.reduce((sum, data) => sum + data.attendance, 0) / businessData.length;
                     
                     storeStatus[storeCode] = {
-                        sales: avgSales,
-                        posts: Math.floor(Math.random() * 20) + 15,
-                        target: 30
+                        sales: avgSales * (0.8 + Math.random() * 0.4), // ±20%のバリエーション
+                        attendance: Math.round(avgAttendance * (0.8 + Math.random() * 0.4)),
+                        attendanceRate: Math.round((70 + Math.random() * 30)) // 70-100%の出勤率
                     };
                 });
             } else {
@@ -1275,8 +1336,8 @@
                 Object.keys(storeInfo).forEach(storeCode => {
                     storeStatus[storeCode] = {
                         sales: Math.floor(Math.random() * 500000) + 500000,
-                        posts: Math.floor(Math.random() * 20) + 15,
-                        target: 30
+                        attendance: Math.floor(Math.random() * 10) + 15,
+                        attendanceRate: Math.round(70 + Math.random() * 30)
                     };
                 });
             }
@@ -1284,8 +1345,7 @@
             // 店舗カード生成
             const storeCards = Object.entries(storeInfo).map(([storeCode, info]) => {
                 const status = storeStatus[storeCode];
-                const postRate = Math.round((status.posts / status.target) * 100);
-                const rateColor = postRate >= 80 ? 'green' : postRate >= 60 ? 'yellow' : 'red';
+                const rateColor = status.attendanceRate >= 90 ? 'green' : status.attendanceRate >= 80 ? 'yellow' : 'red';
                 
                 return `
                     <div class="glass-card p-6 cursor-pointer" onclick="showStoreDetails('${storeCode}')">
@@ -1295,15 +1355,19 @@
                         </div>
                         <div class="space-y-3">
                             <div class="flex justify-between">
-                                <span>投稿数</span>
-                                <span class="font-bold text-${rateColor}-600">${status.posts}/${status.target}</span>
+                                <span>出勤率</span>
+                                <span class="font-bold text-${rateColor}-600">${status.attendanceRate}%</span>
                             </div>
                             <div class="flex justify-between">
-                                <span>売上</span>
+                                <span>平均売上</span>
                                 <span class="font-bold text-blue-600">¥${Math.round(status.sales/1000)}K</span>
                             </div>
+                            <div class="flex justify-between">
+                                <span>出勤者数</span>
+                                <span class="font-bold text-purple-600">${status.attendance}人</span>
+                            </div>
                             <div class="w-full bg-gray-200 rounded-full h-2">
-                                <div class="bg-${rateColor}-500 h-2 rounded-full" style="width: ${postRate}%"></div>
+                                <div class="bg-${rateColor}-500 h-2 rounded-full" style="width: ${status.attendanceRate}%"></div>
                             </div>
                             <div class="text-xs text-gray-600 text-center">
                                 ${info.region} • ${info.brand}
@@ -1711,35 +1775,9 @@
                 });
             }
             
-            // 投稿チャート
-            const postsCtx = document.getElementById('postsChart');
-            if (postsCtx) {
-                postsChart = new Chart(postsCtx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['シャブール', 'ワンカラット', 'GrandOpera名古屋', 'CLASSY名古屋', 'CLASSY錦'],
-                        datasets: [{
-                            data: [80, 75, 85, 90, 60],
-                            backgroundColor: [
-                                'rgba(16, 185, 129, 0.8)',
-                                'rgba(245, 158, 11, 0.8)',
-                                'rgba(239, 68, 68, 0.8)',
-                                'rgba(59, 130, 246, 0.8)',
-                                'rgba(168, 85, 247, 0.8)'
-                            ],
-                            borderWidth: 2
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                position: 'bottom'
-                            }
-                        }
-                    }
-                });
+            // 業務データがある場合はチャートを更新
+            if (businessData && businessData.length > 0) {
+                updateBusinessCharts();
             }
         }
         
@@ -1840,56 +1878,110 @@
             }
         }
         
-        // 売上テンプレートダウンロード
-        function downloadSalesTemplate() {
+        // 業務テンプレートダウンロード
+        function downloadBusinessTemplate() {
             const currentDate = new Date();
             const year = currentDate.getFullYear();
             const month = currentDate.getMonth() + 1;
             
-            // テンプレートデータ作成
+            // テンプレートデータ作成（アップロードされたファイルと同じ構造）
             const daysInMonth = new Date(year, month, 0).getDate();
-            const fullTemplateData = [
-                ['店舗コード', '店舗名', '地域', 'ブランド', '年', '月', '日', '売上金額', '客数', '客単価', '備考']
+            const templateData = [
+                // ヘッダー行1
+                ["日付", "出勤", "欠勤", "売上", "現金", "カード", "他", "支出計", "男性", "経費", "手数料", "消費税", "現金残", "操　作", `${year}年`, null, "アクセス状況", null, null, null, null, null, null, null, null, null, "更新状況"],
+                // ヘッダー行2
+                [45809, null, null, null, null, null, null, null, null, null, null, null, null, null, `${month}月`, "アクセス", "アクセス媒体", null, "お気に入り数", null, "プラチナメール受信者数", null, "アクション数", null, null, "口コミ", "即ヒメ", "写メ日記", "写メ日記(画像・テキスト)", null, null, null, "写メ日記(動画)", null, null, null, "キテネ", "オキニトーク", null, null, null, null, "プラチナメール"],
+                // ヘッダー行3
+                [45810, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "総数", "パソコン", "スマホ", "マイショップ", "マイガール", "メール受信", "マイヘブン受信", "総数", "電話", "ヨヤク", null, "登録数", "投稿数", "通常", "マイガール限定", "フリーポス", "フリーポス", "通常", "マイガール限定", "フリーポス", "フリーポス", "送信数", "送信", "送信人数", "画像送信", "画像送信数", "送信回数", "配信回数"],
+                // ヘッダー行4
+                [45811, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "（時間限定）", "（時間限定）", null, null, "（時間限定）", "（時間限定）", null, "女の子人数", null, "女の子人数"],
+                // ヘッダー行5
+                [45812, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "通常", "マイガール限定", null, null, "通常", "マイガール限定"]
             ];
             
+            // 日付データ行を追加
             for (let day = 1; day <= daysInMonth; day++) {
-                Object.entries(storeInfo).forEach(([code, info]) => {
-                    fullTemplateData.push([
-                        code,
-                        info.name,
-                        info.region,
-                        info.brand,
-                        year,
-                        month,
-                        day,
-                        '', '', '', ''
-                    ]);
-                });
+                const dayCode = 45812 + day; // 連続する日付コード
+                const dayName = `${month}/${day}`;
+                templateData.push([
+                    dayCode, // 日付コード
+                    null, // 出勤
+                    null, // 欠勤
+                    null, // 売上
+                    null, // 現金
+                    null, // カード
+                    null, // 他
+                    null, // 支出計
+                    null, // 男性
+                    null, // 経費
+                    null, // 手数料
+                    null, // 消費税
+                    null, // 現金残
+                    null, // 操作
+                    dayName, // 日付表示
+                    null, // アクセス総数
+                    null, // パソコン
+                    null, // スマホ
+                    null, // マイショップ
+                    null, // マイガール
+                    null, // メール受信
+                    null, // マイヘブン受信
+                    null, // アクション総数
+                    null, // 電話
+                    null, // ヨヤク
+                    null, // 口コミ
+                    null, // 登録数
+                    null, // 投稿数
+                    null, // 通常写メ日記
+                    null, // マイガール限定写メ日記
+                    null, // フリーポス1
+                    null, // フリーポス2
+                    null, // 動画通常
+                    null, // 動画マイガール限定
+                    null, // 動画フリーポス1
+                    null, // 動画フリーポス2
+                    null, // キテネ送信数
+                    null, // オキニトーク送信
+                    null, // 送信人数
+                    null, // 画像送信
+                    null, // 画像送信数
+                    null, // 送信回数
+                    null  // 配信回数
+                ]);
             }
             
             // Excel作成
-            const ws = XLSX.utils.aoa_to_sheet(fullTemplateData);
-            ws['!cols'] = [
-                { wch: 12 }, { wch: 20 }, { wch: 10 }, { wch: 15 },
-                { wch: 8 }, { wch: 6 }, { wch: 6 }, { wch: 15 },
-                { wch: 10 }, { wch: 12 }, { wch: 20 }
+            const ws = XLSX.utils.aoa_to_sheet(templateData);
+            
+            // 列幅設定
+            const colWidths = [
+                { wch: 12 }, { wch: 8 }, { wch: 8 }, { wch: 12 }, { wch: 10 },
+                { wch: 10 }, { wch: 8 }, { wch: 10 }, { wch: 8 }, { wch: 8 },
+                { wch: 10 }, { wch: 10 }, { wch: 12 }, { wch: 8 }, { wch: 12 },
+                { wch: 10 }, { wch: 12 }, { wch: 10 }, { wch: 12 }, { wch: 12 },
+                { wch: 15 }, { wch: 15 }, { wch: 12 }, { wch: 8 }, { wch: 8 },
+                { wch: 8 }, { wch: 10 }, { wch: 10 }, { wch: 12 }, { wch: 15 },
+                { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 15 }, { wch: 12 },
+                { wch: 12 }, { wch: 10 }, { wch: 12 }, { wch: 10 }, { wch: 12 },
+                { wch: 12 }, { wch: 10 }, { wch: 10 }
             ];
+            ws['!cols'] = colWidths;
             
             const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, '売上データ');
+            XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
             
-            const filename = `売上データテンプレート_${year}年${month}月.xlsx`;
+            const filename = `業務データテンプレート_${year}年${month}月.xlsx`;
             XLSX.writeFile(wb, filename);
             
-            showNotification('売上データテンプレートをダウンロードしました', 'success');
+            showNotification('業務データテンプレートをダウンロードしました', 'success');
         }
         
-        // 売上データアップロード処理
-        function handleSalesUpload(event) {
+        // 業務データアップロード処理
+        function handleBusinessUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
             
-            const statusElement = document.getElementById('uploadStatus');
+            const statusElement = document.getElementById('businessUploadStatus');
             statusElement.textContent = 'ファイルを読み込み中...';
             statusElement.className = 'text-sm text-blue-600';
             
@@ -1908,7 +2000,7 @@
                         data = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
                     }
                     
-                    uploadedSalesData = data;
+                    uploadedBusinessData = data;
                     statusElement.textContent = `✅ ${data.length}行のデータを読み込みました`;
                     statusElement.className = 'text-sm text-green-600';
                     
@@ -1926,85 +2018,389 @@
             }
         }
         
-        // 売上データ処理・反映
-        function processSalesData() {
-            if (!uploadedSalesData) {
+        // 業務データ処理・反映
+        function processBusinessData() {
+            if (!uploadedBusinessData) {
                 showNotification('先にファイルをアップロードしてください', 'error');
                 return;
             }
             
             try {
-                const headers = uploadedSalesData[0];
-                const dataRows = uploadedSalesData.slice(1);
+                // データ行は6行目から開始（0-indexedで5行目から）
+                const dataRows = uploadedBusinessData.slice(5);
                 
                 // データ変換
-                const processedData = dataRows.map(row => {
-                    const rowData = {};
-                    headers.forEach((header, index) => {
-                        rowData[header] = row[index];
-                    });
-                    return rowData;
-                }).filter(row => row['店舗コード'] && row['売上金額']);
+                const processedData = dataRows.map((row, index) => {
+                    // 日付の処理
+                    const dateValue = row[14]; // O列（日付表示）
+                    const dayCode = row[0]; // A列（日付コード）
+                    
+                    if (!dateValue) return null;
+                    
+                    return {
+                        dayCode: dayCode,
+                        date: dateValue,
+                        attendance: row[1] || 0, // 出勤
+                        absence: row[2] || 0, // 欠勤
+                        sales: parseFloat(row[3]) || 0, // 売上
+                        cash: parseFloat(row[4]) || 0, // 現金
+                        card: parseFloat(row[5]) || 0, // カード
+                        other: parseFloat(row[6]) || 0, // 他
+                        totalAccess: parseInt(row[15]) || 0, // アクセス総数
+                        pcAccess: parseInt(row[16]) || 0, // パソコン
+                        spAccess: parseInt(row[17]) || 0, // スマホ
+                        myshop: parseInt(row[18]) || 0, // マイショップ
+                        rawIndex: index + 6 // 元の行番号
+                    };
+                }).filter(row => row !== null && row.date); // null行と日付なし行を除外
                 
-                // 売上データをグローバル変数に保存
-                salesData = processedData;
+                // 業務データをグローバル変数に保存
+                businessData = processedData;
                 saveData();
                 
                 // チャート更新
-                if (salesChart) {
-                    updateSalesCharts();
-                }
+                updateBusinessCharts();
                 
                 // ダッシュボード更新
                 renderDashboard();
                 
-                showNotification(`${processedData.length}件の売上データを反映しました`, 'success');
+                // 出勤管理ページが表示されている場合は更新
+                if (currentPage === 'attendance') {
+                    renderAttendance();
+                }
+                
+                showNotification(`${processedData.length}件の業務データを反映しました`, 'success');
                 
                 // アップロード関連をリセット
-                document.getElementById('salesFileInput').value = '';
-                document.getElementById('uploadStatus').textContent = '';
-                uploadedSalesData = null;
+                document.getElementById('businessFileInput').value = '';
+                document.getElementById('businessUploadStatus').textContent = '';
+                uploadedBusinessData = null;
                 
             } catch (error) {
                 console.error('データ処理エラー:', error);
                 showNotification('データの処理中にエラーが発生しました', 'error');
             }
         }
+        // 出勤管理描画
+        function renderAttendance() {
+            updateBusinessSummary();
+            updateBusinessDataTable();
+        }
         
-        // 売上チャート更新
-        function updateSalesCharts() {
-            if (!salesChart || !salesData.length) return;
+        // 業務サマリー更新
+        function updateBusinessSummary() {
+            if (!businessData || businessData.length === 0) {
+                // デフォルト値を設定
+                document.getElementById('totalSales').textContent = '¥0';
+                document.getElementById('attendanceRate').textContent = '0%';
+                document.getElementById('totalAccess').textContent = '0';
+                document.getElementById('avgDailySales').textContent = '¥0';
+                document.getElementById('salesGrowth').textContent = '+0% 前月比';
+                document.getElementById('attendanceCount').textContent = '0/0日';
+                return;
+            }
             
-            // 月別売上集計
-            const monthlySales = {};
-            const storeSales = {};
+            // 売上合計
+            const totalSales = businessData.reduce((sum, data) => sum + data.sales, 0);
+            document.getElementById('totalSales').textContent = `¥${(totalSales / 1000000).toFixed(1)}M`;
             
-            salesData.forEach(row => {
-                const month = `${row['年']}年${row['月']}月`;
-                const store = row['店舗名'];
-                const amount = parseFloat(row['売上金額']) || 0;
-                
-                if (!monthlySales[month]) monthlySales[month] = 0;
-                if (!storeSales[store]) storeSales[store] = 0;
-                
-                monthlySales[month] += amount;
-                storeSales[store] += amount;
-            });
+            // 出勤率計算
+            const totalAttendance = businessData.reduce((sum, data) => sum + data.attendance, 0);
+            const totalPossibleDays = businessData.length;
+            const attendanceRate = totalPossibleDays > 0 ? Math.round((totalAttendance / totalPossibleDays) * 100) : 0;
+            document.getElementById('attendanceRate').textContent = `${attendanceRate}%`;
+            document.getElementById('attendanceCount').textContent = `${totalAttendance}/${totalPossibleDays}日`;
             
-            // チャートデータ更新
-            const months = Object.keys(monthlySales).sort();
-            const amounts = months.map(month => monthlySales[month] / 1000000);
+            // 総アクセス数
+            const totalAccess = businessData.reduce((sum, data) => sum + data.totalAccess, 0);
+            document.getElementById('totalAccess').textContent = totalAccess.toLocaleString();
             
-            salesChart.data.labels = months;
-            salesChart.data.datasets[0].data = amounts;
-            salesChart.update();
+            // 平均日商（出勤日のみ）
+            const workingDays = businessData.filter(data => data.attendance > 0);
+            const avgDailySales = workingDays.length > 0 ? totalSales / workingDays.length : 0;
+            document.getElementById('avgDailySales').textContent = `¥${Math.round(avgDailySales / 1000)}K`;
+            
+            // 成長率（サンプル）
+            const growth = Math.floor(Math.random() * 20) - 5; // -5% to +15%
+            document.getElementById('salesGrowth').textContent = `${growth >= 0 ? '+' : ''}${growth}% 前月比`;
+        }
+        
+        // 業務データテーブル更新
+        function updateBusinessDataTable() {
+            const tableBody = document.getElementById('businessDataTable');
+            if (!tableBody) return;
+            
+            if (!businessData || businessData.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="8" class="text-center text-gray-500 py-8">データがありません</td></tr>';
+                return;
+            }
+            
+            tableBody.innerHTML = businessData.map(data => `
+                <tr class="hover:bg-gray-50">
+                    <td class="p-4 font-medium">${data.date}</td>
+                    <td class="p-4">
+                        <span class="px-3 py-1 text-sm rounded-full ${data.attendance > 0 ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">
+                            ${data.attendance}人
+                        </span>
+                    </td>
+                    <td class="p-4">
+                        <span class="px-3 py-1 text-sm rounded-full ${data.absence > 0 ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800'}">
+                            ${data.absence}人
+                        </span>
+                    </td>
+                    <td class="p-4 font-bold text-blue-600">¥${Math.round(data.sales / 1000)}K</td>
+                    <td class="p-4">¥${Math.round(data.cash / 1000)}K</td>
+                    <td class="p-4">¥${Math.round(data.card / 1000)}K</td>
+                    <td class="p-4 text-purple-600">${data.totalAccess.toLocaleString()}</td>
+                    <td class="p-4">
+                        <button class="text-blue-600 hover:text-blue-800 mr-2" onclick="editBusinessRecord('${data.date}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        // 業務チャート更新
+        function updateBusinessCharts() {
+            if (!businessData || businessData.length === 0) return;
+            
+            // 日次売上チャート
+            const dailySalesCtx = document.getElementById('dailySalesChart');
+            if (dailySalesCtx && !window.dailySalesChart) {
+                window.dailySalesChart = new Chart(dailySalesCtx, {
+                    type: 'line',
+                    data: {
+                        labels: businessData.map(data => data.date),
+                        datasets: [{
+                            label: '日次売上',
+                            data: businessData.map(data => data.sales / 1000), // K単位
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: '売上 (千円)'
+                                }
+                            }
+                        }
+                    }
+                });
+            } else if (window.dailySalesChart) {
+                window.dailySalesChart.data.labels = businessData.map(data => data.date);
+                window.dailySalesChart.data.datasets[0].data = businessData.map(data => data.sales / 1000);
+                window.dailySalesChart.update();
+            }
+            
+            // アクセスチャート
+            const accessCtx = document.getElementById('accessChart');
+            if (accessCtx && !window.accessChart) {
+                window.accessChart = new Chart(accessCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['PCアクセス', 'スマホアクセス'],
+                        datasets: [{
+                            data: [
+                                businessData.reduce((sum, data) => sum + data.pcAccess, 0),
+                                businessData.reduce((sum, data) => sum + data.spAccess, 0)
+                            ],
+                            backgroundColor: [
+                                'rgba(59, 130, 246, 0.8)',
+                                'rgba(16, 185, 129, 0.8)'
+                            ],
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+            } else if (window.accessChart) {
+                window.accessChart.data.datasets[0].data = [
+                    businessData.reduce((sum, data) => sum + data.pcAccess, 0),
+                    businessData.reduce((sum, data) => sum + data.spAccess, 0)
+                ];
+                window.accessChart.update();
+            }
+        }
+        
+        // 業務データエクスポート
+        function exportBusinessData() {
+            if (!businessData || businessData.length === 0) {
+                showNotification('エクスポートするデータがありません', 'error');
+                return;
+            }
+            
+            const data = [
+                ['日付', '出勤', '欠勤', '売上', '現金', 'カード', 'その他', 'アクセス総数', 'PCアクセス', 'スマホアクセス', 'マイショップ'],
+                ...businessData.map(record => [
+                    record.date,
+                    record.attendance,
+                    record.absence,
+                    record.sales,
+                    record.cash,
+                    record.card,
+                    record.other,
+                    record.totalAccess,
+                    record.pcAccess,
+                    record.spAccess,
+                    record.myshop
+                ])
+            ];
+            
+            const ws = XLSX.utils.aoa_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, '業務データ');
+            
+            const filename = `業務データ_${new Date().toISOString().split('T')[0]}.xlsx`;
+            XLSX.writeFile(wb, filename);
+            
+            showNotification('業務データをエクスポートしました', 'success');
+        }
+        
+        // 売上チャート期間変更
+        function changeSalesPeriod(period) {
+            if (!window.dailySalesChart) return;
+            
+            if (period === 'week') {
+                // 最新7日のデータを表示
+                const recentData = businessData.slice(-7);
+                window.dailySalesChart.data.labels = recentData.map(data => data.date);
+                window.dailySalesChart.data.datasets[0].data = recentData.map(data => data.sales / 1000);
+            } else {
+                // 全データを表示
+                window.dailySalesChart.data.labels = businessData.map(data => data.date);
+                window.dailySalesChart.data.datasets[0].data = businessData.map(data => data.sales / 1000);
+            }
+            
+            window.dailySalesChart.update();
+            showNotification(`${period === 'week' ? '週別' : '月別'}表示に変更しました`, 'info');
+        }
+        
+        // 日次記録手動追加
+        function addDailyRecord() {
+            const content = `
+                <div class="space-y-4">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">日付</label>
+                            <input type="date" id="recordDate" class="input-field" value="${new Date().toISOString().split('T')[0]}">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">出勤者数</label>
+                            <input type="number" id="recordAttendance" class="input-field" min="0" placeholder="出勤者数">
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">売上</label>
+                            <input type="number" id="recordSales" class="input-field" min="0" placeholder="売上金額">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">現金</label>
+                            <input type="number" id="recordCash" class="input-field" min="0" placeholder="現金売上">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">カード</label>
+                            <input type="number" id="recordCard" class="input-field" min="0" placeholder="カード売上">
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">アクセス数</label>
+                            <input type="number" id="recordAccess" class="input-field" min="0" placeholder="総アクセス数">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">欠勤者数</label>
+                            <input type="number" id="recordAbsence" class="input-field" min="0" placeholder="欠勤者数">
+                        </div>
+                    </div>
+                    
+                    <div class="flex space-x-3">
+                        <button class="btn btn-primary flex-1" onclick="saveDailyRecord()">
+                            保存
+                        </button>
+                        <button class="btn btn-outline" onclick="closeAllModals()">
+                            キャンセル
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            showCustomModal('日次記録追加', content);
+        }
+        
+        function saveDailyRecord() {
+            const date = document.getElementById('recordDate').value;
+            const attendance = parseInt(document.getElementById('recordAttendance').value) || 0;
+            const sales = parseFloat(document.getElementById('recordSales').value) || 0;
+            const cash = parseFloat(document.getElementById('recordCash').value) || 0;
+            const card = parseFloat(document.getElementById('recordCard').value) || 0;
+            const access = parseInt(document.getElementById('recordAccess').value) || 0;
+            const absence = parseInt(document.getElementById('recordAbsence').value) || 0;
+            
+            if (!date) {
+                showNotification('日付を入力してください', 'error');
+                return;
+            }
+            
+            // 新しい記録を追加
+            const newRecord = {
+                dayCode: Date.now(),
+                date: date,
+                attendance: attendance,
+                absence: absence,
+                sales: sales,
+                cash: cash,
+                card: card,
+                other: sales - cash - card,
+                totalAccess: access,
+                pcAccess: Math.floor(access * 0.3), // 30%をPC想定
+                spAccess: Math.floor(access * 0.7), // 70%をスマホ想定
+                myshop: Math.floor(access * 0.1) // 10%をマイショップ想定
+            };
+            
+            if (!businessData) businessData = [];
+            businessData.push(newRecord);
+            saveData();
+            
+            showNotification('日次記録を保存しました', 'success');
+            closeAllModals();
+            
+            if (currentPage === 'attendance') {
+                renderAttendance();
+            }
+            
+            // チャート更新
+            updateBusinessCharts();
+        }
+        
+        function editBusinessRecord(date) {
+            showNotification('記録編集機能（実装予定）', 'info');
         }
         
         // レポート生成
         function generateReport(type) {
             const reportTypes = {
                 sales: '売上レポート',
-                posts: '投稿レポート',
+                attendance: '出勤レポート',
                 comprehensive: '総合レポート',
                 schedule: 'スケジュールレポート'
             };
@@ -2026,15 +2422,16 @@
                         ])
                     ];
                     break;
-                case 'posts':
+                case 'attendance':
                     data = [
-                        ['店舗名', '目標投稿数', '実投稿数', '達成率', '未達成者数'],
+                        ['店舗名', '出勤予定日数', '実出勤日数', '出勤率', '欠勤日数', '平均出勤者数'],
                         ...Object.entries(storeInfo).map(([code, info]) => [
                             info.name,
                             30,
-                            Math.floor(Math.random() * 15) + 15,
-                            Math.floor(Math.random() * 40) + 50 + '%',
-                            Math.floor(Math.random() * 5) + 1
+                            Math.floor(Math.random() * 8) + 22,
+                            Math.floor(Math.random() * 30) + 70 + '%',
+                            Math.floor(Math.random() * 8) + 1,
+                            Math.floor(Math.random() * 10) + 15
                         ])
                     ];
                     break;
@@ -2042,7 +2439,7 @@
                     data = [
                         ['項目', '目標', '実績', '達成率', '状況'],
                         ['売上合計', '1,000,000,000', '920,000,000', '92%', '順調'],
-                        ['投稿合計', '300', '234', '78%', '要改善'],
+                        ['出勤率', '95%', '87%', '92%', '良好'],
                         ['タスク完了率', '100%', '85%', '85%', '良好'],
                         ['予定消化率', '100%', '95%', '95%', '良好']
                     ];
@@ -2073,7 +2470,7 @@
         function generateMonthEndReport() {
             showNotification('月末データを一括ダウンロード中...', 'info');
             
-            const reports = ['sales', 'posts', 'comprehensive', 'schedule'];
+            const reports = ['sales', 'attendance', 'comprehensive', 'schedule'];
             let downloadCount = 0;
             
             reports.forEach((report, index) => {
@@ -2116,86 +2513,6 @@
             showNotification('タスクデータをエクスポートしました', 'success');
         }
         
-        // 投稿記録追加
-        function addPostEntry() {
-            const content = `
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">店舗</label>
-                        <select id="postStore" class="input-field">
-                            <option value="">選択してください</option>
-                            ${Object.entries(storeInfo).map(([code, info]) => 
-                                `<option value="${code}">${info.name}</option>`
-                            ).join('')}
-                        </select>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">投稿者</label>
-                        <input type="text" id="postAuthor" class="input-field" placeholder="投稿者名">
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">投稿数</label>
-                        <input type="number" id="postCount" class="input-field" min="0" placeholder="投稿数">
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">日付</label>
-                        <input type="date" id="postDate" class="input-field" value="${new Date().toISOString().split('T')[0]}">
-                    </div>
-                    
-                    <div class="flex space-x-3">
-                        <button class="btn btn-primary flex-1" onclick="savePostEntry()">
-                            保存
-                        </button>
-                        <button class="btn btn-outline" onclick="closeAllModals()">
-                            キャンセル
-                        </button>
-                    </div>
-                </div>
-            `;
-            
-            showCustomModal('投稿記録追加', content);
-        }
-        
-        function savePostEntry() {
-            const store = document.getElementById('postStore').value;
-            const author = document.getElementById('postAuthor').value.trim();
-            const count = parseInt(document.getElementById('postCount').value);
-            const date = document.getElementById('postDate').value;
-            
-            if (!store || !author || !count || !date) {
-                showNotification('すべての項目を入力してください', 'error');
-                return;
-            }
-            
-            // 投稿データに追加（実際の実装では配列に保存）
-            const newPost = {
-                id: Date.now(),
-                store,
-                author,
-                count,
-                date,
-                status: 'completed'
-            };
-            
-            if (!postsData) postsData = [];
-            postsData.push(newPost);
-            saveData();
-            
-            showNotification('投稿記録を保存しました', 'success');
-            closeAllModals();
-            
-            if (currentPage === 'posts') {
-                renderPosts();
-            }
-        }
-        
-        function editPostEntry(date, store) {
-            showNotification('投稿記録編集機能（実装予定）', 'info');
-        }
-        
         // データ同期
         function syncAllData() {
             const btn = event.target;
@@ -2229,8 +2546,8 @@
                     <button class="btn btn-outline" onclick="closeAllModals(); showPage('sales');">
                         <i class="fas fa-chart-line mr-2"></i>売上確認
                     </button>
-                    <button class="btn btn-outline" onclick="closeAllModals(); showPage('reports');">
-                        <i class="fas fa-file-alt mr-2"></i>レポート作成
+                    <button class="btn btn-outline" onclick="closeAllModals(); showPage('attendance');">
+                        <i class="fas fa-user-clock mr-2"></i>出勤管理
                     </button>
                 </div>
             `;
@@ -2243,13 +2560,16 @@
             const store = storeInfo[storeCode];
             if (!store) return;
             
-            // 売上データから該当店舗のデータを取得
-            const storeData = salesData.filter(data => data['店舗コード'] === storeCode);
-            const totalSales = storeData.reduce((sum, data) => sum + (parseFloat(data['売上金額']) || 0), 0);
-            const avgSales = storeData.length > 0 ? totalSales / storeData.length : Math.floor(Math.random() * 500000) + 500000;
+            // 業務データから該当店舗のデータを取得（実際には店舗ごとのデータが必要）
+            const avgSales = businessData.length > 0 ? 
+                businessData.reduce((sum, data) => sum + data.sales, 0) / businessData.length : 
+                Math.floor(Math.random() * 500000) + 500000;
             
-            const posts = Math.floor(Math.random() * 20) + 15;
-            const target = 30;
+            const avgAttendance = businessData.length > 0 ?
+                businessData.reduce((sum, data) => sum + data.attendance, 0) / businessData.length :
+                Math.floor(Math.random() * 10) + 15;
+            
+            const attendanceRate = Math.round(70 + Math.random() * 30); // 70-100%
             
             const issues = {
                 'shabour': ['名古屋エリアでの競合対策', '新人スタッフの教育体制強化'],
@@ -2274,10 +2594,10 @@
                     
                     <div class="grid grid-cols-2 gap-4">
                         <div class="glass-card p-4 text-center">
-                            <div class="text-2xl font-bold text-blue-600">${posts}/${target}</div>
-                            <div class="text-sm text-gray-600">投稿数</div>
-                            <div class="text-xs ${posts >= 24 ? 'text-green-600' : 'text-red-600'} mt-1">
-                                達成率: ${Math.round((posts/target)*100)}%
+                            <div class="text-2xl font-bold text-blue-600">${attendanceRate}%</div>
+                            <div class="text-sm text-gray-600">出勤率</div>
+                            <div class="text-xs ${attendanceRate >= 90 ? 'text-green-600' : 'text-orange-600'} mt-1">
+                                ${Math.round(avgAttendance)}人/日
                             </div>
                         </div>
                         <div class="glass-card p-4 text-center">
@@ -2606,40 +2926,6 @@
                    'text-blue-600';
         }
         
-        function getPostStatusGradient(rate) {
-            return rate >= 80 ? 'from-green-50 to-emerald-50' :
-                   rate >= 60 ? 'from-yellow-50 to-amber-50' :
-                   'from-red-50 to-rose-50';
-        }
-        
-        function getPostStatusBorder(rate) {
-            return rate >= 80 ? 'border-green-400' :
-                   rate >= 60 ? 'border-yellow-400' :
-                   'border-red-400';
-        }
-        
-        function getPostStatusColor(rate) {
-            return rate >= 80 ? 'text-green-600' :
-                   rate >= 60 ? 'text-yellow-600' :
-                   'text-red-600';
-        }
-        
-        function getPostStatusProgress(rate) {
-            return rate >= 80 ? 'bg-green-500' :
-                   rate >= 60 ? 'bg-yellow-500' :
-                   'bg-red-500';
-        }
-        
-        function getCountClass(count) {
-            return count >= 3 ? 'bg-green-100 text-green-800' :
-                   count >= 2 ? 'bg-yellow-100 text-yellow-800' :
-                   'bg-red-100 text-red-800';
-        }
-        
-        function getPostEntryStatusClass(status) {
-            return status === 'completed' ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800';
-        }
-        
         // レスポンシブ対応
         window.addEventListener('resize', function() {
             if (window.innerWidth >= 1024) {
@@ -2647,7 +2933,7 @@
             }
         });
         
-        console.log('CLASSY業務管理システム - 横並びレイアウト版初期化完了');
+        console.log('CLASSY業務管理システム - 出勤・売上管理版初期化完了');
         console.log('キーボードショートカット: Ctrl+K (タスク追加), Ctrl+E (予定追加), Ctrl+S (同期)');
     </script>
 </body>
