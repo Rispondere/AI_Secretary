@@ -980,12 +980,22 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log('CLASSY業務管理システム起動');
             
+            // データの初期化
+            tasks = tasks || [];
+            events = events || [];
+            businessData = businessData || [];
+            
             loadData();
             updateDateTime();
             setInterval(updateDateTime, 60000);
             
             setupEventListeners();
-            initializeCharts();
+            
+            // チャート初期化（遅延実行）
+            setTimeout(() => {
+                initializeCharts();
+            }, 100);
+            
             renderDashboard();
             generateCalendar();
             
@@ -994,8 +1004,44 @@
                 createSampleData();
             }
             
+            // サンプル業務データの作成（初回のみ）
+            if (businessData.length === 0) {
+                createSampleBusinessData();
+            }
+            
             console.log('初期化完了 - 10店舗対応');
         });
+        
+        // サンプル業務データ作成
+        function createSampleBusinessData() {
+            const today = new Date();
+            const sampleData = [];
+            
+            // 過去30日間のサンプルデータを作成
+            for (let i = 29; i >= 0; i--) {
+                const date = new Date(today);
+                date.setDate(today.getDate() - i);
+                const dateStr = `${date.getMonth() + 1}/${date.getDate()}`;
+                
+                sampleData.push({
+                    dayCode: 45813 + (29 - i),
+                    date: dateStr,
+                    attendance: Math.floor(Math.random() * 5) + 15, // 15-20人
+                    absence: Math.floor(Math.random() * 3), // 0-2人
+                    sales: Math.floor(Math.random() * 500000) + 800000, // 80万-130万
+                    cash: Math.floor(Math.random() * 200000) + 300000, // 30万-50万
+                    card: Math.floor(Math.random() * 300000) + 500000, // 50万-80万
+                    other: Math.floor(Math.random() * 50000), // 0-5万
+                    totalAccess: Math.floor(Math.random() * 20000) + 50000, // 5万-7万
+                    pcAccess: Math.floor(Math.random() * 5000) + 4000, // 4000-9000
+                    spAccess: Math.floor(Math.random() * 15000) + 45000, // 45000-60000
+                    myshop: Math.floor(Math.random() * 100000) + 200000 // 20万-30万
+                });
+            }
+            
+            businessData = sampleData;
+            saveData();
+        }
         
         // イベントリスナー設定
         function setupEventListeners() {
@@ -1008,7 +1054,10 @@
             });
             
             // オーバーレイクリック
-            document.getElementById('overlay').addEventListener('click', closeSidebar);
+            const overlay = document.getElementById('overlay');
+            if (overlay) {
+                overlay.addEventListener('click', closeSidebar);
+            }
             
             // 検索・フィルター
             const taskSearch = document.getElementById('taskSearch');
@@ -1021,11 +1070,13 @@
             if (statusFilter) statusFilter.addEventListener('change', filterTasks);
             if (storeFilter) storeFilter.addEventListener('change', filterTasks);
             
-            // ファイルアップロード
-            const businessFileInput = document.getElementById('businessFileInput');
-            if (businessFileInput) {
-                businessFileInput.addEventListener('change', handleBusinessUpload);
-            }
+            // ファイルアップロード（複数の入力要素に対応）
+            const businessFileInputs = document.querySelectorAll('#businessFileInput');
+            businessFileInputs.forEach(input => {
+                if (input) {
+                    input.addEventListener('change', handleBusinessUpload);
+                }
+            });
             
             // キーボードショートカット
             document.addEventListener('keydown', function(e) {
@@ -1233,6 +1284,14 @@
             switch(pageName) {
                 case 'dashboard':
                     renderDashboard();
+                    // ダッシュボードのファイル入力のイベントリスナーを再設定
+                    setTimeout(() => {
+                        const fileInput = document.querySelector('#dashboardPage #businessFileInput');
+                        if (fileInput && !fileInput.hasEventListener) {
+                            fileInput.addEventListener('change', handleBusinessUpload);
+                            fileInput.hasEventListener = true;
+                        }
+                    }, 100);
                     break;
                 case 'tasks':
                     renderTasks();
@@ -1242,6 +1301,14 @@
                     break;
                 case 'attendance':
                     renderAttendance();
+                    // 出勤管理のファイル入力のイベントリスナーを再設定
+                    setTimeout(() => {
+                        const fileInput = document.querySelector('#attendancePage #businessFileInput');
+                        if (fileInput && !fileInput.hasEventListener) {
+                            fileInput.addEventListener('change', handleBusinessUpload);
+                            fileInput.hasEventListener = true;
+                        }
+                    }, 100);
                     break;
                 case 'calendar':
                     generateCalendar();
@@ -1742,7 +1809,7 @@
         
         // チャート初期化
         function initializeCharts() {
-            // 売上チャート
+            // 売上チャート（売上分析ページ用）
             const salesCtx = document.getElementById('salesChart');
             if (salesCtx) {
                 salesChart = new Chart(salesCtx, {
@@ -1777,13 +1844,50 @@
             
             // 業務データがある場合はチャートを更新
             if (businessData && businessData.length > 0) {
-                updateBusinessCharts();
+                setTimeout(() => {
+                    updateBusinessCharts();
+                }, 500);
             }
         }
         
         // 売上分析描画
         function renderSales() {
             updateStoreRanking();
+            
+            // 売上チャートがまだない場合は初期化
+            if (!salesChart) {
+                const salesCtx = document.getElementById('salesChart');
+                if (salesCtx) {
+                    salesChart = new Chart(salesCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
+                            datasets: [{
+                                label: '今年',
+                                data: [245, 268, 225, 298, 275, 280],
+                                backgroundColor: 'rgba(59, 130, 246, 0.8)',
+                                borderColor: '#3b82f6',
+                                borderWidth: 2
+                            }, {
+                                label: '前年',
+                                data: [220, 235, 210, 265, 245, 249],
+                                backgroundColor: 'rgba(6, 182, 212, 0.6)',
+                                borderColor: '#06b6d4',
+                                borderWidth: 2
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                }
+            }
         }
         
         function updateStoreRanking() {
@@ -2085,44 +2189,62 @@
         function renderAttendance() {
             updateBusinessSummary();
             updateBusinessDataTable();
+            
+            // チャートが初期化されていない場合は初期化
+            setTimeout(() => {
+                updateBusinessCharts();
+            }, 100);
         }
         
         // 業務サマリー更新
         function updateBusinessSummary() {
             if (!businessData || businessData.length === 0) {
                 // デフォルト値を設定
-                document.getElementById('totalSales').textContent = '¥0';
-                document.getElementById('attendanceRate').textContent = '0%';
-                document.getElementById('totalAccess').textContent = '0';
-                document.getElementById('avgDailySales').textContent = '¥0';
-                document.getElementById('salesGrowth').textContent = '+0% 前月比';
-                document.getElementById('attendanceCount').textContent = '0/0日';
+                const totalSalesEl = document.getElementById('totalSales');
+                const attendanceRateEl = document.getElementById('attendanceRate');
+                const totalAccessEl = document.getElementById('totalAccess');
+                const avgDailySalesEl = document.getElementById('avgDailySales');
+                const salesGrowthEl = document.getElementById('salesGrowth');
+                const attendanceCountEl = document.getElementById('attendanceCount');
+                
+                if (totalSalesEl) totalSalesEl.textContent = '¥0';
+                if (attendanceRateEl) attendanceRateEl.textContent = '0%';
+                if (totalAccessEl) totalAccessEl.textContent = '0';
+                if (avgDailySalesEl) avgDailySalesEl.textContent = '¥0';
+                if (salesGrowthEl) salesGrowthEl.textContent = '+0% 前月比';
+                if (attendanceCountEl) attendanceCountEl.textContent = '0/0日';
                 return;
             }
             
             // 売上合計
             const totalSales = businessData.reduce((sum, data) => sum + data.sales, 0);
-            document.getElementById('totalSales').textContent = `¥${(totalSales / 1000000).toFixed(1)}M`;
+            const totalSalesEl = document.getElementById('totalSales');
+            if (totalSalesEl) totalSalesEl.textContent = `¥${(totalSales / 1000000).toFixed(1)}M`;
             
             // 出勤率計算
             const totalAttendance = businessData.reduce((sum, data) => sum + data.attendance, 0);
             const totalPossibleDays = businessData.length;
             const attendanceRate = totalPossibleDays > 0 ? Math.round((totalAttendance / totalPossibleDays) * 100) : 0;
-            document.getElementById('attendanceRate').textContent = `${attendanceRate}%`;
-            document.getElementById('attendanceCount').textContent = `${totalAttendance}/${totalPossibleDays}日`;
+            const attendanceRateEl = document.getElementById('attendanceRate');
+            const attendanceCountEl = document.getElementById('attendanceCount');
+            if (attendanceRateEl) attendanceRateEl.textContent = `${attendanceRate}%`;
+            if (attendanceCountEl) attendanceCountEl.textContent = `${totalAttendance}/${totalPossibleDays}日`;
             
             // 総アクセス数
             const totalAccess = businessData.reduce((sum, data) => sum + data.totalAccess, 0);
-            document.getElementById('totalAccess').textContent = totalAccess.toLocaleString();
+            const totalAccessEl = document.getElementById('totalAccess');
+            if (totalAccessEl) totalAccessEl.textContent = totalAccess.toLocaleString();
             
             // 平均日商（出勤日のみ）
             const workingDays = businessData.filter(data => data.attendance > 0);
             const avgDailySales = workingDays.length > 0 ? totalSales / workingDays.length : 0;
-            document.getElementById('avgDailySales').textContent = `¥${Math.round(avgDailySales / 1000)}K`;
+            const avgDailySalesEl = document.getElementById('avgDailySales');
+            if (avgDailySalesEl) avgDailySalesEl.textContent = `¥${Math.round(avgDailySales / 1000)}K`;
             
             // 成長率（サンプル）
             const growth = Math.floor(Math.random() * 20) - 5; // -5% to +15%
-            document.getElementById('salesGrowth').textContent = `${growth >= 0 ? '+' : ''}${growth}% 前月比`;
+            const salesGrowthEl = document.getElementById('salesGrowth');
+            if (salesGrowthEl) salesGrowthEl.textContent = `${growth >= 0 ? '+' : ''}${growth}% 前月比`;
         }
         
         // 業務データテーブル更新
@@ -2515,14 +2637,16 @@
         
         // データ同期
         function syncAllData() {
-            const btn = event.target;
-            const originalHTML = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>同期中...';
-            btn.disabled = true;
+            const syncButton = document.querySelector('[onclick="syncAllData()"]');
+            if (!syncButton) return;
+            
+            const originalHTML = syncButton.innerHTML;
+            syncButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>同期中...';
+            syncButton.disabled = true;
             
             setTimeout(() => {
-                btn.innerHTML = originalHTML;
-                btn.disabled = false;
+                syncButton.innerHTML = originalHTML;
+                syncButton.disabled = false;
                 
                 const lastSync = document.getElementById('lastSync');
                 if (lastSync) {
@@ -2931,9 +3055,27 @@
             if (window.innerWidth >= 1024) {
                 closeSidebar();
             }
+            
+            // チャートのリサイズ対応
+            if (salesChart) salesChart.resize();
+            if (window.dailySalesChart) window.dailySalesChart.resize();
+            if (window.accessChart) window.accessChart.resize();
         });
         
-        console.log('CLASSY業務管理システム - 出勤・売上管理版初期化完了');
+        // グローバルエラーハンドリング
+        window.addEventListener('error', function(e) {
+            console.error('JavaScript エラー:', e.error);
+            showNotification('システムエラーが発生しました。ページを再読み込みしてください。', 'error');
+        });
+        
+        console.log('CLASSY業務管理システム - 完全版初期化完了');
+        console.log('利用可能な機能:');
+        console.log('- ダッシュボード（概要表示）');
+        console.log('- タスク管理（追加・編集・削除・フィルター）');
+        console.log('- 売上分析（チャート・ランキング）');
+        console.log('- 出勤管理（業務データアップロード・手動入力）');
+        console.log('- カレンダー（予定管理）');
+        console.log('- レポート（Excel出力）');
         console.log('キーボードショートカット: Ctrl+K (タスク追加), Ctrl+E (予定追加), Ctrl+S (同期)');
     </script>
 </body>
