@@ -24,13 +24,11 @@
             min-height: 100vh;
         }
         
-        /* メインレイアウト */
         .app-container {
             display: flex;
             min-height: 100vh;
         }
         
-        /* サイドバー */
         .sidebar {
             width: 320px;
             background: rgba(255, 255, 255, 0.95);
@@ -42,13 +40,11 @@
             z-index: 999;
         }
         
-        /* メインコンテンツエリア */
         .main-content {
             flex: 1;
             overflow-x: hidden;
         }
         
-        /* モバイル対応 */
         @media (max-width: 1023px) {
             .app-container {
                 flex-direction: column;
@@ -116,16 +112,6 @@
             background: linear-gradient(135deg, var(--success), #047857);
             color: white;
             box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
-        }
-        
-        .btn-warning {
-            background: linear-gradient(135deg, var(--warning), #d97706);
-            color: white;
-        }
-        
-        .btn-danger {
-            background: linear-gradient(135deg, var(--danger), #dc2626);
-            color: white;
         }
         
         .btn-outline {
@@ -321,14 +307,6 @@
             box-shadow: 0 12px 40px rgba(59, 130, 246, 0.6);
         }
         
-        @media (max-width: 768px) {
-            .btn { padding: 20px 24px; font-size: 18px; min-height: 64px; }
-            .input-field { padding: 20px; font-size: 18px; }
-            .task-card { padding: 24px; margin: 16px 0; }
-            .glass-card { margin: 12px; }
-            .modal-content { padding: 24px; }
-        }
-        
         .chart-container { position: relative; height: 400px; width: 100%; }
         .fade-in { animation: fadeIn 0.5s ease-in; }
         
@@ -336,16 +314,23 @@
             from { opacity: 0; transform: translateY(30px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        
+        @media (max-width: 768px) {
+            .btn { padding: 20px 24px; font-size: 18px; min-height: 64px; }
+            .input-field { padding: 20px; font-size: 18px; }
+            .task-card { padding: 24px; margin: 16px 0; }
+            .glass-card { margin: 12px; }
+            .modal-content { padding: 24px; }
+        }
     </style>
 </head>
 <body>
-    <!-- アプリケーションコンテナ -->
     <div class="app-container">
         <!-- オーバーレイ -->
         <div id="overlay" class="overlay lg:hidden"></div>
         
         <!-- フローティングボタン -->
-        <button class="floating-btn lg:hidden" onclick="toggleSidebar()">
+        <button class="floating-btn lg:hidden" id="mobileMenuBtn">
             <i class="fas fa-bars"></i>
         </button>
         
@@ -371,9 +356,9 @@
                         <i class="fas fa-chart-line mr-4 text-xl"></i>
                         <span>売上分析</span>
                     </div>
-                    <div class="nav-item" data-page="posts">
-                        <i class="fas fa-camera mr-4 text-xl"></i>
-                        <span>投稿管理</span>
+                    <div class="nav-item" data-page="attendance">
+                        <i class="fas fa-user-clock mr-4 text-xl"></i>
+                        <span>出勤管理</span>
                     </div>
                     <div class="nav-item" data-page="calendar">
                         <i class="fas fa-calendar mr-4 text-xl"></i>
@@ -390,7 +375,7 @@
                         <div class="text-3xl mb-3">📊</div>
                         <div class="text-sm font-medium text-blue-800">データ同期</div>
                         <div class="text-xs text-blue-600 mb-4" id="lastSync">未同期</div>
-                        <button class="btn btn-primary w-full" onclick="syncAllData()">
+                        <button class="btn btn-primary w-full" id="syncBtn">
                             <i class="fas fa-sync-alt mr-2"></i>同期
                         </button>
                     </div>
@@ -404,7 +389,7 @@
             <header class="glass-card m-4 lg:m-6">
                 <div class="p-6 flex items-center justify-between">
                     <div class="flex items-center">
-                        <button onclick="toggleSidebar()" class="lg:hidden mr-4 p-3 text-gray-600 hover:text-gray-800 rounded-full hover:bg-gray-100">
+                        <button id="menuToggle" class="lg:hidden mr-4 p-3 text-gray-600 hover:text-gray-800 rounded-full hover:bg-gray-100">
                             <i class="fas fa-bars text-xl"></i>
                         </button>
                         <div>
@@ -418,7 +403,7 @@
                             <div class="font-semibold text-gray-900" id="currentDate"></div>
                             <div class="text-sm text-blue-600" id="currentTime"></div>
                         </div>
-                        <button class="btn btn-primary" onclick="showQuickActions()">
+                        <button class="btn btn-primary" id="quickActionBtn">
                             <i class="fas fa-plus mr-2"></i>
                             <span class="hidden sm:inline">クイック</span>
                         </button>
@@ -432,23 +417,23 @@
                 <div class="glass-card p-6 mb-6">
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="text-lg font-bold text-gray-900">業務データアップロード</h3>
-                        <button class="btn btn-success" onclick="downloadBusinessTemplate()">
+                        <button class="btn btn-success" id="downloadTemplateBtn">
                             <i class="fas fa-download mr-2"></i>テンプレートDL
                         </button>
                     </div>
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                         <div>
-                            <input type="file" id="businessFileInput" accept=".xlsx,.xls,.csv" class="input-field">
+                            <input type="file" id="dashboardFileInput" accept=".xlsx,.xls,.csv" class="input-field">
                             <div class="text-sm text-gray-600 mt-2">
                                 <i class="fas fa-info-circle mr-1"></i>
                                 日次売上・出勤・アクセス状況データをアップロード
                             </div>
                         </div>
                         <div class="flex items-center space-x-3">
-                            <button class="btn btn-primary" onclick="processBusinessData()">
+                            <button class="btn btn-primary" id="processDataBtn">
                                 <i class="fas fa-upload mr-2"></i>データ反映
                             </button>
-                            <div id="businessUploadStatus" class="text-sm text-gray-500"></div>
+                            <div id="uploadStatus" class="text-sm text-gray-500"></div>
                         </div>
                     </div>
                 </div>
@@ -461,14 +446,14 @@
                         <div class="text-xs text-green-600 mt-2" id="completedTasksCount">0件完了</div>
                     </div>
                     <div class="glass-card p-6 text-center">
-                        <div class="text-4xl font-bold text-green-600 mb-2">¥2.8M</div>
-                        <div class="text-sm text-gray-600">本日売上</div>
-                        <div class="text-xs text-green-600 mt-2">+15% 昨日比</div>
+                        <div class="text-4xl font-bold text-green-600 mb-2" id="totalSalesDisplay">¥0</div>
+                        <div class="text-sm text-gray-600">累計売上</div>
+                        <div class="text-xs text-green-600 mt-2" id="salesGrowthDisplay">+0% 前月比</div>
                     </div>
                     <div class="glass-card p-6 text-center">
-                        <div class="text-4xl font-bold text-purple-600 mb-2">95%</div>
+                        <div class="text-4xl font-bold text-purple-600 mb-2" id="attendanceRateDisplay">95%</div>
                         <div class="text-sm text-gray-600">出勤率</div>
-                        <div class="text-xs text-green-600 mt-2">今月平均</div>
+                        <div class="text-xs text-orange-600 mt-2">今月平均</div>
                     </div>
                     <div class="glass-card p-6 text-center">
                         <div class="text-4xl font-bold text-cyan-600 mb-2" id="upcomingEvents">0</div>
@@ -481,7 +466,7 @@
                 <div class="glass-card p-6 mb-6">
                     <div class="flex items-center justify-between mb-6">
                         <h3 class="text-xl font-bold text-gray-900">今日のタスク</h3>
-                        <button class="btn btn-outline" onclick="openTaskModal()">
+                        <button class="btn btn-outline" id="addTaskBtn">
                             <i class="fas fa-plus mr-2"></i>追加
                         </button>
                     </div>
@@ -510,10 +495,10 @@
                     <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between mb-6">
                         <h3 class="text-xl font-bold text-gray-900 mb-4 lg:mb-0">タスク管理</h3>
                         <div class="flex flex-wrap gap-3">
-                            <button class="btn btn-primary" onclick="openTaskModal()">
+                            <button class="btn btn-primary" id="newTaskBtn">
                                 <i class="fas fa-plus mr-2"></i>新規タスク
                             </button>
-                            <button class="btn btn-outline" onclick="exportTasks()">
+                            <button class="btn btn-outline" id="exportTasksBtn">
                                 <i class="fas fa-download mr-2"></i>エクスポート
                             </button>
                         </div>
@@ -587,8 +572,8 @@
                         <div class="flex items-center justify-between mb-6">
                             <h4 class="text-lg font-bold text-gray-900">売上推移</h4>
                             <div class="flex space-x-2">
-                                <button class="btn btn-outline" onclick="changeChartPeriod('week')">週別</button>
-                                <button class="btn btn-primary" onclick="changeChartPeriod('month')">月別</button>
+                                <button class="btn btn-outline" id="weekViewBtn">週別</button>
+                                <button class="btn btn-primary" id="monthViewBtn">月別</button>
                             </div>
                         </div>
                         <div class="chart-container">
@@ -611,20 +596,20 @@
                 <div class="glass-card p-6 mb-6">
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="text-lg font-bold text-gray-900">業務データアップロード</h3>
-                        <button class="btn btn-success" onclick="downloadBusinessTemplate()">
+                        <button class="btn btn-success" id="downloadBusinessTemplateBtn">
                             <i class="fas fa-download mr-2"></i>テンプレートDL
                         </button>
                     </div>
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                         <div>
-                            <input type="file" id="businessFileInput" accept=".xlsx,.xls,.csv" class="input-field">
+                            <input type="file" id="attendanceFileInput" accept=".xlsx,.xls,.csv" class="input-field">
                             <div class="text-sm text-gray-600 mt-2">
                                 <i class="fas fa-info-circle mr-1"></i>
                                 日次売上・出勤・アクセス状況データをアップロード
                             </div>
                         </div>
                         <div class="flex items-center space-x-3">
-                            <button class="btn btn-primary" onclick="processBusinessData()">
+                            <button class="btn btn-primary" id="processBusinessDataBtn">
                                 <i class="fas fa-upload mr-2"></i>データ反映
                             </button>
                             <div id="businessUploadStatus" class="text-sm text-gray-500"></div>
@@ -662,8 +647,8 @@
                         <div class="flex items-center justify-between mb-6">
                             <h4 class="text-lg font-bold text-gray-900">日次売上推移</h4>
                             <div class="flex space-x-2">
-                                <button class="btn btn-outline" onclick="changeSalesPeriod('week')">週別</button>
-                                <button class="btn btn-primary" onclick="changeSalesPeriod('month')">月別</button>
+                                <button class="btn btn-outline" id="dailyWeekBtn">週別</button>
+                                <button class="btn btn-primary" id="dailyMonthBtn">月別</button>
                             </div>
                         </div>
                         <div class="chart-container">
@@ -684,10 +669,10 @@
                     <div class="flex items-center justify-between mb-6">
                         <h4 class="text-lg font-bold text-gray-900">日次データ</h4>
                         <div class="flex space-x-3">
-                            <button class="btn btn-outline" onclick="exportBusinessData()">
+                            <button class="btn btn-outline" id="exportBusinessBtn">
                                 <i class="fas fa-download mr-2"></i>エクスポート
                             </button>
-                            <button class="btn btn-primary" onclick="addDailyRecord()">
+                            <button class="btn btn-primary" id="addRecordBtn">
                                 <i class="fas fa-plus mr-2"></i>手動入力
                             </button>
                         </div>
@@ -720,21 +705,21 @@
                     <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between mb-6">
                         <h3 class="text-xl font-bold text-gray-900 mb-4 lg:mb-0">カレンダー</h3>
                         <div class="flex flex-wrap gap-3">
-                            <button class="btn btn-primary" onclick="openEventModal()">
+                            <button class="btn btn-primary" id="addEventBtn">
                                 <i class="fas fa-plus mr-2"></i>予定追加
                             </button>
-                            <button class="btn btn-outline" onclick="goToToday()">今日</button>
+                            <button class="btn btn-outline" id="todayBtn">今日</button>
                         </div>
                     </div>
                     
                     <!-- カレンダーナビゲーション -->
                     <div class="flex items-center justify-between mb-6">
-                        <h4 class="text-2xl font-bold text-gray-900" id="calendarTitle">2024年6月</h4>
+                        <h4 class="text-2xl font-bold text-gray-900" id="calendarTitle">2025年7月</h4>
                         <div class="flex space-x-2">
-                            <button class="btn btn-outline" onclick="previousMonth()">
+                            <button class="btn btn-outline" id="prevMonthBtn">
                                 <i class="fas fa-chevron-left"></i>
                             </button>
-                            <button class="btn btn-outline" onclick="nextMonth()">
+                            <button class="btn btn-outline" id="nextMonthBtn">
                                 <i class="fas fa-chevron-right"></i>
                             </button>
                         </div>
@@ -774,7 +759,7 @@
                         <div class="text-5xl mb-4">📊</div>
                         <h4 class="text-lg font-bold mb-2">売上レポート</h4>
                         <p class="text-gray-600 mb-4">月別・店舗別売上分析</p>
-                        <button class="btn btn-primary w-full" onclick="generateReport('sales')">
+                        <button class="btn btn-primary w-full" id="salesReportBtn">
                             <i class="fas fa-download mr-2"></i>ダウンロード
                         </button>
                     </div>
@@ -783,7 +768,7 @@
                         <div class="text-5xl mb-4">👥</div>
                         <h4 class="text-lg font-bold mb-2">出勤レポート</h4>
                         <p class="text-gray-600 mb-4">出勤率・勤怠状況分析</p>
-                        <button class="btn btn-primary w-full" onclick="generateReport('attendance')">
+                        <button class="btn btn-primary w-full" id="attendanceReportBtn">
                             <i class="fas fa-download mr-2"></i>ダウンロード
                         </button>
                     </div>
@@ -792,7 +777,7 @@
                         <div class="text-5xl mb-4">📋</div>
                         <h4 class="text-lg font-bold mb-2">総合レポート</h4>
                         <p class="text-gray-600 mb-4">全業務統合レポート</p>
-                        <button class="btn btn-primary w-full" onclick="generateReport('comprehensive')">
+                        <button class="btn btn-primary w-full" id="comprehensiveReportBtn">
                             <i class="fas fa-download mr-2"></i>ダウンロード
                         </button>
                     </div>
@@ -801,7 +786,7 @@
                         <div class="text-5xl mb-4">📅</div>
                         <h4 class="text-lg font-bold mb-2">スケジュール</h4>
                         <p class="text-gray-600 mb-4">予定・会議一覧</p>
-                        <button class="btn btn-primary w-full" onclick="generateReport('schedule')">
+                        <button class="btn btn-primary w-full" id="scheduleReportBtn">
                             <i class="fas fa-download mr-2"></i>ダウンロード
                         </button>
                     </div>
@@ -810,7 +795,7 @@
                         <div class="text-5xl mb-4">🎯</div>
                         <h4 class="text-lg font-bold mb-2">月末締めデータ</h4>
                         <p class="text-gray-600 mb-4">全データ一括出力</p>
-                        <button class="btn btn-success w-full" onclick="generateMonthEndReport()">
+                        <button class="btn btn-success w-full" id="monthEndReportBtn">
                             <i class="fas fa-file-archive mr-2"></i>一括DL
                         </button>
                     </div>
@@ -824,7 +809,7 @@
         <div class="modal-content">
             <div class="flex items-center justify-between mb-6">
                 <h3 class="text-xl font-bold text-gray-900" id="taskModalTitle">新しいタスク</h3>
-                <button onclick="closeTaskModal()" class="text-gray-500 hover:text-gray-700">
+                <button id="closeTaskModal" class="text-gray-500 hover:text-gray-700">
                     <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
@@ -874,10 +859,10 @@
                 </div>
                 
                 <div class="flex space-x-4">
-                    <button class="btn btn-primary flex-1" onclick="saveTask()">
+                    <button class="btn btn-primary flex-1" id="saveTaskBtn">
                         <i class="fas fa-save mr-2"></i>保存
                     </button>
-                    <button class="btn btn-outline" onclick="closeTaskModal()">
+                    <button class="btn btn-outline" id="cancelTaskBtn">
                         キャンセル
                     </button>
                 </div>
@@ -890,7 +875,7 @@
         <div class="modal-content">
             <div class="flex items-center justify-between mb-6">
                 <h3 class="text-xl font-bold text-gray-900">予定追加</h3>
-                <button onclick="closeEventModal()" class="text-gray-500 hover:text-gray-700">
+                <button id="closeEventModal" class="text-gray-500 hover:text-gray-700">
                     <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
@@ -936,10 +921,10 @@
                 </div>
                 
                 <div class="flex space-x-4">
-                    <button class="btn btn-primary flex-1" onclick="saveEvent()">
+                    <button class="btn btn-primary flex-1" id="saveEventBtn">
                         <i class="fas fa-save mr-2"></i>保存
                     </button>
-                    <button class="btn btn-outline" onclick="closeEventModal()">
+                    <button class="btn btn-outline" id="cancelEventBtn">
                         キャンセル
                     </button>
                 </div>
@@ -953,14 +938,17 @@
         let sidebarOpen = false;
         let editingTaskId = null;
         let editingEventId = null;
-        let salesChart = null;
         let uploadedBusinessData = null;
+        let salesChart = null;
+        let dailySalesChart = null;
+        let accessChart = null;
+        let currentMonth = new Date().getMonth();
+        let currentYear = new Date().getFullYear();
         
         // データ管理
         let tasks = [];
         let events = [];
-        let businessData = []; // 売上・出勤・アクセスデータ
-        let uploadedBusinessData = null;
+        let businessData = [];
         
         // 10店舗情報
         const storeInfo = {
@@ -975,74 +963,45 @@
             'go_tokyo': { name: 'GrandOpera東京', region: '東京', brand: 'GrandOpera' },
             'go_yokohama': { name: 'GrandOpera横浜', region: '横浜', brand: 'GrandOpera' }
         };
-        
-        // 初期化
+
+        // システム初期化
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('CLASSY業務管理システム起動');
+            console.log('CLASSY業務管理システム起動中...');
             
-            // データの初期化
-            tasks = tasks || [];
-            events = events || [];
-            businessData = businessData || [];
+            // 基本機能の初期化
+            initializeSystem();
             
+            console.log('システム初期化完了');
+        });
+
+        function initializeSystem() {
+            // データ初期化
             loadData();
+            
+            // UI初期化
             updateDateTime();
             setInterval(updateDateTime, 60000);
             
-            setupEventListeners();
-            
-            // チャート初期化（遅延実行）
-            setTimeout(() => {
-                initializeCharts();
-            }, 100);
-            
-            renderDashboard();
-            generateCalendar();
-            
-            // サンプルデータの作成（初回のみ）
+            // サンプルデータの生成（初回のみ）
             if (tasks.length === 0) {
                 createSampleData();
             }
-            
-            // サンプル業務データの作成（初回のみ）
             if (businessData.length === 0) {
                 createSampleBusinessData();
             }
             
-            console.log('初期化完了 - 10店舗対応');
-        });
-        
-        // サンプル業務データ作成
-        function createSampleBusinessData() {
-            const today = new Date();
-            const sampleData = [];
+            // イベントリスナーの設定
+            setupEventListeners();
             
-            // 過去30日間のサンプルデータを作成
-            for (let i = 29; i >= 0; i--) {
-                const date = new Date(today);
-                date.setDate(today.getDate() - i);
-                const dateStr = `${date.getMonth() + 1}/${date.getDate()}`;
-                
-                sampleData.push({
-                    dayCode: 45813 + (29 - i),
-                    date: dateStr,
-                    attendance: Math.floor(Math.random() * 5) + 15, // 15-20人
-                    absence: Math.floor(Math.random() * 3), // 0-2人
-                    sales: Math.floor(Math.random() * 500000) + 800000, // 80万-130万
-                    cash: Math.floor(Math.random() * 200000) + 300000, // 30万-50万
-                    card: Math.floor(Math.random() * 300000) + 500000, // 50万-80万
-                    other: Math.floor(Math.random() * 50000), // 0-5万
-                    totalAccess: Math.floor(Math.random() * 20000) + 50000, // 5万-7万
-                    pcAccess: Math.floor(Math.random() * 5000) + 4000, // 4000-9000
-                    spAccess: Math.floor(Math.random() * 15000) + 45000, // 45000-60000
-                    myshop: Math.floor(Math.random() * 100000) + 200000 // 20万-30万
-                });
-            }
+            // 初期表示の描画
+            renderCurrentPage();
             
-            businessData = sampleData;
-            saveData();
+            // チャート初期化（遅延実行）
+            setTimeout(() => {
+                initializeCharts();
+            }, 500);
         }
-        
+
         // イベントリスナー設定
         function setupEventListeners() {
             // ナビゲーション
@@ -1052,82 +1011,177 @@
                     showPage(page);
                 });
             });
-            
-            // オーバーレイクリック
+
+            // サイドバートグル
+            const menuToggle = document.getElementById('menuToggle');
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
             const overlay = document.getElementById('overlay');
-            if (overlay) {
-                overlay.addEventListener('click', closeSidebar);
-            }
             
-            // 検索・フィルター
+            if (menuToggle) menuToggle.addEventListener('click', toggleSidebar);
+            if (mobileMenuBtn) mobileMenuBtn.addEventListener('click', toggleSidebar);
+            if (overlay) overlay.addEventListener('click', closeSidebar);
+
+            // モーダル関連
+            setupModalListeners();
+            
+            // ボタン関連
+            setupButtonListeners();
+            
+            // フィルター関連
+            setupFilterListeners();
+            
+            // ファイルアップロード関連
+            setupFileUploadListeners();
+
+            // キーボードショートカット
+            document.addEventListener('keydown', handleKeyboardShortcuts);
+        }
+
+        function setupModalListeners() {
+            // タスクモーダル
+            const closeTaskModal = document.getElementById('closeTaskModal');
+            const cancelTaskBtn = document.getElementById('cancelTaskBtn');
+            const saveTaskBtn = document.getElementById('saveTaskBtn');
+            
+            if (closeTaskModal) closeTaskModal.addEventListener('click', () => hideModal('taskModal'));
+            if (cancelTaskBtn) cancelTaskBtn.addEventListener('click', () => hideModal('taskModal'));
+            if (saveTaskBtn) saveTaskBtn.addEventListener('click', saveTask);
+
+            // イベントモーダル
+            const closeEventModal = document.getElementById('closeEventModal');
+            const cancelEventBtn = document.getElementById('cancelEventBtn');
+            const saveEventBtn = document.getElementById('saveEventBtn');
+            
+            if (closeEventModal) closeEventModal.addEventListener('click', () => hideModal('eventModal'));
+            if (cancelEventBtn) cancelEventBtn.addEventListener('click', () => hideModal('eventModal'));
+            if (saveEventBtn) saveEventBtn.addEventListener('click', saveEvent);
+        }
+
+        function setupButtonListeners() {
+            // ダッシュボードボタン
+            const downloadTemplateBtn = document.getElementById('downloadTemplateBtn');
+            const processDataBtn = document.getElementById('processDataBtn');
+            const addTaskBtn = document.getElementById('addTaskBtn');
+            const quickActionBtn = document.getElementById('quickActionBtn');
+            const syncBtn = document.getElementById('syncBtn');
+
+            if (downloadTemplateBtn) downloadTemplateBtn.addEventListener('click', downloadBusinessTemplate);
+            if (processDataBtn) processDataBtn.addEventListener('click', processBusinessData);
+            if (addTaskBtn) addTaskBtn.addEventListener('click', () => openTaskModal());
+            if (quickActionBtn) quickActionBtn.addEventListener('click', showQuickActions);
+            if (syncBtn) syncBtn.addEventListener('click', syncAllData);
+
+            // タスク管理ボタン
+            const newTaskBtn = document.getElementById('newTaskBtn');
+            const exportTasksBtn = document.getElementById('exportTasksBtn');
+
+            if (newTaskBtn) newTaskBtn.addEventListener('click', () => openTaskModal());
+            if (exportTasksBtn) exportTasksBtn.addEventListener('click', exportTasks);
+
+            // 売上分析ボタン
+            const weekViewBtn = document.getElementById('weekViewBtn');
+            const monthViewBtn = document.getElementById('monthViewBtn');
+
+            if (weekViewBtn) weekViewBtn.addEventListener('click', () => changeChartPeriod('week'));
+            if (monthViewBtn) monthViewBtn.addEventListener('click', () => changeChartPeriod('month'));
+
+            // 出勤管理ボタン
+            const downloadBusinessTemplateBtn = document.getElementById('downloadBusinessTemplateBtn');
+            const processBusinessDataBtn = document.getElementById('processBusinessDataBtn');
+            const exportBusinessBtn = document.getElementById('exportBusinessBtn');
+            const addRecordBtn = document.getElementById('addRecordBtn');
+            const dailyWeekBtn = document.getElementById('dailyWeekBtn');
+            const dailyMonthBtn = document.getElementById('dailyMonthBtn');
+
+            if (downloadBusinessTemplateBtn) downloadBusinessTemplateBtn.addEventListener('click', downloadBusinessTemplate);
+            if (processBusinessDataBtn) processBusinessDataBtn.addEventListener('click', processBusinessData);
+            if (exportBusinessBtn) exportBusinessBtn.addEventListener('click', exportBusinessData);
+            if (addRecordBtn) addRecordBtn.addEventListener('click', addDailyRecord);
+            if (dailyWeekBtn) dailyWeekBtn.addEventListener('click', () => changeSalesPeriod('week'));
+            if (dailyMonthBtn) dailyMonthBtn.addEventListener('click', () => changeSalesPeriod('month'));
+
+            // カレンダーボタン
+            const addEventBtn = document.getElementById('addEventBtn');
+            const todayBtn = document.getElementById('todayBtn');
+            const prevMonthBtn = document.getElementById('prevMonthBtn');
+            const nextMonthBtn = document.getElementById('nextMonthBtn');
+
+            if (addEventBtn) addEventBtn.addEventListener('click', () => openEventModal());
+            if (todayBtn) todayBtn.addEventListener('click', goToToday);
+            if (prevMonthBtn) prevMonthBtn.addEventListener('click', previousMonth);
+            if (nextMonthBtn) nextMonthBtn.addEventListener('click', nextMonth);
+
+            // レポートボタン
+            const salesReportBtn = document.getElementById('salesReportBtn');
+            const attendanceReportBtn = document.getElementById('attendanceReportBtn');
+            const comprehensiveReportBtn = document.getElementById('comprehensiveReportBtn');
+            const scheduleReportBtn = document.getElementById('scheduleReportBtn');
+            const monthEndReportBtn = document.getElementById('monthEndReportBtn');
+
+            if (salesReportBtn) salesReportBtn.addEventListener('click', () => generateReport('sales'));
+            if (attendanceReportBtn) attendanceReportBtn.addEventListener('click', () => generateReport('attendance'));
+            if (comprehensiveReportBtn) comprehensiveReportBtn.addEventListener('click', () => generateReport('comprehensive'));
+            if (scheduleReportBtn) scheduleReportBtn.addEventListener('click', () => generateReport('schedule'));
+            if (monthEndReportBtn) monthEndReportBtn.addEventListener('click', generateMonthEndReport);
+        }
+
+        function setupFilterListeners() {
             const taskSearch = document.getElementById('taskSearch');
             const priorityFilter = document.getElementById('priorityFilter');
             const statusFilter = document.getElementById('statusFilter');
             const storeFilter = document.getElementById('storeFilter');
-            
+
             if (taskSearch) taskSearch.addEventListener('input', filterTasks);
             if (priorityFilter) priorityFilter.addEventListener('change', filterTasks);
             if (statusFilter) statusFilter.addEventListener('change', filterTasks);
             if (storeFilter) storeFilter.addEventListener('change', filterTasks);
-            
-            // ファイルアップロード（複数の入力要素に対応）
-            const businessFileInputs = document.querySelectorAll('#businessFileInput');
-            businessFileInputs.forEach(input => {
-                if (input) {
-                    input.addEventListener('change', handleBusinessUpload);
-                }
-            });
-            
-            // キーボードショートカット
-            document.addEventListener('keydown', function(e) {
-                if (e.ctrlKey || e.metaKey) {
-                    switch(e.key) {
-                        case 'k':
-                            e.preventDefault();
-                            openTaskModal();
-                            break;
-                        case 'e':
-                            e.preventDefault();
-                            openEventModal();
-                            break;
-                        case 's':
-                            e.preventDefault();
-                            syncAllData();
-                            break;
-                    }
-                }
-                
-                if (e.key === 'Escape') {
-                    closeAllModals();
-                    closeSidebar();
-                }
-            });
         }
-        
-        // データの読み込み（localStorage使用廃止）
+
+        function setupFileUploadListeners() {
+            const dashboardFileInput = document.getElementById('dashboardFileInput');
+            const attendanceFileInput = document.getElementById('attendanceFileInput');
+
+            if (dashboardFileInput) dashboardFileInput.addEventListener('change', handleBusinessUpload);
+            if (attendanceFileInput) attendanceFileInput.addEventListener('change', handleBusinessUpload);
+        }
+
+        function handleKeyboardShortcuts(e) {
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key) {
+                    case 'k':
+                        e.preventDefault();
+                        openTaskModal();
+                        break;
+                    case 'e':
+                        e.preventDefault();
+                        openEventModal();
+                        break;
+                    case 's':
+                        e.preventDefault();
+                        syncAllData();
+                        break;
+                }
+            }
+            
+            if (e.key === 'Escape') {
+                closeAllModals();
+                closeSidebar();
+            }
+        }
+
+        // データ管理
         function loadData() {
-            try {
-                // ブラウザストレージの代わりにメモリ内で管理
-                tasks = tasks || [];
-                events = events || [];
-                businessData = businessData || [];
-                
-                console.log('データ読み込み完了:', { tasks: tasks.length, events: events.length, businessData: businessData.length });
-            } catch (error) {
-                console.error('データ読み込みエラー:', error);
-            }
+            // メモリ内でのデータ管理（localStorage代替）
+            tasks = tasks || [];
+            events = events || [];
+            businessData = businessData || [];
         }
-        
-        // データの保存（localStorage使用廃止）
+
         function saveData() {
-            try {
-                // ブラウザストレージの代わりにメモリ内で管理
-                console.log('データ保存完了（メモリ内）');
-            } catch (error) {
-                console.error('データ保存エラー:', error);
-            }
+            // メモリ内でのデータ保存（実際のプロジェクトではサーバーに送信）
+            console.log('データ保存完了（メモリ内）');
         }
-        
+
         // サンプルデータ作成
         function createSampleData() {
             const today = new Date();
@@ -1138,7 +1192,7 @@
                 {
                     id: Date.now() + 1,
                     title: '月次売上レポート作成',
-                    description: '6月の売上データをまとめてレポート作成',
+                    description: '7月の売上データをまとめてレポート作成',
                     priority: 'high',
                     store: 'cl_nagoya',
                     dueDate: today.toISOString().split('T')[0],
@@ -1157,8 +1211,8 @@
                 },
                 {
                     id: Date.now() + 3,
-                    title: '投稿確認完了',
-                    description: '各店舗の投稿状況確認',
+                    title: '出勤状況確認完了',
+                    description: '各店舗の出勤状況確認',
                     priority: 'medium',
                     store: '',
                     dueDate: today.toISOString().split('T')[0],
@@ -1171,7 +1225,7 @@
                 {
                     id: Date.now() + 10,
                     title: '月次会議',
-                    description: '6月の振り返りと7月の計画',
+                    description: '7月の振り返りと8月の計画',
                     type: 'meeting',
                     date: today.toISOString().split('T')[0],
                     startTime: '10:00',
@@ -1190,8 +1244,38 @@
             
             saveData();
         }
-        
-        // 日時更新
+
+        function createSampleBusinessData() {
+            const today = new Date();
+            const sampleData = [];
+            
+            // 過去30日間のサンプルデータを作成
+            for (let i = 29; i >= 0; i--) {
+                const date = new Date(today);
+                date.setDate(today.getDate() - i);
+                const dateStr = `${date.getMonth() + 1}/${date.getDate()}`;
+                
+                sampleData.push({
+                    dayCode: 45813 + (29 - i),
+                    date: dateStr,
+                    attendance: Math.floor(Math.random() * 5) + 15,
+                    absence: Math.floor(Math.random() * 3),
+                    sales: Math.floor(Math.random() * 500000) + 800000,
+                    cash: Math.floor(Math.random() * 200000) + 300000,
+                    card: Math.floor(Math.random() * 300000) + 500000,
+                    other: Math.floor(Math.random() * 50000),
+                    totalAccess: Math.floor(Math.random() * 20000) + 50000,
+                    pcAccess: Math.floor(Math.random() * 5000) + 4000,
+                    spAccess: Math.floor(Math.random() * 15000) + 45000,
+                    myshop: Math.floor(Math.random() * 100000) + 200000
+                });
+            }
+            
+            businessData = sampleData;
+            saveData();
+        }
+
+        // UI更新
         function updateDateTime() {
             const now = new Date();
             const dateElement = document.getElementById('currentDate');
@@ -1213,7 +1297,7 @@
                 });
             }
         }
-        
+
         // ナビゲーション
         function toggleSidebar() {
             sidebarOpen = !sidebarOpen;
@@ -1228,15 +1312,17 @@
                 overlay.classList.remove('active');
             }
         }
-        
+
         function closeSidebar() {
             if (window.innerWidth < 1024) {
                 sidebarOpen = false;
-                document.getElementById('sidebar').classList.remove('active');
-                document.getElementById('overlay').classList.remove('active');
+                const sidebar = document.getElementById('sidebar');
+                const overlay = document.getElementById('overlay');
+                if (sidebar) sidebar.classList.remove('active');
+                if (overlay) overlay.classList.remove('active');
             }
         }
-        
+
         function showPage(pageName) {
             // 全ページ非表示
             const pages = ['dashboard', 'tasks', 'sales', 'attendance', 'calendar', 'reports'];
@@ -1281,17 +1367,15 @@
             currentPage = pageName;
             
             // ページ固有の初期化
-            switch(pageName) {
+            renderCurrentPage();
+            
+            closeSidebar();
+        }
+
+        function renderCurrentPage() {
+            switch(currentPage) {
                 case 'dashboard':
                     renderDashboard();
-                    // ダッシュボードのファイル入力のイベントリスナーを再設定
-                    setTimeout(() => {
-                        const fileInput = document.querySelector('#dashboardPage #businessFileInput');
-                        if (fileInput && !fileInput.hasEventListener) {
-                            fileInput.addEventListener('change', handleBusinessUpload);
-                            fileInput.hasEventListener = true;
-                        }
-                    }, 100);
                     break;
                 case 'tasks':
                     renderTasks();
@@ -1301,25 +1385,22 @@
                     break;
                 case 'attendance':
                     renderAttendance();
-                    // 出勤管理のファイル入力のイベントリスナーを再設定
-                    setTimeout(() => {
-                        const fileInput = document.querySelector('#attendancePage #businessFileInput');
-                        if (fileInput && !fileInput.hasEventListener) {
-                            fileInput.addEventListener('change', handleBusinessUpload);
-                            fileInput.hasEventListener = true;
-                        }
-                    }, 100);
                     break;
                 case 'calendar':
                     generateCalendar();
                     break;
             }
-            
-            closeSidebar();
         }
-        
+
         // ダッシュボード描画
         function renderDashboard() {
+            updateDashboardStats();
+            renderTodayTasks();
+            renderStoresOverview();
+            renderWeeklySchedule();
+        }
+
+        function updateDashboardStats() {
             const today = new Date().toISOString().split('T')[0];
             const todayTasks = tasks.filter(task => task.dueDate === today);
             const completedTasks = todayTasks.filter(task => task.completed);
@@ -1329,91 +1410,73 @@
                 weekLater.setDate(weekLater.getDate() + 7);
                 return eventDate <= weekLater && eventDate >= new Date();
             });
-            
+
             // 統計更新
-            const todayTasksCount = document.getElementById('todayTasksCount');
-            const completedTasksCount = document.getElementById('completedTasksCount');
-            const upcomingEventsCount = document.getElementById('upcomingEvents');
-            
-            if (todayTasksCount) todayTasksCount.textContent = todayTasks.length;
-            if (completedTasksCount) completedTasksCount.textContent = `${completedTasks.length}件完了`;
-            if (upcomingEventsCount) upcomingEventsCount.textContent = upcomingEvents.length;
-            
-            // 店舗概要描画
-            renderStoresOverview();
-            
-            // 今日のタスク描画
-            const todayTasksList = document.getElementById('todayTasksList');
-            if (todayTasksList) {
-                if (todayTasks.length === 0) {
-                    todayTasksList.innerHTML = '<div class="text-center text-gray-500 py-8">今日のタスクはありません</div>';
-                } else {
-                    todayTasksList.innerHTML = todayTasks.map(task => `
-                        <div class="task-card ${task.completed ? 'completed' : ''} ${task.priority}-priority">
-                            <div class="flex items-center">
-                                <input type="checkbox" ${task.completed ? 'checked' : ''} 
-                                       onchange="toggleTaskComplete(${task.id})"
-                                       class="mr-4 w-5 h-5 text-blue-600 rounded">
-                                <div class="flex-1">
-                                    <div class="font-semibold text-gray-900 ${task.completed ? 'line-through' : ''}">
-                                        ${task.title}
-                                    </div>
-                                    <div class="text-sm text-gray-600 mt-1">${task.description}</div>
-                                    ${task.store ? `<div class="text-xs text-blue-600 mt-1">${getStoreName(task.store)}</div>` : ''}
-                                </div>
-                                <div class="flex items-center space-x-2">
-                                    <span class="px-3 py-1 text-xs rounded-full ${getPriorityClass(task.priority)}">${getPriorityText(task.priority)}</span>
-                                    <button onclick="editTask(${task.id})" class="text-blue-600 hover:text-blue-800 p-2">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    `).join('');
-                }
+            updateElement('todayTasksCount', todayTasks.length);
+            updateElement('completedTasksCount', `${completedTasks.length}件完了`);
+            updateElement('upcomingEvents', upcomingEvents.length);
+
+            // 業務データから統計計算
+            if (businessData.length > 0) {
+                const totalSales = businessData.reduce((sum, data) => sum + data.sales, 0);
+                const totalAttendance = businessData.reduce((sum, data) => sum + data.attendance, 0);
+                const attendanceRate = Math.round((totalAttendance / businessData.length) * 100);
+
+                updateElement('totalSalesDisplay', `¥${(totalSales / 1000000).toFixed(1)}M`);
+                updateElement('attendanceRateDisplay', `${attendanceRate}%`);
             }
-            
-            // 週間スケジュール描画
-            renderWeeklySchedule();
         }
-        
-        // 店舗概要描画
+
+        function renderTodayTasks() {
+            const today = new Date().toISOString().split('T')[0];
+            const todayTasks = tasks.filter(task => task.dueDate === today);
+            const todayTasksList = document.getElementById('todayTasksList');
+
+            if (!todayTasksList) return;
+
+            if (todayTasks.length === 0) {
+                todayTasksList.innerHTML = '<div class="text-center text-gray-500 py-8">今日のタスクはありません</div>';
+                return;
+            }
+
+            todayTasksList.innerHTML = todayTasks.map(task => createTaskCard(task)).join('');
+        }
+
+        function createTaskCard(task) {
+            return `
+                <div class="task-card ${task.completed ? 'completed' : ''} ${task.priority}-priority">
+                    <div class="flex items-center">
+                        <input type="checkbox" ${task.completed ? 'checked' : ''} 
+                               onchange="toggleTaskComplete(${task.id})"
+                               class="mr-4 w-5 h-5 text-blue-600 rounded">
+                        <div class="flex-1">
+                            <div class="font-semibold text-gray-900 ${task.completed ? 'line-through' : ''}">
+                                ${task.title}
+                            </div>
+                            <div class="text-sm text-gray-600 mt-1">${task.description}</div>
+                            ${task.store ? `<div class="text-xs text-blue-600 mt-1">${getStoreName(task.store)}</div>` : ''}
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="px-3 py-1 text-xs rounded-full ${getPriorityClass(task.priority)}">${getPriorityText(task.priority)}</span>
+                            <button onclick="editTask(${task.id})" class="text-blue-600 hover:text-blue-800 p-2">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
         function renderStoresOverview() {
             const storesOverview = document.getElementById('storesOverview');
             if (!storesOverview) return;
-            
-            // 各店舗のサンプルデータ（実際のシステムでは店舗ごとの業務データを使用）
-            const storeStatus = {};
-            
-            // 業務データから最新の売上を取得（実際には店舗別データが必要）
-            if (businessData.length > 0) {
-                Object.keys(storeInfo).forEach(storeCode => {
-                    // サンプル：全データの平均を各店舗に割り当て
-                    const avgSales = businessData.reduce((sum, data) => sum + data.sales, 0) / businessData.length;
-                    const avgAttendance = businessData.reduce((sum, data) => sum + data.attendance, 0) / businessData.length;
-                    
-                    storeStatus[storeCode] = {
-                        sales: avgSales * (0.8 + Math.random() * 0.4), // ±20%のバリエーション
-                        attendance: Math.round(avgAttendance * (0.8 + Math.random() * 0.4)),
-                        attendanceRate: Math.round((70 + Math.random() * 30)) // 70-100%の出勤率
-                    };
-                });
-            } else {
-                // サンプルデータ
-                Object.keys(storeInfo).forEach(storeCode => {
-                    storeStatus[storeCode] = {
-                        sales: Math.floor(Math.random() * 500000) + 500000,
-                        attendance: Math.floor(Math.random() * 10) + 15,
-                        attendanceRate: Math.round(70 + Math.random() * 30)
-                    };
-                });
-            }
-            
-            // 店舗カード生成
+
             const storeCards = Object.entries(storeInfo).map(([storeCode, info]) => {
-                const status = storeStatus[storeCode];
-                const rateColor = status.attendanceRate >= 90 ? 'green' : status.attendanceRate >= 80 ? 'yellow' : 'red';
-                
+                const attendanceRate = Math.round(70 + Math.random() * 30);
+                const avgSales = Math.floor(Math.random() * 500000) + 500000;
+                const attendance = Math.floor(Math.random() * 10) + 15;
+                const rateColor = attendanceRate >= 90 ? 'green' : attendanceRate >= 80 ? 'yellow' : 'red';
+
                 return `
                     <div class="glass-card p-6 cursor-pointer" onclick="showStoreDetails('${storeCode}')">
                         <div class="flex items-center justify-between mb-4">
@@ -1423,18 +1486,18 @@
                         <div class="space-y-3">
                             <div class="flex justify-between">
                                 <span>出勤率</span>
-                                <span class="font-bold text-${rateColor}-600">${status.attendanceRate}%</span>
+                                <span class="font-bold text-${rateColor}-600">${attendanceRate}%</span>
                             </div>
                             <div class="flex justify-between">
                                 <span>平均売上</span>
-                                <span class="font-bold text-blue-600">¥${Math.round(status.sales/1000)}K</span>
+                                <span class="font-bold text-blue-600">¥${Math.round(avgSales/1000)}K</span>
                             </div>
                             <div class="flex justify-between">
                                 <span>出勤者数</span>
-                                <span class="font-bold text-purple-600">${status.attendance}人</span>
+                                <span class="font-bold text-purple-600">${attendance}人</span>
                             </div>
                             <div class="w-full bg-gray-200 rounded-full h-2">
-                                <div class="bg-${rateColor}-500 h-2 rounded-full" style="width: ${status.attendanceRate}%"></div>
+                                <div class="bg-${rateColor}-500 h-2 rounded-full" style="width: ${attendanceRate}%"></div>
                             </div>
                             <div class="text-xs text-gray-600 text-center">
                                 ${info.region} • ${info.brand}
@@ -1443,20 +1506,19 @@
                     </div>
                 `;
             }).join('');
-            
+
             storesOverview.innerHTML = storeCards;
         }
-        
-        // 週間スケジュール描画
+
         function renderWeeklySchedule() {
             const weeklySchedule = document.getElementById('weeklySchedule');
             if (!weeklySchedule) return;
-            
+
             const weekDays = ['日', '月', '火', '水', '木', '金', '土'];
             const today = new Date();
             const startOfWeek = new Date(today);
             startOfWeek.setDate(today.getDate() - today.getDay());
-            
+
             let weekHTML = '';
             for (let i = 0; i < 7; i++) {
                 const currentDay = new Date(startOfWeek);
@@ -1464,7 +1526,7 @@
                 const dateStr = currentDay.toISOString().split('T')[0];
                 const dayEvents = events.filter(event => event.date === dateStr);
                 const isToday = dateStr === today.toISOString().split('T')[0];
-                
+
                 weekHTML += `
                     <div class="calendar-day ${isToday ? 'today' : ''}" onclick="showDayDetails('${dateStr}')">
                         <div class="font-semibold mb-2">${weekDays[i]} ${currentDay.getDate()}</div>
@@ -1478,20 +1540,24 @@
             }
             weeklySchedule.innerHTML = weekHTML;
         }
-        
+
         // タスク管理
         function renderTasks() {
             const filteredTasks = getFilteredTasks();
             const tasksList = document.getElementById('tasksList');
-            
+
             if (!tasksList) return;
-            
+
             if (filteredTasks.length === 0) {
                 tasksList.innerHTML = '<div class="text-center text-gray-500 py-8">条件に一致するタスクがありません</div>';
                 return;
             }
-            
-            tasksList.innerHTML = filteredTasks.map(task => `
+
+            tasksList.innerHTML = filteredTasks.map(task => createDetailedTaskCard(task)).join('');
+        }
+
+        function createDetailedTaskCard(task) {
+            return `
                 <div class="task-card ${task.completed ? 'completed' : ''} ${task.priority}-priority">
                     <div class="flex items-center">
                         <input type="checkbox" ${task.completed ? 'checked' : ''} 
@@ -1519,15 +1585,15 @@
                         </div>
                     </div>
                 </div>
-            `).join('');
+            `;
         }
-        
+
         function getFilteredTasks() {
             const searchTerm = document.getElementById('taskSearch')?.value.toLowerCase() || '';
             const priorityFilter = document.getElementById('priorityFilter')?.value || '';
             const statusFilter = document.getElementById('statusFilter')?.value || '';
             const storeFilter = document.getElementById('storeFilter')?.value || '';
-            
+
             return tasks.filter(task => {
                 const matchesSearch = task.title.toLowerCase().includes(searchTerm) || 
                                     task.description.toLowerCase().includes(searchTerm);
@@ -1536,59 +1602,54 @@
                                     (statusFilter === 'completed' && task.completed) ||
                                     (statusFilter === 'pending' && !task.completed);
                 const matchesStore = !storeFilter || task.store === storeFilter;
-                
+
                 return matchesSearch && matchesPriority && matchesStatus && matchesStore;
             });
         }
-        
+
         function filterTasks() {
             renderTasks();
         }
-        
+
         function openTaskModal(taskId = null) {
             editingTaskId = taskId;
             const modal = document.getElementById('taskModal');
             const title = document.getElementById('taskModalTitle');
-            
+
             if (taskId) {
                 const task = tasks.find(t => t.id === taskId);
                 if (task) {
                     title.textContent = 'タスク編集';
-                    document.getElementById('taskTitle').value = task.title;
-                    document.getElementById('taskDescription').value = task.description;
-                    document.getElementById('taskPriority').value = task.priority;
-                    document.getElementById('taskStore').value = task.store;
-                    document.getElementById('taskDueDate').value = task.dueDate;
+                    updateElement('taskTitle', task.title, 'value');
+                    updateElement('taskDescription', task.description, 'value');
+                    updateElement('taskPriority', task.priority, 'value');
+                    updateElement('taskStore', task.store, 'value');
+                    updateElement('taskDueDate', task.dueDate, 'value');
                 }
             } else {
                 title.textContent = '新しいタスク';
-                document.getElementById('taskTitle').value = '';
-                document.getElementById('taskDescription').value = '';
-                document.getElementById('taskPriority').value = 'medium';
-                document.getElementById('taskStore').value = '';
-                document.getElementById('taskDueDate').value = '';
+                updateElement('taskTitle', '', 'value');
+                updateElement('taskDescription', '', 'value');
+                updateElement('taskPriority', 'medium', 'value');
+                updateElement('taskStore', '', 'value');
+                updateElement('taskDueDate', '', 'value');
             }
-            
-            modal.classList.remove('hidden');
+
+            showModal('taskModal');
         }
-        
-        function closeTaskModal() {
-            document.getElementById('taskModal').classList.add('hidden');
-            editingTaskId = null;
-        }
-        
+
         function saveTask() {
             const title = document.getElementById('taskTitle').value.trim();
             const description = document.getElementById('taskDescription').value.trim();
             const priority = document.getElementById('taskPriority').value;
             const store = document.getElementById('taskStore').value;
             const dueDate = document.getElementById('taskDueDate').value;
-            
+
             if (!title) {
                 showNotification('タスク名を入力してください', 'error');
                 return;
             }
-            
+
             if (editingTaskId) {
                 const taskIndex = tasks.findIndex(t => t.id === editingTaskId);
                 if (taskIndex !== -1) {
@@ -1616,202 +1677,156 @@
                 tasks.unshift(newTask);
                 showNotification('タスクを追加しました', 'success');
             }
-            
+
             saveData();
-            closeTaskModal();
-            
-            if (currentPage === 'tasks') {
-                renderTasks();
-            } else if (currentPage === 'dashboard') {
-                renderDashboard();
-            }
+            hideModal('taskModal');
+            renderCurrentPage();
         }
-        
+
         function editTask(taskId) {
             openTaskModal(taskId);
         }
-        
+
         function deleteTask(taskId) {
             if (confirm('このタスクを削除しますか？')) {
                 tasks = tasks.filter(t => t.id !== taskId);
                 saveData();
-                
-                if (currentPage === 'tasks') {
-                    renderTasks();
-                } else if (currentPage === 'dashboard') {
-                    renderDashboard();
-                }
-                
+                renderCurrentPage();
                 showNotification('タスクを削除しました', 'success');
             }
         }
-        
+
         function toggleTaskComplete(taskId) {
             const task = tasks.find(t => t.id === taskId);
             if (task) {
                 task.completed = !task.completed;
                 saveData();
-                
-                if (currentPage === 'tasks') {
-                    renderTasks();
-                } else if (currentPage === 'dashboard') {
-                    renderDashboard();
-                }
+                renderCurrentPage();
             }
         }
-        
-        // イベント管理
-        function openEventModal(eventId = null) {
-            editingEventId = eventId;
-            const modal = document.getElementById('eventModal');
-            
-            if (eventId) {
-                const event = events.find(e => e.id === eventId);
-                if (event) {
-                    document.getElementById('eventTitle').value = event.title;
-                    document.getElementById('eventDescription').value = event.description;
-                    document.getElementById('eventType').value = event.type;
-                    document.getElementById('eventDate').value = event.date;
-                    document.getElementById('eventStartTime').value = event.startTime;
-                    document.getElementById('eventEndTime').value = event.endTime;
-                }
-            } else {
-                document.getElementById('eventTitle').value = '';
-                document.getElementById('eventDescription').value = '';
-                document.getElementById('eventType').value = 'meeting';
-                document.getElementById('eventDate').value = '';
-                document.getElementById('eventStartTime').value = '';
-                document.getElementById('eventEndTime').value = '';
+
+        // 売上分析
+        function renderSales() {
+            updateStoreRanking();
+            if (!salesChart) {
+                initializeSalesChart();
             }
-            
-            modal.classList.remove('hidden');
         }
-        
-        function closeEventModal() {
-            document.getElementById('eventModal').classList.add('hidden');
-            editingEventId = null;
+
+        function updateStoreRanking() {
+            const storeRanking = document.getElementById('storeRanking');
+            if (!storeRanking) return;
+
+            const rankings = [
+                { name: 'GrandOpera名古屋', sales: 105.2, achievement: 105.2, rank: 1 },
+                { name: 'CLASSY名古屋', sales: 98.1, achievement: 98.1, rank: 2 },
+                { name: 'シャブール', sales: 88.7, achievement: 88.7, rank: 3 },
+                { name: 'ワンカラット', sales: 85.3, achievement: 85.3, rank: 4 },
+                { name: 'CLASSY錦', sales: 82.1, achievement: 82.1, rank: 5 }
+            ];
+
+            storeRanking.innerHTML = rankings.map(store => `
+                <div class="p-4 bg-gradient-to-r ${getRankingGradient(store.rank)} rounded-16 border-l-4 ${getRankingBorder(store.rank)}">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="text-2xl mr-3">${getRankingEmoji(store.rank)}</div>
+                            <div>
+                                <div class="font-semibold text-gray-900">${store.name}</div>
+                                <div class="text-sm text-gray-600">達成率: ${store.achievement}%</div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="font-bold text-lg ${getRankingColor(store.rank)}">¥${store.sales}M</div>
+                            <div class="text-xs ${store.achievement >= 100 ? 'text-green-600' : 'text-red-600'}">
+                                ${store.achievement >= 100 ? '+' : ''}${(store.achievement - 100).toFixed(1)}%
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
         }
-        
-        function saveEvent() {
-            const title = document.getElementById('eventTitle').value.trim();
-            const description = document.getElementById('eventDescription').value.trim();
-            const type = document.getElementById('eventType').value;
-            const date = document.getElementById('eventDate').value;
-            const startTime = document.getElementById('eventStartTime').value;
-            const endTime = document.getElementById('eventEndTime').value;
-            
-            if (!title || !date) {
-                showNotification('予定名と日付を入力してください', 'error');
+
+        // 出勤管理
+        function renderAttendance() {
+            updateBusinessSummary();
+            updateBusinessDataTable();
+            if (!dailySalesChart || !accessChart) {
+                initializeBusinessCharts();
+            }
+        }
+
+        function updateBusinessSummary() {
+            if (!businessData || businessData.length === 0) {
+                updateElement('totalSales', '¥0');
+                updateElement('attendanceRate', '0%');
+                updateElement('totalAccess', '0');
+                updateElement('avgDailySales', '¥0');
+                updateElement('salesGrowth', '+0% 前月比');
+                updateElement('attendanceCount', '0/0日');
                 return;
             }
-            
-            if (editingEventId) {
-                const eventIndex = events.findIndex(e => e.id === editingEventId);
-                if (eventIndex !== -1) {
-                    events[eventIndex] = {
-                        ...events[eventIndex],
-                        title,
-                        description,
-                        type,
-                        date,
-                        startTime,
-                        endTime
-                    };
-                }
-                showNotification('予定を更新しました', 'success');
-            } else {
-                const newEvent = {
-                    id: Date.now(),
-                    title,
-                    description,
-                    type,
-                    date,
-                    startTime,
-                    endTime
-                };
-                events.push(newEvent);
-                showNotification('予定を追加しました', 'success');
-            }
-            
-            saveData();
-            closeEventModal();
-            
-            if (currentPage === 'calendar') {
-                generateCalendar();
-            } else if (currentPage === 'dashboard') {
-                renderDashboard();
-            }
+
+            const totalSales = businessData.reduce((sum, data) => sum + data.sales, 0);
+            const totalAttendance = businessData.reduce((sum, data) => sum + data.attendance, 0);
+            const totalPossibleDays = businessData.length;
+            const attendanceRate = totalPossibleDays > 0 ? Math.round((totalAttendance / totalPossibleDays) * 100) : 0;
+            const totalAccess = businessData.reduce((sum, data) => sum + data.totalAccess, 0);
+            const workingDays = businessData.filter(data => data.attendance > 0);
+            const avgDailySales = workingDays.length > 0 ? totalSales / workingDays.length : 0;
+            const growth = Math.floor(Math.random() * 20) - 5;
+
+            updateElement('totalSales', `¥${(totalSales / 1000000).toFixed(1)}M`);
+            updateElement('attendanceRate', `${attendanceRate}%`);
+            updateElement('attendanceCount', `${totalAttendance}/${totalPossibleDays}日`);
+            updateElement('totalAccess', totalAccess.toLocaleString());
+            updateElement('avgDailySales', `¥${Math.round(avgDailySales / 1000)}K`);
+            updateElement('salesGrowth', `${growth >= 0 ? '+' : ''}${growth}% 前月比`);
         }
-        
-        // カレンダー機能
-        function generateCalendar() {
-            const calendarGrid = document.getElementById('calendarGrid');
-            if (!calendarGrid) return;
-            
-            const today = new Date();
-            const currentYear = today.getFullYear();
-            const currentMonth = today.getMonth();
-            const firstDay = new Date(currentYear, currentMonth, 1);
-            const lastDay = new Date(currentYear, currentMonth + 1, 0);
-            const startDate = new Date(firstDay);
-            startDate.setDate(startDate.getDate() - firstDay.getDay());
-            
-            // カレンダータイトル更新
-            const calendarTitle = document.getElementById('calendarTitle');
-            if (calendarTitle) {
-                calendarTitle.textContent = `${currentYear}年${currentMonth + 1}月`;
+
+        function updateBusinessDataTable() {
+            const tableBody = document.getElementById('businessDataTable');
+            if (!tableBody) return;
+
+            if (!businessData || businessData.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="8" class="text-center text-gray-500 py-8">データがありません</td></tr>';
+                return;
             }
-            
-            // ヘッダー
-            const headers = ['日', '月', '火', '水', '木', '金', '土'];
-            let calendarHTML = headers.map(header => `
-                <div class="text-center font-semibold p-3 bg-gray-100 rounded-lg">${header}</div>
+
+            tableBody.innerHTML = businessData.map(data => `
+                <tr class="hover:bg-gray-50">
+                    <td class="p-4 font-medium">${data.date}</td>
+                    <td class="p-4">
+                        <span class="px-3 py-1 text-sm rounded-full ${data.attendance > 0 ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">
+                            ${data.attendance}人
+                        </span>
+                    </td>
+                    <td class="p-4">
+                        <span class="px-3 py-1 text-sm rounded-full ${data.absence > 0 ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800'}">
+                            ${data.absence}人
+                        </span>
+                    </td>
+                    <td class="p-4 font-bold text-blue-600">¥${Math.round(data.sales / 1000)}K</td>
+                    <td class="p-4">¥${Math.round(data.cash / 1000)}K</td>
+                    <td class="p-4">¥${Math.round(data.card / 1000)}K</td>
+                    <td class="p-4 text-purple-600">${data.totalAccess.toLocaleString()}</td>
+                    <td class="p-4">
+                        <button class="text-blue-600 hover:text-blue-800 mr-2" onclick="editBusinessRecord('${data.date}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                    </td>
+                </tr>
             `).join('');
-            
-            // カレンダーの日付
-            for (let i = 0; i < 42; i++) {
-                const currentDate = new Date(startDate);
-                currentDate.setDate(startDate.getDate() + i);
-                const dateStr = currentDate.toISOString().split('T')[0];
-                const isCurrentMonth = currentDate.getMonth() === currentMonth;
-                const isToday = dateStr === today.toISOString().split('T')[0];
-                const dayEvents = events.filter(event => event.date === dateStr);
-                
-                calendarHTML += `
-                    <div class="calendar-day ${isToday ? 'today' : ''} ${!isCurrentMonth ? 'opacity-30' : ''}" 
-                         onclick="showDayDetails('${dateStr}')">
-                        <div class="font-semibold mb-2">${currentDate.getDate()}</div>
-                        ${dayEvents.map(event => `
-                            <div class="text-xs p-1 rounded mb-1 cursor-pointer ${getEventClass(event.type)}"
-                                 onclick="event.stopPropagation(); editEvent(${event.id})">
-                                ${event.title}
-                            </div>
-                        `).join('')}
-                    </div>
-                `;
-            }
-            
-            calendarGrid.innerHTML = calendarHTML;
         }
-        
-        function previousMonth() {
-            showNotification('前月表示機能は開発中です', 'info');
-        }
-        
-        function nextMonth() {
-            showNotification('翌月表示機能は開発中です', 'info');
-        }
-        
-        function goToToday() {
-            generateCalendar();
-            showNotification('今日の日付に移動しました', 'info');
-        }
-        
+
         // チャート初期化
         function initializeCharts() {
-            // 売上チャート（売上分析ページ用）
+            initializeSalesChart();
+            initializeBusinessCharts();
+        }
+
+        function initializeSalesChart() {
             const salesCtx = document.getElementById('salesChart');
-            if (salesCtx) {
+            if (salesCtx && !salesChart) {
                 salesChart = new Chart(salesCtx, {
                     type: 'bar',
                     data: {
@@ -1841,462 +1856,19 @@
                     }
                 });
             }
-            
-            // 業務データがある場合はチャートを更新
-            if (businessData && businessData.length > 0) {
-                setTimeout(() => {
-                    updateBusinessCharts();
-                }, 500);
-            }
         }
-        
-        // 売上分析描画
-        function renderSales() {
-            updateStoreRanking();
-            
-            // 売上チャートがまだない場合は初期化
-            if (!salesChart) {
-                const salesCtx = document.getElementById('salesChart');
-                if (salesCtx) {
-                    salesChart = new Chart(salesCtx, {
-                        type: 'bar',
-                        data: {
-                            labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
-                            datasets: [{
-                                label: '今年',
-                                data: [245, 268, 225, 298, 275, 280],
-                                backgroundColor: 'rgba(59, 130, 246, 0.8)',
-                                borderColor: '#3b82f6',
-                                borderWidth: 2
-                            }, {
-                                label: '前年',
-                                data: [220, 235, 210, 265, 245, 249],
-                                backgroundColor: 'rgba(6, 182, 212, 0.6)',
-                                borderColor: '#06b6d4',
-                                borderWidth: 2
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            scales: {
-                                y: {
-                                    beginAtZero: true
-                                }
-                            }
-                        }
-                    });
-                }
-            }
-        }
-        
-        function updateStoreRanking() {
-            const storeRanking = document.getElementById('storeRanking');
-            if (!storeRanking) return;
-            
-            const rankings = [
-                { name: 'GrandOpera名古屋', sales: 105.2, achievement: 105.2, rank: 1 },
-                { name: 'CLASSY名古屋', sales: 98.1, achievement: 98.1, rank: 2 },
-                { name: 'シャブール', sales: 88.7, achievement: 88.7, rank: 3 },
-                { name: 'ワンカラット', sales: 85.3, achievement: 85.3, rank: 4 },
-                { name: 'CLASSY錦', sales: 82.1, achievement: 82.1, rank: 5 }
-            ];
-            
-            storeRanking.innerHTML = rankings.map(store => `
-                <div class="p-4 bg-gradient-to-r ${getRankingGradient(store.rank)} rounded-16 border-l-4 ${getRankingBorder(store.rank)}">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center">
-                            <div class="text-2xl mr-3">${getRankingEmoji(store.rank)}</div>
-                            <div>
-                                <div class="font-semibold text-gray-900">${store.name}</div>
-                                <div class="text-sm text-gray-600">達成率: ${store.achievement}%</div>
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <div class="font-bold text-lg ${getRankingColor(store.rank)}">¥${store.sales}M</div>
-                            <div class="text-xs ${store.achievement >= 100 ? 'text-green-600' : 'text-red-600'}">
-                                ${store.achievement >= 100 ? '+' : ''}${(store.achievement - 100).toFixed(1)}%
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-        }
-        
-        // 投稿管理描画
-        function renderPosts() {
-            const postStatus = document.getElementById('postStatus');
-            if (postStatus) {
-                const stores = [
-                    { name: 'シャブール', posts: 24, target: 30, rate: 80 },
-                    { name: 'ワンカラット', posts: 22, target: 30, rate: 73 },
-                    { name: 'GrandOpera名古屋', posts: 27, target: 30, rate: 90 },
-                    { name: 'CLASSY名古屋', posts: 28, target: 30, rate: 93 },
-                    { name: 'CLASSY錦', posts: 18, target: 30, rate: 60 }
-                ];
-                
-                postStatus.innerHTML = stores.map(store => `
-                    <div class="p-4 bg-gradient-to-r ${getPostStatusGradient(store.rate)} rounded-16 border-l-4 ${getPostStatusBorder(store.rate)}">
-                        <div class="flex justify-between items-center mb-2">
-                            <span class="font-semibold text-gray-900">${store.name}</span>
-                            <span class="font-bold ${getPostStatusColor(store.rate)}">${store.posts}/${store.target}</span>
-                        </div>
-                        <div class="w-full bg-gray-200 rounded-full h-2 mb-2">
-                            <div class="${getPostStatusProgress(store.rate)} h-2 rounded-full" style="width: ${store.rate}%"></div>
-                        </div>
-                        <div class="text-sm text-gray-600">達成率: ${store.rate}% | 残り${store.target - store.posts}件</div>
-                    </div>
-                `).join('');
-            }
-            
-            const postsTable = document.getElementById('postsTable');
-            if (postsTable) {
-                const postEntries = [
-                    { date: '2024-06-26', store: 'shabour', author: '田中美咲', count: 3, status: 'completed' },
-                    { date: '2024-06-26', store: 'cl_nagoya', author: '佐藤花音', count: 2, status: 'completed' },
-                    { date: '2024-06-26', store: 'go_yokohama', author: '鈴木愛子', count: 1, status: 'pending' }
-                ];
-                
-                postsTable.innerHTML = postEntries.map(entry => `
-                    <tr class="hover:bg-gray-50">
-                        <td class="p-4">${formatDate(entry.date)}</td>
-                        <td class="p-4">${getStoreName(entry.store)}</td>
-                        <td class="p-4">${entry.author}</td>
-                        <td class="p-4">
-                            <span class="px-3 py-1 text-sm rounded-full ${getCountClass(entry.count)}">
-                                ${entry.count}件
-                            </span>
-                        </td>
-                        <td class="p-4">
-                            <span class="px-3 py-1 text-xs rounded-full ${getPostEntryStatusClass(entry.status)}">
-                                ${entry.status === 'completed' ? '確認済み' : '未確認'}
-                            </span>
-                        </td>
-                        <td class="p-4">
-                            <button class="text-blue-600 hover:text-blue-800 mr-2" onclick="editPostEntry('${entry.date}', '${entry.store}')">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                        </td>
-                    </tr>
-                `).join('');
-            }
-        }
-        
-        // 業務テンプレートダウンロード
-        function downloadBusinessTemplate() {
-            const currentDate = new Date();
-            const year = currentDate.getFullYear();
-            const month = currentDate.getMonth() + 1;
-            
-            // テンプレートデータ作成（アップロードされたファイルと同じ構造）
-            const daysInMonth = new Date(year, month, 0).getDate();
-            const templateData = [
-                // ヘッダー行1
-                ["日付", "出勤", "欠勤", "売上", "現金", "カード", "他", "支出計", "男性", "経費", "手数料", "消費税", "現金残", "操　作", `${year}年`, null, "アクセス状況", null, null, null, null, null, null, null, null, null, "更新状況"],
-                // ヘッダー行2
-                [45809, null, null, null, null, null, null, null, null, null, null, null, null, null, `${month}月`, "アクセス", "アクセス媒体", null, "お気に入り数", null, "プラチナメール受信者数", null, "アクション数", null, null, "口コミ", "即ヒメ", "写メ日記", "写メ日記(画像・テキスト)", null, null, null, "写メ日記(動画)", null, null, null, "キテネ", "オキニトーク", null, null, null, null, "プラチナメール"],
-                // ヘッダー行3
-                [45810, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "総数", "パソコン", "スマホ", "マイショップ", "マイガール", "メール受信", "マイヘブン受信", "総数", "電話", "ヨヤク", null, "登録数", "投稿数", "通常", "マイガール限定", "フリーポス", "フリーポス", "通常", "マイガール限定", "フリーポス", "フリーポス", "送信数", "送信", "送信人数", "画像送信", "画像送信数", "送信回数", "配信回数"],
-                // ヘッダー行4
-                [45811, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "（時間限定）", "（時間限定）", null, null, "（時間限定）", "（時間限定）", null, "女の子人数", null, "女の子人数"],
-                // ヘッダー行5
-                [45812, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "通常", "マイガール限定", null, null, "通常", "マイガール限定"]
-            ];
-            
-            // 日付データ行を追加
-            for (let day = 1; day <= daysInMonth; day++) {
-                const dayCode = 45812 + day; // 連続する日付コード
-                const dayName = `${month}/${day}`;
-                templateData.push([
-                    dayCode, // 日付コード
-                    null, // 出勤
-                    null, // 欠勤
-                    null, // 売上
-                    null, // 現金
-                    null, // カード
-                    null, // 他
-                    null, // 支出計
-                    null, // 男性
-                    null, // 経費
-                    null, // 手数料
-                    null, // 消費税
-                    null, // 現金残
-                    null, // 操作
-                    dayName, // 日付表示
-                    null, // アクセス総数
-                    null, // パソコン
-                    null, // スマホ
-                    null, // マイショップ
-                    null, // マイガール
-                    null, // メール受信
-                    null, // マイヘブン受信
-                    null, // アクション総数
-                    null, // 電話
-                    null, // ヨヤク
-                    null, // 口コミ
-                    null, // 登録数
-                    null, // 投稿数
-                    null, // 通常写メ日記
-                    null, // マイガール限定写メ日記
-                    null, // フリーポス1
-                    null, // フリーポス2
-                    null, // 動画通常
-                    null, // 動画マイガール限定
-                    null, // 動画フリーポス1
-                    null, // 動画フリーポス2
-                    null, // キテネ送信数
-                    null, // オキニトーク送信
-                    null, // 送信人数
-                    null, // 画像送信
-                    null, // 画像送信数
-                    null, // 送信回数
-                    null  // 配信回数
-                ]);
-            }
-            
-            // Excel作成
-            const ws = XLSX.utils.aoa_to_sheet(templateData);
-            
-            // 列幅設定
-            const colWidths = [
-                { wch: 12 }, { wch: 8 }, { wch: 8 }, { wch: 12 }, { wch: 10 },
-                { wch: 10 }, { wch: 8 }, { wch: 10 }, { wch: 8 }, { wch: 8 },
-                { wch: 10 }, { wch: 10 }, { wch: 12 }, { wch: 8 }, { wch: 12 },
-                { wch: 10 }, { wch: 12 }, { wch: 10 }, { wch: 12 }, { wch: 12 },
-                { wch: 15 }, { wch: 15 }, { wch: 12 }, { wch: 8 }, { wch: 8 },
-                { wch: 8 }, { wch: 10 }, { wch: 10 }, { wch: 12 }, { wch: 15 },
-                { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 15 }, { wch: 12 },
-                { wch: 12 }, { wch: 10 }, { wch: 12 }, { wch: 10 }, { wch: 12 },
-                { wch: 12 }, { wch: 10 }, { wch: 10 }
-            ];
-            ws['!cols'] = colWidths;
-            
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-            
-            const filename = `業務データテンプレート_${year}年${month}月.xlsx`;
-            XLSX.writeFile(wb, filename);
-            
-            showNotification('業務データテンプレートをダウンロードしました', 'success');
-        }
-        
-        // 業務データアップロード処理
-        function handleBusinessUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            
-            const statusElement = document.getElementById('businessUploadStatus');
-            statusElement.textContent = 'ファイルを読み込み中...';
-            statusElement.className = 'text-sm text-blue-600';
-            
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    let data;
-                    
-                    if (file.name.endsWith('.csv')) {
-                        const text = e.target.result;
-                        data = text.split('\n').map(row => row.split(','));
-                    } else {
-                        const workbook = XLSX.read(e.target.result, { type: 'binary' });
-                        const sheetName = workbook.SheetNames[0];
-                        const worksheet = workbook.Sheets[sheetName];
-                        data = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-                    }
-                    
-                    uploadedBusinessData = data;
-                    statusElement.textContent = `✅ ${data.length}行のデータを読み込みました`;
-                    statusElement.className = 'text-sm text-green-600';
-                    
-                } catch (error) {
-                    console.error('ファイル読み込みエラー:', error);
-                    statusElement.textContent = '❌ ファイルの読み込みに失敗しました';
-                    statusElement.className = 'text-sm text-red-600';
-                }
-            };
-            
-            if (file.name.endsWith('.csv')) {
-                reader.readAsText(file);
-            } else {
-                reader.readAsBinaryString(file);
-            }
-        }
-        
-        // 業務データ処理・反映
-        function processBusinessData() {
-            if (!uploadedBusinessData) {
-                showNotification('先にファイルをアップロードしてください', 'error');
-                return;
-            }
-            
-            try {
-                // データ行は6行目から開始（0-indexedで5行目から）
-                const dataRows = uploadedBusinessData.slice(5);
-                
-                // データ変換
-                const processedData = dataRows.map((row, index) => {
-                    // 日付の処理
-                    const dateValue = row[14]; // O列（日付表示）
-                    const dayCode = row[0]; // A列（日付コード）
-                    
-                    if (!dateValue) return null;
-                    
-                    return {
-                        dayCode: dayCode,
-                        date: dateValue,
-                        attendance: row[1] || 0, // 出勤
-                        absence: row[2] || 0, // 欠勤
-                        sales: parseFloat(row[3]) || 0, // 売上
-                        cash: parseFloat(row[4]) || 0, // 現金
-                        card: parseFloat(row[5]) || 0, // カード
-                        other: parseFloat(row[6]) || 0, // 他
-                        totalAccess: parseInt(row[15]) || 0, // アクセス総数
-                        pcAccess: parseInt(row[16]) || 0, // パソコン
-                        spAccess: parseInt(row[17]) || 0, // スマホ
-                        myshop: parseInt(row[18]) || 0, // マイショップ
-                        rawIndex: index + 6 // 元の行番号
-                    };
-                }).filter(row => row !== null && row.date); // null行と日付なし行を除外
-                
-                // 業務データをグローバル変数に保存
-                businessData = processedData;
-                saveData();
-                
-                // チャート更新
-                updateBusinessCharts();
-                
-                // ダッシュボード更新
-                renderDashboard();
-                
-                // 出勤管理ページが表示されている場合は更新
-                if (currentPage === 'attendance') {
-                    renderAttendance();
-                }
-                
-                showNotification(`${processedData.length}件の業務データを反映しました`, 'success');
-                
-                // アップロード関連をリセット
-                document.getElementById('businessFileInput').value = '';
-                document.getElementById('businessUploadStatus').textContent = '';
-                uploadedBusinessData = null;
-                
-            } catch (error) {
-                console.error('データ処理エラー:', error);
-                showNotification('データの処理中にエラーが発生しました', 'error');
-            }
-        }
-        // 出勤管理描画
-        function renderAttendance() {
-            updateBusinessSummary();
-            updateBusinessDataTable();
-            
-            // チャートが初期化されていない場合は初期化
-            setTimeout(() => {
-                updateBusinessCharts();
-            }, 100);
-        }
-        
-        // 業務サマリー更新
-        function updateBusinessSummary() {
-            if (!businessData || businessData.length === 0) {
-                // デフォルト値を設定
-                const totalSalesEl = document.getElementById('totalSales');
-                const attendanceRateEl = document.getElementById('attendanceRate');
-                const totalAccessEl = document.getElementById('totalAccess');
-                const avgDailySalesEl = document.getElementById('avgDailySales');
-                const salesGrowthEl = document.getElementById('salesGrowth');
-                const attendanceCountEl = document.getElementById('attendanceCount');
-                
-                if (totalSalesEl) totalSalesEl.textContent = '¥0';
-                if (attendanceRateEl) attendanceRateEl.textContent = '0%';
-                if (totalAccessEl) totalAccessEl.textContent = '0';
-                if (avgDailySalesEl) avgDailySalesEl.textContent = '¥0';
-                if (salesGrowthEl) salesGrowthEl.textContent = '+0% 前月比';
-                if (attendanceCountEl) attendanceCountEl.textContent = '0/0日';
-                return;
-            }
-            
-            // 売上合計
-            const totalSales = businessData.reduce((sum, data) => sum + data.sales, 0);
-            const totalSalesEl = document.getElementById('totalSales');
-            if (totalSalesEl) totalSalesEl.textContent = `¥${(totalSales / 1000000).toFixed(1)}M`;
-            
-            // 出勤率計算
-            const totalAttendance = businessData.reduce((sum, data) => sum + data.attendance, 0);
-            const totalPossibleDays = businessData.length;
-            const attendanceRate = totalPossibleDays > 0 ? Math.round((totalAttendance / totalPossibleDays) * 100) : 0;
-            const attendanceRateEl = document.getElementById('attendanceRate');
-            const attendanceCountEl = document.getElementById('attendanceCount');
-            if (attendanceRateEl) attendanceRateEl.textContent = `${attendanceRate}%`;
-            if (attendanceCountEl) attendanceCountEl.textContent = `${totalAttendance}/${totalPossibleDays}日`;
-            
-            // 総アクセス数
-            const totalAccess = businessData.reduce((sum, data) => sum + data.totalAccess, 0);
-            const totalAccessEl = document.getElementById('totalAccess');
-            if (totalAccessEl) totalAccessEl.textContent = totalAccess.toLocaleString();
-            
-            // 平均日商（出勤日のみ）
-            const workingDays = businessData.filter(data => data.attendance > 0);
-            const avgDailySales = workingDays.length > 0 ? totalSales / workingDays.length : 0;
-            const avgDailySalesEl = document.getElementById('avgDailySales');
-            if (avgDailySalesEl) avgDailySalesEl.textContent = `¥${Math.round(avgDailySales / 1000)}K`;
-            
-            // 成長率（サンプル）
-            const growth = Math.floor(Math.random() * 20) - 5; // -5% to +15%
-            const salesGrowthEl = document.getElementById('salesGrowth');
-            if (salesGrowthEl) salesGrowthEl.textContent = `${growth >= 0 ? '+' : ''}${growth}% 前月比`;
-        }
-        
-        // 業務データテーブル更新
-        function updateBusinessDataTable() {
-            const tableBody = document.getElementById('businessDataTable');
-            if (!tableBody) return;
-            
-            if (!businessData || businessData.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="8" class="text-center text-gray-500 py-8">データがありません</td></tr>';
-                return;
-            }
-            
-            tableBody.innerHTML = businessData.map(data => `
-                <tr class="hover:bg-gray-50">
-                    <td class="p-4 font-medium">${data.date}</td>
-                    <td class="p-4">
-                        <span class="px-3 py-1 text-sm rounded-full ${data.attendance > 0 ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">
-                            ${data.attendance}人
-                        </span>
-                    </td>
-                    <td class="p-4">
-                        <span class="px-3 py-1 text-sm rounded-full ${data.absence > 0 ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800'}">
-                            ${data.absence}人
-                        </span>
-                    </td>
-                    <td class="p-4 font-bold text-blue-600">¥${Math.round(data.sales / 1000)}K</td>
-                    <td class="p-4">¥${Math.round(data.cash / 1000)}K</td>
-                    <td class="p-4">¥${Math.round(data.card / 1000)}K</td>
-                    <td class="p-4 text-purple-600">${data.totalAccess.toLocaleString()}</td>
-                    <td class="p-4">
-                        <button class="text-blue-600 hover:text-blue-800 mr-2" onclick="editBusinessRecord('${data.date}')">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
-        }
-        
-        // 業務チャート更新
-        function updateBusinessCharts() {
-            if (!businessData || businessData.length === 0) return;
-            
+
+        function initializeBusinessCharts() {
             // 日次売上チャート
             const dailySalesCtx = document.getElementById('dailySalesChart');
-            if (dailySalesCtx && !window.dailySalesChart) {
-                window.dailySalesChart = new Chart(dailySalesCtx, {
+            if (dailySalesCtx && !dailySalesChart && businessData.length > 0) {
+                dailySalesChart = new Chart(dailySalesCtx, {
                     type: 'line',
                     data: {
                         labels: businessData.map(data => data.date),
                         datasets: [{
                             label: '日次売上',
-                            data: businessData.map(data => data.sales / 1000), // K単位
+                            data: businessData.map(data => data.sales / 1000),
                             borderColor: '#3b82f6',
                             backgroundColor: 'rgba(59, 130, 246, 0.1)',
                             borderWidth: 2,
@@ -2317,16 +1889,12 @@
                         }
                     }
                 });
-            } else if (window.dailySalesChart) {
-                window.dailySalesChart.data.labels = businessData.map(data => data.date);
-                window.dailySalesChart.data.datasets[0].data = businessData.map(data => data.sales / 1000);
-                window.dailySalesChart.update();
             }
-            
+
             // アクセスチャート
             const accessCtx = document.getElementById('accessChart');
-            if (accessCtx && !window.accessChart) {
-                window.accessChart = new Chart(accessCtx, {
+            if (accessCtx && !accessChart && businessData.length > 0) {
+                accessChart = new Chart(accessCtx, {
                     type: 'doughnut',
                     data: {
                         labels: ['PCアクセス', 'スマホアクセス'],
@@ -2352,22 +1920,468 @@
                         }
                     }
                 });
-            } else if (window.accessChart) {
-                window.accessChart.data.datasets[0].data = [
+            }
+        }
+
+        // カレンダー機能
+        function generateCalendar() {
+            const calendarGrid = document.getElementById('calendarGrid');
+            const calendarTitle = document.getElementById('calendarTitle');
+            
+            if (!calendarGrid || !calendarTitle) return;
+
+            const firstDay = new Date(currentYear, currentMonth, 1);
+            const lastDay = new Date(currentYear, currentMonth + 1, 0);
+            const startDate = new Date(firstDay);
+            startDate.setDate(startDate.getDate() - firstDay.getDay());
+
+            // カレンダータイトル更新
+            calendarTitle.textContent = `${currentYear}年${currentMonth + 1}月`;
+
+            // ヘッダー
+            const headers = ['日', '月', '火', '水', '木', '金', '土'];
+            let calendarHTML = headers.map(header => `
+                <div class="text-center font-semibold p-3 bg-gray-100 rounded-lg">${header}</div>
+            `).join('');
+
+            // カレンダーの日付
+            const today = new Date();
+            for (let i = 0; i < 42; i++) {
+                const currentDate = new Date(startDate);
+                currentDate.setDate(startDate.getDate() + i);
+                const dateStr = currentDate.toISOString().split('T')[0];
+                const isCurrentMonth = currentDate.getMonth() === currentMonth;
+                const isToday = dateStr === today.toISOString().split('T')[0];
+                const dayEvents = events.filter(event => event.date === dateStr);
+
+                calendarHTML += `
+                    <div class="calendar-day ${isToday ? 'today' : ''} ${!isCurrentMonth ? 'opacity-30' : ''}" 
+                         onclick="showDayDetails('${dateStr}')">
+                        <div class="font-semibold mb-2">${currentDate.getDate()}</div>
+                        ${dayEvents.map(event => `
+                            <div class="text-xs p-1 rounded mb-1 cursor-pointer ${getEventClass(event.type)}"
+                                 onclick="event.stopPropagation(); editEvent(${event.id})">
+                                ${event.title}
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            calendarGrid.innerHTML = calendarHTML;
+        }
+
+        function previousMonth() {
+            currentMonth--;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            generateCalendar();
+        }
+
+        function nextMonth() {
+            currentMonth++;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            generateCalendar();
+        }
+
+        function goToToday() {
+            const today = new Date();
+            currentMonth = today.getMonth();
+            currentYear = today.getFullYear();
+            generateCalendar();
+            showNotification('今日の日付に移動しました', 'info');
+        }
+
+        // イベント管理
+        function openEventModal(eventId = null) {
+            editingEventId = eventId;
+            const modal = document.getElementById('eventModal');
+
+            if (eventId) {
+                const event = events.find(e => e.id === eventId);
+                if (event) {
+                    updateElement('eventTitle', event.title, 'value');
+                    updateElement('eventDescription', event.description, 'value');
+                    updateElement('eventType', event.type, 'value');
+                    updateElement('eventDate', event.date, 'value');
+                    updateElement('eventStartTime', event.startTime, 'value');
+                    updateElement('eventEndTime', event.endTime, 'value');
+                }
+            } else {
+                updateElement('eventTitle', '', 'value');
+                updateElement('eventDescription', '', 'value');
+                updateElement('eventType', 'meeting', 'value');
+                updateElement('eventDate', '', 'value');
+                updateElement('eventStartTime', '', 'value');
+                updateElement('eventEndTime', '', 'value');
+            }
+
+            showModal('eventModal');
+        }
+
+        function saveEvent() {
+            const title = document.getElementById('eventTitle').value.trim();
+            const description = document.getElementById('eventDescription').value.trim();
+            const type = document.getElementById('eventType').value;
+            const date = document.getElementById('eventDate').value;
+            const startTime = document.getElementById('eventStartTime').value;
+            const endTime = document.getElementById('eventEndTime').value;
+
+            if (!title || !date) {
+                showNotification('予定名と日付を入力してください', 'error');
+                return;
+            }
+
+            if (editingEventId) {
+                const eventIndex = events.findIndex(e => e.id === editingEventId);
+                if (eventIndex !== -1) {
+                    events[eventIndex] = {
+                        ...events[eventIndex],
+                        title,
+                        description,
+                        type,
+                        date,
+                        startTime,
+                        endTime
+                    };
+                }
+                showNotification('予定を更新しました', 'success');
+            } else {
+                const newEvent = {
+                    id: Date.now(),
+                    title,
+                    description,
+                    type,
+                    date,
+                    startTime,
+                    endTime
+                };
+                events.push(newEvent);
+                showNotification('予定を追加しました', 'success');
+            }
+
+            saveData();
+            hideModal('eventModal');
+            renderCurrentPage();
+        }
+
+        function editEvent(eventId) {
+            openEventModal(eventId);
+        }
+
+        // ファイルアップロード機能
+        function handleBusinessUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const statusElements = [
+                document.getElementById('uploadStatus'),
+                document.getElementById('businessUploadStatus')
+            ];
+
+            statusElements.forEach(el => {
+                if (el) {
+                    el.textContent = 'ファイルを読み込み中...';
+                    el.className = 'text-sm text-blue-600';
+                }
+            });
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    let data;
+
+                    if (file.name.endsWith('.csv')) {
+                        const text = e.target.result;
+                        data = text.split('\n').map(row => row.split(','));
+                    } else {
+                        const workbook = XLSX.read(e.target.result, { type: 'binary' });
+                        const sheetName = workbook.SheetNames[0];
+                        const worksheet = workbook.Sheets[sheetName];
+                        data = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                    }
+
+                    uploadedBusinessData = data;
+                    statusElements.forEach(el => {
+                        if (el) {
+                            el.textContent = `✅ ${data.length}行のデータを読み込みました`;
+                            el.className = 'text-sm text-green-600';
+                        }
+                    });
+
+                } catch (error) {
+                    console.error('ファイル読み込みエラー:', error);
+                    statusElements.forEach(el => {
+                        if (el) {
+                            el.textContent = '❌ ファイルの読み込みに失敗しました';
+                            el.className = 'text-sm text-red-600';
+                        }
+                    });
+                }
+            };
+
+            if (file.name.endsWith('.csv')) {
+                reader.readAsText(file);
+            } else {
+                reader.readAsBinaryString(file);
+            }
+        }
+
+        function processBusinessData() {
+            if (!uploadedBusinessData) {
+                showNotification('先にファイルをアップロードしてください', 'error');
+                return;
+            }
+
+            try {
+                // データ行は6行目から開始（0-indexedで5行目から）
+                const dataRows = uploadedBusinessData.slice(5);
+
+                // データ変換
+                const processedData = dataRows.map((row, index) => {
+                    const dateValue = row[14]; // O列（日付表示）
+                    const dayCode = row[0]; // A列（日付コード）
+
+                    if (!dateValue) return null;
+
+                    return {
+                        dayCode: dayCode,
+                        date: dateValue,
+                        attendance: row[1] || 0,
+                        absence: row[2] || 0,
+                        sales: parseFloat(row[3]) || 0,
+                        cash: parseFloat(row[4]) || 0,
+                        card: parseFloat(row[5]) || 0,
+                        other: parseFloat(row[6]) || 0,
+                        totalAccess: parseInt(row[15]) || 0,
+                        pcAccess: parseInt(row[16]) || 0,
+                        spAccess: parseInt(row[17]) || 0,
+                        myshop: parseInt(row[18]) || 0,
+                        rawIndex: index + 6
+                    };
+                }).filter(row => row !== null && row.date);
+
+                // 業務データをグローバル変数に保存
+                businessData = processedData;
+                saveData();
+
+                // チャート更新
+                updateBusinessCharts();
+
+                // 現在のページを再描画
+                renderCurrentPage();
+
+                showNotification(`${processedData.length}件の業務データを反映しました`, 'success');
+
+                // アップロード関連をリセット
+                const fileInputs = [
+                    document.getElementById('dashboardFileInput'),
+                    document.getElementById('attendanceFileInput')
+                ];
+                fileInputs.forEach(input => {
+                    if (input) input.value = '';
+                });
+
+                const statusElements = [
+                    document.getElementById('uploadStatus'),
+                    document.getElementById('businessUploadStatus')
+                ];
+                statusElements.forEach(el => {
+                    if (el) el.textContent = '';
+                });
+
+                uploadedBusinessData = null;
+
+            } catch (error) {
+                console.error('データ処理エラー:', error);
+                showNotification('データの処理中にエラーが発生しました', 'error');
+            }
+        }
+
+        function updateBusinessCharts() {
+            if (!businessData || businessData.length === 0) return;
+
+            // 日次売上チャート更新
+            if (dailySalesChart) {
+                dailySalesChart.data.labels = businessData.map(data => data.date);
+                dailySalesChart.data.datasets[0].data = businessData.map(data => data.sales / 1000);
+                dailySalesChart.update();
+            }
+
+            // アクセスチャート更新
+            if (accessChart) {
+                accessChart.data.datasets[0].data = [
                     businessData.reduce((sum, data) => sum + data.pcAccess, 0),
                     businessData.reduce((sum, data) => sum + data.spAccess, 0)
                 ];
-                window.accessChart.update();
+                accessChart.update();
             }
         }
-        
-        // 業務データエクスポート
+
+        // テンプレートダウンロード
+        function downloadBusinessTemplate() {
+            const currentDate = new Date();
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth() + 1;
+
+            // テンプレートデータ作成
+            const daysInMonth = new Date(year, month, 0).getDate();
+            const templateData = [
+                ["日付", "出勤", "欠勤", "売上", "現金", "カード", "他", "支出計", "男性", "経費", "手数料", "消費税", "現金残", "操　作", `${year}年`, null, "アクセス状況"],
+                [45809, null, null, null, null, null, null, null, null, null, null, null, null, null, `${month}月`, "アクセス", "アクセス媒体"],
+                [45810, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "総数", "パソコン", "スマホ"],
+                [45811, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
+                [45812, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]
+            ];
+
+            // 日付データ行を追加
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayCode = 45812 + day;
+                const dayName = `${month}/${day}`;
+                templateData.push([
+                    dayCode, null, null, null, null, null, null, null, null, null, null, null, null, null, dayName, null, null, null
+                ]);
+            }
+
+            // Excel作成
+            const ws = XLSX.utils.aoa_to_sheet(templateData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+
+            const filename = `業務データテンプレート_${year}年${month}月.xlsx`;
+            XLSX.writeFile(wb, filename);
+
+            showNotification('業務データテンプレートをダウンロードしました', 'success');
+        }
+
+        // レポート生成
+        function generateReport(type) {
+            const reportTypes = {
+                sales: '売上レポート',
+                attendance: '出勤レポート',
+                comprehensive: '総合レポート',
+                schedule: 'スケジュールレポート'
+            };
+
+            let data = [];
+            const filename = `${reportTypes[type]}_${new Date().toISOString().split('T')[0]}`;
+
+            switch(type) {
+                case 'sales':
+                    data = [
+                        ['店舗名', '今月売上', '目標', '達成率', '前年同月', '前年比'],
+                        ...Object.entries(storeInfo).map(([code, info]) => [
+                            info.name,
+                            Math.floor(Math.random() * 50000000) + 80000000,
+                            100000000,
+                            Math.floor(Math.random() * 30) + 85 + '%',
+                            Math.floor(Math.random() * 40000000) + 70000000,
+                            '+' + Math.floor(Math.random() * 20) + 5 + '%'
+                        ])
+                    ];
+                    break;
+                case 'attendance':
+                    data = [
+                        ['店舗名', '出勤予定日数', '実出勤日数', '出勤率', '欠勤日数', '平均出勤者数'],
+                        ...Object.entries(storeInfo).map(([code, info]) => [
+                            info.name,
+                            30,
+                            Math.floor(Math.random() * 8) + 22,
+                            Math.floor(Math.random() * 30) + 70 + '%',
+                            Math.floor(Math.random() * 8) + 1,
+                            Math.floor(Math.random() * 10) + 15
+                        ])
+                    ];
+                    break;
+                case 'comprehensive':
+                    data = [
+                        ['項目', '目標', '実績', '達成率', '状況'],
+                        ['売上合計', '1,000,000,000', '920,000,000', '92%', '順調'],
+                        ['出勤率', '95%', '87%', '92%', '良好'],
+                        ['タスク完了率', '100%', '85%', '85%', '良好'],
+                        ['予定消化率', '100%', '95%', '95%', '良好']
+                    ];
+                    break;
+                case 'schedule':
+                    data = [
+                        ['日付', '時間', '予定', '種類', '場所'],
+                        ...events.map(event => [
+                            event.date,
+                            `${event.startTime || ''}-${event.endTime || ''}`,
+                            event.title,
+                            getEventTypeName(event.type),
+                            event.description || ''
+                        ])
+                    ];
+                    break;
+            }
+
+            // Excel作成
+            const ws = XLSX.utils.aoa_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, reportTypes[type]);
+            XLSX.writeFile(wb, `${filename}.xlsx`);
+
+            showNotification(`${reportTypes[type]}をダウンロードしました`, 'success');
+        }
+
+        function generateMonthEndReport() {
+            showNotification('月末データを一括ダウンロード中...', 'info');
+
+            const reports = ['sales', 'attendance', 'comprehensive', 'schedule'];
+            let downloadCount = 0;
+
+            reports.forEach((report, index) => {
+                setTimeout(() => {
+                    generateReport(report);
+                    downloadCount++;
+
+                    if (downloadCount === reports.length) {
+                        setTimeout(() => {
+                            showNotification('月末データの一括ダウンロードが完了しました', 'success');
+                        }, 500);
+                    }
+                }, index * 1000);
+            });
+        }
+
+        // エクスポート機能
+        function exportTasks() {
+            const data = [
+                ['ID', 'タスク名', '説明', '優先度', '店舗', '期限', 'ステータス', '作成日'],
+                ...tasks.map(task => [
+                    task.id,
+                    task.title,
+                    task.description,
+                    getPriorityText(task.priority),
+                    task.store ? getStoreName(task.store) : '',
+                    task.dueDate || '',
+                    task.completed ? '完了' : '未完了',
+                    formatDate(task.createdAt.split('T')[0])
+                ])
+            ];
+
+            const ws = XLSX.utils.aoa_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'タスク一覧');
+
+            const filename = `タスク一覧_${new Date().toISOString().split('T')[0]}.xlsx`;
+            XLSX.writeFile(wb, filename);
+
+            showNotification('タスクデータをエクスポートしました', 'success');
+        }
+
         function exportBusinessData() {
             if (!businessData || businessData.length === 0) {
                 showNotification('エクスポートするデータがありません', 'error');
                 return;
             }
-            
+
             const data = [
                 ['日付', '出勤', '欠勤', '売上', '現金', 'カード', 'その他', 'アクセス総数', 'PCアクセス', 'スマホアクセス', 'マイショップ'],
                 ...businessData.map(record => [
@@ -2384,37 +2398,78 @@
                     record.myshop
                 ])
             ];
-            
+
             const ws = XLSX.utils.aoa_to_sheet(data);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, '業務データ');
-            
+
             const filename = `業務データ_${new Date().toISOString().split('T')[0]}.xlsx`;
             XLSX.writeFile(wb, filename);
-            
+
             showNotification('業務データをエクスポートしました', 'success');
         }
-        
-        // 売上チャート期間変更
-        function changeSalesPeriod(period) {
-            if (!window.dailySalesChart) return;
-            
-            if (period === 'week') {
-                // 最新7日のデータを表示
-                const recentData = businessData.slice(-7);
-                window.dailySalesChart.data.labels = recentData.map(data => data.date);
-                window.dailySalesChart.data.datasets[0].data = recentData.map(data => data.sales / 1000);
-            } else {
-                // 全データを表示
-                window.dailySalesChart.data.labels = businessData.map(data => data.date);
-                window.dailySalesChart.data.datasets[0].data = businessData.map(data => data.sales / 1000);
-            }
-            
-            window.dailySalesChart.update();
+
+        // チャート期間変更
+        function changeChartPeriod(period) {
+            if (!salesChart) return;
+
+            const weekData = {
+                labels: ['月', '火', '水', '木', '金', '土', '日'],
+                datasets: [{
+                    label: '今週',
+                    data: [380, 420, 350, 480, 390, 520, 290],
+                    backgroundColor: 'rgba(59, 130, 246, 0.8)',
+                    borderColor: '#3b82f6',
+                    borderWidth: 2
+                }, {
+                    label: '先週',
+                    data: [350, 390, 320, 450, 360, 480, 270],
+                    backgroundColor: 'rgba(6, 182, 212, 0.6)',
+                    borderColor: '#06b6d4',
+                    borderWidth: 2
+                }]
+            };
+
+            const monthData = {
+                labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
+                datasets: [{
+                    label: '今年',
+                    data: [245, 268, 225, 298, 275, 280],
+                    backgroundColor: 'rgba(59, 130, 246, 0.8)',
+                    borderColor: '#3b82f6',
+                    borderWidth: 2
+                }, {
+                    label: '前年',
+                    data: [220, 235, 210, 265, 245, 249],
+                    backgroundColor: 'rgba(6, 182, 212, 0.6)',
+                    borderColor: '#06b6d4',
+                    borderWidth: 2
+                }]
+            };
+
+            salesChart.data = period === 'week' ? weekData : monthData;
+            salesChart.update();
+
             showNotification(`${period === 'week' ? '週別' : '月別'}表示に変更しました`, 'info');
         }
-        
-        // 日次記録手動追加
+
+        function changeSalesPeriod(period) {
+            if (!dailySalesChart) return;
+
+            if (period === 'week') {
+                const recentData = businessData.slice(-7);
+                dailySalesChart.data.labels = recentData.map(data => data.date);
+                dailySalesChart.data.datasets[0].data = recentData.map(data => data.sales / 1000);
+            } else {
+                dailySalesChart.data.labels = businessData.map(data => data.date);
+                dailySalesChart.data.datasets[0].data = businessData.map(data => data.sales / 1000);
+            }
+
+            dailySalesChart.update();
+            showNotification(`${period === 'week' ? '週別' : '月別'}表示に変更しました`, 'info');
+        }
+
+        // その他の機能
         function addDailyRecord() {
             const content = `
                 <div class="space-y-4">
@@ -2465,10 +2520,10 @@
                     </div>
                 </div>
             `;
-            
+
             showCustomModal('日次記録追加', content);
         }
-        
+
         function saveDailyRecord() {
             const date = document.getElementById('recordDate').value;
             const attendance = parseInt(document.getElementById('recordAttendance').value) || 0;
@@ -2477,13 +2532,12 @@
             const card = parseFloat(document.getElementById('recordCard').value) || 0;
             const access = parseInt(document.getElementById('recordAccess').value) || 0;
             const absence = parseInt(document.getElementById('recordAbsence').value) || 0;
-            
+
             if (!date) {
                 showNotification('日付を入力してください', 'error');
                 return;
             }
-            
-            // 新しい記録を追加
+
             const newRecord = {
                 dayCode: Date.now(),
                 date: date,
@@ -2494,170 +2548,46 @@
                 card: card,
                 other: sales - cash - card,
                 totalAccess: access,
-                pcAccess: Math.floor(access * 0.3), // 30%をPC想定
-                spAccess: Math.floor(access * 0.7), // 70%をスマホ想定
-                myshop: Math.floor(access * 0.1) // 10%をマイショップ想定
+                pcAccess: Math.floor(access * 0.3),
+                spAccess: Math.floor(access * 0.7),
+                myshop: Math.floor(access * 0.1)
             };
-            
+
             if (!businessData) businessData = [];
             businessData.push(newRecord);
             saveData();
-            
+
             showNotification('日次記録を保存しました', 'success');
             closeAllModals();
-            
-            if (currentPage === 'attendance') {
-                renderAttendance();
-            }
-            
-            // チャート更新
+            renderCurrentPage();
             updateBusinessCharts();
         }
-        
+
         function editBusinessRecord(date) {
             showNotification('記録編集機能（実装予定）', 'info');
         }
-        
-        // レポート生成
-        function generateReport(type) {
-            const reportTypes = {
-                sales: '売上レポート',
-                attendance: '出勤レポート',
-                comprehensive: '総合レポート',
-                schedule: 'スケジュールレポート'
-            };
-            
-            let data = [];
-            const filename = `${reportTypes[type]}_${new Date().toISOString().split('T')[0]}`;
-            
-            switch(type) {
-                case 'sales':
-                    data = [
-                        ['店舗名', '今月売上', '目標', '達成率', '前年同月', '前年比'],
-                        ...Object.entries(storeInfo).map(([code, info]) => [
-                            info.name,
-                            Math.floor(Math.random() * 50000000) + 80000000,
-                            100000000,
-                            Math.floor(Math.random() * 30) + 85 + '%',
-                            Math.floor(Math.random() * 40000000) + 70000000,
-                            '+' + Math.floor(Math.random() * 20) + 5 + '%'
-                        ])
-                    ];
-                    break;
-                case 'attendance':
-                    data = [
-                        ['店舗名', '出勤予定日数', '実出勤日数', '出勤率', '欠勤日数', '平均出勤者数'],
-                        ...Object.entries(storeInfo).map(([code, info]) => [
-                            info.name,
-                            30,
-                            Math.floor(Math.random() * 8) + 22,
-                            Math.floor(Math.random() * 30) + 70 + '%',
-                            Math.floor(Math.random() * 8) + 1,
-                            Math.floor(Math.random() * 10) + 15
-                        ])
-                    ];
-                    break;
-                case 'comprehensive':
-                    data = [
-                        ['項目', '目標', '実績', '達成率', '状況'],
-                        ['売上合計', '1,000,000,000', '920,000,000', '92%', '順調'],
-                        ['出勤率', '95%', '87%', '92%', '良好'],
-                        ['タスク完了率', '100%', '85%', '85%', '良好'],
-                        ['予定消化率', '100%', '95%', '95%', '良好']
-                    ];
-                    break;
-                case 'schedule':
-                    data = [
-                        ['日付', '時間', '予定', '種類', '場所'],
-                        ...events.map(event => [
-                            event.date,
-                            `${event.startTime || ''}-${event.endTime || ''}`,
-                            event.title,
-                            getEventTypeName(event.type),
-                            event.description || ''
-                        ])
-                    ];
-                    break;
-            }
-            
-            // Excel作成
-            const ws = XLSX.utils.aoa_to_sheet(data);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, reportTypes[type]);
-            XLSX.writeFile(wb, `${filename}.xlsx`);
-            
-            showNotification(`${reportTypes[type]}をダウンロードしました`, 'success');
-        }
-        
-        function generateMonthEndReport() {
-            showNotification('月末データを一括ダウンロード中...', 'info');
-            
-            const reports = ['sales', 'attendance', 'comprehensive', 'schedule'];
-            let downloadCount = 0;
-            
-            reports.forEach((report, index) => {
-                setTimeout(() => {
-                    generateReport(report);
-                    downloadCount++;
-                    
-                    if (downloadCount === reports.length) {
-                        setTimeout(() => {
-                            showNotification('月末データの一括ダウンロードが完了しました', 'success');
-                        }, 500);
-                    }
-                }, index * 1000);
-            });
-        }
-        
-        // エクスポート機能
-        function exportTasks() {
-            const data = [
-                ['ID', 'タスク名', '説明', '優先度', '店舗', '期限', 'ステータス', '作成日'],
-                ...tasks.map(task => [
-                    task.id,
-                    task.title,
-                    task.description,
-                    getPriorityText(task.priority),
-                    task.store ? getStoreName(task.store) : '',
-                    task.dueDate || '',
-                    task.completed ? '完了' : '未完了',
-                    formatDate(task.createdAt.split('T')[0])
-                ])
-            ];
-            
-            const ws = XLSX.utils.aoa_to_sheet(data);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, 'タスク一覧');
-            
-            const filename = `タスク一覧_${new Date().toISOString().split('T')[0]}.xlsx`;
-            XLSX.writeFile(wb, filename);
-            
-            showNotification('タスクデータをエクスポートしました', 'success');
-        }
-        
-        // データ同期
+
         function syncAllData() {
-            const syncButton = document.querySelector('[onclick="syncAllData()"]');
-            if (!syncButton) return;
-            
-            const originalHTML = syncButton.innerHTML;
-            syncButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>同期中...';
-            syncButton.disabled = true;
-            
+            const syncBtn = document.getElementById('syncBtn');
+            if (!syncBtn) return;
+
+            const originalHTML = syncBtn.innerHTML;
+            syncBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>同期中...';
+            syncBtn.disabled = true;
+
             setTimeout(() => {
-                syncButton.innerHTML = originalHTML;
-                syncButton.disabled = false;
-                
+                syncBtn.innerHTML = originalHTML;
+                syncBtn.disabled = false;
+
                 const lastSync = document.getElementById('lastSync');
                 if (lastSync) {
                     lastSync.textContent = new Date().toLocaleString('ja-JP');
                 }
-                
+
                 showNotification('データ同期が完了しました', 'success');
             }, 2000);
         }
-        
-        // クイックアクション
+
         function showQuickActions() {
             const content = `
                 <div class="grid grid-cols-2 gap-4">
@@ -2675,26 +2605,24 @@
                     </button>
                 </div>
             `;
-            
+
             showCustomModal('クイックアクション', content);
         }
-        
-        // 店舗詳細表示
+
         function showStoreDetails(storeCode) {
             const store = storeInfo[storeCode];
             if (!store) return;
-            
-            // 業務データから該当店舗のデータを取得（実際には店舗ごとのデータが必要）
+
             const avgSales = businessData.length > 0 ? 
                 businessData.reduce((sum, data) => sum + data.sales, 0) / businessData.length : 
                 Math.floor(Math.random() * 500000) + 500000;
-            
+
             const avgAttendance = businessData.length > 0 ?
                 businessData.reduce((sum, data) => sum + data.attendance, 0) / businessData.length :
                 Math.floor(Math.random() * 10) + 15;
-            
-            const attendanceRate = Math.round(70 + Math.random() * 30); // 70-100%
-            
+
+            const attendanceRate = Math.round(70 + Math.random() * 30);
+
             const issues = {
                 'shabour': ['名古屋エリアでの競合対策', '新人スタッフの教育体制強化'],
                 'onecarat': ['高級路線でのブランディング強化', 'VIP顧客の獲得'],
@@ -2707,7 +2635,7 @@
                 'go_tokyo': ['東京でのGrandOpera展開戦略', 'ブランド価値の向上'],
                 'go_yokohama': ['横浜エリアでの地位確立', '新規顧客開拓']
             };
-            
+
             const content = `
                 <div class="space-y-6">
                     <div class="text-center">
@@ -2753,27 +2681,26 @@
                     </div>
                 </div>
             `;
-            
+
             showCustomModal(`${store.name} 詳細`, content);
         }
-        
+
         function createTaskForStore(storeCode) {
             closeAllModals();
             openTaskModal();
-            
+
             setTimeout(() => {
-                document.getElementById('taskStore').value = storeCode;
-                document.getElementById('taskTitle').value = `${storeInfo[storeCode]?.name}の改善対応`;
-                document.getElementById('taskPriority').value = 'high';
+                updateElement('taskStore', storeCode, 'value');
+                updateElement('taskTitle', `${storeInfo[storeCode]?.name}の改善対応`, 'value');
+                updateElement('taskPriority', 'high', 'value');
             }, 100);
         }
-        
-        // 日付詳細表示
+
         function showDayDetails(dateStr) {
             const dayEvents = events.filter(event => event.date === dateStr);
             const dayTasks = tasks.filter(task => task.dueDate === dateStr);
             const date = new Date(dateStr);
-            
+
             const content = `
                 <div class="space-y-6">
                     <div class="text-center">
@@ -2836,78 +2763,45 @@
                     </div>
                 </div>
             `;
-            
+
             showCustomModal('詳細', content);
         }
-        
+
         function addEventForDate(dateStr) {
             closeAllModals();
             openEventModal();
-            
+
             setTimeout(() => {
-                document.getElementById('eventDate').value = dateStr;
+                updateElement('eventDate', dateStr, 'value');
             }, 100);
         }
-        
+
         function addTaskForDate(dateStr) {
             closeAllModals();
             openTaskModal();
-            
+
             setTimeout(() => {
-                document.getElementById('taskDueDate').value = dateStr;
+                updateElement('taskDueDate', dateStr, 'value');
             }, 100);
         }
-        
-        function editEvent(eventId) {
-            closeAllModals();
-            openEventModal(eventId);
-        }
-        
-        // 売上チャート期間変更
-        function changeChartPeriod(period) {
-            if (!salesChart) return;
-            
-            const weekData = {
-                labels: ['月', '火', '水', '木', '金', '土', '日'],
-                datasets: [{
-                    label: '今週',
-                    data: [380, 420, 350, 480, 390, 520, 290],
-                    backgroundColor: 'rgba(59, 130, 246, 0.8)',
-                    borderColor: '#3b82f6',
-                    borderWidth: 2
-                }, {
-                    label: '先週',
-                    data: [350, 390, 320, 450, 360, 480, 270],
-                    backgroundColor: 'rgba(6, 182, 212, 0.6)',
-                    borderColor: '#06b6d4',
-                    borderWidth: 2
-                }]
-            };
-            
-            const monthData = {
-                labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
-                datasets: [{
-                    label: '今年',
-                    data: [245, 268, 225, 298, 275, 280],
-                    backgroundColor: 'rgba(59, 130, 246, 0.8)',
-                    borderColor: '#3b82f6',
-                    borderWidth: 2
-                }, {
-                    label: '前年',
-                    data: [220, 235, 210, 265, 245, 249],
-                    backgroundColor: 'rgba(6, 182, 212, 0.6)',
-                    borderColor: '#06b6d4',
-                    borderWidth: 2
-                }]
-            };
-            
-            salesChart.data = period === 'week' ? weekData : monthData;
-            salesChart.update();
-            
-            showNotification(`${period === 'week' ? '週別' : '月別'}表示に変更しました`, 'info');
-        }
-        
+
         // モーダル管理
+        function showModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.remove('hidden');
+            }
+        }
+
+        function hideModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.add('hidden');
+            }
+            editingTaskId = null;
+            editingEventId = null;
+        }
+
         function showCustomModal(title, content) {
             const modal = document.createElement('div');
             modal.className = 'modal';
@@ -2922,22 +2816,22 @@
                     ${content}
                 </div>
             `;
-            
+
             document.body.appendChild(modal);
-            
+
             modal.addEventListener('click', (e) => {
                 if (e.target === modal) {
                     modal.remove();
                 }
             });
         }
-        
+
         function closeAllModals() {
             document.querySelectorAll('.modal').forEach(modal => modal.remove());
-            document.getElementById('taskModal').classList.add('hidden');
-            document.getElementById('eventModal').classList.add('hidden');
+            hideModal('taskModal');
+            hideModal('eventModal');
         }
-        
+
         // 通知システム
         function showNotification(message, type = 'info') {
             const notification = document.createElement('div');
@@ -2947,11 +2841,11 @@
                 type === 'warning' ? 'border-yellow-500 bg-yellow-50 text-yellow-800' :
                 'border-blue-500 bg-blue-50 text-blue-800'
             }`;
-            
+
             const icon = type === 'success' ? 'check-circle' :
                         type === 'error' ? 'exclamation-circle' :
                         type === 'warning' ? 'exclamation-triangle' : 'info-circle';
-            
+
             notification.innerHTML = `
                 <div class="flex items-center">
                     <i class="fas fa-${icon} mr-3 text-lg"></i>
@@ -2961,17 +2855,24 @@
                     </button>
                 </div>
             `;
-            
+
             document.body.appendChild(notification);
-            
+
             setTimeout(() => {
                 if (notification.parentNode) {
                     notification.remove();
                 }
             }, 5000);
         }
-        
+
         // ユーティリティ関数
+        function updateElement(id, value, property = 'textContent') {
+            const element = document.getElementById(id);
+            if (element) {
+                element[property] = value;
+            }
+        }
+
         function formatDate(dateString) {
             if (!dateString) return '';
             const date = new Date(dateString);
@@ -2981,16 +2882,16 @@
                 day: 'numeric'
             });
         }
-        
+
         function getStoreName(storeCode) {
             return storeInfo[storeCode]?.name || storeCode;
         }
-        
+
         function getPriorityText(priority) {
             const priorities = { high: '高', medium: '中', low: '低' };
             return priorities[priority] || priority;
         }
-        
+
         function getPriorityClass(priority) {
             const classes = {
                 high: 'bg-red-100 text-red-800',
@@ -2999,7 +2900,7 @@
             };
             return classes[priority] || 'bg-gray-100 text-gray-800';
         }
-        
+
         function getEventClass(eventType) {
             const classes = {
                 meeting: 'bg-blue-100 text-blue-800',
@@ -3009,12 +2910,12 @@
             };
             return classes[eventType] || 'bg-gray-100 text-gray-800';
         }
-        
+
         function getEventTypeName(eventType) {
             const names = { meeting: '会議', shooting: '撮影', holiday: '休業', deadline: '締切' };
             return names[eventType] || eventType;
         }
-        
+
         function getBrandEmoji(brand) {
             const emojis = {
                 'CLASSY': '💎',
@@ -3024,59 +2925,59 @@
             };
             return emojis[brand] || '🏪';
         }
-        
+
         function getRankingEmoji(rank) {
             return rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '🏆';
         }
-        
+
         function getRankingGradient(rank) {
             return rank === 1 ? 'from-yellow-50 to-amber-50' :
                    rank === 2 ? 'from-gray-50 to-slate-50' :
                    rank === 3 ? 'from-orange-50 to-amber-50' :
                    'from-blue-50 to-indigo-50';
         }
-        
+
         function getRankingBorder(rank) {
             return rank === 1 ? 'border-yellow-400' :
                    rank === 2 ? 'border-gray-400' :
                    rank === 3 ? 'border-orange-400' :
                    'border-blue-400';
         }
-        
+
         function getRankingColor(rank) {
             return rank === 1 ? 'text-yellow-600' :
                    rank === 2 ? 'text-gray-600' :
                    rank === 3 ? 'text-orange-600' :
                    'text-blue-600';
         }
-        
+
         // レスポンシブ対応
         window.addEventListener('resize', function() {
             if (window.innerWidth >= 1024) {
                 closeSidebar();
             }
-            
+
             // チャートのリサイズ対応
             if (salesChart) salesChart.resize();
-            if (window.dailySalesChart) window.dailySalesChart.resize();
-            if (window.accessChart) window.accessChart.resize();
+            if (dailySalesChart) dailySalesChart.resize();
+            if (accessChart) accessChart.resize();
         });
-        
+
         // グローバルエラーハンドリング
         window.addEventListener('error', function(e) {
             console.error('JavaScript エラー:', e.error);
             showNotification('システムエラーが発生しました。ページを再読み込みしてください。', 'error');
         });
-        
+
         console.log('CLASSY業務管理システム - 完全版初期化完了');
         console.log('利用可能な機能:');
-        console.log('- ダッシュボード（概要表示）');
-        console.log('- タスク管理（追加・編集・削除・フィルター）');
-        console.log('- 売上分析（チャート・ランキング）');
-        console.log('- 出勤管理（業務データアップロード・手動入力）');
-        console.log('- カレンダー（予定管理）');
-        console.log('- レポート（Excel出力）');
-        console.log('キーボードショートカット: Ctrl+K (タスク追加), Ctrl+E (予定追加), Ctrl+S (同期)');
+        console.log('✅ ダッシュボード（概要表示・データアップロード）');
+        console.log('✅ タスク管理（追加・編集・削除・フィルター・エクスポート）');
+        console.log('✅ 売上分析（チャート・ランキング・期間切り替え）');
+        console.log('✅ 出勤管理（業務データアップロード・手動入力・チャート）');
+        console.log('✅ カレンダー（予定管理・月次ナビゲーション）');
+        console.log('✅ レポート（Excel出力・一括ダウンロード）');
+        console.log('✅ キーボードショートカット: Ctrl+K (タスク), Ctrl+E (予定), Ctrl+S (同期)');
     </script>
 </body>
 </html>
