@@ -502,27 +502,89 @@
             
             <!-- 売上分析ページ -->
             <div id="salesPage" class="page-content p-4 lg:p-6 hidden">
+                <!-- 店舗選択 -->
+                <div class="glass-card p-6 mb-6">
+                    <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between mb-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4 lg:mb-0">売上分析</h3>
+                        <div class="flex flex-wrap gap-3">
+                            <select id="salesStoreSelect" class="input-field min-w-[200px]">
+                                <option value="">全店舗統合</option>
+                                <option value="shabour">シャブール</option>
+                                <option value="onecarat">ワンカラット</option>
+                                <option value="go_nagoya">GO名古屋</option>
+                                <option value="go_fukuoka">GO福岡</option>
+                                <option value="go_tokyo">GO東京</option>
+                                <option value="go_yokohama">GO横浜</option>
+                                <option value="opera_nishiki">オペラ錦</option>
+                                <option value="cl_nagoya">CL名古屋</option>
+                                <option value="cl_tokyo">CL東京</option>
+                                <option value="cl_yokkaichi">CL四日市</option>
+                            </select>
+                            <button class="btn btn-outline" id="salesCompareBtn">
+                                <i class="fas fa-balance-scale mr-2"></i>比較分析
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- 売上統計 -->
                 <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-6 mb-6">
                     <div class="glass-card p-6 text-center">
                         <div class="text-4xl font-bold text-blue-600 mb-2" id="totalMonthlySales">¥189M</div>
-                        <div class="text-sm text-gray-600">月間総売上</div>
+                        <div class="text-sm text-gray-600">月間売上</div>
                         <div class="text-xs text-green-600 mt-2" id="totalSalesTarget">目標: ¥196M</div>
                     </div>
                     <div class="glass-card p-6 text-center">
                         <div class="text-4xl font-bold text-green-600 mb-2" id="overallAchievementRate">96.4%</div>
-                        <div class="text-sm text-gray-600">全体達成率</div>
+                        <div class="text-sm text-gray-600">達成率</div>
                         <div class="text-xs text-orange-600 mt-2" id="achievementStatus">目標まで¥7M</div>
                     </div>
                     <div class="glass-card p-6 text-center">
                         <div class="text-4xl font-bold text-purple-600 mb-2" id="storeCount">9</div>
-                        <div class="text-sm text-gray-600">運営店舗</div>
-                        <div class="text-xs text-purple-600 mt-2">全店舗稼働</div>
+                        <div class="text-sm text-gray-600">対象店舗</div>
+                        <div class="text-xs text-purple-600 mt-2" id="storeType">全店舗</div>
                     </div>
                     <div class="glass-card p-6 text-center">
                         <div class="text-4xl font-bold text-orange-600 mb-2" id="averageStoreSales">¥21M</div>
                         <div class="text-sm text-gray-600">平均売上</div>
-                        <div class="text-xs text-orange-600 mt-2">店舗平均</div>
+                        <div class="text-xs text-orange-600 mt-2" id="salesTrend">前月比</div>
+                    </div>
+                </div>
+
+                <!-- 個別店舗詳細（店舗選択時のみ表示） -->
+                <div id="individualStoreDetails" class="glass-card p-6 mb-6 hidden">
+                    <h4 class="text-lg font-bold text-gray-900 mb-6" id="selectedStoreName">店舗詳細</h4>
+                    
+                    <!-- 店舗KPI -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                        <div class="bg-blue-50 p-4 rounded-lg text-center">
+                            <div class="text-2xl font-bold text-blue-600" id="storeAccessCount">1.2M</div>
+                            <div class="text-sm text-gray-600">総アクセス数</div>
+                            <div class="text-xs text-blue-600 mt-1" id="storeAccessAvg">平均: 42K</div>
+                        </div>
+                        <div class="bg-green-50 p-4 rounded-lg text-center">
+                            <div class="text-2xl font-bold text-green-600" id="storeDiaryPosts">8,528</div>
+                            <div class="text-sm text-gray-600">日記投稿数</div>
+                            <div class="text-xs text-green-600 mt-1" id="storeDiaryRate">達成率: 107%</div>
+                        </div>
+                        <div class="bg-purple-50 p-4 rounded-lg text-center">
+                            <div class="text-2xl font-bold text-purple-600" id="storeReviewPosts">156</div>
+                            <div class="text-sm text-gray-600">口コミ数</div>
+                            <div class="text-xs text-purple-600 mt-1" id="storeReviewRate">達成率: 78%</div>
+                        </div>
+                        <div class="bg-orange-50 p-4 rounded-lg text-center">
+                            <div class="text-2xl font-bold text-orange-600" id="storeAttendance">514</div>
+                            <div class="text-sm text-gray-600">出勤人数</div>
+                            <div class="text-xs text-orange-600 mt-1" id="storeGirlCount">女の子: 745人</div>
+                        </div>
+                    </div>
+
+                    <!-- 改善提案 -->
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h5 class="font-semibold text-gray-900 mb-3">💡 改善提案</h5>
+                        <div id="storeImprovementSuggestions" class="space-y-2">
+                            <!-- 動的に生成 -->
+                        </div>
                     </div>
                 </div>
                 
@@ -530,7 +592,7 @@
                 <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
                     <div class="glass-card p-6">
                         <div class="flex items-center justify-between mb-6">
-                            <h4 class="text-lg font-bold text-gray-900">店舗別売上</h4>
+                            <h4 class="text-lg font-bold text-gray-900" id="salesChartTitle">店舗別売上</h4>
                             <div class="flex space-x-2">
                                 <button class="btn btn-primary" id="salesChartBtn">売上</button>
                                 <button class="btn btn-outline" id="achievementChartBtn">達成率</button>
@@ -542,7 +604,7 @@
                     </div>
                     
                     <div class="glass-card p-6">
-                        <h4 class="text-lg font-bold text-gray-900 mb-6">売上ランキング</h4>
+                        <h4 class="text-lg font-bold text-gray-900 mb-6" id="rankingTitle">売上ランキング</h4>
                         <div class="space-y-4" id="storeRanking">
                             <!-- ランキングが動的に表示されます -->
                         </div>
@@ -552,6 +614,31 @@
             
             <!-- KPI管理ページ -->
             <div id="attendancePage" class="page-content p-4 lg:p-6 hidden">
+                <!-- 店舗選択 -->
+                <div class="glass-card p-6 mb-6">
+                    <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between mb-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4 lg:mb-0">KPI管理</h3>
+                        <div class="flex flex-wrap gap-3">
+                            <select id="kpiStoreSelect" class="input-field min-w-[200px]">
+                                <option value="">全店舗統合</option>
+                                <option value="shabour">シャブール</option>
+                                <option value="onecarat">ワンカラット</option>
+                                <option value="go_nagoya">GO名古屋</option>
+                                <option value="go_fukuoka">GO福岡</option>
+                                <option value="go_tokyo">GO東京</option>
+                                <option value="go_yokohama">GO横浜</option>
+                                <option value="opera_nishiki">オペラ錦</option>
+                                <option value="cl_nagoya">CL名古屋</option>
+                                <option value="cl_tokyo">CL東京</option>
+                                <option value="cl_yokkaichi">CL四日市</option>
+                            </select>
+                            <button class="btn btn-outline" id="kpiCompareBtn">
+                                <i class="fas fa-chart-bar mr-2"></i>KPI比較
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- KPIサマリー -->
                 <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-6 mb-6">
                     <div class="glass-card p-6 text-center">
@@ -576,17 +663,104 @@
                     </div>
                 </div>
 
+                <!-- 個別店舗KPI詳細（店舗選択時のみ表示） -->
+                <div id="individualKpiDetails" class="glass-card p-6 mb-6 hidden">
+                    <h4 class="text-lg font-bold text-gray-900 mb-6" id="selectedKpiStoreName">店舗KPI詳細</h4>
+                    
+                    <!-- 店舗KPI指標 -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+                        <!-- アクセス関連 -->
+                        <div class="bg-blue-50 p-6 rounded-lg">
+                            <h5 class="font-semibold text-blue-800 mb-4 flex items-center">
+                                <i class="fas fa-eye mr-2"></i>アクセス分析
+                            </h5>
+                            <div class="space-y-3">
+                                <div class="flex justify-between">
+                                    <span class="text-sm text-gray-600">総アクセス数</span>
+                                    <span class="font-bold text-blue-600" id="kpiStoreAccess">1,241,592</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-sm text-gray-600">平均アクセス</span>
+                                    <span class="font-bold text-blue-600" id="kpiStoreAccessAvg">42,734</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-sm text-gray-600">ユーザー数</span>
+                                    <span class="font-bold text-blue-600" id="kpiStoreUsers">3,441</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- コンテンツ関連 -->
+                        <div class="bg-green-50 p-6 rounded-lg">
+                            <h5 class="font-semibold text-green-800 mb-4 flex items-center">
+                                <i class="fas fa-camera mr-2"></i>コンテンツKPI
+                            </h5>
+                            <div class="space-y-3">
+                                <div class="flex justify-between">
+                                    <span class="text-sm text-gray-600">日記投稿数</span>
+                                    <span class="font-bold text-green-600" id="kpiStoreDiary">8,528</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-sm text-gray-600">達成率</span>
+                                    <span class="font-bold text-green-600" id="kpiStoreDiaryRate">107.3%</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-sm text-gray-600">動画日記</span>
+                                    <span class="font-bold text-green-600" id="kpiStoreVideoDiary">18,481</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- エンゲージメント関連 -->
+                        <div class="bg-purple-50 p-6 rounded-lg">
+                            <h5 class="font-semibold text-purple-800 mb-4 flex items-center">
+                                <i class="fas fa-heart mr-2"></i>エンゲージメント
+                            </h5>
+                            <div class="space-y-3">
+                                <div class="flex justify-between">
+                                    <span class="text-sm text-gray-600">口コミ数</span>
+                                    <span class="font-bold text-purple-600" id="kpiStoreReviews">156</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-sm text-gray-600">キテネ送信</span>
+                                    <span class="font-bold text-purple-600" id="kpiStoreKitene">18,119</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-sm text-gray-600">マイガール</span>
+                                    <span class="font-bold text-purple-600" id="kpiStoreMyGirl">196,763</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- KPI達成状況グラフ -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="bg-white p-4 rounded-lg border">
+                            <h5 class="font-semibold text-gray-900 mb-4">KPI達成率</h5>
+                            <div class="chart-container" style="height: 200px;">
+                                <canvas id="individualKpiChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg border">
+                            <h5 class="font-semibold text-gray-900 mb-4">改善アクション</h5>
+                            <div id="kpiImprovementActions" class="space-y-3">
+                                <!-- 動的に生成 -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- グラフエリア -->
                 <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
                     <div class="glass-card p-6">
-                        <h4 class="text-lg font-bold text-gray-900 mb-6">アクセス分布</h4>
+                        <h4 class="text-lg font-bold text-gray-900 mb-6" id="accessChartTitle">アクセス分布</h4>
                         <div class="chart-container">
                             <canvas id="accessChart"></canvas>
                         </div>
                     </div>
                     
                     <div class="glass-card p-6">
-                        <h4 class="text-lg font-bold text-gray-900 mb-6">KPI達成状況</h4>
+                        <h4 class="text-lg font-bold text-gray-900 mb-6" id="kpiChartTitle">KPI達成状況</h4>
                         <div class="chart-container">
                             <canvas id="kpiChart"></canvas>
                         </div>
@@ -596,7 +770,7 @@
                 <!-- 店舗別KPIテーブル -->
                 <div class="glass-card p-6">
                     <div class="flex items-center justify-between mb-6">
-                        <h4 class="text-lg font-bold text-gray-900">店舗別KPI詳細</h4>
+                        <h4 class="text-lg font-bold text-gray-900" id="kpiTableTitle">店舗別KPI詳細</h4>
                         <div class="flex space-x-3">
                             <button class="btn btn-outline" id="exportKpiBtn">
                                 <i class="fas fa-download mr-2"></i>エクスポート
@@ -990,7 +1164,15 @@
                                                  (this.parseNumber(row['日記平均']) / this.parseNumber(row['日記目標'])),
                             reviewAchievementRate: this.parseNumber(row['口コミ達成率']) || 1.0,
                             newCustomers: this.parseNumber(row['新規の数']) || 0
-                        };
+                        window.testStoreSalesAnalysis = function(storeId) {
+            console.log('=== 店舗別売上分析テスト ===');
+            updateSalesAnalysis(storeId || 'shabour');
+        };
+
+        window.testStoreKpiAnalysis = function(storeId) {
+            console.log('=== 店舗別KPI分析テスト ===');
+            updateKpiAnalysis(storeId || 'onecarat');
+        };
                     }).filter(store => store !== null);
 
                     console.log('変換された店舗データ:', convertedData);
@@ -1035,6 +1217,11 @@
         let salesChart = null;
         let accessChart = null;
         let kpiChart = null;
+        let individualKpiChart = null;
+
+        // 選択された店舗
+        let selectedSalesStore = '';
+        let selectedKpiStore = '';
 
         // 店舗情報
         const actualStoreInfo = {
@@ -3178,7 +3365,8 @@
             
             const buttons = [
                 'addTaskBtn', 'newTaskBtn', 'quickActionBtn', 'addEventBtn',
-                'syncBtn', 'exportTasksBtn', 'exportKpiBtn', 'syncGoogleSheetsBtn'
+                'syncBtn', 'exportTasksBtn', 'exportKpiBtn', 'syncGoogleSheetsBtn',
+                'salesStoreSelect', 'kpiStoreSelect', 'salesCompareBtn', 'kpiCompareBtn'
             ];
             
             buttons.forEach(buttonId => {
@@ -3203,12 +3391,20 @@
             } catch (error) {
                 console.error('変換エラー:', error);
                 return null;
-            }
+        window.testStoreSalesAnalysis = function(storeId) {
+            console.log('=== 店舗別売上分析テスト ===');
+            updateSalesAnalysis(storeId || 'shabour');
+        };
+
+        window.testStoreKpiAnalysis = function(storeId) {
+            console.log('=== 店舗別KPI分析テスト ===');
+            updateKpiAnalysis(storeId || 'onecarat');
         };
 
         console.log('=== CLASSY業務管理システム初期化完了 ===');
         console.log('📊 店舗数:', storeData.length, '店舗（オペラ錦を含む）');
         console.log('🔗 Google Sheets同期機能が追加されました');
+        console.log('🏪 店舗別分析機能が追加されました');
         console.log('');
         console.log('🚀 機能テスト:');
         console.log('- window.testTaskModal() でタスクモーダルをテスト');
@@ -3216,6 +3412,8 @@
         console.log('- window.testButtons() でボタンの存在確認');
         console.log('- window.testGoogleSheets() でGoogle Sheets同期をテスト');
         console.log('- window.testGoogleSheetsUrl(url) でURL変換をテスト');
+        console.log('- window.testStoreSalesAnalysis(storeId) で店舗別売上分析をテスト');
+        console.log('- window.testStoreKpiAnalysis(storeId) で店舗別KPI分析をテスト');
         console.log('');
         console.log('⌨️ キーボードショートカット:');
         console.log('- Ctrl+K: タスク追加');
@@ -3228,10 +3426,16 @@
         console.log('2. URLを入力フィールドに貼り付け');
         console.log('3. 「Google Sheetsから同期」ボタンをクリック');
         console.log('');
+        console.log('🏪 店舗別分析:');
+        console.log('1. 売上分析・KPI管理ページで店舗を選択');
+        console.log('2. 個別店舗の詳細データと改善提案を表示');
+        console.log('3. 比較分析機能で複数店舗を比較');
+        console.log('');
         console.log('💡 トラブルシューティング:');
         console.log('- 同期エラーの場合: Sheetsの共有設定を確認');
         console.log('- データが反映されない場合: 列名（ヘッダー）を確認');
         console.log('- CORS エラーの場合: Sheetsを公開設定にしてください');
+        console.log('- 店舗別分析が表示されない場合: 店舗選択ドロップダウンを確認');
     </script>
 </body>
 </html>
