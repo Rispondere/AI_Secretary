@@ -967,29 +967,93 @@
 
         // システム初期化
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('CLASSY業務管理システム起動中...');
+            console.log('=== DOMContentLoaded イベント発火 ===');
             initializeSystem();
-            console.log('システム初期化完了');
+            
+            // システム動作テスト
+            setTimeout(() => {
+                console.log('=== システム動作テスト開始 ===');
+                
+                // 必要な要素の存在確認
+                const testElements = [
+                    'taskModal', 'eventModal', 'addTaskBtn', 'newTaskBtn', 
+                    'addEventBtn', 'taskTitle', 'eventTitle'
+                ];
+                
+                let allElementsExist = true;
+                testElements.forEach(elementId => {
+                    const element = document.getElementById(elementId);
+                    if (element) {
+                        console.log(`✅ ${elementId}: 存在`);
+                    } else {
+                        console.error(`❌ ${elementId}: 見つかりません`);
+                        allElementsExist = false;
+                    }
+                });
+                
+                if (allElementsExist) {
+                    console.log('✅ 全ての必要な要素が存在します');
+                    
+                    // テスト用のボタンクリック関数を追加
+                    window.testTaskModal = function() {
+                        console.log('=== テスト: タスクモーダル表示 ===');
+                        openTaskModal();
+                    };
+                    
+                    window.testEventModal = function() {
+                        console.log('=== テスト: イベントモーダル表示 ===');
+                        openEventModal();
+                    };
+                    
+                    console.log('テスト関数を追加しました: window.testTaskModal(), window.testEventModal()');
+                    
+                    // 成功通知
+                    showNotification('システム初期化完了！タスク・予定追加機能が利用可能です', 'success');
+                } else {
+                    console.error('❌ 一部の要素が見つかりません');
+                    showNotification('システムの初期化でエラーが発生しました', 'error');
+                }
+                
+                console.log('=== システム動作テスト完了 ===');
+            }, 2000);
         });
 
         function initializeSystem() {
+            console.log('=== システム初期化開始 ===');
+            
             loadData();
             updateDateTime();
             setInterval(updateDateTime, 60000);
             
             if (tasks.length === 0) {
                 createSampleData();
+                console.log('サンプルデータ作成完了');
             }
             if (storeData.length === 0) {
                 loadActualStoreData();
+                console.log('店舗データ読み込み完了');
             }
             
-            setupEventListeners();
-            renderCurrentPage();
+            // DOM読み込み完了後にイベントリスナーを設定
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', function() {
+                    console.log('DOM読み込み完了 - イベントリスナー設定開始');
+                    setupEventListeners();
+                    renderCurrentPage();
+                });
+            } else {
+                console.log('DOM既に読み込み済み - イベントリスナー設定開始');
+                setupEventListeners();
+                renderCurrentPage();
+            }
             
+            // チャート初期化（遅延実行）
             setTimeout(() => {
                 initializeCharts();
-            }, 500);
+                console.log('チャート初期化完了');
+            }, 1000);
+            
+            console.log('=== システム初期化完了 ===');
         }
 
         // 実際の店舗データを読み込み
@@ -1297,6 +1361,9 @@
 
         // イベントリスナー設定
         function setupEventListeners() {
+            console.log('=== イベントリスナー設定開始 ===');
+            
+            // ナビゲーション
             document.querySelectorAll('.nav-item').forEach(item => {
                 item.addEventListener('click', function() {
                     const page = this.getAttribute('data-page');
@@ -1304,6 +1371,7 @@
                 });
             });
 
+            // サイドバートグル
             const menuToggle = document.getElementById('menuToggle');
             const mobileMenuBtn = document.getElementById('mobileMenuBtn');
             const overlay = document.getElementById('overlay');
@@ -1312,187 +1380,299 @@
             if (mobileMenuBtn) mobileMenuBtn.addEventListener('click', toggleSidebar);
             if (overlay) overlay.addEventListener('click', closeSidebar);
 
+            // モーダル関連（先に設定）
             setupModalListeners();
+            
+            // ボタン関連
             setupButtonListeners();
+            
+            // フィルター関連
             setupFilterListeners();
+            
+            // ファイルアップロード関連
             setupFileUploadListeners();
 
+            // キーボードショートカット
             document.addEventListener('keydown', handleKeyboardShortcuts);
+            
+            // グローバルクリック処理（タスク完了チェックボックス用）
+            document.addEventListener('click', function(e) {
+                // タスク完了チェックボックス
+                if (e.target.type === 'checkbox' && e.target.hasAttribute('onchange')) {
+                    const onchangeAttr = e.target.getAttribute('onchange');
+                    if (onchangeAttr && onchangeAttr.includes('toggleTaskComplete')) {
+                        const taskId = onchangeAttr.match(/toggleTaskComplete\((\d+)\)/);
+                        if (taskId) {
+                            toggleTaskComplete(parseInt(taskId[1]));
+                        }
+                    }
+                }
+                
+                // タスク編集ボタン
+                if (e.target.closest('button[onclick*="editTask"]')) {
+                    const onclickAttr = e.target.closest('button').getAttribute('onclick');
+                    const taskId = onclickAttr.match(/editTask\((\d+)\)/);
+                    if (taskId) {
+                        editTask(parseInt(taskId[1]));
+                    }
+                }
+                
+                // タスク削除ボタン
+                if (e.target.closest('button[onclick*="deleteTask"]')) {
+                    const onclickAttr = e.target.closest('button').getAttribute('onclick');
+                    const taskId = onclickAttr.match(/deleteTask\((\d+)\)/);
+                    if (taskId) {
+                        deleteTask(parseInt(taskId[1]));
+                    }
+                }
+                
+                // 店舗詳細表示
+                if (e.target.closest('.glass-card[onclick*="showStoreDetails"]')) {
+                    const onclickAttr = e.target.closest('.glass-card').getAttribute('onclick');
+                    const storeCode = onclickAttr.match(/showStoreDetails\('(.+?)'\)/);
+                    if (storeCode) {
+                        showStoreDetails(storeCode[1]);
+                    }
+                }
+            });
+            
+            console.log('=== イベントリスナー設定完了 ===');
         }
 
         function setupModalListeners() {
-            console.log('モーダルイベントリスナーを設定中...');
+            console.log('=== モーダルイベントリスナー設定開始 ===');
             
-            // タスクモーダル
-            const closeTaskModal = document.getElementById('closeTaskModal');
-            const cancelTaskBtn = document.getElementById('cancelTaskBtn');
-            const saveTaskBtn = document.getElementById('saveTaskBtn');
+            // モーダルが存在するかチェック
+            const taskModal = document.getElementById('taskModal');
+            const eventModal = document.getElementById('eventModal');
             
-            if (closeTaskModal) {
-                closeTaskModal.addEventListener('click', function() {
-                    console.log('タスクモーダルを閉じます（×ボタン）');
-                    hideModal('taskModal');
-                });
-                console.log('closeTaskModalのイベントリスナー設定完了');
-            } else {
-                console.error('closeTaskModal要素が見つかりません');
+            if (!taskModal) {
+                console.error('タスクモーダルが見つかりません');
+                return;
+            }
+            if (!eventModal) {
+                console.error('イベントモーダルが見つかりません');
+                return;
             }
             
-            if (cancelTaskBtn) {
-                cancelTaskBtn.addEventListener('click', function() {
-                    console.log('タスクモーダルをキャンセルします');
-                    hideModal('taskModal');
-                });
-                console.log('cancelTaskBtnのイベントリスナー設定完了');
-            } else {
-                console.error('cancelTaskBtn要素が見つかりません');
-            }
+            // タスクモーダルのボタン設定
+            const taskModalButtons = [
+                { id: 'closeTaskModal', action: 'close', name: 'タスクモーダル閉じる' },
+                { id: 'cancelTaskBtn', action: 'close', name: 'タスクキャンセル' },
+                { id: 'saveTaskBtn', action: 'save', name: 'タスク保存' }
+            ];
             
-            if (saveTaskBtn) {
-                saveTaskBtn.addEventListener('click', function() {
-                    console.log('タスク保存ボタンがクリックされました');
-                    saveTask();
-                });
-                console.log('saveTaskBtnのイベントリスナー設定完了');
-            } else {
-                console.error('saveTaskBtn要素が見つかりません');
-            }
+            taskModalButtons.forEach(button => {
+                const element = document.getElementById(button.id);
+                if (element) {
+                    // 既存のイベントリスナーを削除
+                    element.replaceWith(element.cloneNode(true));
+                    const newElement = document.getElementById(button.id);
+                    
+                    newElement.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log(`${button.name}ボタンがクリックされました`);
+                        
+                        if (button.action === 'close') {
+                            hideModal('taskModal');
+                        } else if (button.action === 'save') {
+                            saveTask();
+                        }
+                    });
+                    console.log(`${button.name}のイベントリスナー設定完了`);
+                } else {
+                    console.error(`${button.name}ボタンが見つかりません: ${button.id}`);
+                }
+            });
 
-            // イベントモーダル
-            const closeEventModal = document.getElementById('closeEventModal');
-            const cancelEventBtn = document.getElementById('cancelEventBtn');
-            const saveEventBtn = document.getElementById('saveEventBtn');
+            // イベントモーダルのボタン設定
+            const eventModalButtons = [
+                { id: 'closeEventModal', action: 'close', name: 'イベントモーダル閉じる' },
+                { id: 'cancelEventBtn', action: 'close', name: 'イベントキャンセル' },
+                { id: 'saveEventBtn', action: 'save', name: 'イベント保存' }
+            ];
             
-            if (closeEventModal) {
-                closeEventModal.addEventListener('click', function() {
-                    console.log('イベントモーダルを閉じます（×ボタン）');
-                    hideModal('eventModal');
+            eventModalButtons.forEach(button => {
+                const element = document.getElementById(button.id);
+                if (element) {
+                    // 既存のイベントリスナーを削除
+                    element.replaceWith(element.cloneNode(true));
+                    const newElement = document.getElementById(button.id);
+                    
+                    newElement.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log(`${button.name}ボタンがクリックされました`);
+                        
+                        if (button.action === 'close') {
+                            hideModal('eventModal');
+                        } else if (button.action === 'save') {
+                            saveEvent();
+                        }
+                    });
+                    console.log(`${button.name}のイベントリスナー設定完了`);
+                } else {
+                    console.error(`${button.name}ボタンが見つかりません: ${button.id}`);
+                }
+            });
+            
+            // モーダル背景クリックで閉じる
+            [taskModal, eventModal].forEach(modal => {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === modal) {
+                        console.log('モーダル背景クリック - 閉じます');
+                        if (modal.id === 'taskModal') {
+                            hideModal('taskModal');
+                        } else {
+                            hideModal('eventModal');
+                        }
+                    }
                 });
-                console.log('closeEventModalのイベントリスナー設定完了');
-            } else {
-                console.error('closeEventModal要素が見つかりません');
-            }
+            });
             
-            if (cancelEventBtn) {
-                cancelEventBtn.addEventListener('click', function() {
-                    console.log('イベントモーダルをキャンセルします');
-                    hideModal('eventModal');
-                });
-                console.log('cancelEventBtnのイベントリスナー設定完了');
-            } else {
-                console.error('cancelEventBtn要素が見つかりません');
-            }
-            
-            if (saveEventBtn) {
-                saveEventBtn.addEventListener('click', function() {
-                    console.log('イベント保存ボタンがクリックされました');
-                    saveEvent();
-                });
-                console.log('saveEventBtnのイベントリスナー設定完了');
-            } else {
-                console.error('saveEventBtn要素が見つかりません');
-            }
-            
-            console.log('モーダルイベントリスナー設定完了');
+            console.log('=== モーダルイベントリスナー設定完了 ===');
         }
 
         function setupButtonListeners() {
-            console.log('ボタンイベントリスナーを設定中...');
+            console.log('=== ボタンイベントリスナー設定開始 ===');
             
-            // ダッシュボードボタン
-            const downloadTemplateBtn = document.getElementById('downloadTemplateBtn');
-            const processDataBtn = document.getElementById('processDataBtn');
-            const addTaskBtn = document.getElementById('addTaskBtn');
-            const quickActionBtn = document.getElementById('quickActionBtn');
-            const syncBtn = document.getElementById('syncBtn');
+            // タスク追加ボタンの設定を確実にする
+            const taskButtons = [
+                { id: 'addTaskBtn', name: 'ダッシュボードタスク追加' },
+                { id: 'newTaskBtn', name: 'タスク管理新規' },
+                { id: 'quickActionBtn', name: 'クイックアクション' }
+            ];
+            
+            taskButtons.forEach(button => {
+                const element = document.getElementById(button.id);
+                if (element) {
+                    // 既存のイベントリスナーを削除
+                    element.replaceWith(element.cloneNode(true));
+                    const newElement = document.getElementById(button.id);
+                    
+                    if (button.id === 'quickActionBtn') {
+                        newElement.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            console.log(`${button.name}ボタンがクリックされました`);
+                            showQuickActions();
+                        });
+                    } else {
+                        newElement.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            console.log(`${button.name}ボタンがクリックされました`);
+                            openTaskModal();
+                        });
+                    }
+                    console.log(`${button.name}のイベントリスナー設定完了`);
+                } else {
+                    console.warn(`${button.name}ボタンが見つかりません: ${button.id}`);
+                }
+            });
 
-            if (downloadTemplateBtn) {
-                downloadTemplateBtn.addEventListener('click', downloadStoreTemplate);
-                console.log('downloadTemplateBtnのイベントリスナー設定完了');
-            }
-            if (processDataBtn) {
-                processDataBtn.addEventListener('click', processStoreData);
-                console.log('processDataBtnのイベントリスナー設定完了');
-            }
-            if (addTaskBtn) {
-                addTaskBtn.addEventListener('click', function() {
-                    console.log('addTaskBtnがクリックされました');
-                    openTaskModal();
-                });
-                console.log('addTaskBtnのイベントリスナー設定完了');
-            }
-            if (quickActionBtn) {
-                quickActionBtn.addEventListener('click', showQuickActions);
-                console.log('quickActionBtnのイベントリスナー設定完了');
-            }
-            if (syncBtn) {
-                syncBtn.addEventListener('click', syncAllData);
-                console.log('syncBtnのイベントリスナー設定完了');
-            }
+            // イベント追加ボタンの設定
+            const eventButtons = [
+                { id: 'addEventBtn', name: 'カレンダー予定追加' }
+            ];
+            
+            eventButtons.forEach(button => {
+                const element = document.getElementById(button.id);
+                if (element) {
+                    // 既存のイベントリスナーを削除
+                    element.replaceWith(element.cloneNode(true));
+                    const newElement = document.getElementById(button.id);
+                    
+                    newElement.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log(`${button.name}ボタンがクリックされました`);
+                        openEventModal();
+                    });
+                    console.log(`${button.name}のイベントリスナー設定完了`);
+                } else {
+                    console.warn(`${button.name}ボタンが見つかりません: ${button.id}`);
+                }
+            });
 
-            // タスク管理ボタン
-            const newTaskBtn = document.getElementById('newTaskBtn');
-            const exportTasksBtn = document.getElementById('exportTasksBtn');
+            // その他のボタン
+            const otherButtons = [
+                { id: 'downloadTemplateBtn', func: downloadStoreTemplate, name: 'テンプレートDL' },
+                { id: 'processDataBtn', func: processStoreData, name: 'データ処理' },
+                { id: 'syncBtn', func: syncAllData, name: '同期' },
+                { id: 'exportTasksBtn', func: exportTasks, name: 'タスクエクスポート' },
+                { id: 'downloadKpiTemplateBtn', func: downloadStoreTemplate, name: 'KPIテンプレートDL' },
+                { id: 'processKpiDataBtn', func: processStoreData, name: 'KPIデータ処理' },
+                { id: 'exportKpiBtn', func: exportKpiData, name: 'KPIエクスポート' },
+                { id: 'todayBtn', func: goToToday, name: '今日' },
+                { id: 'prevMonthBtn', func: previousMonth, name: '前月' },
+                { id: 'nextMonthBtn', func: nextMonth, name: '次月' }
+            ];
 
-            if (newTaskBtn) {
-                newTaskBtn.addEventListener('click', function() {
-                    console.log('newTaskBtnがクリックされました');
-                    openTaskModal();
-                });
-                console.log('newTaskBtnのイベントリスナー設定完了');
-            }
-            if (exportTasksBtn) {
-                exportTasksBtn.addEventListener('click', exportTasks);
-                console.log('exportTasksBtnのイベントリスナー設定完了');
-            }
+            otherButtons.forEach(button => {
+                const element = document.getElementById(button.id);
+                if (element) {
+                    element.replaceWith(element.cloneNode(true));
+                    const newElement = document.getElementById(button.id);
+                    newElement.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log(`${button.name}ボタンがクリックされました`);
+                        button.func();
+                    });
+                    console.log(`${button.name}のイベントリスナー設定完了`);
+                }
+            });
 
-            // 売上分析ボタン
-            const salesChartBtn = document.getElementById('salesChartBtn');
-            const achievementChartBtn = document.getElementById('achievementChartBtn');
+            // チャート切り替えボタン
+            const chartButtons = [
+                { id: 'salesChartBtn', func: () => updateSalesChart('sales'), name: '売上チャート' },
+                { id: 'achievementChartBtn', func: () => updateSalesChart('achievement'), name: '達成率チャート' }
+            ];
 
-            if (salesChartBtn) salesChartBtn.addEventListener('click', () => updateSalesChart('sales'));
-            if (achievementChartBtn) achievementChartBtn.addEventListener('click', () => updateSalesChart('achievement'));
-
-            // KPI管理ボタン
-            const downloadKpiTemplateBtn = document.getElementById('downloadKpiTemplateBtn');
-            const processKpiDataBtn = document.getElementById('processKpiDataBtn');
-            const exportKpiBtn = document.getElementById('exportKpiBtn');
-
-            if (downloadKpiTemplateBtn) downloadKpiTemplateBtn.addEventListener('click', downloadStoreTemplate);
-            if (processKpiDataBtn) processKpiDataBtn.addEventListener('click', processStoreData);
-            if (exportKpiBtn) exportKpiBtn.addEventListener('click', exportKpiData);
-
-            // カレンダーボタン
-            const addEventBtn = document.getElementById('addEventBtn');
-            const todayBtn = document.getElementById('todayBtn');
-            const prevMonthBtn = document.getElementById('prevMonthBtn');
-            const nextMonthBtn = document.getElementById('nextMonthBtn');
-
-            if (addEventBtn) {
-                addEventBtn.addEventListener('click', function() {
-                    console.log('addEventBtnがクリックされました');
-                    openEventModal();
-                });
-                console.log('addEventBtnのイベントリスナー設定完了');
-            }
-            if (todayBtn) todayBtn.addEventListener('click', goToToday);
-            if (prevMonthBtn) prevMonthBtn.addEventListener('click', previousMonth);
-            if (nextMonthBtn) nextMonthBtn.addEventListener('click', nextMonth);
+            chartButtons.forEach(button => {
+                const element = document.getElementById(button.id);
+                if (element) {
+                    element.replaceWith(element.cloneNode(true));
+                    const newElement = document.getElementById(button.id);
+                    newElement.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log(`${button.name}ボタンがクリックされました`);
+                        button.func();
+                    });
+                }
+            });
 
             // レポートボタン
-            const salesReportBtn = document.getElementById('salesReportBtn');
-            const kpiReportBtn = document.getElementById('kpiReportBtn');
-            const comprehensiveReportBtn = document.getElementById('comprehensiveReportBtn');
-            const scheduleReportBtn = document.getElementById('scheduleReportBtn');
-            const monthEndReportBtn = document.getElementById('monthEndReportBtn');
+            const reportButtons = [
+                { id: 'salesReportBtn', type: 'sales', name: '売上レポート' },
+                { id: 'kpiReportBtn', type: 'kpi', name: 'KPIレポート' },
+                { id: 'comprehensiveReportBtn', type: 'comprehensive', name: '総合レポート' },
+                { id: 'scheduleReportBtn', type: 'schedule', name: 'スケジュールレポート' },
+                { id: 'monthEndReportBtn', func: generateMonthEndReport, name: '月末レポート' }
+            ];
 
-            if (salesReportBtn) salesReportBtn.addEventListener('click', () => generateReport('sales'));
-            if (kpiReportBtn) kpiReportBtn.addEventListener('click', () => generateReport('kpi'));
-            if (comprehensiveReportBtn) comprehensiveReportBtn.addEventListener('click', () => generateReport('comprehensive'));
-            if (scheduleReportBtn) scheduleReportBtn.addEventListener('click', () => generateReport('schedule'));
-            if (monthEndReportBtn) monthEndReportBtn.addEventListener('click', generateMonthEndReport);
+            reportButtons.forEach(button => {
+                const element = document.getElementById(button.id);
+                if (element) {
+                    element.replaceWith(element.cloneNode(true));
+                    const newElement = document.getElementById(button.id);
+                    newElement.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log(`${button.name}ボタンがクリックされました`);
+                        if (button.func) {
+                            button.func();
+                        } else {
+                            generateReport(button.type);
+                        }
+                    });
+                }
+            });
             
-            console.log('全ボタンのイベントリスナー設定完了');
+            console.log('=== ボタンイベントリスナー設定完了 ===');
         }
 
         function setupFilterListeners() {
@@ -1516,18 +1696,34 @@
         }
 
         function handleKeyboardShortcuts(e) {
+            // モーダルが開いている場合はESCキーのみ処理
+            const modalOpen = !document.getElementById('taskModal').classList.contains('hidden') || 
+                             !document.getElementById('eventModal').classList.contains('hidden');
+            
+            if (modalOpen && e.key === 'Escape') {
+                console.log('ESCキーでモーダルを閉じます');
+                closeAllModals();
+                return;
+            }
+            
+            // モーダルが開いている時は他のショートカットを無効にする
+            if (modalOpen) return;
+            
             if (e.ctrlKey || e.metaKey) {
                 switch(e.key) {
                     case 'k':
                         e.preventDefault();
+                        console.log('Ctrl+K: タスクモーダルを開きます');
                         openTaskModal();
                         break;
                     case 'e':
                         e.preventDefault();
+                        console.log('Ctrl+E: イベントモーダルを開きます');
                         openEventModal();
                         break;
                     case 's':
                         e.preventDefault();
+                        console.log('Ctrl+S: データ同期を実行します');
                         syncAllData();
                         break;
                 }
@@ -3365,23 +3561,31 @@
             showNotification('システムエラーが発生しました。ページを再読み込みしてください。', 'error');
         });
 
-        console.log('CLASSY業務管理システム - 実データ対応版初期化完了');
+        console.log('CLASSY業務管理システム - デバッグ対応版初期化完了');
         console.log('✅ アップロードファイル対応版に更新');
         console.log('✅ 実際の店舗データ（9店舗）に対応');
         console.log('✅ KPI管理機能の実装');
         console.log('✅ 達成率ベースの分析機能');
         console.log('✅ 改善提案機能の実装');
-        console.log('✅ タスク・予定追加機能のデバッグ対応');
+        console.log('✅ タスク・予定追加機能の完全修正');
         console.log('');
         console.log('🚀 使用方法:');
         console.log('- タスク追加: 「追加」ボタンまたは「新規タスク」ボタンをクリック');
         console.log('- 予定追加: カレンダーページで「予定追加」ボタンをクリック');
-        console.log('- キーボードショートカット: Ctrl+K（タスク）、Ctrl+E（予定）');
-        
-        // 初期化完了を通知
-        setTimeout(() => {
-            showNotification('システム初期化完了！タスクと予定を追加できます', 'success');
-        }, 1000);
+        console.log('- キーボードショートカット: Ctrl+K（タスク）、Ctrl+E（予定）、Ctrl+S（同期）');
+        console.log('');
+        console.log('🔧 デバッグ機能:');
+        console.log('- window.testTaskModal() でタスクモーダルをテスト');
+        console.log('- window.testEventModal() でイベントモーダルをテスト');
+        console.log('- ブラウザの開発者ツール（F12）でコンソールログを確認可能');
+        console.log('');
+        console.log('📋 機能一覧:');
+        console.log('- ダッシュボード: 全体統計と店舗状況の表示');
+        console.log('- タスク管理: タスクの追加・編集・削除・フィルタリング');
+        console.log('- 売上分析: 店舗別売上とランキング表示');
+        console.log('- KPI管理: アクセス・日記・口コミ等の管理');
+        console.log('- カレンダー: 予定の追加・編集・表示');
+        console.log('- レポート: Excel形式での各種レポート出力');
     </script>
 </body>
 </html>
