@@ -386,6 +386,1428 @@
                 
                 <div class="mt-8 p-6 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-20">
                     <div class="text-center">
+                        <div class="text-3xl mb-3">📊</div>
+                        <div class="text-sm font-medium text-blue-800">データ同期</div>
+                        <div class="text-xs text-blue-600 mb-4" id="lastSync">2025/6/30 更新</div>
+                        <button class="btn btn-primary w-full" id="syncBtn">
+                            <i class="fas fa-sync-alt mr-2"></i>同期
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- メインコンテンツ -->
+        <div class="main-content">
+            <!-- ヘッダー -->
+            <header class="glass-card m-4 lg:m-6">
+                <div class="p-6 flex items-center justify-between">
+                    <div class="flex items-center">
+                        <button id="menuToggle" class="lg:hidden mr-4 p-3 text-gray-600 hover:text-gray-800 rounded-full hover:bg-gray-100">
+                            <i class="fas fa-bars text-xl"></i>
+                        </button>
+                        <div>
+                            <h1 class="text-2xl lg:text-3xl font-bold text-gray-900">CLASSY業務管理</h1>
+                            <p class="text-sm lg:text-base text-gray-600" id="currentPageTitle">ダッシュボード</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center space-x-4">
+                        <div class="text-right hidden sm:block">
+                            <div class="font-semibold text-gray-900" id="currentDate"></div>
+                            <div class="text-sm text-blue-600" id="currentTime"></div>
+                        </div>
+                        <button class="btn btn-primary" id="quickActionBtn">
+                            <i class="fas fa-plus mr-2"></i>
+                            <span class="hidden sm:inline">クイック</span>
+                        </button>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- ダッシュボードページ -->
+            <div id="dashboardPage" class="page-content p-4 lg:p-6 fade-in">
+                <!-- データアップロード -->
+                <div class="glass-card p-6 mb-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-bold text-gray-900">全店統計データアップロード</h3>
+                        <button class="btn btn-success" id="downloadTemplateBtn">
+                            <i class="fas fa-download mr-2"></i>テンプレートDL
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        <div>
+                            <input type="file" id="dashboardFileInput" accept=".xlsx,.xls,.csv" class="input-field">
+                            <div class="text-sm text-gray-600 mt-2">
+                                <i class="fas fa-info-circle mr-1"></i>
+                                全店統計データ（売上・KPI・アクセス数等）をアップロード
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <button class="btn btn-primary" id="processDataBtn">
+                                <i class="fas fa-upload mr-2"></i>データ反映
+                            </button>
+                            <div id="uploadStatus" class="text-sm text-gray-500"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 全体統計 -->
+                <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-6 mb-6">
+                    <div class="glass-card p-6 text-center">
+                        <div class="text-4xl font-bold text-blue-600 mb-2" id="totalSalesAmount">¥189M</div>
+                        <div class="text-sm text-gray-600">総売上</div>
+                        <div class="text-xs text-green-600 mt-2" id="salesAchievementRate">96.4%達成</div>
+                    </div>
+                    <div class="glass-card p-6 text-center">
+                        <div class="text-4xl font-bold text-green-600 mb-2" id="totalAccessCount">10.1M</div>
+                        <div class="text-sm text-gray-600">総アクセス数</div>
+                        <div class="text-xs text-green-600 mt-2" id="averageAccess">平均 1.1M</div>
+                    </div>
+                    <div class="glass-card p-6 text-center">
+                        <div class="text-4xl font-bold text-purple-600 mb-2" id="totalAttendance">3,892</div>
+                        <div class="text-sm text-gray-600">総出勤人数</div>
+                        <div class="text-xs text-orange-600 mt-2" id="averageAttendance">平均 432人</div>
+                    </div>
+                    <div class="glass-card p-6 text-center">
+                        <div class="text-4xl font-bold text-cyan-600 mb-2" id="achievingStores">4/9</div>
+                        <div class="text-sm text-gray-600">目標達成店舗</div>
+                        <div class="text-xs text-blue-600 mt-2">売上基準</div>
+                    </div>
+                </div>
+                
+                <!-- 今日のタスク -->
+                <div class="glass-card p-6 mb-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-bold text-gray-900">今日のタスク</h3>
+                        <button class="btn btn-outline" id="addTaskBtn">
+                            <i class="fas fa-plus mr-2"></i>追加
+                        </button>
+                    </div>
+                    <div id="todayTasksList" class="space-y-4">
+                        <!-- タスクが動的に表示されます -->
+                    </div>
+                </div>
+                
+                <!-- 店舗状況 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6 mb-6" id="storesOverview">
+                    <!-- 店舗カードが動的に生成されます -->
+                </div>
+                
+                <!-- 今週の予定 -->
+                <div class="glass-card p-6">
+                    <h3 class="text-xl font-bold text-gray-900 mb-6">今週の予定</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-7 gap-3" id="weeklySchedule">
+                        <!-- 週間スケジュールがここに表示されます -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- タスク管理ページ -->
+            <div id="tasksPage" class="page-content p-4 lg:p-6 hidden">
+                <div class="glass-card p-6 mb-6">
+                    <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between mb-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4 lg:mb-0">タスク管理</h3>
+                        <div class="flex flex-wrap gap-3">
+                            <button class="btn btn-primary" id="newTaskBtn">
+                                <i class="fas fa-plus mr-2"></i>新規タスク
+                            </button>
+                            <button class="btn btn-outline" id="exportTasksBtn">
+                                <i class="fas fa-download mr-2"></i>エクスポート
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- フィルターとソート -->
+                    <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6">
+                        <input type="text" id="taskSearch" placeholder="タスクを検索..." class="input-field">
+                        <select id="priorityFilter" class="input-field">
+                            <option value="">すべての優先度</option>
+                            <option value="high">高優先度</option>
+                            <option value="medium">中優先度</option>
+                            <option value="low">低優先度</option>
+                        </select>
+                        <select id="statusFilter" class="input-field">
+                            <option value="">すべてのステータス</option>
+                            <option value="pending">未完了</option>
+                            <option value="completed">完了済み</option>
+                        </select>
+                        <select id="storeFilter" class="input-field">
+                            <option value="">すべての店舗</option>
+                            <option value="shabour">シャブール</option>
+                            <option value="onecarat">ワンカラット</option>
+                            <option value="go_nagoya">GO名古屋</option>
+                            <option value="go_fukuoka">GO福岡</option>
+                            <option value="go_tokyo">GO東京</option>
+                            <option value="go_yokohama">GO横浜</option>
+                            <option value="cl_nagoya">CL名古屋</option>
+                            <option value="cl_tokyo">CL東京</option>
+                            <option value="cl_yokkaichi">CL四日市</option>
+                        </select>
+                    </div>
+                    
+                    <!-- タスクリスト -->
+                    <div id="tasksList" class="space-y-4">
+                        <!-- タスクが動的に表示されます -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 売上分析ページ -->
+            <div id="salesPage" class="page-content p-4 lg:p-6 hidden">
+                <!-- 売上統計 -->
+                <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-6 mb-6">
+                    <div class="glass-card p-6 text-center">
+                        <div class="text-4xl font-bold text-blue-600 mb-2" id="totalMonthlySales">¥189M</div>
+                        <div class="text-sm text-gray-600">月間総売上</div>
+                        <div class="text-xs text-green-600 mt-2" id="totalSalesTarget">目標: ¥196M</div>
+                    </div>
+                    <div class="glass-card p-6 text-center">
+                        <div class="text-4xl font-bold text-green-600 mb-2" id="overallAchievementRate">96.4%</div>
+                        <div class="text-sm text-gray-600">全体達成率</div>
+                        <div class="text-xs text-orange-600 mt-2" id="achievementStatus">目標まで¥7M</div>
+                    </div>
+                    <div class="glass-card p-6 text-center">
+                        <div class="text-4xl font-bold text-purple-600 mb-2" id="storeCount">9</div>
+                        <div class="text-sm text-gray-600">運営店舗</div>
+                        <div class="text-xs text-purple-600 mt-2">全店舗稼働</div>
+                    </div>
+                    <div class="glass-card p-6 text-center">
+                        <div class="text-4xl font-bold text-orange-600 mb-2" id="averageStoreSales">¥21M</div>
+                        <div class="text-sm text-gray-600">平均売上</div>
+                        <div class="text-xs text-orange-600 mt-2">店舗平均</div>
+                    </div>
+                </div>
+                
+                <!-- グラフエリア -->
+                <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
+                    <div class="glass-card p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <h4 class="text-lg font-bold text-gray-900">店舗別売上</h4>
+                            <div class="flex space-x-2">
+                                <button class="btn btn-primary" id="salesChartBtn">売上</button>
+                                <button class="btn btn-outline" id="achievementChartBtn">達成率</button>
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="salesChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="glass-card p-6">
+                        <h4 class="text-lg font-bold text-gray-900 mb-6">売上ランキング</h4>
+                        <div class="space-y-4" id="storeRanking">
+                            <!-- ランキングが動的に表示されます -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- KPI管理ページ -->
+            <div id="attendancePage" class="page-content p-4 lg:p-6 hidden">
+                <!-- データアップロード -->
+                <div class="glass-card p-6 mb-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-bold text-gray-900">KPIデータアップロード</h3>
+                        <button class="btn btn-success" id="downloadKpiTemplateBtn">
+                            <i class="fas fa-download mr-2"></i>テンプレートDL
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        <div>
+                            <input type="file" id="attendanceFileInput" accept=".xlsx,.xls,.csv" class="input-field">
+                            <div class="text-sm text-gray-600 mt-2">
+                                <i class="fas fa-info-circle mr-1"></i>
+                                KPI統計データ（アクセス・出勤・日記・口コミ等）をアップロード
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <button class="btn btn-primary" id="processKpiDataBtn">
+                                <i class="fas fa-upload mr-2"></i>データ反映
+                            </button>
+                            <div id="kpiUploadStatus" class="text-sm text-gray-500"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- KPIサマリー -->
+                <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-6 mb-6">
+                    <div class="glass-card p-6 text-center">
+                        <div class="text-4xl font-bold text-blue-600 mb-2" id="totalDiaryPosts">47,593</div>
+                        <div class="text-sm text-gray-600">写メ日記投稿数</div>
+                        <div class="text-xs text-blue-600 mt-2" id="diaryAchievement">達成率 85.1%</div>
+                    </div>
+                    <div class="glass-card p-6 text-center">
+                        <div class="text-4xl font-bold text-green-600 mb-2" id="totalReviews">1,652</div>
+                        <div class="text-sm text-gray-600">口コミ掲載数</div>
+                        <div class="text-xs text-green-600 mt-2" id="reviewAchievement">達成率 96.2%</div>
+                    </div>
+                    <div class="glass-card p-6 text-center">
+                        <div class="text-4xl font-bold text-purple-600 mb-2" id="totalKitene">171,512</div>
+                        <div class="text-sm text-gray-600">キテネ送信数</div>
+                        <div class="text-xs text-purple-600 mt-2" id="kiteneAverage">平均 19,057</div>
+                    </div>
+                    <div class="glass-card p-6 text-center">
+                        <div class="text-4xl font-bold text-orange-600 mb-2" id="totalUsers">35,507</div>
+                        <div class="text-sm text-gray-600">総ユーザー数</div>
+                        <div class="text-xs text-orange-600 mt-2" id="newUsers">新規 503人</div>
+                    </div>
+                </div>
+
+                <!-- グラフエリア -->
+                <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
+                    <div class="glass-card p-6">
+                        <h4 class="text-lg font-bold text-gray-900 mb-6">アクセス分布</h4>
+                        <div class="chart-container">
+                            <canvas id="accessChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="glass-card p-6">
+                        <h4 class="text-lg font-bold text-gray-900 mb-6">KPI達成状況</h4>
+                        <div class="chart-container">
+                            <canvas id="kpiChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 店舗別KPIテーブル -->
+                <div class="glass-card p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h4 class="text-lg font-bold text-gray-900">店舗別KPI詳細</h4>
+                        <div class="flex space-x-3">
+                            <button class="btn btn-outline" id="exportKpiBtn">
+                                <i class="fas fa-download mr-2"></i>エクスポート
+                            </button>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="bg-gray-50">
+                                    <th class="text-left p-4 font-semibold">店舗</th>
+                                    <th class="text-left p-4 font-semibold">売上達成率</th>
+                                    <th class="text-left p-4 font-semibold">日記達成率</th>
+                                    <th class="text-left p-4 font-semibold">口コミ達成率</th>
+                                    <th class="text-left p-4 font-semibold">アクセス数</th>
+                                    <th class="text-left p-4 font-semibold">出勤人数</th>
+                                    <th class="text-left p-4 font-semibold">女の子人数</th>
+                                </tr>
+                            </thead>
+                            <tbody id="kpiDataTable">
+                                <!-- データが動的に表示されます -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- カレンダーページ -->
+            <div id="calendarPage" class="page-content p-4 lg:p-6 hidden">
+                <div class="glass-card p-6 mb-6">
+                    <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between mb-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4 lg:mb-0">カレンダー</h3>
+                        <div class="flex flex-wrap gap-3">
+                            <button class="btn btn-primary" id="addEventBtn">
+                                <i class="fas fa-plus mr-2"></i>予定追加
+                            </button>
+                            <button class="btn btn-outline" id="todayBtn">今日</button>
+                        </div>
+                    </div>
+                    
+                    <!-- カレンダーナビゲーション -->
+                    <div class="flex items-center justify-between mb-6">
+                        <h4 class="text-2xl font-bold text-gray-900" id="calendarTitle">2025年7月</h4>
+                        <div class="flex space-x-2">
+                            <button class="btn btn-outline" id="prevMonthBtn">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <button class="btn btn-outline" id="nextMonthBtn">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- カレンダーグリッド -->
+                    <div id="calendarGrid" class="grid grid-cols-7 gap-2 mb-6">
+                        <!-- カレンダーが動的に表示されます -->
+                    </div>
+                    
+                    <!-- イベント凡例 -->
+                    <div class="flex flex-wrap gap-4 text-sm">
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 bg-blue-400 rounded mr-2"></div>
+                            <span>会議</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 bg-green-400 rounded mr-2"></div>
+                            <span>撮影</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 bg-red-400 rounded mr-2"></div>
+                            <span>休業</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 bg-orange-400 rounded mr-2"></div>
+                            <span>締切</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- レポートページ -->
+            <div id="reportsPage" class="page-content p-4 lg:p-6 hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                    <div class="glass-card p-6 text-center">
+                        <div class="text-5xl mb-4">📊</div>
+                        <h4 class="text-lg font-bold mb-2">売上レポート</h4>
+                        <p class="text-gray-600 mb-4">月別・店舗別売上分析</p>
+                        <button class="btn btn-primary w-full" id="salesReportBtn">
+                            <i class="fas fa-download mr-2"></i>ダウンロード
+                        </button>
+                    </div>
+                    
+                    <div class="glass-card p-6 text-center">
+                        <div class="text-5xl mb-4">📈</div>
+                        <h4 class="text-lg font-bold mb-2">KPIレポート</h4>
+                        <p class="text-gray-600 mb-4">アクセス・日記・口コミ等分析</p>
+                        <button class="btn btn-primary w-full" id="kpiReportBtn">
+                            <i class="fas fa-download mr-2"></i>ダウンロード
+                        </button>
+                    </div>
+                    
+                    <div class="glass-card p-6 text-center">
+                        <div class="text-5xl mb-4">📋</div>
+                        <h4 class="text-lg font-bold mb-2">総合レポート</h4>
+                        <p class="text-gray-600 mb-4">全業務統合レポート</p>
+                        <button class="btn btn-primary w-full" id="comprehensiveReportBtn">
+                            <i class="fas fa-download mr-2"></i>ダウンロード
+                        </button>
+                    </div>
+                    
+                    <div class="glass-card p-6 text-center">
+                        <div class="text-5xl mb-4">📅</div>
+                        <h4 class="text-lg font-bold mb-2">スケジュール</h4>
+                        <p class="text-gray-600 mb-4">予定・会議一覧</p>
+                        <button class="btn btn-primary w-full" id="scheduleReportBtn">
+                            <i class="fas fa-download mr-2"></i>ダウンロード
+                        </button>
+                    </div>
+                    
+                    <div class="glass-card p-6 text-center">
+                        <div class="text-5xl mb-4">🎯</div>
+                        <h4 class="text-lg font-bold mb-2">月末締めデータ</h4>
+                        <p class="text-gray-600 mb-4">全データ一括出力</p>
+                        <button class="btn btn-success w-full" id="monthEndReportBtn">
+                            <i class="fas fa-file-archive mr-2"></i>一括DL
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- タスクモーダル -->
+    <div id="taskModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-bold text-gray-900" id="taskModalTitle">新しいタスク</h3>
+                <button id="closeTaskModal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="space-y-6">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">タスク名</label>
+                    <input type="text" id="taskTitle" class="input-field" placeholder="タスク名を入力">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">説明</label>
+                    <textarea id="taskDescription" class="input-field" rows="3" placeholder="詳細説明"></textarea>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">優先度</label>
+                        <select id="taskPriority" class="input-field">
+                            <option value="low">低</option>
+                            <option value="medium" selected>中</option>
+                            <option value="high">高</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">担当店舗</label>
+                        <select id="taskStore" class="input-field">
+                            <option value="">選択してください</option>
+                            <option value="shabour">シャブール</option>
+                            <option value="onecarat">ワンカラット</option>
+                            <option value="go_nagoya">GO名古屋</option>
+                            <option value="go_fukuoka">GO福岡</option>
+                            <option value="go_tokyo">GO東京</option>
+                            <option value="go_yokohama">GO横浜</option>
+                            <option value="cl_nagoya">CL名古屋</option>
+                            <option value="cl_tokyo">CL東京</option>
+                            <option value="cl_yokkaichi">CL四日市</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">期限</label>
+                        <input type="date" id="taskDueDate" class="input-field">
+                    </div>
+                </div>
+                
+                <div class="flex space-x-4">
+                    <button class="btn btn-primary flex-1" id="saveTaskBtn">
+                        <i class="fas fa-save mr-2"></i>保存
+                    </button>
+                    <button class="btn btn-outline" id="cancelTaskBtn">
+                        キャンセル
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- イベントモーダル -->
+    <div id="eventModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-bold text-gray-900">予定追加</h3>
+                <button id="closeEventModal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="space-y-6">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">予定名</label>
+                    <input type="text" id="eventTitle" class="input-field" placeholder="予定名を入力">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">説明</label>
+                    <textarea id="eventDescription" class="input-field" rows="3" placeholder="詳細説明"></textarea>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">種類</label>
+                        <select id="eventType" class="input-field">
+                            <option value="meeting">会議</option>
+                            <option value="shooting">撮影</option>
+                            <option value="holiday">休業</option>
+                            <option value="deadline">締切</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">日付</label>
+                        <input type="date" id="eventDate" class="input-field">
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">開始時間</label>
+                        <input type="time" id="eventStartTime" class="input-field">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">終了時間</label>
+                        <input type="time" id="eventEndTime" class="input-field">
+                    </div>
+                </div>
+                
+                <div class="flex space-x-4">
+                    <button class="btn btn-primary flex-1" id="saveEventBtn">
+                        <i class="fas fa-save mr-2"></i>保存
+                    </button>
+                    <button class="btn btn-outline" id="cancelEventBtn">
+                        キャンセル
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // グローバル変数
+        let currentPage = 'dashboard';
+        let sidebarOpen = false;
+        let editingTaskId = null;
+        let editingEventId = null;
+        let uploadedBusinessData = null;
+        let salesChart = null;
+        let accessChart = null;
+        let kpiChart = null;
+        let currentMonth = new Date().getMonth();
+        let currentYear = new Date().getFullYear();
+        
+        // データ管理
+        let tasks = [];
+        let events = [];
+        let storeData = [];
+        
+        // 実際の店舗情報（アップロードファイルに基づく）
+        const actualStoreInfo = {
+            'shabour': { name: 'シャブール', shortName: 'シャブール', type: 'Premium' },
+            'onecarat': { name: 'ワンカラット', shortName: 'ワンカラット', type: 'Premium' },
+            'go_nagoya': { name: 'GO名古屋', shortName: 'GO名古屋', type: 'GrandOpera' },
+            'go_fukuoka': { name: 'GO福岡', shortName: 'GO福岡', type: 'GrandOpera' },
+            'go_tokyo': { name: 'GO東京', shortName: 'GO東京', type: 'GrandOpera' },
+            'go_yokohama': { name: 'GO横浜', shortName: 'GO横浜', type: 'GrandOpera' },
+            'cl_nagoya': { name: 'CL名古屋', shortName: 'CL名古屋', type: 'CLASSY' },
+            'cl_tokyo': { name: 'CL東京', shortName: 'CL東京', type: 'CLASSY' },
+            'cl_yokkaichi': { name: 'CL四日市', shortName: 'CL四日市', type: 'CLASSY' }
+        };
+
+        // システム初期化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('CLASSY業務管理システム起動中...');
+            initializeSystem();
+            console.log('システム初期化完了');
+        });
+
+        function initializeSystem() {
+            loadData();
+            updateDateTime();
+            setInterval(updateDateTime, 60000);
+            
+            if (tasks.length === 0) {
+                createSampleData();
+            }
+            if (storeData.length === 0) {
+                loadActualStoreData();
+            }
+            
+            setupEventListeners();
+            renderCurrentPage();
+            
+            setTimeout(() => {
+                initializeCharts();
+            }, 500);
+        }
+
+        // 実際の店舗データを読み込み
+        function loadActualStoreData() {
+            storeData = [
+                {
+                    id: 'shabour',
+                    name: 'シャブール',
+                    salesTarget: 33000000,
+                    totalSales: 29544738,
+                    salesDifference: -3455262,
+                    accessAverage: 65126,
+                    diaryTarget: 280,
+                    diaryDifference: -28,
+                    diaryAverage: 252,
+                    reviewTarget: 300,
+                    reviewDifference: 44,
+                    messageCount: 89,
+                    girlCount: 763,
+                    userCount: 6529,
+                    myGirlCount: 424651,
+                    totalAccess: 1967152,
+                    diaryPosts: 7560,
+                    limitedDiary: 1845,
+                    videoDiary: 21141,
+                    kiteneMessages: 20260,
+                    reviewPosts: 344,
+                    attendanceCount: 687,
+                    customerCount: 1557,
+                    dailySalesAverage: 1100000,
+                    salesAchievementRate: 0.8953,
+                    diaryAchievementRate: 0.9,
+                    reviewAchievementRate: 1.1467,
+                    kiteneChange: -125,
+                    okinTalkChange: 2,
+                    kiteneAverage: 800,
+                    newCustomers: 0
+                },
+                {
+                    id: 'onecarat',
+                    name: 'ワンカラット',
+                    salesTarget: 17500000,
+                    totalSales: 18314356,
+                    salesDifference: 814356,
+                    accessAverage: 42734,
+                    diaryTarget: 265,
+                    diaryDifference: 19.3,
+                    diaryAverage: 284.3,
+                    reviewTarget: 200,
+                    reviewDifference: -44,
+                    messageCount: 38,
+                    girlCount: 745,
+                    userCount: 3441,
+                    myGirlCount: 196763,
+                    totalAccess: 1241592,
+                    diaryPosts: 8528,
+                    limitedDiary: 706,
+                    videoDiary: 18481,
+                    kiteneMessages: 18119,
+                    reviewPosts: 156,
+                    attendanceCount: 514,
+                    customerCount: 937,
+                    dailySalesAverage: 583333,
+                    salesAchievementRate: 1.0465,
+                    diaryAchievementRate: 1.0727,
+                    reviewAchievementRate: 0.78,
+                    kiteneChange: -21,
+                    okinTalkChange: 1,
+                    kiteneAverage: 624,
+                    newCustomers: 0
+                },
+                {
+                    id: 'go_nagoya',
+                    name: 'GO名古屋',
+                    salesTarget: 28000000,
+                    totalSales: 29265025,
+                    salesDifference: 1265025,
+                    accessAverage: 48825,
+                    diaryTarget: 180,
+                    diaryDifference: -59.8,
+                    diaryAverage: 120.2,
+                    reviewTarget: 205,
+                    reviewDifference: 11,
+                    messageCount: 10,
+                    girlCount: 923,
+                    userCount: 4351,
+                    myGirlCount: 138740,
+                    totalAccess: 1349912,
+                    diaryPosts: 3605,
+                    limitedDiary: 630,
+                    videoDiary: 27789,
+                    kiteneMessages: 27376,
+                    reviewPosts: 216,
+                    attendanceCount: 518,
+                    customerCount: 880,
+                    dailySalesAverage: 933333,
+                    salesAchievementRate: 1.0452,
+                    diaryAchievementRate: 0.6676,
+                    reviewAchievementRate: 1.0537,
+                    kiteneChange: -61,
+                    okinTalkChange: 0,
+                    kiteneAverage: 973,
+                    newCustomers: 0
+                },
+                {
+                    id: 'go_fukuoka',
+                    name: 'GO福岡',
+                    salesTarget: 36000000,
+                    totalSales: 37050068,
+                    salesDifference: 1050068,
+                    accessAverage: 51499,
+                    diaryTarget: 250,
+                    diaryDifference: 10.9,
+                    diaryAverage: 260.9,
+                    reviewTarget: 180,
+                    reviewDifference: 22,
+                    messageCount: 4159,
+                    girlCount: 826,
+                    userCount: 2652,
+                    myGirlCount: 240562,
+                    totalAccess: 1619670,
+                    diaryPosts: 7828,
+                    limitedDiary: 2440,
+                    videoDiary: 32763,
+                    kiteneMessages: 32011,
+                    reviewPosts: 202,
+                    attendanceCount: 514,
+                    customerCount: 1006,
+                    dailySalesAverage: 1200000,
+                    salesAchievementRate: 1.0292,
+                    diaryAchievementRate: 1.0437,
+                    reviewAchievementRate: 1.1222,
+                    kiteneChange: 52,
+                    okinTalkChange: 23,
+                    kiteneAverage: 1015,
+                    newCustomers: 115
+                },
+                {
+                    id: 'go_tokyo',
+                    name: 'GO東京',
+                    salesTarget: 28000000,
+                    totalSales: 27324427,
+                    salesDifference: -675573,
+                    accessAverage: 35465,
+                    diaryTarget: 250,
+                    diaryDifference: -111.2,
+                    diaryAverage: 138.8,
+                    reviewTarget: 150,
+                    reviewDifference: -34,
+                    messageCount: 21,
+                    girlCount: 693,
+                    userCount: 7020,
+                    myGirlCount: 142358,
+                    totalAccess: 1182336,
+                    diaryPosts: 4164,
+                    limitedDiary: 1511,
+                    videoDiary: 19512,
+                    kiteneMessages: 19067,
+                    reviewPosts: 116,
+                    attendanceCount: 457,
+                    customerCount: 722,
+                    dailySalesAverage: 933333,
+                    salesAchievementRate: 0.9759,
+                    diaryAchievementRate: 0.5552,
+                    reviewAchievementRate: 0.7733,
+                    kiteneChange: -152,
+                    okinTalkChange: 0,
+                    kiteneAverage: 787,
+                    newCustomers: 0
+                },
+                {
+                    id: 'go_yokohama',
+                    name: 'GO横浜',
+                    salesTarget: 23000000,
+                    totalSales: 22547274,
+                    salesDifference: -452726,
+                    accessAverage: 19664,
+                    diaryTarget: 200,
+                    diaryDifference: -30.8,
+                    diaryAverage: 169.2,
+                    reviewTarget: 145,
+                    reviewDifference: -18,
+                    messageCount: 45,
+                    girlCount: 700,
+                    userCount: 3830,
+                    myGirlCount: 42166,
+                    totalAccess: 599756,
+                    diaryPosts: 5077,
+                    limitedDiary: 1677,
+                    videoDiary: 25474,
+                    kiteneMessages: 24565,
+                    reviewPosts: 127,
+                    attendanceCount: 407,
+                    customerCount: 592,
+                    dailySalesAverage: 766667,
+                    salesAchievementRate: 0.9803,
+                    diaryAchievementRate: 0.8462,
+                    reviewAchievementRate: 0.8759,
+                    kiteneChange: 137,
+                    okinTalkChange: 1,
+                    kiteneAverage: 681,
+                    newCustomers: 0
+                },
+                {
+                    id: 'cl_nagoya',
+                    name: 'CL名古屋',
+                    salesTarget: 6000000,
+                    totalSales: 5300320,
+                    salesDifference: -699680,
+                    accessAverage: 14717,
+                    diaryTarget: 80,
+                    diaryDifference: -18.3,
+                    diaryAverage: 61.7,
+                    reviewTarget: 150,
+                    reviewDifference: -37,
+                    messageCount: 24,
+                    girlCount: 316,
+                    userCount: 2453,
+                    myGirlCount: 25764,
+                    totalAccess: 514243,
+                    diaryPosts: 1851,
+                    limitedDiary: 591,
+                    videoDiary: 8018,
+                    kiteneMessages: 7775,
+                    reviewPosts: 113,
+                    attendanceCount: 197,
+                    customerCount: 458,
+                    dailySalesAverage: 200000,
+                    salesAchievementRate: 0.8834,
+                    diaryAchievementRate: 0.7713,
+                    reviewAchievementRate: 0.7533,
+                    kiteneChange: -12,
+                    okinTalkChange: 0,
+                    kiteneAverage: 271,
+                    newCustomers: 0
+                },
+                {
+                    id: 'cl_tokyo',
+                    name: 'CL東京',
+                    salesTarget: 7200000,
+                    totalSales: 6719328,
+                    salesDifference: -480672,
+                    accessAverage: 26465,
+                    diaryTarget: 100,
+                    diaryDifference: -30.7,
+                    diaryAverage: 69.3,
+                    reviewTarget: 180,
+                    reviewDifference: -58,
+                    messageCount: 2493,
+                    girlCount: 267,
+                    userCount: 2064,
+                    myGirlCount: 73336,
+                    totalAccess: 742231,
+                    diaryPosts: 2079,
+                    limitedDiary: 672,
+                    videoDiary: 6730,
+                    kiteneMessages: 6522,
+                    reviewPosts: 122,
+                    attendanceCount: 238,
+                    customerCount: 609,
+                    dailySalesAverage: 240000,
+                    salesAchievementRate: 0.9332,
+                    diaryAchievementRate: 0.693,
+                    reviewAchievementRate: 0.6778,
+                    kiteneChange: -102,
+                    okinTalkChange: -27,
+                    kiteneAverage: 319,
+                    newCustomers: 110
+                },
+                {
+                    id: 'cl_yokkaichi',
+                    name: 'CL四日市',
+                    salesTarget: 12500000,
+                    totalSales: 12943296,
+                    salesDifference: 443296,
+                    accessAverage: 32278,
+                    diaryTarget: 205,
+                    diaryDifference: 5,
+                    diaryAverage: 210,
+                    reviewTarget: 240,
+                    reviewDifference: 16,
+                    messageCount: 6842,
+                    girlCount: 598,
+                    userCount: 5077,
+                    myGirlCount: 45108,
+                    totalAccess: 881476,
+                    diaryPosts: 6301,
+                    limitedDiary: 2583,
+                    videoDiary: 18446,
+                    kiteneMessages: 17259,
+                    reviewPosts: 256,
+                    attendanceCount: 356,
+                    customerCount: 914,
+                    dailySalesAverage: 416667,
+                    salesAchievementRate: 1.0355,
+                    diaryAchievementRate: 1.0246,
+                    reviewAchievementRate: 1.0667,
+                    kiteneChange: -45,
+                    okinTalkChange: -50,
+                    kiteneAverage: 620,
+                    newCustomers: 278
+                }
+            ];
+        }
+
+        // イベントリスナー設定
+        function setupEventListeners() {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const page = this.getAttribute('data-page');
+                    showPage(page);
+                });
+            });
+
+            const menuToggle = document.getElementById('menuToggle');
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const overlay = document.getElementById('overlay');
+            
+            if (menuToggle) menuToggle.addEventListener('click', toggleSidebar);
+            if (mobileMenuBtn) mobileMenuBtn.addEventListener('click', toggleSidebar);
+            if (overlay) overlay.addEventListener('click', closeSidebar);
+
+            setupModalListeners();
+            setupButtonListeners();
+            setupFilterListeners();
+            setupFileUploadListeners();
+
+            document.addEventListener('keydown', handleKeyboardShortcuts);
+        }
+
+        function setupModalListeners() {
+            const closeTaskModal = document.getElementById('closeTaskModal');
+            const cancelTaskBtn = document.getElementById('cancelTaskBtn');
+            const saveTaskBtn = document.getElementById('saveTaskBtn');
+            
+            if (closeTaskModal) closeTaskModal.addEventListener('click', () => hideModal('taskModal'));
+            if (cancelTaskBtn) cancelTaskBtn.addEventListener('click', () => hideModal('taskModal'));
+            if (saveTaskBtn) saveTaskBtn.addEventListener('click', saveTask);
+
+            const closeEventModal = document.getElementById('closeEventModal');
+            const cancelEventBtn = document.getElementById('cancelEventBtn');
+            const saveEventBtn = document.getElementById('saveEventBtn');
+            
+            if (closeEventModal) closeEventModal.addEventListener('click', () => hideModal('eventModal'));
+            if (cancelEventBtn) cancelEventBtn.addEventListener('click', () => hideModal('eventModal'));
+            if (saveEventBtn) saveEventBtn.addEventListener('click', saveEvent);
+        }
+
+        function setupButtonListeners() {
+            const downloadTemplateBtn = document.getElementById('downloadTemplateBtn');
+            const processDataBtn = document.getElementById('processDataBtn');
+            const addTaskBtn = document.getElementById('addTaskBtn');
+            const quickActionBtn = document.getElementById('quickActionBtn');
+            const syncBtn = document.getElementById('syncBtn');
+
+            if (downloadTemplateBtn) downloadTemplateBtn.addEventListener('click', downloadStoreTemplate);
+            if (processDataBtn) processDataBtn.addEventListener('click', processStoreData);
+            if (addTaskBtn) addTaskBtn.addEventListener('click', () => openTaskModal());
+            if (quickActionBtn) quickActionBtn.addEventListener('click', showQuickActions);
+            if (syncBtn) syncBtn.addEventListener('click', syncAllData);
+
+            const newTaskBtn = document.getElementById('newTaskBtn');
+            const exportTasksBtn = document.getElementById('exportTasksBtn');
+
+            if (newTaskBtn) newTaskBtn.addEventListener('click', () => openTaskModal());
+            if (exportTasksBtn) exportTasksBtn.addEventListener('click', exportTasks);
+
+            const salesChartBtn = document.getElementById('salesChartBtn');
+            const achievementChartBtn = document.getElementById('achievementChartBtn');
+
+            if (salesChartBtn) salesChartBtn.addEventListener('click', () => updateSalesChart('sales'));
+            if (achievementChartBtn) achievementChartBtn.addEventListener('click', () => updateSalesChart('achievement'));
+
+            const downloadKpiTemplateBtn = document.getElementById('downloadKpiTemplateBtn');
+            const processKpiDataBtn = document.getElementById('processKpiDataBtn');
+            const exportKpiBtn = document.getElementById('exportKpiBtn');
+
+            if (downloadKpiTemplateBtn) downloadKpiTemplateBtn.addEventListener('click', downloadStoreTemplate);
+            if (processKpiDataBtn) processKpiDataBtn.addEventListener('click', processStoreData);
+            if (exportKpiBtn) exportKpiBtn.addEventListener('click', exportKpiData);
+
+            const addEventBtn = document.getElementById('addEventBtn');
+            const todayBtn = document.getElementById('todayBtn');
+            const prevMonthBtn = document.getElementById('prevMonthBtn');
+            const nextMonthBtn = document.getElementById('nextMonthBtn');
+
+            if (addEventBtn) addEventBtn.addEventListener('click', () => openEventModal());
+            if (todayBtn) todayBtn.addEventListener('click', goToToday);
+            if (prevMonthBtn) prevMonthBtn.addEventListener('click', previousMonth);
+            if (nextMonthBtn) nextMonthBtn.addEventListener('click', nextMonth);
+
+            const salesReportBtn = document.getElementById('salesReportBtn');
+            const kpiReportBtn = document.getElementById('kpiReportBtn');
+            const comprehensiveReportBtn = document.getElementById('comprehensiveReportBtn');
+            const scheduleReportBtn = document.getElementById('scheduleReportBtn');
+            const monthEndReportBtn = document.getElementById('monthEndReportBtn');
+
+            if (salesReportBtn) salesReportBtn.addEventListener('click', () => generateReport('sales'));
+            if (kpiReportBtn) kpiReportBtn.addEventListener('click', () => generateReport('kpi'));
+            if (comprehensiveReportBtn) comprehensiveReportBtn.addEventListener('click', () => generateReport('comprehensive'));
+            if (scheduleReportBtn) scheduleReportBtn.addEventListener('click', () => generateReport('schedule'));
+            if (monthEndReportBtn) monthEndReportBtn.addEventListener('click', generateMonthEndReport);
+        }
+
+        function setupFilterListeners() {
+            const taskSearch = document.getElementById('taskSearch');
+            const priorityFilter = document.getElementById('priorityFilter');
+            const statusFilter = document.getElementById('statusFilter');
+            const storeFilter = document.getElementById('storeFilter');
+
+            if (taskSearch) taskSearch.addEventListener('input', filterTasks);
+            if (priorityFilter) priorityFilter.addEventListener('change', filterTasks);
+            if (statusFilter) statusFilter.addEventListener('change', filterTasks);
+            if (storeFilter) storeFilter.addEventListener('change', filterTasks);
+        }
+
+        function setupFileUploadListeners() {
+            const dashboardFileInput = document.getElementById('dashboardFileInput');
+            const attendanceFileInput = document.getElementById('attendanceFileInput');
+
+            if (dashboardFileInput) dashboardFileInput.addEventListener('change', handleStoreDataUpload);
+            if (attendanceFileInput) attendanceFileInput.addEventListener('change', handleStoreDataUpload);
+        }
+
+        function handleKeyboardShortcuts(e) {
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key) {
+                    case 'k':
+                        e.preventDefault();
+                        openTaskModal();
+                        break;
+                    case 'e':
+                        e.preventDefault();
+                        openEventModal();
+                        break;
+                    case 's':
+                        e.preventDefault();
+                        syncAllData();
+                        break;
+                }
+            }
+            
+            if (e.key === 'Escape') {
+                closeAllModals();
+                closeSidebar();
+            }
+        }
+
+        // データ管理
+        function loadData() {
+            tasks = tasks || [];
+            events = events || [];
+            storeData = storeData || [];
+        }
+
+        function saveData() {
+            console.log('データ保存完了（メモリ内）');
+        }
+
+        // サンプルデータ作成
+        function createSampleData() {
+            const today = new Date();
+            const tomorrow = new Date(today);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            
+            tasks = [
+                {
+                    id: Date.now() + 1,
+                    title: '6月売上レポート作成',
+                    description: '各店舗の6月売上データをまとめてレポート作成',
+                    priority: 'high',
+                    store: 'cl_nagoya',
+                    dueDate: today.toISOString().split('T')[0],
+                    completed: false,
+                    createdAt: today.toISOString()
+                },
+                {
+                    id: Date.now() + 2,
+                    title: 'GO福岡のKPI改善策検討',
+                    description: '売上好調なGO福岡の成功要因を他店に展開',
+                    priority: 'medium',
+                    store: 'go_fukuoka',
+                    dueDate: tomorrow.toISOString().split('T')[0],
+                    completed: false,
+                    createdAt: today.toISOString()
+                },
+                {
+                    id: Date.now() + 3,
+                    title: 'CL東京の口コミ施策強化',
+                    description: '口コミ達成率が低いCL東京の改善施策を実施',
+                    priority: 'high',
+                    store: 'cl_tokyo',
+                    dueDate: today.toISOString().split('T')[0],
+                    completed: false,
+                    createdAt: today.toISOString()
+                },
+                {
+                    id: Date.now() + 4,
+                    title: '全店舗データ同期完了',
+                    description: '6月末の全店舗データ同期作業',
+                    priority: 'medium',
+                    store: '',
+                    dueDate: today.toISOString().split('T')[0],
+                    completed: true,
+                    createdAt: today.toISOString()
+                }
+            ];
+            
+            events = [
+                {
+                    id: Date.now() + 10,
+                    title: '6月月次会議',
+                    description: '各店舗の6月実績報告と7月計画',
+                    type: 'meeting',
+                    date: today.toISOString().split('T')[0],
+                    startTime: '10:00',
+                    endTime: '12:00'
+                },
+                {
+                    id: Date.now() + 11,
+                    title: 'GO福岡撮影',
+                    description: '夏の新キャンペーン撮影',
+                    type: 'shooting',
+                    date: tomorrow.toISOString().split('T')[0],
+                    startTime: '14:00',
+                    endTime: '16:00'
+                }
+            ];
+            
+            saveData();
+        }
+
+        // UI更新
+        function updateDateTime() {
+            const now = new Date();
+            const dateElement = document.getElementById('currentDate');
+            const timeElement = document.getElementById('currentTime');
+            
+            if (dateElement) {
+                dateElement.textContent = now.toLocaleDateString('ja-JP', {
+                    year: 'numeric',
+                    month: 'numeric',
+                    day: 'numeric',
+                    weekday: 'short'
+                });
+            }
+            
+            if (timeElement) {
+                timeElement.textContent = now.toLocaleTimeString('ja-JP', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            }
+        }
+
+        // ナビゲーション
+        function toggleSidebar() {
+            sidebarOpen = !sidebarOpen;
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            
+            if (sidebarOpen) {
+                sidebar.classList.add('active');
+                overlay.classList.add('active');
+            } else {
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+            }
+        }
+
+        function closeSidebar() {
+            if (window.innerWidth < 1024) {
+                sidebarOpen = false;
+                const sidebar = document.getElementById('sidebar');
+                const overlay = document.getElementById('overlay');
+                if (sidebar) sidebar.classList.remove('active');
+                if (overlay) overlay.classList.remove('active');
+            }
+        }
+
+        function showPage(pageName) {
+            const pages = ['dashboard', 'tasks', 'sales', 'attendance', 'calendar', 'reports'];
+            pages.forEach(page => {
+                const element = document.getElementById(page + 'Page');
+                if (element) element.classList.add('hidden');
+            });
+            
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            const targetPage = document.getElementById(pageName + 'Page');
+            if (targetPage) {
+                targetPage.classList.remove('hidden');
+                targetPage.classList.add('fade-in');
+            }
+            
+            const targetNav = document.querySelector(`[data-page="${pageName}"]`);
+            if (targetNav) {
+                targetNav.classList.add('active');
+            }
+            
+            const pageTitles = {
+                dashboard: 'ダッシュボード',
+                tasks: 'タスク管理',
+                sales: '売上分析',
+                attendance: 'KPI管理',
+                calendar: 'カレンダー',
+                reports: 'レポート'
+            };
+            
+            const titleElement = document.getElementById('currentPageTitle');
+            if (titleElement) {
+                titleElement.textContent = pageTitles[pageName];
+            }
+            
+            currentPage = pageName;
+            renderCurrentPage();
+            closeSidebar();
+        }
+
+        function renderCurrentPage() {
+            switch(currentPage) {
+                case 'dashboard':
+                    renderDashboard();
+                    break;
+                case 'tasks':
+                    renderTasks();
+                    break;
+                case 'sales':
+                    renderSales();
+                    break;
+                case 'attendance':
+                    renderKpiManagement();
+                    break;
+                case 'calendar':
+                    generateCalendar();
+                    break;
+            }
+        }
+
+        // ダッシュボード描画
+        function renderDashboard() {
+            updateDashboardStats();
+            renderTodayTasks();
+            renderStoresOverview();
+            renderWeeklySchedule();
+        }
+
+        function updateDashboardStats() {
+            if (!storeData || storeData.length === 0) return;
+
+            const totalSales = storeData.reduce((sum, store) => sum + store.totalSales, 0);
+            const totalSalesTarget = storeData.reduce((sum, store) => sum + store.salesTarget, 0);
+            const totalAccess = storeData.reduce((sum, store) => sum + store.totalAccess, 0);
+            const totalAttendance = storeData.reduce((sum, store) => sum + store.attendanceCount, 0);
+            const achievingStores = storeData.filter(store => store.salesAchievementRate >= 1.0).length;
+
+            const overallAchievementRate = totalSalesTarget > 0 ? (totalSales / totalSalesTarget) * 100 : 0;
+            const averageAccess = Math.round(totalAccess / storeData.length);
+            const averageAttendance = Math.round(totalAttendance / storeData.length);
+
+            updateElement('totalSalesAmount', `¥${(totalSales / 1000000).toFixed(0)}M`);
+            updateElement('salesAchievementRate', `${overallAchievementRate.toFixed(1)}%達成`);
+            updateElement('totalAccessCount', `${(totalAccess / 1000000).toFixed(1)}M`);
+            updateElement('averageAccess', `平均 ${(averageAccess / 1000000).toFixed(1)}M`);
+            updateElement('totalAttendance', totalAttendance.toLocaleString());
+            updateElement('averageAttendance', `平均 ${averageAttendance}人`);
+            updateElement('achievingStores', `${achievingStores}/${storeData.length}`);
+        }
+
+        function renderTodayTasks() {
+            const today = new Date().toISOString().split('T')[0];
+            const todayTasks = tasks.filter(task => task.dueDate === today);
+            const todayTasksList = document.getElementById('todayTasksList');
+
+            if (!todayTasksList) return;
+
+            if (todayTasks.length === 0) {
+                todayTasksList.innerHTML = '<div class="text-center text-gray-500 py-8">今日のタスクはありません</div>';
+                return;
+            }
+
+            todayTasksList.innerHTML = todayTasks.map(task => createTaskCard(task)).join('');
+        }
+
+        function createTaskCard(task) {
+            return `
+                <div class="task-card ${task.completed ? 'completed' : ''} ${task.priority}-priority">
+                    <div class="flex items-center">
+                        <input type="checkbox" ${task.completed ? 'checked' : ''} 
+                               onchange="toggleTaskComplete(${task.id})"
+                               class="mr-4 w-5 h-5 text-blue-600 rounded">
+                        <div class="flex-1">
+                            <div class="font-semibold text-gray-900 ${task.completed ? 'line-through' : ''}">
+                                ${task.title}
+                            </div>
+                            <div class="text-sm text-gray-600 mt-1">${task.description}</div>
+                            ${task.store ? `<div class="text-xs text-blue-600 mt-1">${getStoreName(task.store)}</div>` : ''}
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="px-3 py-1 text-xs rounded-full ${getPriorityClass(task.priority)}">${getPriorityText(task.priority)}</span>
+                            <button onclick="editTask(${task.id})" class="text-blue-600 hover:text-blue-800 p-2">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderStoresOverview() {
+            const storesOverview = document.getElementById('storesOverview');
+            if (!storesOverview || !storeData || storeData.length === 0) return;
+
+            const storeCards = storeData.map(store => {
+                const achievementClass = getAchievementClass(store.salesAchievementRate);
+                const achievementText = getAchievementText(store.salesAchievementRate);
+
+                return `
+                    <div class="glass-card p-6 cursor-pointer" onclick="showStoreDetails('${store.id}')">
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="text-lg font-semibold text-gray-900">${store.name}</h4>
+                            <div class="text-2xl">${getBrandEmoji(actualStoreInfo[store.id]?.type || 'Other')}</div>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="flex justify-between">
+                                <span>売上達成率</span>
+                                <span class="achievement-badge ${achievementClass}">${(store.salesAchievementRate * 100).toFixed(1)}%</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>月次売上</span>
+                                <span class="font-bold text-blue-600">¥${(store.totalSales / 1000000).toFixed(1)}M</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>出勤人数</span>
+                                <span class="font-bold text-purple-600">${store.attendanceCount}人</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-blue-500 h-2 rounded-full" style="width: ${Math.min(100, store.salesAchievementRate * 100)}%"></div>
+                            </div>
+                            <div class="text-xs text-gray-600 text-center">
+                                目標: ¥${(store.salesTarget / 1000000).toFixed(1)}M • ${achievementText}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            storesOverview.innerHTML = storeCards;
+        }
+
+        function renderWeeklySchedule() {
+            const weeklySchedule = document.getElementById('weeklySchedule');
+            if (!weeklySchedule) return;
+
+            const weekDays = ['日', '月', '火', '水', '木', '金', '土'];
+            const today = new Date();
+            const startOfWeek = new Date(today);
+            startOfWeek.setDate(today.getDate() - today.getDay());
+
+            let weekHTML = '';
+            for (let i = 0; i < 7; i++) {
+                const currentDay = new Date(startOfWeek);
+                currentDay.setDate(startOfWeek.getDate() + i);
+                const dateStr = currentDay.toISOString().split('T')[0];
+                const dayEvents = events.filter(event => event.date === dateStr);
+                const isToday = dateStr === today.toISOString().split('T')[0];
+
+                weekHTML += `
+                    <div class="calendar-day ${isToday ? 'today' : ''}" onclick="showDayDetails('${dateStr}')">
+                        <div class="font-semibold mb-2">${weekDays[i]} ${currentDay.getDate()}</div>
+                        ${dayEvents.map(event => `
+                            <div class="text-xs p-1 rounded mb-1 ${getEventClass(event.type)}">
+                                ${event.title}
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+            weeklySchedule.innerHTML = weekHTML;
+        }
+
+        // 売上分析
+        function renderSales() {
+            updateSalesStats();
+            updateStoreRanking();
+            if (!salesChart) {
+                initializeSalesChart();
+            } else {
+                updateSalesChart('sales');
+            }
+        }
+
+        function updateSalesStats() {
+            if (!storeData || storeData.length === 0) return;
+
+            const totalSales = storeData.reduce((sum, store) => sum + store.totalSales, 0);
+            const totalTarget = storeData.reduce((sum, store) => sum + store.salesTarget, 0);
+            const achievementRate = totalTarget > 0 ? (totalSales / totalTarget) * 100 : 0;
+            const averageSales = totalSales / storeData.length;
+
+            updateElement('totalMonthlySales', `¥${(totalSales / 1000000).toFixed(0)}M`);
+            updateElement('totalSalesTarget', `目標: ¥${(totalTarget / 1000000).toFixed(0)}M`);
+            updateElement('overallAchievementRate', `${achievementRate.toFixed(1)}%`);
+            updateElement('achievementStatus', achievementRate >= 100 ? '目標達成' : `目標まで¥${((totalTarget - totalSales) / 1000000).toFixed(0)}M`);
+            updateElement('averageStoreSales', `¥${(averageSales / 1000000).toFixed(0)}M`);
+        }
+
+        function updateStoreRanking() {
+            const storeRanking = document.getElementById('storeRanking');
+            if (!storeRanking || !storeData || storeData.length === 0) return;
+
+            const sortedStores = [...storeData].sort((a, b) => b.totalSales - a.totalSales);
+
+            storeRanking.innerHTML = sortedStores.slice(0, 5).map((store, index) => `
+                <div class="p-4 bg-gradient-to-r ${getRankingGradient(index + 1)} rounded-16 border-l-4 ${getRankingBorder(index + 1)}">
+                    <div class="flex items-center justify-between">
                         <div class="flex items-center">
                             <div class="text-2xl mr-3">${getRankingEmoji(index + 1)}</div>
                             <div>
@@ -422,7 +1844,6 @@
             const totalUsers = storeData.reduce((sum, store) => sum + store.userCount, 0);
             const newUsers = storeData.reduce((sum, store) => sum + store.newCustomers, 0);
 
-            // 達成率計算
             const diaryAchievement = storeData.reduce((sum, store) => sum + store.diaryAchievementRate, 0) / storeData.length;
             const reviewAchievement = storeData.reduce((sum, store) => sum + store.reviewAchievementRate, 0) / storeData.length;
             const kiteneAverage = Math.round(totalKitene / storeData.length);
@@ -432,7 +1853,7 @@
             updateElement('totalReviews', totalReviews.toLocaleString());
             updateElement('reviewAchievement', `達成率 ${(reviewAchievement * 100).toFixed(1)}%`);
             updateElement('totalKitene', totalKitene.toLocaleString());
-            updateElement('kiteneAverage', `平均 ${kiteneAverage}`);
+            updateElement('kiteneAverage', `平均 ${kiteneAverage.toLocaleString()}`);
             updateElement('totalUsers', totalUsers.toLocaleString());
             updateElement('newUsers', `新規 ${newUsers}人`);
         }
@@ -528,7 +1949,7 @@
                             data: storeData.map(store => store.totalAccess),
                             backgroundColor: [
                                 '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6',
-                                '#06B6D4', '#84CC16', '#F97316', '#EC4899', '#6B7280'
+                                '#06B6D4', '#84CC16', '#F97316', '#EC4899'
                             ],
                             borderWidth: 2
                         }]
@@ -647,16 +2068,13 @@
             const startDate = new Date(firstDay);
             startDate.setDate(startDate.getDate() - firstDay.getDay());
 
-            // カレンダータイトル更新
             calendarTitle.textContent = `${currentYear}年${currentMonth + 1}月`;
 
-            // ヘッダー
             const headers = ['日', '月', '火', '水', '木', '金', '土'];
             let calendarHTML = headers.map(header => `
                 <div class="text-center font-semibold p-3 bg-gray-100 rounded-lg">${header}</div>
             `).join('');
 
-            // カレンダーの日付
             const today = new Date();
             for (let i = 0; i < 42; i++) {
                 const currentDate = new Date(startDate);
@@ -774,16 +2192,13 @@
             }
 
             try {
-                // ヘッダー行（0行目）をスキップしてデータ行（1行目以降）を処理
                 const dataRows = uploadedBusinessData.slice(1);
 
-                // データ変換
                 const processedData = dataRows.map(row => {
-                    if (!row[0]) return null; // 店舗名が空の行はスキップ
+                    if (!row[0]) return null;
 
-                    // 実際のExcelファイルの構造に基づいてマッピング
                     return {
-                        id: getStoreId(row[0]), // 店舗名からIDを生成
+                        id: getStoreId(row[0]),
                         name: row[0],
                         salesTarget: parseFloat(row[1]) || 0,
                         totalSales: parseFloat(row[2]) || 0,
@@ -818,19 +2233,14 @@
                     };
                 }).filter(row => row !== null);
 
-                // 店舗データをグローバル変数に保存
                 storeData = processedData;
                 saveData();
 
-                // チャート更新
                 updateAllCharts();
-
-                // 現在のページを再描画
                 renderCurrentPage();
 
                 showNotification(`${processedData.length}店舗のデータを反映しました`, 'success');
 
-                // アップロード関連をリセット
                 const fileInputs = [
                     document.getElementById('dashboardFileInput'),
                     document.getElementById('attendanceFileInput')
@@ -858,7 +2268,6 @@
         function updateAllCharts() {
             if (!storeData || storeData.length === 0) return;
 
-            // 売上チャート更新
             if (salesChart) {
                 salesChart.data.labels = storeData.map(store => store.name);
                 salesChart.data.datasets[0].data = storeData.map(store => store.totalSales / 1000000);
@@ -868,14 +2277,12 @@
                 salesChart.update();
             }
 
-            // アクセスチャート更新
             if (accessChart) {
                 accessChart.data.labels = storeData.map(store => store.name);
                 accessChart.data.datasets[0].data = storeData.map(store => store.totalAccess);
                 accessChart.update();
             }
 
-            // KPIチャート更新
             if (kpiChart) {
                 kpiChart.data.datasets = storeData.slice(0, 5).map((store, index) => ({
                     label: store.name,
@@ -904,7 +2311,6 @@
             const year = currentDate.getFullYear();
             const month = currentDate.getMonth() + 1;
 
-            // テンプレートデータ作成（実際のファイル構造に基づく）
             const templateData = [
                 [
                     "店舗", "売上目標", "総売上", "現在売り上げ状況", "アクセス平均", "日記目標", "日記差分", "日記平均",
@@ -924,7 +2330,6 @@
                 ["CL四日市", 12500000, "", "", "", 205, "", "", 240, "", "", "", "", "", "", "", "", "", "", "", "", "", 12500000, "", "", "", "", "", "", "", "", "", ""]
             ];
 
-            // Excel作成
             const ws = XLSX.utils.aoa_to_sheet(templateData);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, '全店統計');
@@ -1245,7 +2650,6 @@
                     break;
             }
 
-            // Excel作成
             const ws = XLSX.utils.aoa_to_sheet(data);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, reportTypes[type]);
@@ -1783,7 +3187,6 @@
                 closeSidebar();
             }
 
-            // チャートのリサイズ対応
             if (salesChart) salesChart.resize();
             if (accessChart) accessChart.resize();
             if (kpiChart) kpiChart.resize();
@@ -1803,1474 +3206,4 @@
         console.log('✅ 改善提案機能の実装');
     </script>
 </body>
-</html>text-3xl mb-3">📊</div>
-                        <div class="text-sm font-medium text-blue-800">データ同期</div>
-                        <div class="text-xs text-blue-600 mb-4" id="lastSync">2025/6/30 更新</div>
-                        <button class="btn btn-primary w-full" id="syncBtn">
-                            <i class="fas fa-sync-alt mr-2"></i>同期
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- メインコンテンツ -->
-        <div class="main-content">
-            <!-- ヘッダー -->
-            <header class="glass-card m-4 lg:m-6">
-                <div class="p-6 flex items-center justify-between">
-                    <div class="flex items-center">
-                        <button id="menuToggle" class="lg:hidden mr-4 p-3 text-gray-600 hover:text-gray-800 rounded-full hover:bg-gray-100">
-                            <i class="fas fa-bars text-xl"></i>
-                        </button>
-                        <div>
-                            <h1 class="text-2xl lg:text-3xl font-bold text-gray-900">CLASSY業務管理</h1>
-                            <p class="text-sm lg:text-base text-gray-600" id="currentPageTitle">ダッシュボード</p>
-                        </div>
-                    </div>
-                    
-                    <div class="flex items-center space-x-4">
-                        <div class="text-right hidden sm:block">
-                            <div class="font-semibold text-gray-900" id="currentDate"></div>
-                            <div class="text-sm text-blue-600" id="currentTime"></div>
-                        </div>
-                        <button class="btn btn-primary" id="quickActionBtn">
-                            <i class="fas fa-plus mr-2"></i>
-                            <span class="hidden sm:inline">クイック</span>
-                        </button>
-                    </div>
-                </div>
-            </header>
-            
-            <!-- ダッシュボードページ -->
-            <div id="dashboardPage" class="page-content p-4 lg:p-6 fade-in">
-                <!-- データアップロード -->
-                <div class="glass-card p-6 mb-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-bold text-gray-900">全店統計データアップロード</h3>
-                        <button class="btn btn-success" id="downloadTemplateBtn">
-                            <i class="fas fa-download mr-2"></i>テンプレートDL
-                        </button>
-                    </div>
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                        <div>
-                            <input type="file" id="dashboardFileInput" accept=".xlsx,.xls,.csv" class="input-field">
-                            <div class="text-sm text-gray-600 mt-2">
-                                <i class="fas fa-info-circle mr-1"></i>
-                                全店統計データ（売上・KPI・アクセス数等）をアップロード
-                            </div>
-                        </div>
-                        <div class="flex items-center space-x-3">
-                            <button class="btn btn-primary" id="processDataBtn">
-                                <i class="fas fa-upload mr-2"></i>データ反映
-                            </button>
-                            <div id="uploadStatus" class="text-sm text-gray-500"></div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- 全体統計 -->
-                <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-6 mb-6">
-                    <div class="glass-card p-6 text-center">
-                        <div class="text-4xl font-bold text-blue-600 mb-2" id="totalSalesAmount">¥0</div>
-                        <div class="text-sm text-gray-600">総売上</div>
-                        <div class="text-xs text-green-600 mt-2" id="salesAchievementRate">0%達成</div>
-                    </div>
-                    <div class="glass-card p-6 text-center">
-                        <div class="text-4xl font-bold text-green-600 mb-2" id="totalAccessCount">0</div>
-                        <div class="text-sm text-gray-600">総アクセス数</div>
-                        <div class="text-xs text-green-600 mt-2" id="averageAccess">平均 0</div>
-                    </div>
-                    <div class="glass-card p-6 text-center">
-                        <div class="text-4xl font-bold text-purple-600 mb-2" id="totalAttendance">0</div>
-                        <div class="text-sm text-gray-600">総出勤人数</div>
-                        <div class="text-xs text-orange-600 mt-2" id="averageAttendance">平均 0人</div>
-                    </div>
-                    <div class="glass-card p-6 text-center">
-                        <div class="text-4xl font-bold text-cyan-600 mb-2" id="achievingStores">0/0</div>
-                        <div class="text-sm text-gray-600">目標達成店舗</div>
-                        <div class="text-xs text-blue-600 mt-2">売上基準</div>
-                    </div>
-                </div>
-                
-                <!-- 今日のタスク -->
-                <div class="glass-card p-6 mb-6">
-                    <div class="flex items-center justify-between mb-6">
-                        <h3 class="text-xl font-bold text-gray-900">今日のタスク</h3>
-                        <button class="btn btn-outline" id="addTaskBtn">
-                            <i class="fas fa-plus mr-2"></i>追加
-                        </button>
-                    </div>
-                    <div id="todayTasksList" class="space-y-4">
-                        <!-- タスクが動的に表示されます -->
-                    </div>
-                </div>
-                
-                <!-- 店舗状況 -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6 mb-6" id="storesOverview">
-                    <!-- 店舗カードが動的に生成されます -->
-                </div>
-                
-                <!-- 今週の予定 -->
-                <div class="glass-card p-6">
-                    <h3 class="text-xl font-bold text-gray-900 mb-6">今週の予定</h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-7 gap-3" id="weeklySchedule">
-                        <!-- 週間スケジュールがここに表示されます -->
-                    </div>
-                </div>
-            </div>
-            
-            <!-- タスク管理ページ -->
-            <div id="tasksPage" class="page-content p-4 lg:p-6 hidden">
-                <div class="glass-card p-6 mb-6">
-                    <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between mb-6">
-                        <h3 class="text-xl font-bold text-gray-900 mb-4 lg:mb-0">タスク管理</h3>
-                        <div class="flex flex-wrap gap-3">
-                            <button class="btn btn-primary" id="newTaskBtn">
-                                <i class="fas fa-plus mr-2"></i>新規タスク
-                            </button>
-                            <button class="btn btn-outline" id="exportTasksBtn">
-                                <i class="fas fa-download mr-2"></i>エクスポート
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <!-- フィルターとソート -->
-                    <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6">
-                        <input type="text" id="taskSearch" placeholder="タスクを検索..." class="input-field">
-                        <select id="priorityFilter" class="input-field">
-                            <option value="">すべての優先度</option>
-                            <option value="high">高優先度</option>
-                            <option value="medium">中優先度</option>
-                            <option value="low">低優先度</option>
-                        </select>
-                        <select id="statusFilter" class="input-field">
-                            <option value="">すべてのステータス</option>
-                            <option value="pending">未完了</option>
-                            <option value="completed">完了済み</option>
-                        </select>
-                        <select id="storeFilter" class="input-field">
-                            <option value="">すべての店舗</option>
-                            <option value="shabour">シャブール</option>
-                            <option value="onecarat">ワンカラット</option>
-                            <option value="go_nagoya">GO名古屋</option>
-                            <option value="go_fukuoka">GO福岡</option>
-                            <option value="go_tokyo">GO東京</option>
-                            <option value="go_yokohama">GO横浜</option>
-                            <option value="cl_nagoya">CL名古屋</option>
-                            <option value="cl_tokyo">CL東京</option>
-                            <option value="cl_yokkaichi">CL四日市</option>
-                        </select>
-                    </div>
-                    
-                    <!-- タスクリスト -->
-                    <div id="tasksList" class="space-y-4">
-                        <!-- タスクが動的に表示されます -->
-                    </div>
-                </div>
-            </div>
-            
-            <!-- 売上分析ページ -->
-            <div id="salesPage" class="page-content p-4 lg:p-6 hidden">
-                <!-- 売上統計 -->
-                <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-6 mb-6">
-                    <div class="glass-card p-6 text-center">
-                        <div class="text-4xl font-bold text-blue-600 mb-2" id="totalMonthlySales">¥0M</div>
-                        <div class="text-sm text-gray-600">月間総売上</div>
-                        <div class="text-xs text-green-600 mt-2" id="totalSalesTarget">目標: ¥0M</div>
-                    </div>
-                    <div class="glass-card p-6 text-center">
-                        <div class="text-4xl font-bold text-green-600 mb-2" id="overallAchievementRate">0%</div>
-                        <div class="text-sm text-gray-600">全体達成率</div>
-                        <div class="text-xs text-green-600 mt-2" id="achievementStatus">-</div>
-                    </div>
-                    <div class="glass-card p-6 text-center">
-                        <div class="text-4xl font-bold text-purple-600 mb-2" id="storeCount">10</div>
-                        <div class="text-sm text-gray-600">運営店舗</div>
-                        <div class="text-xs text-purple-600 mt-2">全店舗稼働</div>
-                    </div>
-                    <div class="glass-card p-6 text-center">
-                        <div class="text-4xl font-bold text-orange-600 mb-2" id="averageStoreSales">¥0M</div>
-                        <div class="text-sm text-gray-600">平均売上</div>
-                        <div class="text-xs text-orange-600 mt-2">店舗平均</div>
-                    </div>
-                </div>
-                
-                <!-- グラフエリア -->
-                <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
-                    <div class="glass-card p-6">
-                        <div class="flex items-center justify-between mb-6">
-                            <h4 class="text-lg font-bold text-gray-900">店舗別売上</h4>
-                            <div class="flex space-x-2">
-                                <button class="btn btn-primary" id="salesChartBtn">売上</button>
-                                <button class="btn btn-outline" id="achievementChartBtn">達成率</button>
-                            </div>
-                        </div>
-                        <div class="chart-container">
-                            <canvas id="salesChart"></canvas>
-                        </div>
-                    </div>
-                    
-                    <div class="glass-card p-6">
-                        <h4 class="text-lg font-bold text-gray-900 mb-6">店舗別ランキング</h4>
-                        <div class="space-y-4" id="storeRanking">
-                            <!-- ランキングが動的に表示されます -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- KPI管理ページ -->
-            <div id="attendancePage" class="page-content p-4 lg:p-6 hidden">
-                <!-- データアップロード -->
-                <div class="glass-card p-6 mb-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-bold text-gray-900">KPIデータアップロード</h3>
-                        <button class="btn btn-success" id="downloadKpiTemplateBtn">
-                            <i class="fas fa-download mr-2"></i>テンプレートDL
-                        </button>
-                    </div>
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                        <div>
-                            <input type="file" id="attendanceFileInput" accept=".xlsx,.xls,.csv" class="input-field">
-                            <div class="text-sm text-gray-600 mt-2">
-                                <i class="fas fa-info-circle mr-1"></i>
-                                KPI統計データ（アクセス・出勤・日記・口コミ等）をアップロード
-                            </div>
-                        </div>
-                        <div class="flex items-center space-x-3">
-                            <button class="btn btn-primary" id="processKpiDataBtn">
-                                <i class="fas fa-upload mr-2"></i>データ反映
-                            </button>
-                            <div id="kpiUploadStatus" class="text-sm text-gray-500"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- KPIサマリー -->
-                <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-6 mb-6">
-                    <div class="glass-card p-6 text-center">
-                        <div class="text-4xl font-bold text-blue-600 mb-2" id="totalDiaryPosts">0</div>
-                        <div class="text-sm text-gray-600">写メ日記投稿数</div>
-                        <div class="text-xs text-blue-600 mt-2" id="diaryAchievement">達成率 0%</div>
-                    </div>
-                    <div class="glass-card p-6 text-center">
-                        <div class="text-4xl font-bold text-green-600 mb-2" id="totalReviews">0</div>
-                        <div class="text-sm text-gray-600">口コミ掲載数</div>
-                        <div class="text-xs text-green-600 mt-2" id="reviewAchievement">達成率 0%</div>
-                    </div>
-                    <div class="glass-card p-6 text-center">
-                        <div class="text-4xl font-bold text-purple-600 mb-2" id="totalKitene">0</div>
-                        <div class="text-sm text-gray-600">キテネ送信数</div>
-                        <div class="text-xs text-purple-600 mt-2" id="kiteneAverage">平均 0</div>
-                    </div>
-                    <div class="glass-card p-6 text-center">
-                        <div class="text-4xl font-bold text-orange-600 mb-2" id="totalUsers">0</div>
-                        <div class="text-sm text-gray-600">総ユーザー数</div>
-                        <div class="text-xs text-orange-600 mt-2" id="newUsers">新規 0人</div>
-                    </div>
-                </div>
-
-                <!-- グラフエリア -->
-                <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
-                    <div class="glass-card p-6">
-                        <h4 class="text-lg font-bold text-gray-900 mb-6">アクセス状況</h4>
-                        <div class="chart-container">
-                            <canvas id="accessChart"></canvas>
-                        </div>
-                    </div>
-                    
-                    <div class="glass-card p-6">
-                        <h4 class="text-lg font-bold text-gray-900 mb-6">KPI達成状況</h4>
-                        <div class="chart-container">
-                            <canvas id="kpiChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 店舗別KPIテーブル -->
-                <div class="glass-card p-6">
-                    <div class="flex items-center justify-between mb-6">
-                        <h4 class="text-lg font-bold text-gray-900">店舗別KPI詳細</h4>
-                        <div class="flex space-x-3">
-                            <button class="btn btn-outline" id="exportKpiBtn">
-                                <i class="fas fa-download mr-2"></i>エクスポート
-                            </button>
-                        </div>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full">
-                            <thead>
-                                <tr class="bg-gray-50">
-                                    <th class="text-left p-4 font-semibold">店舗</th>
-                                    <th class="text-left p-4 font-semibold">売上達成率</th>
-                                    <th class="text-left p-4 font-semibold">日記達成率</th>
-                                    <th class="text-left p-4 font-semibold">口コミ達成率</th>
-                                    <th class="text-left p-4 font-semibold">アクセス数</th>
-                                    <th class="text-left p-4 font-semibold">出勤人数</th>
-                                    <th class="text-left p-4 font-semibold">女の子人数</th>
-                                </tr>
-                            </thead>
-                            <tbody id="kpiDataTable">
-                                <!-- データが動的に表示されます -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- カレンダーページ -->
-            <div id="calendarPage" class="page-content p-4 lg:p-6 hidden">
-                <div class="glass-card p-6 mb-6">
-                    <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between mb-6">
-                        <h3 class="text-xl font-bold text-gray-900 mb-4 lg:mb-0">カレンダー</h3>
-                        <div class="flex flex-wrap gap-3">
-                            <button class="btn btn-primary" id="addEventBtn">
-                                <i class="fas fa-plus mr-2"></i>予定追加
-                            </button>
-                            <button class="btn btn-outline" id="todayBtn">今日</button>
-                        </div>
-                    </div>
-                    
-                    <!-- カレンダーナビゲーション -->
-                    <div class="flex items-center justify-between mb-6">
-                        <h4 class="text-2xl font-bold text-gray-900" id="calendarTitle">2025年7月</h4>
-                        <div class="flex space-x-2">
-                            <button class="btn btn-outline" id="prevMonthBtn">
-                                <i class="fas fa-chevron-left"></i>
-                            </button>
-                            <button class="btn btn-outline" id="nextMonthBtn">
-                                <i class="fas fa-chevron-right"></i>
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <!-- カレンダーグリッド -->
-                    <div id="calendarGrid" class="grid grid-cols-7 gap-2 mb-6">
-                        <!-- カレンダーが動的に表示されます -->
-                    </div>
-                    
-                    <!-- イベント凡例 -->
-                    <div class="flex flex-wrap gap-4 text-sm">
-                        <div class="flex items-center">
-                            <div class="w-3 h-3 bg-blue-400 rounded mr-2"></div>
-                            <span>会議</span>
-                        </div>
-                        <div class="flex items-center">
-                            <div class="w-3 h-3 bg-green-400 rounded mr-2"></div>
-                            <span>撮影</span>
-                        </div>
-                        <div class="flex items-center">
-                            <div class="w-3 h-3 bg-red-400 rounded mr-2"></div>
-                            <span>休業</span>
-                        </div>
-                        <div class="flex items-center">
-                            <div class="w-3 h-3 bg-orange-400 rounded mr-2"></div>
-                            <span>締切</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- レポートページ -->
-            <div id="reportsPage" class="page-content p-4 lg:p-6 hidden">
-                <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                    <div class="glass-card p-6 text-center">
-                        <div class="text-5xl mb-4">📊</div>
-                        <h4 class="text-lg font-bold mb-2">売上レポート</h4>
-                        <p class="text-gray-600 mb-4">月別・店舗別売上分析</p>
-                        <button class="btn btn-primary w-full" id="salesReportBtn">
-                            <i class="fas fa-download mr-2"></i>ダウンロード
-                        </button>
-                    </div>
-                    
-                    <div class="glass-card p-6 text-center">
-                        <div class="text-5xl mb-4">📈</div>
-                        <h4 class="text-lg font-bold mb-2">KPIレポート</h4>
-                        <p class="text-gray-600 mb-4">アクセス・日記・口コミ等分析</p>
-                        <button class="btn btn-primary w-full" id="kpiReportBtn">
-                            <i class="fas fa-download mr-2"></i>ダウンロード
-                        </button>
-                    </div>
-                    
-                    <div class="glass-card p-6 text-center">
-                        <div class="text-5xl mb-4">📋</div>
-                        <h4 class="text-lg font-bold mb-2">総合レポート</h4>
-                        <p class="text-gray-600 mb-4">全業務統合レポート</p>
-                        <button class="btn btn-primary w-full" id="comprehensiveReportBtn">
-                            <i class="fas fa-download mr-2"></i>ダウンロード
-                        </button>
-                    </div>
-                    
-                    <div class="glass-card p-6 text-center">
-                        <div class="text-5xl mb-4">📅</div>
-                        <h4 class="text-lg font-bold mb-2">スケジュール</h4>
-                        <p class="text-gray-600 mb-4">予定・会議一覧</p>
-                        <button class="btn btn-primary w-full" id="scheduleReportBtn">
-                            <i class="fas fa-download mr-2"></i>ダウンロード
-                        </button>
-                    </div>
-                    
-                    <div class="glass-card p-6 text-center">
-                        <div class="text-5xl mb-4">🎯</div>
-                        <h4 class="text-lg font-bold mb-2">月末締めデータ</h4>
-                        <p class="text-gray-600 mb-4">全データ一括出力</p>
-                        <button class="btn btn-success w-full" id="monthEndReportBtn">
-                            <i class="fas fa-file-archive mr-2"></i>一括DL
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- タスクモーダル -->
-    <div id="taskModal" class="modal hidden">
-        <div class="modal-content">
-            <div class="flex items-center justify-between mb-6">
-                <h3 class="text-xl font-bold text-gray-900" id="taskModalTitle">新しいタスク</h3>
-                <button id="closeTaskModal" class="text-gray-500 hover:text-gray-700">
-                    <i class="fas fa-times text-xl"></i>
-                </button>
-            </div>
-            
-            <div class="space-y-6">
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">タスク名</label>
-                    <input type="text" id="taskTitle" class="input-field" placeholder="タスク名を入力">
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">説明</label>
-                    <textarea id="taskDescription" class="input-field" rows="3" placeholder="詳細説明"></textarea>
-                </div>
-                
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">優先度</label>
-                        <select id="taskPriority" class="input-field">
-                            <option value="low">低</option>
-                            <option value="medium" selected>中</option>
-                            <option value="high">高</option>
-                        </select>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">担当店舗</label>
-                        <select id="taskStore" class="input-field">
-                            <option value="">選択してください</option>
-                            <option value="shabour">シャブール</option>
-                            <option value="onecarat">ワンカラット</option>
-                            <option value="go_nagoya">GO名古屋</option>
-                            <option value="go_fukuoka">GO福岡</option>
-                            <option value="go_tokyo">GO東京</option>
-                            <option value="go_yokohama">GO横浜</option>
-                            <option value="cl_nagoya">CL名古屋</option>
-                            <option value="cl_tokyo">CL東京</option>
-                            <option value="cl_yokkaichi">CL四日市</option>
-                        </select>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">期限</label>
-                        <input type="date" id="taskDueDate" class="input-field">
-                    </div>
-                </div>
-                
-                <div class="flex space-x-4">
-                    <button class="btn btn-primary flex-1" id="saveTaskBtn">
-                        <i class="fas fa-save mr-2"></i>保存
-                    </button>
-                    <button class="btn btn-outline" id="cancelTaskBtn">
-                        キャンセル
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- イベントモーダル -->
-    <div id="eventModal" class="modal hidden">
-        <div class="modal-content">
-            <div class="flex items-center justify-between mb-6">
-                <h3 class="text-xl font-bold text-gray-900">予定追加</h3>
-                <button id="closeEventModal" class="text-gray-500 hover:text-gray-700">
-                    <i class="fas fa-times text-xl"></i>
-                </button>
-            </div>
-            
-            <div class="space-y-6">
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">予定名</label>
-                    <input type="text" id="eventTitle" class="input-field" placeholder="予定名を入力">
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">説明</label>
-                    <textarea id="eventDescription" class="input-field" rows="3" placeholder="詳細説明"></textarea>
-                </div>
-                
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">種類</label>
-                        <select id="eventType" class="input-field">
-                            <option value="meeting">会議</option>
-                            <option value="shooting">撮影</option>
-                            <option value="holiday">休業</option>
-                            <option value="deadline">締切</option>
-                        </select>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">日付</label>
-                        <input type="date" id="eventDate" class="input-field">
-                    </div>
-                </div>
-                
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">開始時間</label>
-                        <input type="time" id="eventStartTime" class="input-field">
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">終了時間</label>
-                        <input type="time" id="eventEndTime" class="input-field">
-                    </div>
-                </div>
-                
-                <div class="flex space-x-4">
-                    <button class="btn btn-primary flex-1" id="saveEventBtn">
-                        <i class="fas fa-save mr-2"></i>保存
-                    </button>
-                    <button class="btn btn-outline" id="cancelEventBtn">
-                        キャンセル
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // グローバル変数
-        let currentPage = 'dashboard';
-        let sidebarOpen = false;
-        let editingTaskId = null;
-        let editingEventId = null;
-        let uploadedBusinessData = null;
-        let salesChart = null;
-        let accessChart = null;
-        let kpiChart = null;
-        let currentMonth = new Date().getMonth();
-        let currentYear = new Date().getFullYear();
-        
-        // データ管理
-        let tasks = [];
-        let events = [];
-        let storeData = [];
-        
-        // 実際の店舗情報（アップロードファイルに基づく）
-        const actualStoreInfo = {
-            'shabour': { name: 'シャブール', shortName: 'シャブール', type: 'Premium' },
-            'onecarat': { name: 'ワンカラット', shortName: 'ワンカラット', type: 'Premium' },
-            'go_nagoya': { name: 'GO名古屋', shortName: 'GO名古屋', type: 'GrandOpera' },
-            'go_fukuoka': { name: 'GO福岡', shortName: 'GO福岡', type: 'GrandOpera' },
-            'go_tokyo': { name: 'GO東京', shortName: 'GO東京', type: 'GrandOpera' },
-            'go_yokohama': { name: 'GO横浜', shortName: 'GO横浜', type: 'GrandOpera' },
-            'cl_nagoya': { name: 'CL名古屋', shortName: 'CL名古屋', type: 'CLASSY' },
-            'cl_tokyo': { name: 'CL東京', shortName: 'CL東京', type: 'CLASSY' },
-            'cl_yokkaichi': { name: 'CL四日市', shortName: 'CL四日市', type: 'CLASSY' }
-        };
-
-        // システム初期化
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('CLASSY業務管理システム起動中...');
-            
-            // 基本機能の初期化
-            initializeSystem();
-            
-            console.log('システム初期化完了');
-        });
-
-        function initializeSystem() {
-            // データ初期化
-            loadData();
-            
-            // UI初期化
-            updateDateTime();
-            setInterval(updateDateTime, 60000);
-            
-            // サンプルデータの生成（初回のみ）
-            if (tasks.length === 0) {
-                createSampleData();
-            }
-            if (storeData.length === 0) {
-                loadActualStoreData();
-            }
-            
-            // イベントリスナーの設定
-            setupEventListeners();
-            
-            // 初期表示の描画
-            renderCurrentPage();
-            
-            // チャート初期化（遅延実行）
-            setTimeout(() => {
-                initializeCharts();
-            }, 500);
-        }
-
-        // 実際の店舗データを読み込み
-        function loadActualStoreData() {
-            // アップロードされたExcelファイルのデータに基づいたサンプルデータ
-            storeData = [
-                {
-                    id: 'shabour',
-                    name: 'シャブール',
-                    salesTarget: 33000000,
-                    totalSales: 29544738,
-                    salesDifference: -3455262,
-                    accessAverage: 65126,
-                    diaryTarget: 280,
-                    diaryDifference: -28,
-                    diaryAverage: 252,
-                    reviewTarget: 300,
-                    reviewDifference: 44,
-                    messageCount: 89,
-                    girlCount: 763,
-                    userCount: 6529,
-                    myGirlCount: 424651,
-                    totalAccess: 1967152,
-                    diaryPosts: 7560,
-                    limitedDiary: 1845,
-                    videoDiary: 21141,
-                    kiteneMessages: 20260,
-                    reviewPosts: 344,
-                    attendanceCount: 687,
-                    customerCount: 1557,
-                    dailySalesAverage: 1100000,
-                    salesAchievementRate: 0.8953,
-                    diaryAchievementRate: 0.9,
-                    reviewAchievementRate: 1.1467,
-                    kiteneChange: -125,
-                    okinTalkChange: 2,
-                    kiteneAverage: 800,
-                    newCustomers: 0
-                },
-                {
-                    id: 'onecarat',
-                    name: 'ワンカラット',
-                    salesTarget: 17500000,
-                    totalSales: 18314356,
-                    salesDifference: 814356,
-                    accessAverage: 42734,
-                    diaryTarget: 265,
-                    diaryDifference: 19.3,
-                    diaryAverage: 284.3,
-                    reviewTarget: 200,
-                    reviewDifference: -44,
-                    messageCount: 38,
-                    girlCount: 745,
-                    userCount: 3441,
-                    myGirlCount: 196763,
-                    totalAccess: 1241592,
-                    diaryPosts: 8528,
-                    limitedDiary: 706,
-                    videoDiary: 18481,
-                    kiteneMessages: 18119,
-                    reviewPosts: 156,
-                    attendanceCount: 514,
-                    customerCount: 937,
-                    dailySalesAverage: 583333,
-                    salesAchievementRate: 1.0465,
-                    diaryAchievementRate: 1.0727,
-                    reviewAchievementRate: 0.78,
-                    kiteneChange: -21,
-                    okinTalkChange: 1,
-                    kiteneAverage: 624,
-                    newCustomers: 0
-                },
-                {
-                    id: 'go_nagoya',
-                    name: 'GO名古屋',
-                    salesTarget: 28000000,
-                    totalSales: 29265025,
-                    salesDifference: 1265025,
-                    accessAverage: 48825,
-                    diaryTarget: 180,
-                    diaryDifference: -59.8,
-                    diaryAverage: 120.2,
-                    reviewTarget: 205,
-                    reviewDifference: 11,
-                    messageCount: 10,
-                    girlCount: 923,
-                    userCount: 4351,
-                    myGirlCount: 138740,
-                    totalAccess: 1349912,
-                    diaryPosts: 3605,
-                    limitedDiary: 630,
-                    videoDiary: 27789,
-                    kiteneMessages: 27376,
-                    reviewPosts: 216,
-                    attendanceCount: 518,
-                    customerCount: 880,
-                    dailySalesAverage: 933333,
-                    salesAchievementRate: 1.0452,
-                    diaryAchievementRate: 0.6676,
-                    reviewAchievementRate: 1.0537,
-                    kiteneChange: -61,
-                    okinTalkChange: 0,
-                    kiteneAverage: 973,
-                    newCustomers: 0
-                },
-                {
-                    id: 'go_fukuoka',
-                    name: 'GO福岡',
-                    salesTarget: 36000000,
-                    totalSales: 37050068,
-                    salesDifference: 1050068,
-                    accessAverage: 51499,
-                    diaryTarget: 250,
-                    diaryDifference: 10.9,
-                    diaryAverage: 260.9,
-                    reviewTarget: 180,
-                    reviewDifference: 22,
-                    messageCount: 4159,
-                    girlCount: 826,
-                    userCount: 2652,
-                    myGirlCount: 240562,
-                    totalAccess: 1619670,
-                    diaryPosts: 7828,
-                    limitedDiary: 2440,
-                    videoDiary: 32763,
-                    kiteneMessages: 32011,
-                    reviewPosts: 202,
-                    attendanceCount: 514,
-                    customerCount: 1006,
-                    dailySalesAverage: 1200000,
-                    salesAchievementRate: 1.0292,
-                    diaryAchievementRate: 1.0437,
-                    reviewAchievementRate: 1.1222,
-                    kiteneChange: 52,
-                    okinTalkChange: 23,
-                    kiteneAverage: 1015,
-                    newCustomers: 115
-                },
-                {
-                    id: 'go_tokyo',
-                    name: 'GO東京',
-                    salesTarget: 28000000,
-                    totalSales: 27324427,
-                    salesDifference: -675573,
-                    accessAverage: 35465,
-                    diaryTarget: 250,
-                    diaryDifference: -111.2,
-                    diaryAverage: 138.8,
-                    reviewTarget: 150,
-                    reviewDifference: -34,
-                    messageCount: 21,
-                    girlCount: 693,
-                    userCount: 7020,
-                    myGirlCount: 142358,
-                    totalAccess: 1182336,
-                    diaryPosts: 4164,
-                    limitedDiary: 1511,
-                    videoDiary: 19512,
-                    kiteneMessages: 19067,
-                    reviewPosts: 116,
-                    attendanceCount: 457,
-                    customerCount: 722,
-                    dailySalesAverage: 933333,
-                    salesAchievementRate: 0.9759,
-                    diaryAchievementRate: 0.5552,
-                    reviewAchievementRate: 0.7733,
-                    kiteneChange: -152,
-                    okinTalkChange: 0,
-                    kiteneAverage: 787,
-                    newCustomers: 0
-                },
-                {
-                    id: 'go_yokohama',
-                    name: 'GO横浜',
-                    salesTarget: 23000000,
-                    totalSales: 22547274,
-                    salesDifference: -452726,
-                    accessAverage: 19664,
-                    diaryTarget: 200,
-                    diaryDifference: -30.8,
-                    diaryAverage: 169.2,
-                    reviewTarget: 145,
-                    reviewDifference: -18,
-                    messageCount: 45,
-                    girlCount: 700,
-                    userCount: 3830,
-                    myGirlCount: 42166,
-                    totalAccess: 599756,
-                    diaryPosts: 5077,
-                    limitedDiary: 1677,
-                    videoDiary: 25474,
-                    kiteneMessages: 24565,
-                    reviewPosts: 127,
-                    attendanceCount: 407,
-                    customerCount: 592,
-                    dailySalesAverage: 766667,
-                    salesAchievementRate: 0.9803,
-                    diaryAchievementRate: 0.8462,
-                    reviewAchievementRate: 0.8759,
-                    kiteneChange: 137,
-                    okinTalkChange: 1,
-                    kiteneAverage: 681,
-                    newCustomers: 0
-                },
-                {
-                    id: 'cl_nagoya',
-                    name: 'CL名古屋',
-                    salesTarget: 6000000,
-                    totalSales: 5300320,
-                    salesDifference: -699680,
-                    accessAverage: 14717,
-                    diaryTarget: 80,
-                    diaryDifference: -18.3,
-                    diaryAverage: 61.7,
-                    reviewTarget: 150,
-                    reviewDifference: -37,
-                    messageCount: 24,
-                    girlCount: 316,
-                    userCount: 2453,
-                    myGirlCount: 25764,
-                    totalAccess: 514243,
-                    diaryPosts: 1851,
-                    limitedDiary: 591,
-                    videoDiary: 8018,
-                    kiteneMessages: 7775,
-                    reviewPosts: 113,
-                    attendanceCount: 197,
-                    customerCount: 458,
-                    dailySalesAverage: 200000,
-                    salesAchievementRate: 0.8834,
-                    diaryAchievementRate: 0.7713,
-                    reviewAchievementRate: 0.7533,
-                    kiteneChange: -12,
-                    okinTalkChange: 0,
-                    kiteneAverage: 271,
-                    newCustomers: 0
-                },
-                {
-                    id: 'cl_tokyo',
-                    name: 'CL東京',
-                    salesTarget: 7200000,
-                    totalSales: 6719328,
-                    salesDifference: -480672,
-                    accessAverage: 26465,
-                    diaryTarget: 100,
-                    diaryDifference: -30.7,
-                    diaryAverage: 69.3,
-                    reviewTarget: 180,
-                    reviewDifference: -58,
-                    messageCount: 2493,
-                    girlCount: 267,
-                    userCount: 2064,
-                    myGirlCount: 73336,
-                    totalAccess: 742231,
-                    diaryPosts: 2079,
-                    limitedDiary: 672,
-                    videoDiary: 6730,
-                    kiteneMessages: 6522,
-                    reviewPosts: 122,
-                    attendanceCount: 238,
-                    customerCount: 609,
-                    dailySalesAverage: 240000,
-                    salesAchievementRate: 0.9332,
-                    diaryAchievementRate: 0.693,
-                    reviewAchievementRate: 0.6778,
-                    kiteneChange: -102,
-                    okinTalkChange: -27,
-                    kiteneAverage: 319,
-                    newCustomers: 110
-                },
-                {
-                    id: 'cl_yokkaichi',
-                    name: 'CL四日市',
-                    salesTarget: 12500000,
-                    totalSales: 12943296,
-                    salesDifference: 443296,
-                    accessAverage: 32278,
-                    diaryTarget: 205,
-                    diaryDifference: 5,
-                    diaryAverage: 210,
-                    reviewTarget: 240,
-                    reviewDifference: 16,
-                    messageCount: 6842,
-                    girlCount: 598,
-                    userCount: 5077,
-                    myGirlCount: 45108,
-                    totalAccess: 881476,
-                    diaryPosts: 6301,
-                    limitedDiary: 2583,
-                    videoDiary: 18446,
-                    kiteneMessages: 17259,
-                    reviewPosts: 256,
-                    attendanceCount: 356,
-                    customerCount: 914,
-                    dailySalesAverage: 416667,
-                    salesAchievementRate: 1.0355,
-                    diaryAchievementRate: 1.0246,
-                    reviewAchievementRate: 1.0667,
-                    kiteneChange: -45,
-                    okinTalkChange: -50,
-                    kiteneAverage: 620,
-                    newCustomers: 278
-                }
-            ];
-        }
-
-        // イベントリスナー設定
-        function setupEventListeners() {
-            // ナビゲーション
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.addEventListener('click', function() {
-                    const page = this.getAttribute('data-page');
-                    showPage(page);
-                });
-            });
-
-            // サイドバートグル
-            const menuToggle = document.getElementById('menuToggle');
-            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-            const overlay = document.getElementById('overlay');
-            
-            if (menuToggle) menuToggle.addEventListener('click', toggleSidebar);
-            if (mobileMenuBtn) mobileMenuBtn.addEventListener('click', toggleSidebar);
-            if (overlay) overlay.addEventListener('click', closeSidebar);
-
-            // モーダル関連
-            setupModalListeners();
-            
-            // ボタン関連
-            setupButtonListeners();
-            
-            // フィルター関連
-            setupFilterListeners();
-            
-            // ファイルアップロード関連
-            setupFileUploadListeners();
-
-            // キーボードショートカット
-            document.addEventListener('keydown', handleKeyboardShortcuts);
-        }
-
-        function setupModalListeners() {
-            // タスクモーダル
-            const closeTaskModal = document.getElementById('closeTaskModal');
-            const cancelTaskBtn = document.getElementById('cancelTaskBtn');
-            const saveTaskBtn = document.getElementById('saveTaskBtn');
-            
-            if (closeTaskModal) closeTaskModal.addEventListener('click', () => hideModal('taskModal'));
-            if (cancelTaskBtn) cancelTaskBtn.addEventListener('click', () => hideModal('taskModal'));
-            if (saveTaskBtn) saveTaskBtn.addEventListener('click', saveTask);
-
-            // イベントモーダル
-            const closeEventModal = document.getElementById('closeEventModal');
-            const cancelEventBtn = document.getElementById('cancelEventBtn');
-            const saveEventBtn = document.getElementById('saveEventBtn');
-            
-            if (closeEventModal) closeEventModal.addEventListener('click', () => hideModal('eventModal'));
-            if (cancelEventBtn) cancelEventBtn.addEventListener('click', () => hideModal('eventModal'));
-            if (saveEventBtn) saveEventBtn.addEventListener('click', saveEvent);
-        }
-
-        function setupButtonListeners() {
-            // ダッシュボードボタン
-            const downloadTemplateBtn = document.getElementById('downloadTemplateBtn');
-            const processDataBtn = document.getElementById('processDataBtn');
-            const addTaskBtn = document.getElementById('addTaskBtn');
-            const quickActionBtn = document.getElementById('quickActionBtn');
-            const syncBtn = document.getElementById('syncBtn');
-
-            if (downloadTemplateBtn) downloadTemplateBtn.addEventListener('click', downloadStoreTemplate);
-            if (processDataBtn) processDataBtn.addEventListener('click', processStoreData);
-            if (addTaskBtn) addTaskBtn.addEventListener('click', () => openTaskModal());
-            if (quickActionBtn) quickActionBtn.addEventListener('click', showQuickActions);
-            if (syncBtn) syncBtn.addEventListener('click', syncAllData);
-
-            // タスク管理ボタン
-            const newTaskBtn = document.getElementById('newTaskBtn');
-            const exportTasksBtn = document.getElementById('exportTasksBtn');
-
-            if (newTaskBtn) newTaskBtn.addEventListener('click', () => openTaskModal());
-            if (exportTasksBtn) exportTasksBtn.addEventListener('click', exportTasks);
-
-            // 売上分析ボタン
-            const salesChartBtn = document.getElementById('salesChartBtn');
-            const achievementChartBtn = document.getElementById('achievementChartBtn');
-
-            if (salesChartBtn) salesChartBtn.addEventListener('click', () => updateSalesChart('sales'));
-            if (achievementChartBtn) achievementChartBtn.addEventListener('click', () => updateSalesChart('achievement'));
-
-            // KPI管理ボタン
-            const downloadKpiTemplateBtn = document.getElementById('downloadKpiTemplateBtn');
-            const processKpiDataBtn = document.getElementById('processKpiDataBtn');
-            const exportKpiBtn = document.getElementById('exportKpiBtn');
-
-            if (downloadKpiTemplateBtn) downloadKpiTemplateBtn.addEventListener('click', downloadStoreTemplate);
-            if (processKpiDataBtn) processKpiDataBtn.addEventListener('click', processStoreData);
-            if (exportKpiBtn) exportKpiBtn.addEventListener('click', exportKpiData);
-
-            // カレンダーボタン
-            const addEventBtn = document.getElementById('addEventBtn');
-            const todayBtn = document.getElementById('todayBtn');
-            const prevMonthBtn = document.getElementById('prevMonthBtn');
-            const nextMonthBtn = document.getElementById('nextMonthBtn');
-
-            if (addEventBtn) addEventBtn.addEventListener('click', () => openEventModal());
-            if (todayBtn) todayBtn.addEventListener('click', goToToday);
-            if (prevMonthBtn) prevMonthBtn.addEventListener('click', previousMonth);
-            if (nextMonthBtn) nextMonthBtn.addEventListener('click', nextMonth);
-
-            // レポートボタン
-            const salesReportBtn = document.getElementById('salesReportBtn');
-            const kpiReportBtn = document.getElementById('kpiReportBtn');
-            const comprehensiveReportBtn = document.getElementById('comprehensiveReportBtn');
-            const scheduleReportBtn = document.getElementById('scheduleReportBtn');
-            const monthEndReportBtn = document.getElementById('monthEndReportBtn');
-
-            if (salesReportBtn) salesReportBtn.addEventListener('click', () => generateReport('sales'));
-            if (kpiReportBtn) kpiReportBtn.addEventListener('click', () => generateReport('kpi'));
-            if (comprehensiveReportBtn) comprehensiveReportBtn.addEventListener('click', () => generateReport('comprehensive'));
-            if (scheduleReportBtn) scheduleReportBtn.addEventListener('click', () => generateReport('schedule'));
-            if (monthEndReportBtn) monthEndReportBtn.addEventListener('click', generateMonthEndReport);
-        }
-
-        function setupFilterListeners() {
-            const taskSearch = document.getElementById('taskSearch');
-            const priorityFilter = document.getElementById('priorityFilter');
-            const statusFilter = document.getElementById('statusFilter');
-            const storeFilter = document.getElementById('storeFilter');
-
-            if (taskSearch) taskSearch.addEventListener('input', filterTasks);
-            if (priorityFilter) priorityFilter.addEventListener('change', filterTasks);
-            if (statusFilter) statusFilter.addEventListener('change', filterTasks);
-            if (storeFilter) storeFilter.addEventListener('change', filterTasks);
-        }
-
-        function setupFileUploadListeners() {
-            const dashboardFileInput = document.getElementById('dashboardFileInput');
-            const attendanceFileInput = document.getElementById('attendanceFileInput');
-
-            if (dashboardFileInput) dashboardFileInput.addEventListener('change', handleStoreDataUpload);
-            if (attendanceFileInput) attendanceFileInput.addEventListener('change', handleStoreDataUpload);
-        }
-
-        function handleKeyboardShortcuts(e) {
-            if (e.ctrlKey || e.metaKey) {
-                switch(e.key) {
-                    case 'k':
-                        e.preventDefault();
-                        openTaskModal();
-                        break;
-                    case 'e':
-                        e.preventDefault();
-                        openEventModal();
-                        break;
-                    case 's':
-                        e.preventDefault();
-                        syncAllData();
-                        break;
-                }
-            }
-            
-            if (e.key === 'Escape') {
-                closeAllModals();
-                closeSidebar();
-            }
-        }
-
-        // データ管理
-        function loadData() {
-            // メモリ内でのデータ管理（localStorage代替）
-            tasks = tasks || [];
-            events = events || [];
-            storeData = storeData || [];
-        }
-
-        function saveData() {
-            // メモリ内でのデータ保存（実際のプロジェクトではサーバーに送信）
-            console.log('データ保存完了（メモリ内）');
-        }
-
-        // サンプルデータ作成
-        function createSampleData() {
-            const today = new Date();
-            const tomorrow = new Date(today);
-            tomorrow.setDate(tomorrow.getDate() + 1);
-            
-            tasks = [
-                {
-                    id: Date.now() + 1,
-                    title: '6月売上レポート作成',
-                    description: '各店舗の6月売上データをまとめてレポート作成',
-                    priority: 'high',
-                    store: 'cl_nagoya',
-                    dueDate: today.toISOString().split('T')[0],
-                    completed: false,
-                    createdAt: today.toISOString()
-                },
-                {
-                    id: Date.now() + 2,
-                    title: 'GO福岡のKPI改善策検討',
-                    description: '売上好調なGO福岡の成功要因を他店に展開',
-                    priority: 'medium',
-                    store: 'go_fukuoka',
-                    dueDate: tomorrow.toISOString().split('T')[0],
-                    completed: false,
-                    createdAt: today.toISOString()
-                },
-                {
-                    id: Date.now() + 3,
-                    title: 'CL東京の口コミ施策強化',
-                    description: '口コミ達成率が低いCL東京の改善施策を実施',
-                    priority: 'high',
-                    store: 'cl_tokyo',
-                    dueDate: today.toISOString().split('T')[0],
-                    completed: false,
-                    createdAt: today.toISOString()
-                },
-                {
-                    id: Date.now() + 4,
-                    title: '全店舗データ同期完了',
-                    description: '6月末の全店舗データ同期作業',
-                    priority: 'medium',
-                    store: '',
-                    dueDate: today.toISOString().split('T')[0],
-                    completed: true,
-                    createdAt: today.toISOString()
-                }
-            ];
-            
-            events = [
-                {
-                    id: Date.now() + 10,
-                    title: '6月月次会議',
-                    description: '各店舗の6月実績報告と7月計画',
-                    type: 'meeting',
-                    date: today.toISOString().split('T')[0],
-                    startTime: '10:00',
-                    endTime: '12:00'
-                },
-                {
-                    id: Date.now() + 11,
-                    title: 'GO福岡撮影',
-                    description: '夏の新キャンペーン撮影',
-                    type: 'shooting',
-                    date: tomorrow.toISOString().split('T')[0],
-                    startTime: '14:00',
-                    endTime: '16:00'
-                }
-            ];
-            
-            saveData();
-        }
-
-        // UI更新
-        function updateDateTime() {
-            const now = new Date();
-            const dateElement = document.getElementById('currentDate');
-            const timeElement = document.getElementById('currentTime');
-            
-            if (dateElement) {
-                dateElement.textContent = now.toLocaleDateString('ja-JP', {
-                    year: 'numeric',
-                    month: 'numeric',
-                    day: 'numeric',
-                    weekday: 'short'
-                });
-            }
-            
-            if (timeElement) {
-                timeElement.textContent = now.toLocaleTimeString('ja-JP', {
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
-            }
-        }
-
-        // ナビゲーション
-        function toggleSidebar() {
-            sidebarOpen = !sidebarOpen;
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('overlay');
-            
-            if (sidebarOpen) {
-                sidebar.classList.add('active');
-                overlay.classList.add('active');
-            } else {
-                sidebar.classList.remove('active');
-                overlay.classList.remove('active');
-            }
-        }
-
-        function closeSidebar() {
-            if (window.innerWidth < 1024) {
-                sidebarOpen = false;
-                const sidebar = document.getElementById('sidebar');
-                const overlay = document.getElementById('overlay');
-                if (sidebar) sidebar.classList.remove('active');
-                if (overlay) overlay.classList.remove('active');
-            }
-        }
-
-        function showPage(pageName) {
-            // 全ページ非表示
-            const pages = ['dashboard', 'tasks', 'sales', 'attendance', 'calendar', 'reports'];
-            pages.forEach(page => {
-                const element = document.getElementById(page + 'Page');
-                if (element) element.classList.add('hidden');
-            });
-            
-            // ナビゲーション状態リセット
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.classList.remove('active');
-            });
-            
-            // 選択ページ表示
-            const targetPage = document.getElementById(pageName + 'Page');
-            if (targetPage) {
-                targetPage.classList.remove('hidden');
-                targetPage.classList.add('fade-in');
-            }
-            
-            // ナビゲーション状態更新
-            const targetNav = document.querySelector(`[data-page="${pageName}"]`);
-            if (targetNav) {
-                targetNav.classList.add('active');
-            }
-            
-            // ページタイトル更新
-            const pageTitles = {
-                dashboard: 'ダッシュボード',
-                tasks: 'タスク管理',
-                sales: '売上分析',
-                attendance: 'KPI管理',
-                calendar: 'カレンダー',
-                reports: 'レポート'
-            };
-            
-            const titleElement = document.getElementById('currentPageTitle');
-            if (titleElement) {
-                titleElement.textContent = pageTitles[pageName];
-            }
-            
-            currentPage = pageName;
-            
-            // ページ固有の初期化
-            renderCurrentPage();
-            
-            closeSidebar();
-        }
-
-        function renderCurrentPage() {
-            switch(currentPage) {
-                case 'dashboard':
-                    renderDashboard();
-                    break;
-                case 'tasks':
-                    renderTasks();
-                    break;
-                case 'sales':
-                    renderSales();
-                    break;
-                case 'attendance':
-                    renderKpiManagement();
-                    break;
-                case 'calendar':
-                    generateCalendar();
-                    break;
-            }
-        }
-
-        // ダッシュボード描画
-        function renderDashboard() {
-            updateDashboardStats();
-            renderTodayTasks();
-            renderStoresOverview();
-            renderWeeklySchedule();
-        }
-
-        function updateDashboardStats() {
-            if (!storeData || storeData.length === 0) return;
-
-            // 全体統計の計算
-            const totalSales = storeData.reduce((sum, store) => sum + store.totalSales, 0);
-            const totalSalesTarget = storeData.reduce((sum, store) => sum + store.salesTarget, 0);
-            const totalAccess = storeData.reduce((sum, store) => sum + store.totalAccess, 0);
-            const totalAttendance = storeData.reduce((sum, store) => sum + store.attendanceCount, 0);
-            const achievingStores = storeData.filter(store => store.salesAchievementRate >= 1.0).length;
-
-            const overallAchievementRate = totalSalesTarget > 0 ? (totalSales / totalSalesTarget) * 100 : 0;
-            const averageAccess = Math.round(totalAccess / storeData.length);
-            const averageAttendance = Math.round(totalAttendance / storeData.length);
-
-            // タスク統計
-            const today = new Date().toISOString().split('T')[0];
-            const todayTasks = tasks.filter(task => task.dueDate === today);
-            const completedTasks = todayTasks.filter(task => task.completed);
-
-            // UI更新
-            updateElement('totalSalesAmount', `¥${(totalSales / 100000000).toFixed(1)}億`);
-            updateElement('salesAchievementRate', `${overallAchievementRate.toFixed(1)}%達成`);
-            updateElement('totalAccessCount', totalAccess.toLocaleString());
-            updateElement('averageAccess', `平均 ${averageAccess.toLocaleString()}`);
-            updateElement('totalAttendance', totalAttendance.toLocaleString());
-            updateElement('averageAttendance', `平均 ${averageAttendance}人`);
-            updateElement('achievingStores', `${achievingStores}/${storeData.length}`);
-        }
-
-        function renderTodayTasks() {
-            const today = new Date().toISOString().split('T')[0];
-            const todayTasks = tasks.filter(task => task.dueDate === today);
-            const todayTasksList = document.getElementById('todayTasksList');
-
-            if (!todayTasksList) return;
-
-            if (todayTasks.length === 0) {
-                todayTasksList.innerHTML = '<div class="text-center text-gray-500 py-8">今日のタスクはありません</div>';
-                return;
-            }
-
-            todayTasksList.innerHTML = todayTasks.map(task => createTaskCard(task)).join('');
-        }
-
-        function createTaskCard(task) {
-            return `
-                <div class="task-card ${task.completed ? 'completed' : ''} ${task.priority}-priority">
-                    <div class="flex items-center">
-                        <input type="checkbox" ${task.completed ? 'checked' : ''} 
-                               onchange="toggleTaskComplete(${task.id})"
-                               class="mr-4 w-5 h-5 text-blue-600 rounded">
-                        <div class="flex-1">
-                            <div class="font-semibold text-gray-900 ${task.completed ? 'line-through' : ''}">
-                                ${task.title}
-                            </div>
-                            <div class="text-sm text-gray-600 mt-1">${task.description}</div>
-                            ${task.store ? `<div class="text-xs text-blue-600 mt-1">${getStoreName(task.store)}</div>` : ''}
-                        </div>
-                        <div class="flex items-center space-x-2">
-                            <span class="px-3 py-1 text-xs rounded-full ${getPriorityClass(task.priority)}">${getPriorityText(task.priority)}</span>
-                            <button onclick="editTask(${task.id})" class="text-blue-600 hover:text-blue-800 p-2">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function renderStoresOverview() {
-            const storesOverview = document.getElementById('storesOverview');
-            if (!storesOverview || !storeData || storeData.length === 0) return;
-
-            const storeCards = storeData.map(store => {
-                const achievementClass = getAchievementClass(store.salesAchievementRate);
-                const achievementText = getAchievementText(store.salesAchievementRate);
-
-                return `
-                    <div class="glass-card p-6 cursor-pointer" onclick="showStoreDetails('${store.id}')">
-                        <div class="flex items-center justify-between mb-4">
-                            <h4 class="text-lg font-semibold text-gray-900">${store.name}</h4>
-                            <div class="text-2xl">${getBrandEmoji(actualStoreInfo[store.id]?.type || 'Other')}</div>
-                        </div>
-                        <div class="space-y-3">
-                            <div class="flex justify-between">
-                                <span>売上達成率</span>
-                                <span class="achievement-badge ${achievementClass}">${(store.salesAchievementRate * 100).toFixed(1)}%</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span>月次売上</span>
-                                <span class="font-bold text-blue-600">¥${(store.totalSales / 1000000).toFixed(1)}M</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span>出勤人数</span>
-                                <span class="font-bold text-purple-600">${store.attendanceCount}人</span>
-                            </div>
-                            <div class="w-full bg-gray-200 rounded-full h-2">
-                                <div class="bg-blue-500 h-2 rounded-full" style="width: ${Math.min(100, store.salesAchievementRate * 100)}%"></div>
-                            </div>
-                            <div class="text-xs text-gray-600 text-center">
-                                目標: ¥${(store.salesTarget / 1000000).toFixed(1)}M • ${achievementText}
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-
-            storesOverview.innerHTML = storeCards;
-        }
-
-        function renderWeeklySchedule() {
-            const weeklySchedule = document.getElementById('weeklySchedule');
-            if (!weeklySchedule) return;
-
-            const weekDays = ['日', '月', '火', '水', '木', '金', '土'];
-            const today = new Date();
-            const startOfWeek = new Date(today);
-            startOfWeek.setDate(today.getDate() - today.getDay());
-
-            let weekHTML = '';
-            for (let i = 0; i < 7; i++) {
-                const currentDay = new Date(startOfWeek);
-                currentDay.setDate(startOfWeek.getDate() + i);
-                const dateStr = currentDay.toISOString().split('T')[0];
-                const dayEvents = events.filter(event => event.date === dateStr);
-                const isToday = dateStr === today.toISOString().split('T')[0];
-
-                weekHTML += `
-                    <div class="calendar-day ${isToday ? 'today' : ''}" onclick="showDayDetails('${dateStr}')">
-                        <div class="font-semibold mb-2">${weekDays[i]} ${currentDay.getDate()}</div>
-                        ${dayEvents.map(event => `
-                            <div class="text-xs p-1 rounded mb-1 ${getEventClass(event.type)}">
-                                ${event.title}
-                            </div>
-                        `).join('')}
-                    </div>
-                `;
-            }
-            weeklySchedule.innerHTML = weekHTML;
-        }
-
-        // 売上分析
-        function renderSales() {
-            updateSalesStats();
-            updateStoreRanking();
-            if (!salesChart) {
-                initializeSalesChart();
-            } else {
-                updateSalesChart('sales');
-            }
-        }
-
-        function updateSalesStats() {
-            if (!storeData || storeData.length === 0) return;
-
-            const totalSales = storeData.reduce((sum, store) => sum + store.totalSales, 0);
-            const totalTarget = storeData.reduce((sum, store) => sum + store.salesTarget, 0);
-            const achievementRate = totalTarget > 0 ? (totalSales / totalTarget) * 100 : 0;
-            const averageSales = totalSales / storeData.length;
-
-            updateElement('totalMonthlySales', `¥${(totalSales / 100000000).toFixed(1)}億`);
-            updateElement('totalSalesTarget', `目標: ¥${(totalTarget / 100000000).toFixed(1)}億`);
-            updateElement('overallAchievementRate', `${achievementRate.toFixed(1)}%`);
-            updateElement('achievementStatus', achievementRate >= 100 ? '目標達成' : '目標未達');
-            updateElement('averageStoreSales', `¥${(averageSales / 1000000).toFixed(1)}M`);
-        }
-
-        function updateStoreRanking() {
-            const storeRanking = document.getElementById('storeRanking');
-            if (!storeRanking || !storeData || storeData.length === 0) return;
-
-            // 売上順でソート
-            const sortedStores = [...storeData].sort((a, b) => b.totalSales - a.totalSales);
-
-            storeRanking.innerHTML = sortedStores.slice(0, 5).map((store, index) => `
-                <div class="p-4 bg-gradient-to-r ${getRankingGradient(index + 1)} rounded-16 border-l-4 ${getRankingBorder(index + 1)}">
-                    <div class="flex items-center justify-between">
-                        <div class="
+</html>
