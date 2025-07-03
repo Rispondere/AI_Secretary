@@ -261,27 +261,6 @@
         
         .hidden { display: none !important; }
         
-        .calendar-day {
-            min-height: 100px;
-            border: 1px solid rgba(59, 130, 246, 0.1);
-            border-radius: 12px;
-            padding: 12px;
-            background: rgba(255, 255, 255, 0.8);
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-        
-        .calendar-day:hover {
-            background: rgba(59, 130, 246, 0.05);
-            border-color: var(--primary);
-        }
-        
-        .calendar-day.today {
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(6, 182, 212, 0.1));
-            border-color: var(--primary);
-            font-weight: 600;
-        }
-        
         .floating-btn {
             position: fixed;
             bottom: 30px;
@@ -313,14 +292,6 @@
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(30px); }
             to { opacity: 1; transform: translateY(0); }
-        }
-        
-        @media (max-width: 768px) {
-            .btn { padding: 20px 24px; font-size: 18px; min-height: 64px; }
-            .input-field { padding: 20px; font-size: 18px; }
-            .task-card { padding: 24px; margin: 16px 0; }
-            .glass-card { margin: 12px; }
-            .modal-content { padding: 24px; }
         }
 
         .achievement-badge {
@@ -388,7 +359,7 @@
                     <div class="text-center">
                         <div class="text-3xl mb-3">📊</div>
                         <div class="text-sm font-medium text-blue-800">データ同期</div>
-                        <div class="text-xs text-blue-600 mb-4" id="lastSync">2025/6/30 更新</div>
+                        <div class="text-xs text-blue-600 mb-4" id="lastSync">2025/7/3 更新</div>
                         <button class="btn btn-primary w-full" id="syncBtn">
                             <i class="fas fa-sync-alt mr-2"></i>同期
                         </button>
@@ -427,31 +398,6 @@
             
             <!-- ダッシュボードページ -->
             <div id="dashboardPage" class="page-content p-4 lg:p-6 fade-in">
-                <!-- データアップロード -->
-                <div class="glass-card p-6 mb-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-bold text-gray-900">全店統計データアップロード</h3>
-                        <button class="btn btn-success" id="downloadTemplateBtn">
-                            <i class="fas fa-download mr-2"></i>テンプレートDL
-                        </button>
-                    </div>
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                        <div>
-                            <input type="file" id="dashboardFileInput" accept=".xlsx,.xls,.csv" class="input-field">
-                            <div class="text-sm text-gray-600 mt-2">
-                                <i class="fas fa-info-circle mr-1"></i>
-                                全店統計データ（売上・KPI・アクセス数等）をアップロード
-                            </div>
-                        </div>
-                        <div class="flex items-center space-x-3">
-                            <button class="btn btn-primary" id="processDataBtn">
-                                <i class="fas fa-upload mr-2"></i>データ反映
-                            </button>
-                            <div id="uploadStatus" class="text-sm text-gray-500"></div>
-                        </div>
-                    </div>
-                </div>
-                
                 <!-- 全体統計 -->
                 <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-6 mb-6">
                     <div class="glass-card p-6 text-center">
@@ -605,31 +551,6 @@
             
             <!-- KPI管理ページ -->
             <div id="attendancePage" class="page-content p-4 lg:p-6 hidden">
-                <!-- データアップロード -->
-                <div class="glass-card p-6 mb-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-bold text-gray-900">KPIデータアップロード</h3>
-                        <button class="btn btn-success" id="downloadKpiTemplateBtn">
-                            <i class="fas fa-download mr-2"></i>テンプレートDL
-                        </button>
-                    </div>
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                        <div>
-                            <input type="file" id="attendanceFileInput" accept=".xlsx,.xls,.csv" class="input-field">
-                            <div class="text-sm text-gray-600 mt-2">
-                                <i class="fas fa-info-circle mr-1"></i>
-                                KPI統計データ（アクセス・出勤・日記・口コミ等）をアップロード
-                            </div>
-                        </div>
-                        <div class="flex items-center space-x-3">
-                            <button class="btn btn-primary" id="processKpiDataBtn">
-                                <i class="fas fa-upload mr-2"></i>データ反映
-                            </button>
-                            <div id="kpiUploadStatus" class="text-sm text-gray-500"></div>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- KPIサマリー -->
                 <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-6 mb-6">
                     <div class="glass-card p-6 text-center">
@@ -732,26 +653,6 @@
                     <div id="calendarGrid" class="grid grid-cols-7 gap-2 mb-6">
                         <!-- カレンダーが動的に表示されます -->
                     </div>
-                    
-                    <!-- イベント凡例 -->
-                    <div class="flex flex-wrap gap-4 text-sm">
-                        <div class="flex items-center">
-                            <div class="w-3 h-3 bg-blue-400 rounded mr-2"></div>
-                            <span>会議</span>
-                        </div>
-                        <div class="flex items-center">
-                            <div class="w-3 h-3 bg-green-400 rounded mr-2"></div>
-                            <span>撮影</span>
-                        </div>
-                        <div class="flex items-center">
-                            <div class="w-3 h-3 bg-red-400 rounded mr-2"></div>
-                            <span>休業</span>
-                        </div>
-                        <div class="flex items-center">
-                            <div class="w-3 h-3 bg-orange-400 rounded mr-2"></div>
-                            <span>締切</span>
-                        </div>
-                    </div>
                 </div>
             </div>
             
@@ -782,24 +683,6 @@
                         <p class="text-gray-600 mb-4">全業務統合レポート</p>
                         <button class="btn btn-primary w-full" id="comprehensiveReportBtn">
                             <i class="fas fa-download mr-2"></i>ダウンロード
-                        </button>
-                    </div>
-                    
-                    <div class="glass-card p-6 text-center">
-                        <div class="text-5xl mb-4">📅</div>
-                        <h4 class="text-lg font-bold mb-2">スケジュール</h4>
-                        <p class="text-gray-600 mb-4">予定・会議一覧</p>
-                        <button class="btn btn-primary w-full" id="scheduleReportBtn">
-                            <i class="fas fa-download mr-2"></i>ダウンロード
-                        </button>
-                    </div>
-                    
-                    <div class="glass-card p-6 text-center">
-                        <div class="text-5xl mb-4">🎯</div>
-                        <h4 class="text-lg font-bold mb-2">月末締めデータ</h4>
-                        <p class="text-gray-600 mb-4">全データ一括出力</p>
-                        <button class="btn btn-success w-full" id="monthEndReportBtn">
-                            <i class="fas fa-file-archive mr-2"></i>一括DL
                         </button>
                     </div>
                 </div>
@@ -935,247 +818,26 @@
     </div>
 
     <script>
-        // Google Sheets API設定
-        const GOOGLE_SHEETS_CONFIG = {
-            // ⚠️ ここにデプロイ後のGoogle Apps Script URLを設定してください
-            API_URL: 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec',
-            TIMEOUT: 10000 // 10秒タイムアウト
-        };
+        // ===== グローバル変数定義 =====
+        let currentPage = 'dashboard';
+        let sidebarOpen = false;
+        let editingTaskId = null;
+        let editingEventId = null;
+        let currentMonth = new Date().getMonth();
+        let currentYear = new Date().getFullYear();
+        let uploadedBusinessData = null;
 
-        // データ管理クラス
-        class DataManager {
-            constructor() {
-                this.cache = {
-                    tasks: [],
-                    events: [],
-                    storeData: [],
-                    lastSync: null
-                };
-                this.isOnline = navigator.onLine;
-                this.setupNetworkListener();
-            }
+        // データ配列
+        let tasks = [];
+        let events = [];
+        let storeData = [];
 
-            setupNetworkListener() {
-                window.addEventListener('online', () => {
-                    this.isOnline = true;
-                    console.log('ネットワーク接続が復旧しました');
-                    this.syncWithServer();
-                });
+        // チャート変数
+        let salesChart = null;
+        let accessChart = null;
+        let kpiChart = null;
 
-                window.addEventListener('offline', () => {
-                    this.isOnline = false;
-                    console.log('ネットワーク接続が切断されました');
-                });
-            }
-
-            async saveTask(task) {
-                console.log('タスクを保存:', task);
-                
-                try {
-                    const response = await this.postToSheets({
-                        type: 'task',
-                        ...task
-                    });
-                    
-                    if (response.status === 'success') {
-                        // ローカルキャッシュを更新
-                        const existingIndex = this.cache.tasks.findIndex(t => t.id === task.id);
-                        if (existingIndex >= 0) {
-                            this.cache.tasks[existingIndex] = task;
-                        } else {
-                            this.cache.tasks.push(task);
-                        }
-                        
-                        showNotification('タスクをGoogle Sheetsに保存しました', 'success');
-                        return true;
-                    } else {
-                        throw new Error(response.message || '保存に失敗しました');
-                    }
-                } catch (error) {
-                    console.error('タスク保存エラー:', error);
-                    showNotification('タスクの保存に失敗しました: ' + error.message, 'error');
-                    return false;
-                }
-            }
-
-            async saveEvent(event) {
-                console.log('イベントを保存:', event);
-                
-                try {
-                    const response = await this.postToSheets({
-                        type: 'event',
-                        ...event
-                    });
-                    
-                    if (response.status === 'success') {
-                        const existingIndex = this.cache.events.findIndex(e => e.id === event.id);
-                        if (existingIndex >= 0) {
-                            this.cache.events[existingIndex] = event;
-                        } else {
-                            this.cache.events.push(event);
-                        }
-                        
-                        showNotification('予定をGoogle Sheetsに保存しました', 'success');
-                        return true;
-                    } else {
-                        throw new Error(response.message || '保存に失敗しました');
-                    }
-                } catch (error) {
-                    console.error('イベント保存エラー:', error);
-                    showNotification('予定の保存に失敗しました: ' + error.message, 'error');
-                    return false;
-                }
-            }
-
-            async saveKpiData(kpiData) {
-                console.log('KPIデータを保存:', kpiData);
-                
-                try {
-                    const response = await this.postToSheets({
-                        type: 'kpi',
-                        ...kpiData
-                    });
-                    
-                    if (response.status === 'success') {
-                        showNotification('KPIデータをGoogle Sheetsに保存しました', 'success');
-                        return true;
-                    } else {
-                        throw new Error(response.message || '保存に失敗しました');
-                    }
-                } catch (error) {
-                    console.error('KPIデータ保存エラー:', error);
-                    showNotification('KPIデータの保存に失敗しました: ' + error.message, 'error');
-                    return false;
-                }
-            }
-
-            async loadAllData(storeFilter = 'all') {
-                console.log('データを読み込み中...', storeFilter);
-                
-                try {
-                    const url = storeFilter === 'all' 
-                        ? GOOGLE_SHEETS_CONFIG.API_URL 
-                        : `${GOOGLE_SHEETS_CONFIG.API_URL}?store=${encodeURIComponent(storeFilter)}`;
-                    
-                    const response = await fetch(url, {
-                        method: 'GET',
-                        headers: {
-                            'Accept': 'application/json'
-                        }
-                    });
-
-                    if (!response.ok) {
-                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                    }
-
-                    const result = await response.json();
-                    
-                    if (result.status === 'success') {
-                        // データをタイプ別に分類
-                        this.cache.tasks = result.data.filter(item => item.type === 'task');
-                        this.cache.events = result.data.filter(item => item.type === 'event');
-                        this.cache.lastSync = new Date().toISOString();
-                        
-                        console.log(`データ読み込み完了: タスク${this.cache.tasks.length}件、イベント${this.cache.events.length}件`);
-                        showNotification(`Google Sheetsからデータを読み込みました（${result.filteredCount}件）`, 'success');
-                        
-                        return {
-                            tasks: this.cache.tasks,
-                            events: this.cache.events,
-                            stores: result.stores || [],
-                            totalCount: result.totalCount || 0
-                        };
-                    } else {
-                        throw new Error(result.message || 'データの読み込みに失敗しました');
-                    }
-                } catch (error) {
-                    console.error('データ読み込みエラー:', error);
-                    showNotification('データの読み込みに失敗しました: ' + error.message, 'error');
-                    
-                    // キャッシュデータを返す
-                    return {
-                        tasks: this.cache.tasks,
-                        events: this.cache.events,
-                        stores: [],
-                        totalCount: 0
-                    };
-                }
-            }
-
-            async postToSheets(data) {
-                if (!this.isOnline) {
-                    throw new Error('ネットワーク接続がありません');
-                }
-
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), GOOGLE_SHEETS_CONFIG.TIMEOUT);
-
-                try {
-                    const response = await fetch(GOOGLE_SHEETS_CONFIG.API_URL, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(data),
-                        signal: controller.signal
-                    });
-
-                    clearTimeout(timeoutId);
-
-                    if (!response.ok) {
-                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                    }
-
-                    return await response.json();
-                } catch (error) {
-                    clearTimeout(timeoutId);
-                    if (error.name === 'AbortError') {
-                        throw new Error('タイムアウトしました。もう一度お試しください。');
-                    }
-                    throw error;
-                }
-            }
-
-            async syncWithServer() {
-                console.log('サーバーと同期中...');
-                return await this.loadAllData();
-            }
-
-            async deleteTask(taskId) {
-                // 注意: 実際の削除機能はGoogle Apps Script側で実装が必要
-                console.log('タスク削除:', taskId);
-                const task = this.cache.tasks.find(t => t.id === taskId);
-                if (task) {
-                    task.status = 'deleted';
-                    task.updatedAt = new Date().toISOString();
-                    return await this.saveTask(task);
-                }
-                return false;
-            }
-
-            getTasks(storeFilter = null) {
-                if (storeFilter) {
-                    return this.cache.tasks.filter(task => 
-                        task.store === storeFilter && task.status !== 'deleted'
-                    );
-                }
-                return this.cache.tasks.filter(task => task.status !== 'deleted');
-            }
-
-            getEvents(storeFilter = null) {
-                if (storeFilter) {
-                    return this.cache.events.filter(event => 
-                        event.store === storeFilter && event.status !== 'deleted'
-                    );
-                }
-                return this.cache.events.filter(event => event.status !== 'deleted');
-            }
-        }
-
-        // グローバルデータマネージャーインスタンス
-        let dataManager = null;
-        
-        // 実際の店舗情報（アップロードファイルに基づく）
+        // 店舗情報
         const actualStoreInfo = {
             'shabour': { name: 'シャブール', shortName: 'シャブール', type: 'Premium' },
             'onecarat': { name: 'ワンカラット', shortName: 'ワンカラット', type: 'Premium' },
@@ -1188,789 +850,37 @@
             'cl_yokkaichi': { name: 'CL四日市', shortName: 'CL四日市', type: 'CLASSY' }
         };
 
-        // システム初期化
+        // ===== システム初期化 =====
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('=== DOMContentLoaded イベント発火 ===');
-            initializeSystem();
+            console.log('=== CLASSY業務管理システム初期化開始 ===');
             
-            // システム動作テスト
-            setTimeout(() => {
-                console.log('=== システム動作テスト開始 ===');
-                
-                // 必要な要素の存在確認
-                const testElements = [
-                    'taskModal', 'eventModal', 'addTaskBtn', 'newTaskBtn', 
-                    'addEventBtn', 'taskTitle', 'eventTitle'
-                ];
-                
-                let allElementsExist = true;
-                testElements.forEach(elementId => {
-                    const element = document.getElementById(elementId);
-                    if (element) {
-                        console.log(`✅ ${elementId}: 存在`);
-                    } else {
-                        console.error(`❌ ${elementId}: 見つかりません`);
-                        allElementsExist = false;
-                    }
-                });
-                
-                if (allElementsExist) {
-                    console.log('✅ 全ての必要な要素が存在します');
-                    
-                    // テスト用のボタンクリック関数を追加
-                    window.testTaskModal = function() {
-                        console.log('=== テスト: タスクモーダル表示 ===');
-                        openTaskModal();
-                    };
-                    
-                    window.testEventModal = function() {
-                        console.log('=== テスト: イベントモーダル表示 ===');
-                        openEventModal();
-                    };
-                    
-                    console.log('テスト関数を追加しました: window.testTaskModal(), window.testEventModal()');
-                    
-                    // 成功通知
-                    showNotification('システム初期化完了！タスク・予定追加機能が利用可能です', 'success');
-                } else {
-                    console.error('❌ 一部の要素が見つかりません');
-                    showNotification('システムの初期化でエラーが発生しました', 'error');
-                }
-                
-                console.log('=== システム動作テスト完了 ===');
-            }, 2000);
-        });
-
-        function initializeSystem() {
-            console.log('=== システム初期化開始 ===');
+            // データ初期化
+            loadSampleData();
+            loadActualStoreData();
             
-            loadData();
+            // UI初期化
             updateDateTime();
             setInterval(updateDateTime, 60000);
             
-            if (tasks.length === 0) {
-                createSampleData();
-                console.log('サンプルデータ作成完了');
-            }
-            if (storeData.length === 0) {
-                loadActualStoreData();
-                console.log('店舗データ読み込み完了');
-            }
+            // イベントリスナー設定
+            setupEventListeners();
             
-            // DOM読み込み完了後にイベントリスナーを設定
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', function() {
-                    console.log('DOM読み込み完了 - イベントリスナー設定開始');
-                    setupEventListeners();
-                    renderCurrentPage();
-                });
-            } else {
-                console.log('DOM既に読み込み済み - イベントリスナー設定開始');
-                setupEventListeners();
-                renderCurrentPage();
-            }
+            // 初期ページ描画
+            renderCurrentPage();
             
-            // チャート初期化（遅延実行）
+            // チャート初期化（遅延）
             setTimeout(() => {
                 initializeCharts();
-                console.log('チャート初期化完了');
             }, 1000);
             
-            console.log('=== システム初期化完了 ===');
-        }
-
-        // 実際の店舗データを読み込み
-        function loadActualStoreData() {
-            storeData = [
-                {
-                    id: 'shabour',
-                    name: 'シャブール',
-                    salesTarget: 33000000,
-                    totalSales: 29544738,
-                    salesDifference: -3455262,
-                    accessAverage: 65126,
-                    diaryTarget: 280,
-                    diaryDifference: -28,
-                    diaryAverage: 252,
-                    reviewTarget: 300,
-                    reviewDifference: 44,
-                    messageCount: 89,
-                    girlCount: 763,
-                    userCount: 6529,
-                    myGirlCount: 424651,
-                    totalAccess: 1967152,
-                    diaryPosts: 7560,
-                    limitedDiary: 1845,
-                    videoDiary: 21141,
-                    kiteneMessages: 20260,
-                    reviewPosts: 344,
-                    attendanceCount: 687,
-                    customerCount: 1557,
-                    dailySalesAverage: 1100000,
-                    salesAchievementRate: 0.8953,
-                    diaryAchievementRate: 0.9,
-                    reviewAchievementRate: 1.1467,
-                    kiteneChange: -125,
-                    okinTalkChange: 2,
-                    kiteneAverage: 800,
-                    newCustomers: 0
-                },
-                {
-                    id: 'onecarat',
-                    name: 'ワンカラット',
-                    salesTarget: 17500000,
-                    totalSales: 18314356,
-                    salesDifference: 814356,
-                    accessAverage: 42734,
-                    diaryTarget: 265,
-                    diaryDifference: 19.3,
-                    diaryAverage: 284.3,
-                    reviewTarget: 200,
-                    reviewDifference: -44,
-                    messageCount: 38,
-                    girlCount: 745,
-                    userCount: 3441,
-                    myGirlCount: 196763,
-                    totalAccess: 1241592,
-                    diaryPosts: 8528,
-                    limitedDiary: 706,
-                    videoDiary: 18481,
-                    kiteneMessages: 18119,
-                    reviewPosts: 156,
-                    attendanceCount: 514,
-                    customerCount: 937,
-                    dailySalesAverage: 583333,
-                    salesAchievementRate: 1.0465,
-                    diaryAchievementRate: 1.0727,
-                    reviewAchievementRate: 0.78,
-                    kiteneChange: -21,
-                    okinTalkChange: 1,
-                    kiteneAverage: 624,
-                    newCustomers: 0
-                },
-                {
-                    id: 'go_nagoya',
-                    name: 'GO名古屋',
-                    salesTarget: 28000000,
-                    totalSales: 29265025,
-                    salesDifference: 1265025,
-                    accessAverage: 48825,
-                    diaryTarget: 180,
-                    diaryDifference: -59.8,
-                    diaryAverage: 120.2,
-                    reviewTarget: 205,
-                    reviewDifference: 11,
-                    messageCount: 10,
-                    girlCount: 923,
-                    userCount: 4351,
-                    myGirlCount: 138740,
-                    totalAccess: 1349912,
-                    diaryPosts: 3605,
-                    limitedDiary: 630,
-                    videoDiary: 27789,
-                    kiteneMessages: 27376,
-                    reviewPosts: 216,
-                    attendanceCount: 518,
-                    customerCount: 880,
-                    dailySalesAverage: 933333,
-                    salesAchievementRate: 1.0452,
-                    diaryAchievementRate: 0.6676,
-                    reviewAchievementRate: 1.0537,
-                    kiteneChange: -61,
-                    okinTalkChange: 0,
-                    kiteneAverage: 973,
-                    newCustomers: 0
-                },
-                {
-                    id: 'go_fukuoka',
-                    name: 'GO福岡',
-                    salesTarget: 36000000,
-                    totalSales: 37050068,
-                    salesDifference: 1050068,
-                    accessAverage: 51499,
-                    diaryTarget: 250,
-                    diaryDifference: 10.9,
-                    diaryAverage: 260.9,
-                    reviewTarget: 180,
-                    reviewDifference: 22,
-                    messageCount: 4159,
-                    girlCount: 826,
-                    userCount: 2652,
-                    myGirlCount: 240562,
-                    totalAccess: 1619670,
-                    diaryPosts: 7828,
-                    limitedDiary: 2440,
-                    videoDiary: 32763,
-                    kiteneMessages: 32011,
-                    reviewPosts: 202,
-                    attendanceCount: 514,
-                    customerCount: 1006,
-                    dailySalesAverage: 1200000,
-                    salesAchievementRate: 1.0292,
-                    diaryAchievementRate: 1.0437,
-                    reviewAchievementRate: 1.1222,
-                    kiteneChange: 52,
-                    okinTalkChange: 23,
-                    kiteneAverage: 1015,
-                    newCustomers: 115
-                },
-                {
-                    id: 'go_tokyo',
-                    name: 'GO東京',
-                    salesTarget: 28000000,
-                    totalSales: 27324427,
-                    salesDifference: -675573,
-                    accessAverage: 35465,
-                    diaryTarget: 250,
-                    diaryDifference: -111.2,
-                    diaryAverage: 138.8,
-                    reviewTarget: 150,
-                    reviewDifference: -34,
-                    messageCount: 21,
-                    girlCount: 693,
-                    userCount: 7020,
-                    myGirlCount: 142358,
-                    totalAccess: 1182336,
-                    diaryPosts: 4164,
-                    limitedDiary: 1511,
-                    videoDiary: 19512,
-                    kiteneMessages: 19067,
-                    reviewPosts: 116,
-                    attendanceCount: 457,
-                    customerCount: 722,
-                    dailySalesAverage: 933333,
-                    salesAchievementRate: 0.9759,
-                    diaryAchievementRate: 0.5552,
-                    reviewAchievementRate: 0.7733,
-                    kiteneChange: -152,
-                    okinTalkChange: 0,
-                    kiteneAverage: 787,
-                    newCustomers: 0
-                },
-                {
-                    id: 'go_yokohama',
-                    name: 'GO横浜',
-                    salesTarget: 23000000,
-                    totalSales: 22547274,
-                    salesDifference: -452726,
-                    accessAverage: 19664,
-                    diaryTarget: 200,
-                    diaryDifference: -30.8,
-                    diaryAverage: 169.2,
-                    reviewTarget: 145,
-                    reviewDifference: -18,
-                    messageCount: 45,
-                    girlCount: 700,
-                    userCount: 3830,
-                    myGirlCount: 42166,
-                    totalAccess: 599756,
-                    diaryPosts: 5077,
-                    limitedDiary: 1677,
-                    videoDiary: 25474,
-                    kiteneMessages: 24565,
-                    reviewPosts: 127,
-                    attendanceCount: 407,
-                    customerCount: 592,
-                    dailySalesAverage: 766667,
-                    salesAchievementRate: 0.9803,
-                    diaryAchievementRate: 0.8462,
-                    reviewAchievementRate: 0.8759,
-                    kiteneChange: 137,
-                    okinTalkChange: 1,
-                    kiteneAverage: 681,
-                    newCustomers: 0
-                },
-                {
-                    id: 'cl_nagoya',
-                    name: 'CL名古屋',
-                    salesTarget: 6000000,
-                    totalSales: 5300320,
-                    salesDifference: -699680,
-                    accessAverage: 14717,
-                    diaryTarget: 80,
-                    diaryDifference: -18.3,
-                    diaryAverage: 61.7,
-                    reviewTarget: 150,
-                    reviewDifference: -37,
-                    messageCount: 24,
-                    girlCount: 316,
-                    userCount: 2453,
-                    myGirlCount: 25764,
-                    totalAccess: 514243,
-                    diaryPosts: 1851,
-                    limitedDiary: 591,
-                    videoDiary: 8018,
-                    kiteneMessages: 7775,
-                    reviewPosts: 113,
-                    attendanceCount: 197,
-                    customerCount: 458,
-                    dailySalesAverage: 200000,
-                    salesAchievementRate: 0.8834,
-                    diaryAchievementRate: 0.7713,
-                    reviewAchievementRate: 0.7533,
-                    kiteneChange: -12,
-                    okinTalkChange: 0,
-                    kiteneAverage: 271,
-                    newCustomers: 0
-                },
-                {
-                    id: 'cl_tokyo',
-                    name: 'CL東京',
-                    salesTarget: 7200000,
-                    totalSales: 6719328,
-                    salesDifference: -480672,
-                    accessAverage: 26465,
-                    diaryTarget: 100,
-                    diaryDifference: -30.7,
-                    diaryAverage: 69.3,
-                    reviewTarget: 180,
-                    reviewDifference: -58,
-                    messageCount: 2493,
-                    girlCount: 267,
-                    userCount: 2064,
-                    myGirlCount: 73336,
-                    totalAccess: 742231,
-                    diaryPosts: 2079,
-                    limitedDiary: 672,
-                    videoDiary: 6730,
-                    kiteneMessages: 6522,
-                    reviewPosts: 122,
-                    attendanceCount: 238,
-                    customerCount: 609,
-                    dailySalesAverage: 240000,
-                    salesAchievementRate: 0.9332,
-                    diaryAchievementRate: 0.693,
-                    reviewAchievementRate: 0.6778,
-                    kiteneChange: -102,
-                    okinTalkChange: -27,
-                    kiteneAverage: 319,
-                    newCustomers: 110
-                },
-                {
-                    id: 'cl_yokkaichi',
-                    name: 'CL四日市',
-                    salesTarget: 12500000,
-                    totalSales: 12943296,
-                    salesDifference: 443296,
-                    accessAverage: 32278,
-                    diaryTarget: 205,
-                    diaryDifference: 5,
-                    diaryAverage: 210,
-                    reviewTarget: 240,
-                    reviewDifference: 16,
-                    messageCount: 6842,
-                    girlCount: 598,
-                    userCount: 5077,
-                    myGirlCount: 45108,
-                    totalAccess: 881476,
-                    diaryPosts: 6301,
-                    limitedDiary: 2583,
-                    videoDiary: 18446,
-                    kiteneMessages: 17259,
-                    reviewPosts: 256,
-                    attendanceCount: 356,
-                    customerCount: 914,
-                    dailySalesAverage: 416667,
-                    salesAchievementRate: 1.0355,
-                    diaryAchievementRate: 1.0246,
-                    reviewAchievementRate: 1.0667,
-                    kiteneChange: -45,
-                    okinTalkChange: -50,
-                    kiteneAverage: 620,
-                    newCustomers: 278
-                }
-            ];
-        }
-
-        // イベントリスナー設定
-        function setupEventListeners() {
-            console.log('=== イベントリスナー設定開始 ===');
+            // 初期化完了通知
+            showNotification('システム初期化完了！', 'success');
             
-            // ナビゲーション
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.addEventListener('click', function() {
-                    const page = this.getAttribute('data-page');
-                    showPage(page);
-                });
-            });
+            console.log('=== 初期化完了 ===');
+        });
 
-            // サイドバートグル
-            const menuToggle = document.getElementById('menuToggle');
-            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-            const overlay = document.getElementById('overlay');
-            
-            if (menuToggle) menuToggle.addEventListener('click', toggleSidebar);
-            if (mobileMenuBtn) mobileMenuBtn.addEventListener('click', toggleSidebar);
-            if (overlay) overlay.addEventListener('click', closeSidebar);
-
-            // モーダル関連（先に設定）
-            setupModalListeners();
-            
-            // ボタン関連
-            setupButtonListeners();
-            
-            // フィルター関連
-            setupFilterListeners();
-            
-            // ファイルアップロード関連
-            setupFileUploadListeners();
-
-            // キーボードショートカット
-            document.addEventListener('keydown', handleKeyboardShortcuts);
-            
-            // グローバルクリック処理（タスク完了チェックボックス用）
-            document.addEventListener('click', function(e) {
-                // タスク完了チェックボックス
-                if (e.target.type === 'checkbox' && e.target.hasAttribute('onchange')) {
-                    const onchangeAttr = e.target.getAttribute('onchange');
-                    if (onchangeAttr && onchangeAttr.includes('toggleTaskComplete')) {
-                        const taskId = onchangeAttr.match(/toggleTaskComplete\((\d+)\)/);
-                        if (taskId) {
-                            toggleTaskComplete(parseInt(taskId[1]));
-                        }
-                    }
-                }
-                
-                // タスク編集ボタン
-                if (e.target.closest('button[onclick*="editTask"]')) {
-                    const onclickAttr = e.target.closest('button').getAttribute('onclick');
-                    const taskId = onclickAttr.match(/editTask\((\d+)\)/);
-                    if (taskId) {
-                        editTask(parseInt(taskId[1]));
-                    }
-                }
-                
-                // タスク削除ボタン
-                if (e.target.closest('button[onclick*="deleteTask"]')) {
-                    const onclickAttr = e.target.closest('button').getAttribute('onclick');
-                    const taskId = onclickAttr.match(/deleteTask\((\d+)\)/);
-                    if (taskId) {
-                        deleteTask(parseInt(taskId[1]));
-                    }
-                }
-                
-                // 店舗詳細表示
-                if (e.target.closest('.glass-card[onclick*="showStoreDetails"]')) {
-                    const onclickAttr = e.target.closest('.glass-card').getAttribute('onclick');
-                    const storeCode = onclickAttr.match(/showStoreDetails\('(.+?)'\)/);
-                    if (storeCode) {
-                        showStoreDetails(storeCode[1]);
-                    }
-                }
-            });
-            
-            console.log('=== イベントリスナー設定完了 ===');
-        }
-
-        function setupModalListeners() {
-            console.log('=== モーダルイベントリスナー設定開始 ===');
-            
-            // モーダルが存在するかチェック
-            const taskModal = document.getElementById('taskModal');
-            const eventModal = document.getElementById('eventModal');
-            
-            if (!taskModal) {
-                console.error('タスクモーダルが見つかりません');
-                return;
-            }
-            if (!eventModal) {
-                console.error('イベントモーダルが見つかりません');
-                return;
-            }
-            
-            // タスクモーダルのボタン設定
-            const taskModalButtons = [
-                { id: 'closeTaskModal', action: 'close', name: 'タスクモーダル閉じる' },
-                { id: 'cancelTaskBtn', action: 'close', name: 'タスクキャンセル' },
-                { id: 'saveTaskBtn', action: 'save', name: 'タスク保存' }
-            ];
-            
-            taskModalButtons.forEach(button => {
-                const element = document.getElementById(button.id);
-                if (element) {
-                    // 既存のイベントリスナーを削除
-                    element.replaceWith(element.cloneNode(true));
-                    const newElement = document.getElementById(button.id);
-                    
-                    newElement.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        console.log(`${button.name}ボタンがクリックされました`);
-                        
-                        if (button.action === 'close') {
-                            hideModal('taskModal');
-                        } else if (button.action === 'save') {
-                            saveTask();
-                        }
-                    });
-                    console.log(`${button.name}のイベントリスナー設定完了`);
-                } else {
-                    console.error(`${button.name}ボタンが見つかりません: ${button.id}`);
-                }
-            });
-
-            // イベントモーダルのボタン設定
-            const eventModalButtons = [
-                { id: 'closeEventModal', action: 'close', name: 'イベントモーダル閉じる' },
-                { id: 'cancelEventBtn', action: 'close', name: 'イベントキャンセル' },
-                { id: 'saveEventBtn', action: 'save', name: 'イベント保存' }
-            ];
-            
-            eventModalButtons.forEach(button => {
-                const element = document.getElementById(button.id);
-                if (element) {
-                    // 既存のイベントリスナーを削除
-                    element.replaceWith(element.cloneNode(true));
-                    const newElement = document.getElementById(button.id);
-                    
-                    newElement.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        console.log(`${button.name}ボタンがクリックされました`);
-                        
-                        if (button.action === 'close') {
-                            hideModal('eventModal');
-                        } else if (button.action === 'save') {
-                            saveEvent();
-                        }
-                    });
-                    console.log(`${button.name}のイベントリスナー設定完了`);
-                } else {
-                    console.error(`${button.name}ボタンが見つかりません: ${button.id}`);
-                }
-            });
-            
-            // モーダル背景クリックで閉じる
-            [taskModal, eventModal].forEach(modal => {
-                modal.addEventListener('click', function(e) {
-                    if (e.target === modal) {
-                        console.log('モーダル背景クリック - 閉じます');
-                        if (modal.id === 'taskModal') {
-                            hideModal('taskModal');
-                        } else {
-                            hideModal('eventModal');
-                        }
-                    }
-                });
-            });
-            
-            console.log('=== モーダルイベントリスナー設定完了 ===');
-        }
-
-        function setupButtonListeners() {
-            console.log('=== ボタンイベントリスナー設定開始 ===');
-            
-            // タスク追加ボタンの設定を確実にする
-            const taskButtons = [
-                { id: 'addTaskBtn', name: 'ダッシュボードタスク追加' },
-                { id: 'newTaskBtn', name: 'タスク管理新規' },
-                { id: 'quickActionBtn', name: 'クイックアクション' }
-            ];
-            
-            taskButtons.forEach(button => {
-                const element = document.getElementById(button.id);
-                if (element) {
-                    // 既存のイベントリスナーを削除
-                    element.replaceWith(element.cloneNode(true));
-                    const newElement = document.getElementById(button.id);
-                    
-                    if (button.id === 'quickActionBtn') {
-                        newElement.addEventListener('click', function(e) {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            console.log(`${button.name}ボタンがクリックされました`);
-                            showQuickActions();
-                        });
-                    } else {
-                        newElement.addEventListener('click', function(e) {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            console.log(`${button.name}ボタンがクリックされました`);
-                            openTaskModal();
-                        });
-                    }
-                    console.log(`${button.name}のイベントリスナー設定完了`);
-                } else {
-                    console.warn(`${button.name}ボタンが見つかりません: ${button.id}`);
-                }
-            });
-
-            // イベント追加ボタンの設定
-            const eventButtons = [
-                { id: 'addEventBtn', name: 'カレンダー予定追加' }
-            ];
-            
-            eventButtons.forEach(button => {
-                const element = document.getElementById(button.id);
-                if (element) {
-                    // 既存のイベントリスナーを削除
-                    element.replaceWith(element.cloneNode(true));
-                    const newElement = document.getElementById(button.id);
-                    
-                    newElement.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        console.log(`${button.name}ボタンがクリックされました`);
-                        openEventModal();
-                    });
-                    console.log(`${button.name}のイベントリスナー設定完了`);
-                } else {
-                    console.warn(`${button.name}ボタンが見つかりません: ${button.id}`);
-                }
-            });
-
-            // その他のボタン
-            const otherButtons = [
-                { id: 'downloadTemplateBtn', func: downloadStoreTemplate, name: 'テンプレートDL' },
-                { id: 'processDataBtn', func: processStoreData, name: 'データ処理' },
-                { id: 'syncBtn', func: syncAllData, name: '同期' },
-                { id: 'exportTasksBtn', func: exportTasks, name: 'タスクエクスポート' },
-                { id: 'downloadKpiTemplateBtn', func: downloadStoreTemplate, name: 'KPIテンプレートDL' },
-                { id: 'processKpiDataBtn', func: processStoreData, name: 'KPIデータ処理' },
-                { id: 'exportKpiBtn', func: exportKpiData, name: 'KPIエクスポート' },
-                { id: 'todayBtn', func: goToToday, name: '今日' },
-                { id: 'prevMonthBtn', func: previousMonth, name: '前月' },
-                { id: 'nextMonthBtn', func: nextMonth, name: '次月' }
-            ];
-
-            otherButtons.forEach(button => {
-                const element = document.getElementById(button.id);
-                if (element) {
-                    element.replaceWith(element.cloneNode(true));
-                    const newElement = document.getElementById(button.id);
-                    newElement.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        console.log(`${button.name}ボタンがクリックされました`);
-                        button.func();
-                    });
-                    console.log(`${button.name}のイベントリスナー設定完了`);
-                }
-            });
-
-            // チャート切り替えボタン
-            const chartButtons = [
-                { id: 'salesChartBtn', func: () => updateSalesChart('sales'), name: '売上チャート' },
-                { id: 'achievementChartBtn', func: () => updateSalesChart('achievement'), name: '達成率チャート' }
-            ];
-
-            chartButtons.forEach(button => {
-                const element = document.getElementById(button.id);
-                if (element) {
-                    element.replaceWith(element.cloneNode(true));
-                    const newElement = document.getElementById(button.id);
-                    newElement.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        console.log(`${button.name}ボタンがクリックされました`);
-                        button.func();
-                    });
-                }
-            });
-
-            // レポートボタン
-            const reportButtons = [
-                { id: 'salesReportBtn', type: 'sales', name: '売上レポート' },
-                { id: 'kpiReportBtn', type: 'kpi', name: 'KPIレポート' },
-                { id: 'comprehensiveReportBtn', type: 'comprehensive', name: '総合レポート' },
-                { id: 'scheduleReportBtn', type: 'schedule', name: 'スケジュールレポート' },
-                { id: 'monthEndReportBtn', func: generateMonthEndReport, name: '月末レポート' }
-            ];
-
-            reportButtons.forEach(button => {
-                const element = document.getElementById(button.id);
-                if (element) {
-                    element.replaceWith(element.cloneNode(true));
-                    const newElement = document.getElementById(button.id);
-                    newElement.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        console.log(`${button.name}ボタンがクリックされました`);
-                        if (button.func) {
-                            button.func();
-                        } else {
-                            generateReport(button.type);
-                        }
-                    });
-                }
-            });
-            
-            console.log('=== ボタンイベントリスナー設定完了 ===');
-        }
-
-        function setupFilterListeners() {
-            const taskSearch = document.getElementById('taskSearch');
-            const priorityFilter = document.getElementById('priorityFilter');
-            const statusFilter = document.getElementById('statusFilter');
-            const storeFilter = document.getElementById('storeFilter');
-
-            if (taskSearch) taskSearch.addEventListener('input', filterTasks);
-            if (priorityFilter) priorityFilter.addEventListener('change', filterTasks);
-            if (statusFilter) statusFilter.addEventListener('change', filterTasks);
-            if (storeFilter) storeFilter.addEventListener('change', filterTasks);
-        }
-
-        function setupFileUploadListeners() {
-            const dashboardFileInput = document.getElementById('dashboardFileInput');
-            const attendanceFileInput = document.getElementById('attendanceFileInput');
-
-            if (dashboardFileInput) dashboardFileInput.addEventListener('change', handleStoreDataUpload);
-            if (attendanceFileInput) attendanceFileInput.addEventListener('change', handleStoreDataUpload);
-        }
-
-        function handleKeyboardShortcuts(e) {
-            // モーダルが開いている場合はESCキーのみ処理
-            const modalOpen = !document.getElementById('taskModal').classList.contains('hidden') || 
-                             !document.getElementById('eventModal').classList.contains('hidden');
-            
-            if (modalOpen && e.key === 'Escape') {
-                console.log('ESCキーでモーダルを閉じます');
-                closeAllModals();
-                return;
-            }
-            
-            // モーダルが開いている時は他のショートカットを無効にする
-            if (modalOpen) return;
-            
-            if (e.ctrlKey || e.metaKey) {
-                switch(e.key) {
-                    case 'k':
-                        e.preventDefault();
-                        console.log('Ctrl+K: タスクモーダルを開きます');
-                        openTaskModal();
-                        break;
-                    case 'e':
-                        e.preventDefault();
-                        console.log('Ctrl+E: イベントモーダルを開きます');
-                        openEventModal();
-                        break;
-                    case 's':
-                        e.preventDefault();
-                        console.log('Ctrl+S: データ同期を実行します');
-                        syncAllData();
-                        break;
-                }
-            }
-            
-            if (e.key === 'Escape') {
-                closeAllModals();
-                closeSidebar();
-            }
-        }
-
-        // データ管理
-        function loadData() {
-            tasks = tasks || [];
-            events = events || [];
-            storeData = storeData || [];
-        }
-
-        function saveData() {
-            console.log('データ保存完了（メモリ内）');
-        }
-
-        // サンプルデータ作成
-        function createSampleData() {
+        // ===== データ管理 =====
+        function loadSampleData() {
             const today = new Date();
             const tomorrow = new Date(today);
             tomorrow.setDate(tomorrow.getDate() + 1);
@@ -2005,16 +915,6 @@
                     dueDate: today.toISOString().split('T')[0],
                     completed: false,
                     createdAt: today.toISOString()
-                },
-                {
-                    id: Date.now() + 4,
-                    title: '全店舗データ同期完了',
-                    description: '6月末の全店舗データ同期作業',
-                    priority: 'medium',
-                    store: '',
-                    dueDate: today.toISOString().split('T')[0],
-                    completed: true,
-                    createdAt: today.toISOString()
                 }
             ];
             
@@ -2038,11 +938,365 @@
                     endTime: '16:00'
                 }
             ];
-            
-            saveData();
         }
 
-        // UI更新
+        function loadActualStoreData() {
+            storeData = [
+                {
+                    id: 'shabour',
+                    name: 'シャブール',
+                    salesTarget: 33000000,
+                    totalSales: 29544738,
+                    salesDifference: -3455262,
+                    accessAverage: 65126,
+                    diaryTarget: 280,
+                    diaryAverage: 252,
+                    reviewTarget: 300,
+                    totalAccess: 1967152,
+                    diaryPosts: 7560,
+                    kiteneMessages: 20260,
+                    reviewPosts: 344,
+                    attendanceCount: 687,
+                    girlCount: 763,
+                    userCount: 6529,
+                    salesAchievementRate: 0.8953,
+                    diaryAchievementRate: 0.9,
+                    reviewAchievementRate: 1.1467,
+                    newCustomers: 0
+                },
+                {
+                    id: 'onecarat',
+                    name: 'ワンカラット',
+                    salesTarget: 17500000,
+                    totalSales: 18314356,
+                    salesDifference: 814356,
+                    accessAverage: 42734,
+                    diaryTarget: 265,
+                    diaryAverage: 284.3,
+                    reviewTarget: 200,
+                    totalAccess: 1241592,
+                    diaryPosts: 8528,
+                    kiteneMessages: 18119,
+                    reviewPosts: 156,
+                    attendanceCount: 514,
+                    girlCount: 745,
+                    userCount: 3441,
+                    salesAchievementRate: 1.0465,
+                    diaryAchievementRate: 1.0727,
+                    reviewAchievementRate: 0.78,
+                    newCustomers: 0
+                },
+                {
+                    id: 'go_nagoya',
+                    name: 'GO名古屋',
+                    salesTarget: 28000000,
+                    totalSales: 29265025,
+                    salesDifference: 1265025,
+                    accessAverage: 48825,
+                    diaryTarget: 180,
+                    diaryAverage: 120.2,
+                    reviewTarget: 205,
+                    totalAccess: 1349912,
+                    diaryPosts: 3605,
+                    kiteneMessages: 27376,
+                    reviewPosts: 216,
+                    attendanceCount: 518,
+                    girlCount: 923,
+                    userCount: 4351,
+                    salesAchievementRate: 1.0452,
+                    diaryAchievementRate: 0.6676,
+                    reviewAchievementRate: 1.0537,
+                    newCustomers: 0
+                },
+                {
+                    id: 'go_fukuoka',
+                    name: 'GO福岡',
+                    salesTarget: 36000000,
+                    totalSales: 37050068,
+                    salesDifference: 1050068,
+                    accessAverage: 51499,
+                    diaryTarget: 250,
+                    diaryAverage: 260.9,
+                    reviewTarget: 180,
+                    totalAccess: 1619670,
+                    diaryPosts: 7828,
+                    kiteneMessages: 32011,
+                    reviewPosts: 202,
+                    attendanceCount: 514,
+                    girlCount: 826,
+                    userCount: 2652,
+                    salesAchievementRate: 1.0292,
+                    diaryAchievementRate: 1.0437,
+                    reviewAchievementRate: 1.1222,
+                    newCustomers: 115
+                },
+                {
+                    id: 'go_tokyo',
+                    name: 'GO東京',
+                    salesTarget: 28000000,
+                    totalSales: 27324427,
+                    salesDifference: -675573,
+                    accessAverage: 35465,
+                    diaryTarget: 250,
+                    diaryAverage: 138.8,
+                    reviewTarget: 150,
+                    totalAccess: 1182336,
+                    diaryPosts: 4164,
+                    kiteneMessages: 19067,
+                    reviewPosts: 116,
+                    attendanceCount: 457,
+                    girlCount: 693,
+                    userCount: 7020,
+                    salesAchievementRate: 0.9759,
+                    diaryAchievementRate: 0.5552,
+                    reviewAchievementRate: 0.7733,
+                    newCustomers: 0
+                },
+                {
+                    id: 'go_yokohama',
+                    name: 'GO横浜',
+                    salesTarget: 23000000,
+                    totalSales: 22547274,
+                    salesDifference: -452726,
+                    accessAverage: 19664,
+                    diaryTarget: 200,
+                    diaryAverage: 169.2,
+                    reviewTarget: 145,
+                    totalAccess: 599756,
+                    diaryPosts: 5077,
+                    kiteneMessages: 24565,
+                    reviewPosts: 127,
+                    attendanceCount: 407,
+                    girlCount: 700,
+                    userCount: 3830,
+                    salesAchievementRate: 0.9803,
+                    diaryAchievementRate: 0.8462,
+                    reviewAchievementRate: 0.8759,
+                    newCustomers: 0
+                },
+                {
+                    id: 'cl_nagoya',
+                    name: 'CL名古屋',
+                    salesTarget: 6000000,
+                    totalSales: 5300320,
+                    salesDifference: -699680,
+                    accessAverage: 14717,
+                    diaryTarget: 80,
+                    diaryAverage: 61.7,
+                    reviewTarget: 150,
+                    totalAccess: 514243,
+                    diaryPosts: 1851,
+                    kiteneMessages: 7775,
+                    reviewPosts: 113,
+                    attendanceCount: 197,
+                    girlCount: 316,
+                    userCount: 2453,
+                    salesAchievementRate: 0.8834,
+                    diaryAchievementRate: 0.7713,
+                    reviewAchievementRate: 0.7533,
+                    newCustomers: 0
+                },
+                {
+                    id: 'cl_tokyo',
+                    name: 'CL東京',
+                    salesTarget: 7200000,
+                    totalSales: 6719328,
+                    salesDifference: -480672,
+                    accessAverage: 26465,
+                    diaryTarget: 100,
+                    diaryAverage: 69.3,
+                    reviewTarget: 180,
+                    totalAccess: 742231,
+                    diaryPosts: 2079,
+                    kiteneMessages: 6522,
+                    reviewPosts: 122,
+                    attendanceCount: 238,
+                    girlCount: 267,
+                    userCount: 2064,
+                    salesAchievementRate: 0.9332,
+                    diaryAchievementRate: 0.693,
+                    reviewAchievementRate: 0.6778,
+                    newCustomers: 110
+                },
+                {
+                    id: 'cl_yokkaichi',
+                    name: 'CL四日市',
+                    salesTarget: 12500000,
+                    totalSales: 12943296,
+                    salesDifference: 443296,
+                    accessAverage: 32278,
+                    diaryTarget: 205,
+                    diaryAverage: 210,
+                    reviewTarget: 240,
+                    totalAccess: 881476,
+                    diaryPosts: 6301,
+                    kiteneMessages: 17259,
+                    reviewPosts: 256,
+                    attendanceCount: 356,
+                    girlCount: 598,
+                    userCount: 5077,
+                    salesAchievementRate: 1.0355,
+                    diaryAchievementRate: 1.0246,
+                    reviewAchievementRate: 1.0667,
+                    newCustomers: 278
+                }
+            ];
+        }
+
+        // ===== イベントリスナー設定 =====
+        function setupEventListeners() {
+            // ナビゲーション
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const page = this.getAttribute('data-page');
+                    showPage(page);
+                });
+            });
+
+            // サイドバートグル
+            const menuToggle = document.getElementById('menuToggle');
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const overlay = document.getElementById('overlay');
+            
+            if (menuToggle) menuToggle.addEventListener('click', toggleSidebar);
+            if (mobileMenuBtn) mobileMenuBtn.addEventListener('click', toggleSidebar);
+            if (overlay) overlay.addEventListener('click', closeSidebar);
+
+            // ボタンイベント
+            setupButtonListeners();
+            
+            // モーダルイベント
+            setupModalListeners();
+            
+            // フィルター
+            setupFilterListeners();
+
+            // キーボードショートカット
+            document.addEventListener('keydown', handleKeyboardShortcuts);
+        }
+
+        function setupButtonListeners() {
+            // タスク追加ボタン
+            const addTaskBtn = document.getElementById('addTaskBtn');
+            const newTaskBtn = document.getElementById('newTaskBtn');
+            const quickActionBtn = document.getElementById('quickActionBtn');
+            
+            if (addTaskBtn) addTaskBtn.addEventListener('click', () => openTaskModal());
+            if (newTaskBtn) newTaskBtn.addEventListener('click', () => openTaskModal());
+            if (quickActionBtn) quickActionBtn.addEventListener('click', showQuickActions);
+
+            // イベント追加ボタン
+            const addEventBtn = document.getElementById('addEventBtn');
+            if (addEventBtn) addEventBtn.addEventListener('click', () => openEventModal());
+
+            // その他のボタン
+            const syncBtn = document.getElementById('syncBtn');
+            const exportTasksBtn = document.getElementById('exportTasksBtn');
+            const exportKpiBtn = document.getElementById('exportKpiBtn');
+            
+            if (syncBtn) syncBtn.addEventListener('click', syncAllData);
+            if (exportTasksBtn) exportTasksBtn.addEventListener('click', exportTasks);
+            if (exportKpiBtn) exportKpiBtn.addEventListener('click', exportKpiData);
+
+            // カレンダーボタン
+            const todayBtn = document.getElementById('todayBtn');
+            const prevMonthBtn = document.getElementById('prevMonthBtn');
+            const nextMonthBtn = document.getElementById('nextMonthBtn');
+            
+            if (todayBtn) todayBtn.addEventListener('click', goToToday);
+            if (prevMonthBtn) prevMonthBtn.addEventListener('click', previousMonth);
+            if (nextMonthBtn) nextMonthBtn.addEventListener('click', nextMonth);
+
+            // チャートボタン
+            const salesChartBtn = document.getElementById('salesChartBtn');
+            const achievementChartBtn = document.getElementById('achievementChartBtn');
+            
+            if (salesChartBtn) salesChartBtn.addEventListener('click', () => updateSalesChart('sales'));
+            if (achievementChartBtn) achievementChartBtn.addEventListener('click', () => updateSalesChart('achievement'));
+
+            // レポートボタン
+            const salesReportBtn = document.getElementById('salesReportBtn');
+            const kpiReportBtn = document.getElementById('kpiReportBtn');
+            const comprehensiveReportBtn = document.getElementById('comprehensiveReportBtn');
+            
+            if (salesReportBtn) salesReportBtn.addEventListener('click', () => generateReport('sales'));
+            if (kpiReportBtn) kpiReportBtn.addEventListener('click', () => generateReport('kpi'));
+            if (comprehensiveReportBtn) comprehensiveReportBtn.addEventListener('click', () => generateReport('comprehensive'));
+        }
+
+        function setupModalListeners() {
+            // タスクモーダル
+            const closeTaskModal = document.getElementById('closeTaskModal');
+            const saveTaskBtn = document.getElementById('saveTaskBtn');
+            const cancelTaskBtn = document.getElementById('cancelTaskBtn');
+            
+            if (closeTaskModal) closeTaskModal.addEventListener('click', () => hideModal('taskModal'));
+            if (saveTaskBtn) saveTaskBtn.addEventListener('click', saveTask);
+            if (cancelTaskBtn) cancelTaskBtn.addEventListener('click', () => hideModal('taskModal'));
+
+            // イベントモーダル
+            const closeEventModal = document.getElementById('closeEventModal');
+            const saveEventBtn = document.getElementById('saveEventBtn');
+            const cancelEventBtn = document.getElementById('cancelEventBtn');
+            
+            if (closeEventModal) closeEventModal.addEventListener('click', () => hideModal('eventModal'));
+            if (saveEventBtn) saveEventBtn.addEventListener('click', saveEvent);
+            if (cancelEventBtn) cancelEventBtn.addEventListener('click', () => hideModal('eventModal'));
+
+            // モーダル背景クリックで閉じる
+            const taskModal = document.getElementById('taskModal');
+            const eventModal = document.getElementById('eventModal');
+            
+            if (taskModal) {
+                taskModal.addEventListener('click', (e) => {
+                    if (e.target === taskModal) hideModal('taskModal');
+                });
+            }
+            
+            if (eventModal) {
+                eventModal.addEventListener('click', (e) => {
+                    if (e.target === eventModal) hideModal('eventModal');
+                });
+            }
+        }
+
+        function setupFilterListeners() {
+            const taskSearch = document.getElementById('taskSearch');
+            const priorityFilter = document.getElementById('priorityFilter');
+            const statusFilter = document.getElementById('statusFilter');
+            const storeFilter = document.getElementById('storeFilter');
+
+            if (taskSearch) taskSearch.addEventListener('input', filterTasks);
+            if (priorityFilter) priorityFilter.addEventListener('change', filterTasks);
+            if (statusFilter) statusFilter.addEventListener('change', filterTasks);
+            if (storeFilter) storeFilter.addEventListener('change', filterTasks);
+        }
+
+        function handleKeyboardShortcuts(e) {
+            if (e.key === 'Escape') {
+                closeAllModals();
+                closeSidebar();
+            }
+            
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key) {
+                    case 'k':
+                        e.preventDefault();
+                        openTaskModal();
+                        break;
+                    case 'e':
+                        e.preventDefault();
+                        openEventModal();
+                        break;
+                    case 's':
+                        e.preventDefault();
+                        syncAllData();
+                        break;
+                }
+            }
+        }
+
+        // ===== UI管理 =====
         function updateDateTime() {
             const now = new Date();
             const dateElement = document.getElementById('currentDate');
@@ -2065,7 +1319,6 @@
             }
         }
 
-        // ナビゲーション
         function toggleSidebar() {
             sidebarOpen = !sidebarOpen;
             const sidebar = document.getElementById('sidebar');
@@ -2151,7 +1404,7 @@
             }
         }
 
-        // ダッシュボード描画
+        // ===== ページ描画 =====
         function renderDashboard() {
             updateDashboardStats();
             renderTodayTasks();
@@ -2280,7 +1533,7 @@
                 const isToday = dateStr === today.toISOString().split('T')[0];
 
                 weekHTML += `
-                    <div class="calendar-day ${isToday ? 'today' : ''}" onclick="showDayDetails('${dateStr}')">
+                    <div class="bg-white rounded-lg p-4 min-h-[100px] border ${isToday ? 'border-blue-500 bg-blue-50' : 'border-gray-200'}">
                         <div class="font-semibold mb-2">${weekDays[i]} ${currentDay.getDate()}</div>
                         ${dayEvents.map(event => `
                             <div class="text-xs p-1 rounded mb-1 ${getEventClass(event.type)}">
@@ -2293,7 +1546,52 @@
             weeklySchedule.innerHTML = weekHTML;
         }
 
-        // 売上分析
+        function renderTasks() {
+            const filteredTasks = getFilteredTasks();
+            const tasksList = document.getElementById('tasksList');
+
+            if (!tasksList) return;
+
+            if (filteredTasks.length === 0) {
+                tasksList.innerHTML = '<div class="text-center text-gray-500 py-8">条件に一致するタスクがありません</div>';
+                return;
+            }
+
+            tasksList.innerHTML = filteredTasks.map(task => createDetailedTaskCard(task)).join('');
+        }
+
+        function createDetailedTaskCard(task) {
+            return `
+                <div class="task-card ${task.completed ? 'completed' : ''} ${task.priority}-priority">
+                    <div class="flex items-center">
+                        <input type="checkbox" ${task.completed ? 'checked' : ''} 
+                               onchange="toggleTaskComplete(${task.id})"
+                               class="mr-4 w-5 h-5 text-blue-600 rounded">
+                        <div class="flex-1">
+                            <div class="font-semibold text-gray-900 ${task.completed ? 'line-through' : ''}">
+                                ${task.title}
+                            </div>
+                            <div class="text-sm text-gray-600 mt-1">${task.description}</div>
+                            <div class="flex items-center space-x-4 mt-2 text-xs text-gray-500">
+                                ${task.store ? `<span>店舗: ${getStoreName(task.store)}</span>` : ''}
+                                ${task.dueDate ? `<span>期限: ${formatDate(task.dueDate)}</span>` : ''}
+                                <span>作成: ${formatDate(task.createdAt.split('T')[0])}</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="px-3 py-1 text-xs rounded-full ${getPriorityClass(task.priority)}">${getPriorityText(task.priority)}</span>
+                            <button onclick="editTask(${task.id})" class="text-blue-600 hover:text-blue-800 p-2">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="deleteTask(${task.id})" class="text-red-600 hover:text-red-800 p-2">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
         function renderSales() {
             updateSalesStats();
             updateStoreRanking();
@@ -2346,7 +1644,6 @@
             `).join('');
         }
 
-        // KPI管理
         function renderKpiManagement() {
             updateKpiSummary();
             updateKpiDataTable();
@@ -2407,7 +1704,7 @@
             `).join('');
         }
 
-        // チャート初期化
+        // ===== チャート機能 =====
         function initializeCharts() {
             initializeSalesChart();
             initializeKpiCharts();
@@ -2576,7 +1873,7 @@
             salesChart.update();
         }
 
-        // カレンダー機能
+        // ===== カレンダー機能 =====
         function generateCalendar() {
             const calendarGrid = document.getElementById('calendarGrid');
             const calendarTitle = document.getElementById('calendarTitle');
@@ -2605,7 +1902,7 @@
                 const dayEvents = events.filter(event => event.date === dateStr);
 
                 calendarHTML += `
-                    <div class="calendar-day ${isToday ? 'today' : ''} ${!isCurrentMonth ? 'opacity-30' : ''}" 
+                    <div class="bg-white rounded-lg p-3 min-h-[100px] border ${isToday ? 'border-blue-500 bg-blue-50' : 'border-gray-200'} ${!isCurrentMonth ? 'opacity-30' : ''} cursor-pointer hover:bg-gray-50" 
                          onclick="showDayDetails('${dateStr}')">
                         <div class="font-semibold mb-2">${currentDate.getDate()}</div>
                         ${dayEvents.map(event => `
@@ -2647,289 +1944,7 @@
             showNotification('今日の日付に移動しました', 'info');
         }
 
-        // ファイルアップロード機能
-        function handleStoreDataUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const statusElements = [
-                document.getElementById('uploadStatus'),
-                document.getElementById('kpiUploadStatus')
-            ];
-
-            statusElements.forEach(el => {
-                if (el) {
-                    el.textContent = 'ファイルを読み込み中...';
-                    el.className = 'text-sm text-blue-600';
-                }
-            });
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    let data;
-
-                    if (file.name.endsWith('.csv')) {
-                        const text = e.target.result;
-                        data = text.split('\n').map(row => row.split(','));
-                    } else {
-                        const workbook = XLSX.read(e.target.result, { type: 'binary' });
-                        const sheetName = workbook.SheetNames[0];
-                        const worksheet = workbook.Sheets[sheetName];
-                        data = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-                    }
-
-                    uploadedBusinessData = data;
-                    statusElements.forEach(el => {
-                        if (el) {
-                            el.textContent = `✅ ${data.length}行のデータを読み込みました`;
-                            el.className = 'text-sm text-green-600';
-                        }
-                    });
-
-                } catch (error) {
-                    console.error('ファイル読み込みエラー:', error);
-                    statusElements.forEach(el => {
-                        if (el) {
-                            el.textContent = '❌ ファイルの読み込みに失敗しました';
-                            el.className = 'text-sm text-red-600';
-                        }
-                    });
-                }
-            };
-
-            if (file.name.endsWith('.csv')) {
-                reader.readAsText(file);
-            } else {
-                reader.readAsBinaryString(file);
-            }
-        }
-
-        function processStoreData() {
-            if (!uploadedBusinessData) {
-                showNotification('先にファイルをアップロードしてください', 'error');
-                return;
-            }
-
-            try {
-                const dataRows = uploadedBusinessData.slice(1);
-
-                const processedData = dataRows.map(row => {
-                    if (!row[0]) return null;
-
-                    return {
-                        id: getStoreId(row[0]),
-                        name: row[0],
-                        salesTarget: parseFloat(row[1]) || 0,
-                        totalSales: parseFloat(row[2]) || 0,
-                        salesDifference: parseFloat(row[3]) || 0,
-                        accessAverage: parseFloat(row[4]) || 0,
-                        diaryTarget: parseFloat(row[5]) || 0,
-                        diaryDifference: parseFloat(row[6]) || 0,
-                        diaryAverage: parseFloat(row[7]) || 0,
-                        reviewTarget: parseFloat(row[8]) || 0,
-                        reviewDifference: parseFloat(row[9]) || 0,
-                        messageCount: parseFloat(row[10]) || 0,
-                        girlCount: parseFloat(row[11]) || 0,
-                        userCount: parseFloat(row[12]) || 0,
-                        myGirlCount: parseFloat(row[13]) || 0,
-                        totalAccess: parseFloat(row[14]) || 0,
-                        diaryPosts: parseFloat(row[15]) || 0,
-                        limitedDiary: parseFloat(row[16]) || 0,
-                        videoDiary: parseFloat(row[17]) || 0,
-                        kiteneMessages: parseFloat(row[18]) || 0,
-                        reviewPosts: parseFloat(row[19]) || 0,
-                        attendanceCount: parseFloat(row[20]) || 0,
-                        customerCount: parseFloat(row[21]) || 0,
-                        salesDaysTarget: parseFloat(row[22]) || 0,
-                        dailySalesAverage: parseFloat(row[23]) || 0,
-                        salesAchievementRate: parseFloat(row[24]) || 0,
-                        diaryAchievementRate: parseFloat(row[25]) || 0,
-                        reviewAchievementRate: parseFloat(row[26]) || 0,
-                        kiteneChange: parseFloat(row[27]) || 0,
-                        okinTalkChange: parseFloat(row[28]) || 0,
-                        kiteneAverage: parseFloat(row[29]) || 0,
-                        newCustomers: parseFloat(row[31]) || 0
-                    };
-                }).filter(row => row !== null);
-
-                storeData = processedData;
-                saveData();
-
-                updateAllCharts();
-                renderCurrentPage();
-
-                showNotification(`${processedData.length}店舗のデータを反映しました`, 'success');
-
-                const fileInputs = [
-                    document.getElementById('dashboardFileInput'),
-                    document.getElementById('attendanceFileInput')
-                ];
-                fileInputs.forEach(input => {
-                    if (input) input.value = '';
-                });
-
-                const statusElements = [
-                    document.getElementById('uploadStatus'),
-                    document.getElementById('kpiUploadStatus')
-                ];
-                statusElements.forEach(el => {
-                    if (el) el.textContent = '';
-                });
-
-                uploadedBusinessData = null;
-
-            } catch (error) {
-                console.error('データ処理エラー:', error);
-                showNotification('データの処理中にエラーが発生しました', 'error');
-            }
-        }
-
-        function updateAllCharts() {
-            if (!storeData || storeData.length === 0) return;
-
-            if (salesChart) {
-                salesChart.data.labels = storeData.map(store => store.name);
-                salesChart.data.datasets[0].data = storeData.map(store => store.totalSales / 1000000);
-                if (salesChart.data.datasets[1]) {
-                    salesChart.data.datasets[1].data = storeData.map(store => store.salesTarget / 1000000);
-                }
-                salesChart.update();
-            }
-
-            if (accessChart) {
-                accessChart.data.labels = storeData.map(store => store.name);
-                accessChart.data.datasets[0].data = storeData.map(store => store.totalAccess);
-                accessChart.update();
-            }
-
-            if (kpiChart) {
-                kpiChart.data.datasets = storeData.slice(0, 5).map((store, index) => ({
-                    label: store.name,
-                    data: [
-                        store.salesAchievementRate * 100,
-                        store.diaryAchievementRate * 100,
-                        store.reviewAchievementRate * 100
-                    ],
-                    borderColor: [
-                        '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'
-                    ][index],
-                    backgroundColor: [
-                        'rgba(59, 130, 246, 0.2)', 'rgba(16, 185, 129, 0.2)', 
-                        'rgba(245, 158, 11, 0.2)', 'rgba(239, 68, 68, 0.2)', 
-                        'rgba(139, 92, 246, 0.2)'
-                    ][index],
-                    borderWidth: 2
-                }));
-                kpiChart.update();
-            }
-        }
-
-        // テンプレートダウンロード
-        function downloadStoreTemplate() {
-            const currentDate = new Date();
-            const year = currentDate.getFullYear();
-            const month = currentDate.getMonth() + 1;
-
-            const templateData = [
-                [
-                    "店舗", "売上目標", "総売上", "現在売り上げ状況", "アクセス平均", "日記目標", "日記差分", "日記平均",
-                    "口コミ目標", "口コミ差分", "送信数", "女の子人数", "ユーザ数", "マイガール数", "総アクセス数",
-                    "写メ日記投稿数", "限定日記数", "動画日記数", "キテネ送信数", "口コミ掲載数", "出勤人数",
-                    "顧客人数", "日数目標", "1日売上平均", "売上達成率", "日記達成率", "口コミ達成率",
-                    "キテネ増減", "オキニトーク増減", "キテネ平均", "オキニトーク平均", "新規の数", ""
-                ],
-                ["シャブール", 33000000, "", "", "", 280, "", "", 300, "", "", "", "", "", "", "", "", "", "", "", "", "", 33000000, "", "", "", "", "", "", "", "", "", ""],
-                ["ワンカラット", 17500000, "", "", "", 265, "", "", 200, "", "", "", "", "", "", "", "", "", "", "", "", "", 17500000, "", "", "", "", "", "", "", "", "", ""],
-                ["GO名古屋", 28000000, "", "", "", 180, "", "", 205, "", "", "", "", "", "", "", "", "", "", "", "", "", 28000000, "", "", "", "", "", "", "", "", "", ""],
-                ["GO福岡", 36000000, "", "", "", 250, "", "", 180, "", "", "", "", "", "", "", "", "", "", "", "", "", 36000000, "", "", "", "", "", "", "", "", "", ""],
-                ["GO東京", 28000000, "", "", "", 250, "", "", 150, "", "", "", "", "", "", "", "", "", "", "", "", "", 28000000, "", "", "", "", "", "", "", "", "", ""],
-                ["GO横浜", 23000000, "", "", "", 200, "", "", 145, "", "", "", "", "", "", "", "", "", "", "", "", "", 23000000, "", "", "", "", "", "", "", "", "", ""],
-                ["CL名古屋", 6000000, "", "", "", 80, "", "", 150, "", "", "", "", "", "", "", "", "", "", "", "", "", 6000000, "", "", "", "", "", "", "", "", "", ""],
-                ["CL東京", 7200000, "", "", "", 100, "", "", 180, "", "", "", "", "", "", "", "", "", "", "", "", "", 7200000, "", "", "", "", "", "", "", "", "", ""],
-                ["CL四日市", 12500000, "", "", "", 205, "", "", 240, "", "", "", "", "", "", "", "", "", "", "", "", "", 12500000, "", "", "", "", "", "", "", "", "", ""]
-            ];
-
-            const ws = XLSX.utils.aoa_to_sheet(templateData);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, '全店統計');
-
-            const filename = `全店統計テンプレート_${year}年${month}月.xlsx`;
-            XLSX.writeFile(wb, filename);
-
-            showNotification('全店統計テンプレートをダウンロードしました', 'success');
-        }
-
-        // タスク管理
-        function renderTasks() {
-            const filteredTasks = getFilteredTasks();
-            const tasksList = document.getElementById('tasksList');
-
-            if (!tasksList) return;
-
-            if (filteredTasks.length === 0) {
-                tasksList.innerHTML = '<div class="text-center text-gray-500 py-8">条件に一致するタスクがありません</div>';
-                return;
-            }
-
-            tasksList.innerHTML = filteredTasks.map(task => createDetailedTaskCard(task)).join('');
-        }
-
-        function createDetailedTaskCard(task) {
-            return `
-                <div class="task-card ${task.completed ? 'completed' : ''} ${task.priority}-priority">
-                    <div class="flex items-center">
-                        <input type="checkbox" ${task.completed ? 'checked' : ''} 
-                               onchange="toggleTaskComplete(${task.id})"
-                               class="mr-4 w-5 h-5 text-blue-600 rounded">
-                        <div class="flex-1">
-                            <div class="font-semibold text-gray-900 ${task.completed ? 'line-through' : ''}">
-                                ${task.title}
-                            </div>
-                            <div class="text-sm text-gray-600 mt-1">${task.description}</div>
-                            <div class="flex items-center space-x-4 mt-2 text-xs text-gray-500">
-                                ${task.store ? `<span>店舗: ${getStoreName(task.store)}</span>` : ''}
-                                ${task.dueDate ? `<span>期限: ${formatDate(task.dueDate)}</span>` : ''}
-                                <span>作成: ${formatDate(task.createdAt.split('T')[0])}</span>
-                            </div>
-                        </div>
-                        <div class="flex items-center space-x-2">
-                            <span class="px-3 py-1 text-xs rounded-full ${getPriorityClass(task.priority)}">${getPriorityText(task.priority)}</span>
-                            <button onclick="editTask(${task.id})" class="text-blue-600 hover:text-blue-800 p-2">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button onclick="deleteTask(${task.id})" class="text-red-600 hover:text-red-800 p-2">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function getFilteredTasks() {
-            const searchTerm = document.getElementById('taskSearch')?.value.toLowerCase() || '';
-            const priorityFilter = document.getElementById('priorityFilter')?.value || '';
-            const statusFilter = document.getElementById('statusFilter')?.value || '';
-            const storeFilter = document.getElementById('storeFilter')?.value || '';
-
-            return tasks.filter(task => {
-                const matchesSearch = task.title.toLowerCase().includes(searchTerm) || 
-                                    task.description.toLowerCase().includes(searchTerm);
-                const matchesPriority = !priorityFilter || task.priority === priorityFilter;
-                const matchesStatus = !statusFilter || 
-                                    (statusFilter === 'completed' && task.completed) ||
-                                    (statusFilter === 'pending' && !task.completed);
-                const matchesStore = !storeFilter || task.store === storeFilter;
-
-                return matchesSearch && matchesPriority && matchesStatus && matchesStore;
-            });
-        }
-
-        function filterTasks() {
-            renderTasks();
-        }
-
+        // ===== タスク管理 =====
         function openTaskModal(taskId = null) {
             editingTaskId = taskId;
             const modal = document.getElementById('taskModal');
@@ -2958,8 +1973,6 @@
         }
 
         function saveTask() {
-            console.log('saveTask関数が呼び出されました');
-            
             const titleElement = document.getElementById('taskTitle');
             const descriptionElement = document.getElementById('taskDescription');
             const priorityElement = document.getElementById('taskPriority');
@@ -2967,7 +1980,6 @@
             const dueDateElement = document.getElementById('taskDueDate');
 
             if (!titleElement || !descriptionElement || !priorityElement || !storeElement || !dueDateElement) {
-                console.error('フォーム要素が見つかりません');
                 showNotification('フォームの読み込みでエラーが発生しました', 'error');
                 return;
             }
@@ -2977,8 +1989,6 @@
             const priority = priorityElement.value;
             const store = storeElement.value;
             const dueDate = dueDateElement.value;
-
-            console.log('取得した値:', { title, description, priority, store, dueDate });
 
             if (!title) {
                 showNotification('タスク名を入力してください', 'error');
@@ -3011,11 +2021,9 @@
                         createdAt: new Date().toISOString()
                     };
                     tasks.unshift(newTask);
-                    console.log('新しいタスクを追加:', newTask);
                     showNotification('タスクを追加しました', 'success');
                 }
 
-                saveData();
                 hideModal('taskModal');
                 renderCurrentPage();
             } catch (error) {
@@ -3031,7 +2039,6 @@
         function deleteTask(taskId) {
             if (confirm('このタスクを削除しますか？')) {
                 tasks = tasks.filter(t => t.id !== taskId);
-                saveData();
                 renderCurrentPage();
                 showNotification('タスクを削除しました', 'success');
             }
@@ -3041,12 +2048,35 @@
             const task = tasks.find(t => t.id === taskId);
             if (task) {
                 task.completed = !task.completed;
-                saveData();
                 renderCurrentPage();
+                showNotification(task.completed ? 'タスクを完了しました' : 'タスクを未完了に戻しました', 'success');
             }
         }
 
-        // イベント管理
+        function getFilteredTasks() {
+            const searchTerm = document.getElementById('taskSearch')?.value.toLowerCase() || '';
+            const priorityFilter = document.getElementById('priorityFilter')?.value || '';
+            const statusFilter = document.getElementById('statusFilter')?.value || '';
+            const storeFilter = document.getElementById('storeFilter')?.value || '';
+
+            return tasks.filter(task => {
+                const matchesSearch = task.title.toLowerCase().includes(searchTerm) || 
+                                    task.description.toLowerCase().includes(searchTerm);
+                const matchesPriority = !priorityFilter || task.priority === priorityFilter;
+                const matchesStatus = !statusFilter || 
+                                    (statusFilter === 'completed' && task.completed) ||
+                                    (statusFilter === 'pending' && !task.completed);
+                const matchesStore = !storeFilter || task.store === storeFilter;
+
+                return matchesSearch && matchesPriority && matchesStatus && matchesStore;
+            });
+        }
+
+        function filterTasks() {
+            renderTasks();
+        }
+
+        // ===== イベント管理 =====
         function openEventModal(eventId = null) {
             editingEventId = eventId;
             const modal = document.getElementById('eventModal');
@@ -3074,8 +2104,6 @@
         }
 
         function saveEvent() {
-            console.log('saveEvent関数が呼び出されました');
-            
             const titleElement = document.getElementById('eventTitle');
             const descriptionElement = document.getElementById('eventDescription');
             const typeElement = document.getElementById('eventType');
@@ -3084,7 +2112,6 @@
             const endTimeElement = document.getElementById('eventEndTime');
 
             if (!titleElement || !descriptionElement || !typeElement || !dateElement || !startTimeElement || !endTimeElement) {
-                console.error('イベントフォーム要素が見つかりません');
                 showNotification('フォームの読み込みでエラーが発生しました', 'error');
                 return;
             }
@@ -3095,8 +2122,6 @@
             const date = dateElement.value;
             const startTime = startTimeElement.value;
             const endTime = endTimeElement.value;
-
-            console.log('取得したイベント値:', { title, description, type, date, startTime, endTime });
 
             if (!title || !date) {
                 showNotification('予定名と日付を入力してください', 'error');
@@ -3129,11 +2154,9 @@
                         endTime
                     };
                     events.push(newEvent);
-                    console.log('新しいイベントを追加:', newEvent);
                     showNotification('予定を追加しました', 'success');
                 }
 
-                saveData();
                 hideModal('eventModal');
                 renderCurrentPage();
             } catch (error) {
@@ -3146,167 +2169,7 @@
             openEventModal(eventId);
         }
 
-        // レポート生成
-        function generateReport(type) {
-            const reportTypes = {
-                sales: '売上レポート',
-                kpi: 'KPIレポート',
-                comprehensive: '総合レポート',
-                schedule: 'スケジュールレポート'
-            };
-
-            let data = [];
-            const filename = `${reportTypes[type]}_${new Date().toISOString().split('T')[0]}`;
-
-            switch(type) {
-                case 'sales':
-                    data = [
-                        ['店舗名', '売上目標', '売上実績', '達成率', '売上差分', '日商平均'],
-                        ...storeData.map(store => [
-                            store.name,
-                            store.salesTarget,
-                            store.totalSales,
-                            `${(store.salesAchievementRate * 100).toFixed(1)}%`,
-                            store.salesDifference,
-                            store.dailySalesAverage
-                        ])
-                    ];
-                    break;
-                case 'kpi':
-                    data = [
-                        ['店舗名', '日記達成率', '口コミ達成率', '総アクセス数', '出勤人数', '女の子人数', 'キテネ送信数'],
-                        ...storeData.map(store => [
-                            store.name,
-                            `${(store.diaryAchievementRate * 100).toFixed(1)}%`,
-                            `${(store.reviewAchievementRate * 100).toFixed(1)}%`,
-                            store.totalAccess,
-                            store.attendanceCount,
-                            store.girlCount,
-                            store.kiteneMessages
-                        ])
-                    ];
-                    break;
-                case 'comprehensive':
-                    data = [
-                        ['店舗名', '売上達成率', '日記達成率', '口コミ達成率', '総合評価'],
-                        ...storeData.map(store => {
-                            const overall = ((store.salesAchievementRate + store.diaryAchievementRate + store.reviewAchievementRate) / 3 * 100).toFixed(1);
-                            return [
-                                store.name,
-                                `${(store.salesAchievementRate * 100).toFixed(1)}%`,
-                                `${(store.diaryAchievementRate * 100).toFixed(1)}%`,
-                                `${(store.reviewAchievementRate * 100).toFixed(1)}%`,
-                                `${overall}%`
-                            ];
-                        })
-                    ];
-                    break;
-                case 'schedule':
-                    data = [
-                        ['日付', '時間', '予定', '種類', '場所'],
-                        ...events.map(event => [
-                            event.date,
-                            `${event.startTime || ''}-${event.endTime || ''}`,
-                            event.title,
-                            getEventTypeName(event.type),
-                            event.description || ''
-                        ])
-                    ];
-                    break;
-            }
-
-            const ws = XLSX.utils.aoa_to_sheet(data);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, reportTypes[type]);
-            XLSX.writeFile(wb, `${filename}.xlsx`);
-
-            showNotification(`${reportTypes[type]}をダウンロードしました`, 'success');
-        }
-
-        function generateMonthEndReport() {
-            showNotification('月末データを一括ダウンロード中...', 'info');
-
-            const reports = ['sales', 'kpi', 'comprehensive', 'schedule'];
-            let downloadCount = 0;
-
-            reports.forEach((report, index) => {
-                setTimeout(() => {
-                    generateReport(report);
-                    downloadCount++;
-
-                    if (downloadCount === reports.length) {
-                        setTimeout(() => {
-                            showNotification('月末データの一括ダウンロードが完了しました', 'success');
-                        }, 500);
-                    }
-                }, index * 1000);
-            });
-        }
-
-        // エクスポート機能
-        function exportTasks() {
-            const data = [
-                ['ID', 'タスク名', '説明', '優先度', '店舗', '期限', 'ステータス', '作成日'],
-                ...tasks.map(task => [
-                    task.id,
-                    task.title,
-                    task.description,
-                    getPriorityText(task.priority),
-                    task.store ? getStoreName(task.store) : '',
-                    task.dueDate || '',
-                    task.completed ? '完了' : '未完了',
-                    formatDate(task.createdAt.split('T')[0])
-                ])
-            ];
-
-            const ws = XLSX.utils.aoa_to_sheet(data);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, 'タスク一覧');
-
-            const filename = `タスク一覧_${new Date().toISOString().split('T')[0]}.xlsx`;
-            XLSX.writeFile(wb, filename);
-
-            showNotification('タスクデータをエクスポートしました', 'success');
-        }
-
-        function exportKpiData() {
-            if (!storeData || storeData.length === 0) {
-                showNotification('エクスポートするデータがありません', 'error');
-                return;
-            }
-
-            const data = [
-                ['店舗名', '売上目標', '売上実績', '売上達成率', '日記目標', '日記平均', '日記達成率', 
-                 '口コミ目標', '口コミ達成率', 'アクセス数', '出勤人数', '女の子人数', 'ユーザー数', 'キテネ送信数'],
-                ...storeData.map(store => [
-                    store.name,
-                    store.salesTarget,
-                    store.totalSales,
-                    store.salesAchievementRate,
-                    store.diaryTarget,
-                    store.diaryAverage,
-                    store.diaryAchievementRate,
-                    store.reviewTarget,
-                    store.reviewAchievementRate,
-                    store.totalAccess,
-                    store.attendanceCount,
-                    store.girlCount,
-                    store.userCount,
-                    store.kiteneMessages
-                ])
-            ];
-
-            const ws = XLSX.utils.aoa_to_sheet(data);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, 'KPIデータ');
-
-            const filename = `KPIデータ_${new Date().toISOString().split('T')[0]}.xlsx`;
-            XLSX.writeFile(wb, filename);
-
-            showNotification('KPIデータをエクスポートしました', 'success');
-        }
-
-        // その他の機能
+        // ===== その他の機能 =====
         function syncAllData() {
             const syncBtn = document.getElementById('syncBtn');
             if (!syncBtn) return;
@@ -3411,7 +2274,7 @@
                             ${store.reviewAchievementRate < 1.0 ? `
                                 <div class="p-3 bg-orange-50 border-l-4 border-orange-400 rounded text-sm">
                                     <i class="fas fa-exclamation-triangle text-orange-600 mr-2"></i>
-                                    口コミ目標未達：目標${store.reviewTarget}に対し差分${store.reviewDifference}
+                                    口コミ目標未達：要改善
                                 </div>
                             ` : ''}
                         </div>
@@ -3550,13 +2413,135 @@
             }, 100);
         }
 
-        // モーダル管理
+        // ===== レポート生成 =====
+        function generateReport(type) {
+            const reportTypes = {
+                sales: '売上レポート',
+                kpi: 'KPIレポート',
+                comprehensive: '総合レポート'
+            };
+
+            let data = [];
+            const filename = `${reportTypes[type]}_${new Date().toISOString().split('T')[0]}`;
+
+            switch(type) {
+                case 'sales':
+                    data = [
+                        ['店舗名', '売上目標', '売上実績', '達成率', '売上差分'],
+                        ...storeData.map(store => [
+                            store.name,
+                            store.salesTarget,
+                            store.totalSales,
+                            `${(store.salesAchievementRate * 100).toFixed(1)}%`,
+                            store.salesDifference
+                        ])
+                    ];
+                    break;
+                case 'kpi':
+                    data = [
+                        ['店舗名', '日記達成率', '口コミ達成率', '総アクセス数', '出勤人数', '女の子人数', 'キテネ送信数'],
+                        ...storeData.map(store => [
+                            store.name,
+                            `${(store.diaryAchievementRate * 100).toFixed(1)}%`,
+                            `${(store.reviewAchievementRate * 100).toFixed(1)}%`,
+                            store.totalAccess,
+                            store.attendanceCount,
+                            store.girlCount,
+                            store.kiteneMessages
+                        ])
+                    ];
+                    break;
+                case 'comprehensive':
+                    data = [
+                        ['店舗名', '売上達成率', '日記達成率', '口コミ達成率', '総合評価'],
+                        ...storeData.map(store => {
+                            const overall = ((store.salesAchievementRate + store.diaryAchievementRate + store.reviewAchievementRate) / 3 * 100).toFixed(1);
+                            return [
+                                store.name,
+                                `${(store.salesAchievementRate * 100).toFixed(1)}%`,
+                                `${(store.diaryAchievementRate * 100).toFixed(1)}%`,
+                                `${(store.reviewAchievementRate * 100).toFixed(1)}%`,
+                                `${overall}%`
+                            ];
+                        })
+                    ];
+                    break;
+            }
+
+            const ws = XLSX.utils.aoa_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, reportTypes[type]);
+            XLSX.writeFile(wb, `${filename}.xlsx`);
+
+            showNotification(`${reportTypes[type]}をダウンロードしました`, 'success');
+        }
+
+        function exportTasks() {
+            const data = [
+                ['ID', 'タスク名', '説明', '優先度', '店舗', '期限', 'ステータス', '作成日'],
+                ...tasks.map(task => [
+                    task.id,
+                    task.title,
+                    task.description,
+                    getPriorityText(task.priority),
+                    task.store ? getStoreName(task.store) : '',
+                    task.dueDate || '',
+                    task.completed ? '完了' : '未完了',
+                    formatDate(task.createdAt.split('T')[0])
+                ])
+            ];
+
+            const ws = XLSX.utils.aoa_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'タスク一覧');
+
+            const filename = `タスク一覧_${new Date().toISOString().split('T')[0]}.xlsx`;
+            XLSX.writeFile(wb, filename);
+
+            showNotification('タスクデータをエクスポートしました', 'success');
+        }
+
+        function exportKpiData() {
+            if (!storeData || storeData.length === 0) {
+                showNotification('エクスポートするデータがありません', 'error');
+                return;
+            }
+
+            const data = [
+                ['店舗名', '売上目標', '売上実績', '売上達成率', '日記目標', '日記平均', '日記達成率', 
+                 '口コミ達成率', 'アクセス数', '出勤人数', '女の子人数', 'ユーザー数', 'キテネ送信数'],
+                ...storeData.map(store => [
+                    store.name,
+                    store.salesTarget,
+                    store.totalSales,
+                    store.salesAchievementRate,
+                    store.diaryTarget,
+                    store.diaryAverage,
+                    store.diaryAchievementRate,
+                    store.reviewAchievementRate,
+                    store.totalAccess,
+                    store.attendanceCount,
+                    store.girlCount,
+                    store.userCount,
+                    store.kiteneMessages
+                ])
+            ];
+
+            const ws = XLSX.utils.aoa_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'KPIデータ');
+
+            const filename = `KPIデータ_${new Date().toISOString().split('T')[0]}.xlsx`;
+            XLSX.writeFile(wb, filename);
+
+            showNotification('KPIデータをエクスポートしました', 'success');
+        }
+
+        // ===== モーダル管理 =====
         function showModal(modalId) {
-            console.log('モーダル表示:', modalId);
             const modal = document.getElementById(modalId);
             if (modal) {
                 modal.classList.remove('hidden');
-                console.log('モーダル表示完了:', modalId);
                 
                 // フォーカスを最初の入力フィールドに移動
                 setTimeout(() => {
@@ -3565,17 +2550,13 @@
                         firstInput.focus();
                     }
                 }, 100);
-            } else {
-                console.error('モーダルが見つかりません:', modalId);
             }
         }
 
         function hideModal(modalId) {
-            console.log('モーダル非表示:', modalId);
             const modal = document.getElementById(modalId);
             if (modal) {
                 modal.classList.add('hidden');
-                console.log('モーダル非表示完了:', modalId);
             }
             editingTaskId = null;
             editingEventId = null;
@@ -3611,7 +2592,7 @@
             hideModal('eventModal');
         }
 
-        // 通知システム
+        // ===== 通知システム =====
         function showNotification(message, type = 'info') {
             const notification = document.createElement('div');
             notification.className = `notification border-l-4 ${
@@ -3644,7 +2625,7 @@
             }, 5000);
         }
 
-        // ユーティリティ関数
+        // ===== ユーティリティ関数 =====
         function updateElement(id, value, property = 'textContent') {
             const element = document.getElementById(id);
             if (element) {
@@ -3653,9 +2634,6 @@
                 } else {
                     element[property] = value || '';
                 }
-                console.log(`要素更新: ${id} = ${value} (${property})`);
-            } else {
-                console.error(`要素が見つかりません: ${id}`);
             }
         }
 
@@ -3672,21 +2650,6 @@
         function getStoreName(storeCode) {
             const store = storeData.find(s => s.id === storeCode);
             return store ? store.name : actualStoreInfo[storeCode]?.name || storeCode;
-        }
-
-        function getStoreId(storeName) {
-            const mapping = {
-                'シャブール': 'shabour',
-                'ワンカラット': 'onecarat',
-                'GO名古屋': 'go_nagoya',
-                'GO福岡': 'go_fukuoka',
-                'GO東京': 'go_tokyo',
-                'GO横浜': 'go_yokohama',
-                'CL名古屋': 'cl_nagoya',
-                'CL東京': 'cl_tokyo',
-                'CL四日市': 'cl_yokkaichi'
-            };
-            return mapping[storeName] || storeName.toLowerCase().replace(/[^a-z0-9]/g, '_');
         }
 
         function getPriorityText(priority) {
@@ -3711,11 +2674,6 @@
                 deadline: 'bg-orange-100 text-orange-800'
             };
             return classes[eventType] || 'bg-gray-100 text-gray-800';
-        }
-
-        function getEventTypeName(eventType) {
-            const names = { meeting: '会議', shooting: '撮影', holiday: '休業', deadline: '締切' };
-            return names[eventType] || eventType;
         }
 
         function getBrandEmoji(brand) {
@@ -3767,7 +2725,7 @@
                    'text-blue-600';
         }
 
-        // レスポンシブ対応
+        // ===== レスポンシブ対応 =====
         window.addEventListener('resize', function() {
             if (window.innerWidth >= 1024) {
                 closeSidebar();
@@ -3778,37 +2736,33 @@
             if (kpiChart) kpiChart.resize();
         });
 
-        // グローバルエラーハンドリング
+        // ===== グローバルエラーハンドリング =====
         window.addEventListener('error', function(e) {
             console.error('JavaScript エラー:', e.error);
             showNotification('システムエラーが発生しました。ページを再読み込みしてください。', 'error');
         });
 
-        console.log('CLASSY業務管理システム - デバッグ対応版初期化完了');
-        console.log('✅ アップロードファイル対応版に更新');
-        console.log('✅ 実際の店舗データ（9店舗）に対応');
-        console.log('✅ KPI管理機能の実装');
-        console.log('✅ 達成率ベースの分析機能');
-        console.log('✅ 改善提案機能の実装');
-        console.log('✅ タスク・予定追加機能の完全修正');
-        console.log('');
-        console.log('🚀 使用方法:');
-        console.log('- タスク追加: 「追加」ボタンまたは「新規タスク」ボタンをクリック');
-        console.log('- 予定追加: カレンダーページで「予定追加」ボタンをクリック');
-        console.log('- キーボードショートカット: Ctrl+K（タスク）、Ctrl+E（予定）、Ctrl+S（同期）');
-        console.log('');
-        console.log('🔧 デバッグ機能:');
+        // ===== デバッグ用関数 =====
+        window.testTaskModal = function() {
+            console.log('=== テスト: タスクモーダル表示 ===');
+            openTaskModal();
+        };
+        
+        window.testEventModal = function() {
+            console.log('=== テスト: イベントモーダル表示 ===');
+            openEventModal();
+        };
+
+        console.log('=== CLASSY業務管理システム初期化完了 ===');
+        console.log('🚀 機能テスト:');
         console.log('- window.testTaskModal() でタスクモーダルをテスト');
         console.log('- window.testEventModal() でイベントモーダルをテスト');
-        console.log('- ブラウザの開発者ツール（F12）でコンソールログを確認可能');
         console.log('');
-        console.log('📋 機能一覧:');
-        console.log('- ダッシュボード: 全体統計と店舗状況の表示');
-        console.log('- タスク管理: タスクの追加・編集・削除・フィルタリング');
-        console.log('- 売上分析: 店舗別売上とランキング表示');
-        console.log('- KPI管理: アクセス・日記・口コミ等の管理');
-        console.log('- カレンダー: 予定の追加・編集・表示');
-        console.log('- レポート: Excel形式での各種レポート出力');
+        console.log('⌨️ キーボードショートカット:');
+        console.log('- Ctrl+K: タスク追加');
+        console.log('- Ctrl+E: 予定追加');
+        console.log('- Ctrl+S: データ同期');
+        console.log('- Esc: モーダル閉じる');
     </script>
 </body>
 </html>
