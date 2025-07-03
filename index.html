@@ -1321,48 +1321,139 @@
         }
 
         function setupModalListeners() {
+            console.log('モーダルイベントリスナーを設定中...');
+            
+            // タスクモーダル
             const closeTaskModal = document.getElementById('closeTaskModal');
             const cancelTaskBtn = document.getElementById('cancelTaskBtn');
             const saveTaskBtn = document.getElementById('saveTaskBtn');
             
-            if (closeTaskModal) closeTaskModal.addEventListener('click', () => hideModal('taskModal'));
-            if (cancelTaskBtn) cancelTaskBtn.addEventListener('click', () => hideModal('taskModal'));
-            if (saveTaskBtn) saveTaskBtn.addEventListener('click', saveTask);
+            if (closeTaskModal) {
+                closeTaskModal.addEventListener('click', function() {
+                    console.log('タスクモーダルを閉じます（×ボタン）');
+                    hideModal('taskModal');
+                });
+                console.log('closeTaskModalのイベントリスナー設定完了');
+            } else {
+                console.error('closeTaskModal要素が見つかりません');
+            }
+            
+            if (cancelTaskBtn) {
+                cancelTaskBtn.addEventListener('click', function() {
+                    console.log('タスクモーダルをキャンセルします');
+                    hideModal('taskModal');
+                });
+                console.log('cancelTaskBtnのイベントリスナー設定完了');
+            } else {
+                console.error('cancelTaskBtn要素が見つかりません');
+            }
+            
+            if (saveTaskBtn) {
+                saveTaskBtn.addEventListener('click', function() {
+                    console.log('タスク保存ボタンがクリックされました');
+                    saveTask();
+                });
+                console.log('saveTaskBtnのイベントリスナー設定完了');
+            } else {
+                console.error('saveTaskBtn要素が見つかりません');
+            }
 
+            // イベントモーダル
             const closeEventModal = document.getElementById('closeEventModal');
             const cancelEventBtn = document.getElementById('cancelEventBtn');
             const saveEventBtn = document.getElementById('saveEventBtn');
             
-            if (closeEventModal) closeEventModal.addEventListener('click', () => hideModal('eventModal'));
-            if (cancelEventBtn) cancelEventBtn.addEventListener('click', () => hideModal('eventModal'));
-            if (saveEventBtn) saveEventBtn.addEventListener('click', saveEvent);
+            if (closeEventModal) {
+                closeEventModal.addEventListener('click', function() {
+                    console.log('イベントモーダルを閉じます（×ボタン）');
+                    hideModal('eventModal');
+                });
+                console.log('closeEventModalのイベントリスナー設定完了');
+            } else {
+                console.error('closeEventModal要素が見つかりません');
+            }
+            
+            if (cancelEventBtn) {
+                cancelEventBtn.addEventListener('click', function() {
+                    console.log('イベントモーダルをキャンセルします');
+                    hideModal('eventModal');
+                });
+                console.log('cancelEventBtnのイベントリスナー設定完了');
+            } else {
+                console.error('cancelEventBtn要素が見つかりません');
+            }
+            
+            if (saveEventBtn) {
+                saveEventBtn.addEventListener('click', function() {
+                    console.log('イベント保存ボタンがクリックされました');
+                    saveEvent();
+                });
+                console.log('saveEventBtnのイベントリスナー設定完了');
+            } else {
+                console.error('saveEventBtn要素が見つかりません');
+            }
+            
+            console.log('モーダルイベントリスナー設定完了');
         }
 
         function setupButtonListeners() {
+            console.log('ボタンイベントリスナーを設定中...');
+            
+            // ダッシュボードボタン
             const downloadTemplateBtn = document.getElementById('downloadTemplateBtn');
             const processDataBtn = document.getElementById('processDataBtn');
             const addTaskBtn = document.getElementById('addTaskBtn');
             const quickActionBtn = document.getElementById('quickActionBtn');
             const syncBtn = document.getElementById('syncBtn');
 
-            if (downloadTemplateBtn) downloadTemplateBtn.addEventListener('click', downloadStoreTemplate);
-            if (processDataBtn) processDataBtn.addEventListener('click', processStoreData);
-            if (addTaskBtn) addTaskBtn.addEventListener('click', () => openTaskModal());
-            if (quickActionBtn) quickActionBtn.addEventListener('click', showQuickActions);
-            if (syncBtn) syncBtn.addEventListener('click', syncAllData);
+            if (downloadTemplateBtn) {
+                downloadTemplateBtn.addEventListener('click', downloadStoreTemplate);
+                console.log('downloadTemplateBtnのイベントリスナー設定完了');
+            }
+            if (processDataBtn) {
+                processDataBtn.addEventListener('click', processStoreData);
+                console.log('processDataBtnのイベントリスナー設定完了');
+            }
+            if (addTaskBtn) {
+                addTaskBtn.addEventListener('click', function() {
+                    console.log('addTaskBtnがクリックされました');
+                    openTaskModal();
+                });
+                console.log('addTaskBtnのイベントリスナー設定完了');
+            }
+            if (quickActionBtn) {
+                quickActionBtn.addEventListener('click', showQuickActions);
+                console.log('quickActionBtnのイベントリスナー設定完了');
+            }
+            if (syncBtn) {
+                syncBtn.addEventListener('click', syncAllData);
+                console.log('syncBtnのイベントリスナー設定完了');
+            }
 
+            // タスク管理ボタン
             const newTaskBtn = document.getElementById('newTaskBtn');
             const exportTasksBtn = document.getElementById('exportTasksBtn');
 
-            if (newTaskBtn) newTaskBtn.addEventListener('click', () => openTaskModal());
-            if (exportTasksBtn) exportTasksBtn.addEventListener('click', exportTasks);
+            if (newTaskBtn) {
+                newTaskBtn.addEventListener('click', function() {
+                    console.log('newTaskBtnがクリックされました');
+                    openTaskModal();
+                });
+                console.log('newTaskBtnのイベントリスナー設定完了');
+            }
+            if (exportTasksBtn) {
+                exportTasksBtn.addEventListener('click', exportTasks);
+                console.log('exportTasksBtnのイベントリスナー設定完了');
+            }
 
+            // 売上分析ボタン
             const salesChartBtn = document.getElementById('salesChartBtn');
             const achievementChartBtn = document.getElementById('achievementChartBtn');
 
             if (salesChartBtn) salesChartBtn.addEventListener('click', () => updateSalesChart('sales'));
             if (achievementChartBtn) achievementChartBtn.addEventListener('click', () => updateSalesChart('achievement'));
 
+            // KPI管理ボタン
             const downloadKpiTemplateBtn = document.getElementById('downloadKpiTemplateBtn');
             const processKpiDataBtn = document.getElementById('processKpiDataBtn');
             const exportKpiBtn = document.getElementById('exportKpiBtn');
@@ -1371,16 +1462,24 @@
             if (processKpiDataBtn) processKpiDataBtn.addEventListener('click', processStoreData);
             if (exportKpiBtn) exportKpiBtn.addEventListener('click', exportKpiData);
 
+            // カレンダーボタン
             const addEventBtn = document.getElementById('addEventBtn');
             const todayBtn = document.getElementById('todayBtn');
             const prevMonthBtn = document.getElementById('prevMonthBtn');
             const nextMonthBtn = document.getElementById('nextMonthBtn');
 
-            if (addEventBtn) addEventBtn.addEventListener('click', () => openEventModal());
+            if (addEventBtn) {
+                addEventBtn.addEventListener('click', function() {
+                    console.log('addEventBtnがクリックされました');
+                    openEventModal();
+                });
+                console.log('addEventBtnのイベントリスナー設定完了');
+            }
             if (todayBtn) todayBtn.addEventListener('click', goToToday);
             if (prevMonthBtn) prevMonthBtn.addEventListener('click', previousMonth);
             if (nextMonthBtn) nextMonthBtn.addEventListener('click', nextMonth);
 
+            // レポートボタン
             const salesReportBtn = document.getElementById('salesReportBtn');
             const kpiReportBtn = document.getElementById('kpiReportBtn');
             const comprehensiveReportBtn = document.getElementById('comprehensiveReportBtn');
@@ -1392,6 +1491,8 @@
             if (comprehensiveReportBtn) comprehensiveReportBtn.addEventListener('click', () => generateReport('comprehensive'));
             if (scheduleReportBtn) scheduleReportBtn.addEventListener('click', () => generateReport('schedule'));
             if (monthEndReportBtn) monthEndReportBtn.addEventListener('click', generateMonthEndReport);
+            
+            console.log('全ボタンのイベントリスナー設定完了');
         }
 
         function setupFilterListeners() {
@@ -2438,48 +2539,70 @@
         }
 
         function saveTask() {
-            const title = document.getElementById('taskTitle').value.trim();
-            const description = document.getElementById('taskDescription').value.trim();
-            const priority = document.getElementById('taskPriority').value;
-            const store = document.getElementById('taskStore').value;
-            const dueDate = document.getElementById('taskDueDate').value;
+            console.log('saveTask関数が呼び出されました');
+            
+            const titleElement = document.getElementById('taskTitle');
+            const descriptionElement = document.getElementById('taskDescription');
+            const priorityElement = document.getElementById('taskPriority');
+            const storeElement = document.getElementById('taskStore');
+            const dueDateElement = document.getElementById('taskDueDate');
+
+            if (!titleElement || !descriptionElement || !priorityElement || !storeElement || !dueDateElement) {
+                console.error('フォーム要素が見つかりません');
+                showNotification('フォームの読み込みでエラーが発生しました', 'error');
+                return;
+            }
+
+            const title = titleElement.value.trim();
+            const description = descriptionElement.value.trim();
+            const priority = priorityElement.value;
+            const store = storeElement.value;
+            const dueDate = dueDateElement.value;
+
+            console.log('取得した値:', { title, description, priority, store, dueDate });
 
             if (!title) {
                 showNotification('タスク名を入力してください', 'error');
                 return;
             }
 
-            if (editingTaskId) {
-                const taskIndex = tasks.findIndex(t => t.id === editingTaskId);
-                if (taskIndex !== -1) {
-                    tasks[taskIndex] = {
-                        ...tasks[taskIndex],
+            try {
+                if (editingTaskId) {
+                    const taskIndex = tasks.findIndex(t => t.id === editingTaskId);
+                    if (taskIndex !== -1) {
+                        tasks[taskIndex] = {
+                            ...tasks[taskIndex],
+                            title,
+                            description,
+                            priority,
+                            store,
+                            dueDate
+                        };
+                    }
+                    showNotification('タスクを更新しました', 'success');
+                } else {
+                    const newTask = {
+                        id: Date.now(),
                         title,
                         description,
                         priority,
                         store,
-                        dueDate
+                        dueDate,
+                        completed: false,
+                        createdAt: new Date().toISOString()
                     };
+                    tasks.unshift(newTask);
+                    console.log('新しいタスクを追加:', newTask);
+                    showNotification('タスクを追加しました', 'success');
                 }
-                showNotification('タスクを更新しました', 'success');
-            } else {
-                const newTask = {
-                    id: Date.now(),
-                    title,
-                    description,
-                    priority,
-                    store,
-                    dueDate,
-                    completed: false,
-                    createdAt: new Date().toISOString()
-                };
-                tasks.unshift(newTask);
-                showNotification('タスクを追加しました', 'success');
-            }
 
-            saveData();
-            hideModal('taskModal');
-            renderCurrentPage();
+                saveData();
+                hideModal('taskModal');
+                renderCurrentPage();
+            } catch (error) {
+                console.error('タスク保存エラー:', error);
+                showNotification('タスクの保存中にエラーが発生しました', 'error');
+            }
         }
 
         function editTask(taskId) {
@@ -2532,23 +2655,53 @@
         }
 
         function saveEvent() {
-            const title = document.getElementById('eventTitle').value.trim();
-            const description = document.getElementById('eventDescription').value.trim();
-            const type = document.getElementById('eventType').value;
-            const date = document.getElementById('eventDate').value;
-            const startTime = document.getElementById('eventStartTime').value;
-            const endTime = document.getElementById('eventEndTime').value;
+            console.log('saveEvent関数が呼び出されました');
+            
+            const titleElement = document.getElementById('eventTitle');
+            const descriptionElement = document.getElementById('eventDescription');
+            const typeElement = document.getElementById('eventType');
+            const dateElement = document.getElementById('eventDate');
+            const startTimeElement = document.getElementById('eventStartTime');
+            const endTimeElement = document.getElementById('eventEndTime');
+
+            if (!titleElement || !descriptionElement || !typeElement || !dateElement || !startTimeElement || !endTimeElement) {
+                console.error('イベントフォーム要素が見つかりません');
+                showNotification('フォームの読み込みでエラーが発生しました', 'error');
+                return;
+            }
+
+            const title = titleElement.value.trim();
+            const description = descriptionElement.value.trim();
+            const type = typeElement.value;
+            const date = dateElement.value;
+            const startTime = startTimeElement.value;
+            const endTime = endTimeElement.value;
+
+            console.log('取得したイベント値:', { title, description, type, date, startTime, endTime });
 
             if (!title || !date) {
                 showNotification('予定名と日付を入力してください', 'error');
                 return;
             }
 
-            if (editingEventId) {
-                const eventIndex = events.findIndex(e => e.id === editingEventId);
-                if (eventIndex !== -1) {
-                    events[eventIndex] = {
-                        ...events[eventIndex],
+            try {
+                if (editingEventId) {
+                    const eventIndex = events.findIndex(e => e.id === editingEventId);
+                    if (eventIndex !== -1) {
+                        events[eventIndex] = {
+                            ...events[eventIndex],
+                            title,
+                            description,
+                            type,
+                            date,
+                            startTime,
+                            endTime
+                        };
+                    }
+                    showNotification('予定を更新しました', 'success');
+                } else {
+                    const newEvent = {
+                        id: Date.now(),
                         title,
                         description,
                         type,
@@ -2556,25 +2709,18 @@
                         startTime,
                         endTime
                     };
+                    events.push(newEvent);
+                    console.log('新しいイベントを追加:', newEvent);
+                    showNotification('予定を追加しました', 'success');
                 }
-                showNotification('予定を更新しました', 'success');
-            } else {
-                const newEvent = {
-                    id: Date.now(),
-                    title,
-                    description,
-                    type,
-                    date,
-                    startTime,
-                    endTime
-                };
-                events.push(newEvent);
-                showNotification('予定を追加しました', 'success');
-            }
 
-            saveData();
-            hideModal('eventModal');
-            renderCurrentPage();
+                saveData();
+                hideModal('eventModal');
+                renderCurrentPage();
+            } catch (error) {
+                console.error('イベント保存エラー:', error);
+                showNotification('予定の保存中にエラーが発生しました', 'error');
+            }
         }
 
         function editEvent(eventId) {
@@ -2766,10 +2912,10 @@
         function showQuickActions() {
             const content = `
                 <div class="grid grid-cols-2 gap-4">
-                    <button class="btn btn-primary" onclick="closeAllModals(); openTaskModal();">
+                    <button class="btn btn-primary" onclick="closeAllModals(); setTimeout(() => openTaskModal(), 100);">
                         <i class="fas fa-plus mr-2"></i>新しいタスク
                     </button>
-                    <button class="btn btn-primary" onclick="closeAllModals(); openEventModal();">
+                    <button class="btn btn-primary" onclick="closeAllModals(); setTimeout(() => openEventModal(), 100);">
                         <i class="fas fa-calendar mr-2"></i>予定追加
                     </button>
                     <button class="btn btn-outline" onclick="closeAllModals(); showPage('sales');">
@@ -2987,16 +3133,30 @@
 
         // モーダル管理
         function showModal(modalId) {
+            console.log('モーダル表示:', modalId);
             const modal = document.getElementById(modalId);
             if (modal) {
                 modal.classList.remove('hidden');
+                console.log('モーダル表示完了:', modalId);
+                
+                // フォーカスを最初の入力フィールドに移動
+                setTimeout(() => {
+                    const firstInput = modal.querySelector('input, textarea, select');
+                    if (firstInput) {
+                        firstInput.focus();
+                    }
+                }, 100);
+            } else {
+                console.error('モーダルが見つかりません:', modalId);
             }
         }
 
         function hideModal(modalId) {
+            console.log('モーダル非表示:', modalId);
             const modal = document.getElementById(modalId);
             if (modal) {
                 modal.classList.add('hidden');
+                console.log('モーダル非表示完了:', modalId);
             }
             editingTaskId = null;
             editingEventId = null;
@@ -3069,7 +3229,14 @@
         function updateElement(id, value, property = 'textContent') {
             const element = document.getElementById(id);
             if (element) {
-                element[property] = value;
+                if (property === 'value') {
+                    element.value = value || '';
+                } else {
+                    element[property] = value || '';
+                }
+                console.log(`要素更新: ${id} = ${value} (${property})`);
+            } else {
+                console.error(`要素が見つかりません: ${id}`);
             }
         }
 
@@ -3204,6 +3371,17 @@
         console.log('✅ KPI管理機能の実装');
         console.log('✅ 達成率ベースの分析機能');
         console.log('✅ 改善提案機能の実装');
+        console.log('✅ タスク・予定追加機能のデバッグ対応');
+        console.log('');
+        console.log('🚀 使用方法:');
+        console.log('- タスク追加: 「追加」ボタンまたは「新規タスク」ボタンをクリック');
+        console.log('- 予定追加: カレンダーページで「予定追加」ボタンをクリック');
+        console.log('- キーボードショートカット: Ctrl+K（タスク）、Ctrl+E（予定）');
+        
+        // 初期化完了を通知
+        setTimeout(() => {
+            showNotification('システム初期化完了！タスクと予定を追加できます', 'success');
+        }, 1000);
     </script>
 </body>
 </html>
