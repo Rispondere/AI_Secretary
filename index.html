@@ -935,22 +935,245 @@
     </div>
 
     <script>
-        // グローバル変数
-        let currentPage = 'dashboard';
-        let sidebarOpen = false;
-        let editingTaskId = null;
-        let editingEventId = null;
-        let uploadedBusinessData = null;
-        let salesChart = null;
-        let accessChart = null;
-        let kpiChart = null;
-        let currentMonth = new Date().getMonth();
-        let currentYear = new Date().getFullYear();
-        
-        // データ管理
-        let tasks = [];
-        let events = [];
-        let storeData = [];
+        // Google Sheets API設定
+        const GOOGLE_SHEETS_CONFIG = {
+            // ⚠️ ここにデプロイ後のGoogle Apps Script URLを設定してください
+            API_URL: 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec',
+            TIMEOUT: 10000 // 10秒タイムアウト
+        };
+
+        // データ管理クラス
+        class DataManager {
+            constructor() {
+                this.cache = {
+                    tasks: [],
+                    events: [],
+                    storeData: [],
+                    lastSync: null
+                };
+                this.isOnline = navigator.onLine;
+                this.setupNetworkListener();
+            }
+
+            setupNetworkListener() {
+                window.addEventListener('online', () => {
+                    this.isOnline = true;
+                    console.log('ネットワーク接続が復旧しました');
+                    this.syncWithServer();
+                });
+
+                window.addEventListener('offline', () => {
+                    this.isOnline = false;
+                    console.log('ネットワーク接続が切断されました');
+                });
+            }
+
+            async saveTask(task) {
+                console.log('タスクを保存:', task);
+                
+                try {
+                    const response = await this.postToSheets({
+                        type: 'task',
+                        ...task
+                    });
+                    
+                    if (response.status === 'success') {
+                        // ローカルキャッシュを更新
+                        const existingIndex = this.cache.tasks.findIndex(t => t.id === task.id);
+                        if (existingIndex >= 0) {
+                            this.cache.tasks[existingIndex] = task;
+                        } else {
+                            this.cache.tasks.push(task);
+                        }
+                        
+                        showNotification('タスクをGoogle Sheetsに保存しました', 'success');
+                        return true;
+                    } else {
+                        throw new Error(response.message || '保存に失敗しました');
+                    }
+                } catch (error) {
+                    console.error('タスク保存エラー:', error);
+                    showNotification('タスクの保存に失敗しました: ' + error.message, 'error');
+                    return false;
+                }
+            }
+
+            async saveEvent(event) {
+                console.log('イベントを保存:', event);
+                
+                try {
+                    const response = await this.postToSheets({
+                        type: 'event',
+                        ...event
+                    });
+                    
+                    if (response.status === 'success') {
+                        const existingIndex = this.cache.events.findIndex(e => e.id === event.id);
+                        if (existingIndex >= 0) {
+                            this.cache.events[existingIndex] = event;
+                        } else {
+                            this.cache.events.push(event);
+                        }
+                        
+                        showNotification('予定をGoogle Sheetsに保存しました', 'success');
+                        return true;
+                    } else {
+                        throw new Error(response.message || '保存に失敗しました');
+                    }
+                } catch (error) {
+                    console.error('イベント保存エラー:', error);
+                    showNotification('予定の保存に失敗しました: ' + error.message, 'error');
+                    return false;
+                }
+            }
+
+            async saveKpiData(kpiData) {
+                console.log('KPIデータを保存:', kpiData);
+                
+                try {
+                    const response = await this.postToSheets({
+                        type: 'kpi',
+                        ...kpiData
+                    });
+                    
+                    if (response.status === 'success') {
+                        showNotification('KPIデータをGoogle Sheetsに保存しました', 'success');
+                        return true;
+                    } else {
+                        throw new Error(response.message || '保存に失敗しました');
+                    }
+                } catch (error) {
+                    console.error('KPIデータ保存エラー:', error);
+                    showNotification('KPIデータの保存に失敗しました: ' + error.message, 'error');
+                    return false;
+                }
+            }
+
+            async loadAllData(storeFilter = 'all') {
+                console.log('データを読み込み中...', storeFilter);
+                
+                try {
+                    const url = storeFilter === 'all' 
+                        ? GOOGLE_SHEETS_CONFIG.API_URL 
+                        : `${GOOGLE_SHEETS_CONFIG.API_URL}?store=${encodeURIComponent(storeFilter)}`;
+                    
+                    const response = await fetch(url, {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+
+                    const result = await response.json();
+                    
+                    if (result.status === 'success') {
+                        // データをタイプ別に分類
+                        this.cache.tasks = result.data.filter(item => item.type === 'task');
+                        this.cache.events = result.data.filter(item => item.type === 'event');
+                        this.cache.lastSync = new Date().toISOString();
+                        
+                        console.log(`データ読み込み完了: タスク${this.cache.tasks.length}件、イベント${this.cache.events.length}件`);
+                        showNotification(`Google Sheetsからデータを読み込みました（${result.filteredCount}件）`, 'success');
+                        
+                        return {
+                            tasks: this.cache.tasks,
+                            events: this.cache.events,
+                            stores: result.stores || [],
+                            totalCount: result.totalCount || 0
+                        };
+                    } else {
+                        throw new Error(result.message || 'データの読み込みに失敗しました');
+                    }
+                } catch (error) {
+                    console.error('データ読み込みエラー:', error);
+                    showNotification('データの読み込みに失敗しました: ' + error.message, 'error');
+                    
+                    // キャッシュデータを返す
+                    return {
+                        tasks: this.cache.tasks,
+                        events: this.cache.events,
+                        stores: [],
+                        totalCount: 0
+                    };
+                }
+            }
+
+            async postToSheets(data) {
+                if (!this.isOnline) {
+                    throw new Error('ネットワーク接続がありません');
+                }
+
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), GOOGLE_SHEETS_CONFIG.TIMEOUT);
+
+                try {
+                    const response = await fetch(GOOGLE_SHEETS_CONFIG.API_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data),
+                        signal: controller.signal
+                    });
+
+                    clearTimeout(timeoutId);
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+
+                    return await response.json();
+                } catch (error) {
+                    clearTimeout(timeoutId);
+                    if (error.name === 'AbortError') {
+                        throw new Error('タイムアウトしました。もう一度お試しください。');
+                    }
+                    throw error;
+                }
+            }
+
+            async syncWithServer() {
+                console.log('サーバーと同期中...');
+                return await this.loadAllData();
+            }
+
+            async deleteTask(taskId) {
+                // 注意: 実際の削除機能はGoogle Apps Script側で実装が必要
+                console.log('タスク削除:', taskId);
+                const task = this.cache.tasks.find(t => t.id === taskId);
+                if (task) {
+                    task.status = 'deleted';
+                    task.updatedAt = new Date().toISOString();
+                    return await this.saveTask(task);
+                }
+                return false;
+            }
+
+            getTasks(storeFilter = null) {
+                if (storeFilter) {
+                    return this.cache.tasks.filter(task => 
+                        task.store === storeFilter && task.status !== 'deleted'
+                    );
+                }
+                return this.cache.tasks.filter(task => task.status !== 'deleted');
+            }
+
+            getEvents(storeFilter = null) {
+                if (storeFilter) {
+                    return this.cache.events.filter(event => 
+                        event.store === storeFilter && event.status !== 'deleted'
+                    );
+                }
+                return this.cache.events.filter(event => event.status !== 'deleted');
+            }
+        }
+
+        // グローバルデータマネージャーインスタンス
+        let dataManager = null;
         
         // 実際の店舗情報（アップロードファイルに基づく）
         const actualStoreInfo = {
