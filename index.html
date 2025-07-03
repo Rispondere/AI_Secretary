@@ -834,6 +834,203 @@
         let events = [];
         let storeData = [];
 
+        // ===== Google Sheets同期機能 =====
+        class GoogleSheetsSync {
+            constructor() {
+                this.baseUrl = '';
+                this.lastSyncTime = null;
+            }
+
+            // Google SheetsのURLをCSV形式のURLに変換
+            convertToCSVUrl(originalUrl) {
+                try {
+                    // URLからスプレッドシートIDを抽出
+                    const spreadsheetId = originalUrl.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+                    if (!spreadsheetId) {
+                        throw new Error('無効なGoogle SheetsのURLです');
+                    }
+
+                    // gidパラメータを抽出（シート番号）
+                    let gid = '0'; // デフォルト
+                    const gidMatch = originalUrl.match(/[#&]gid=(\d+)/);
+                    if (gidMatch) {
+                        gid = gidMatch[1];
+                    }
+
+                    // CSV形式のURLを生成
+                    const csvUrl = `https://docs.google.com/spreadsheets/d/${spreadsheetId[1]}/export?format=csv&gid=${gid}`;
+                    console.log('CSV URL生成:', csvUrl);
+                    return csvUrl;
+                } catch (error) {
+                    console.error('URL変換エラー:', error);
+                    throw error;
+                }
+            }
+
+            // Google Sheetsからデータを取得
+            async fetchGoogleSheetsData(url) {
+                try {
+                    const csvUrl = this.convertToCSVUrl(url);
+                    console.log('Google Sheetsからデータを取得中...', csvUrl);
+
+                    const response = await fetch(csvUrl, {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'text/csv'
+                        }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: データの取得に失敗しました。Sheetsが公開設定されているか確認してください。`);
+                    }
+
+                    const csvText = await response.text();
+                    console.log('CSVデータ取得成功:', csvText.substring(0, 200) + '...');
+
+                    return this.parseCSVData(csvText);
+                } catch (error) {
+                    console.error('Google Sheets取得エラー:', error);
+                    throw error;
+                }
+            }
+
+            // CSVデータを解析
+            parseCSVData(csvText) {
+                try {
+                    const lines = csvText.split('\n');
+                    const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+                    const data = [];
+
+                    console.log('CSVヘッダー:', headers);
+
+                    for (let i = 1; i < lines.length; i++) {
+                        const line = lines[i].trim();
+                        if (line) {
+                            const values = this.parseCSVLine(line);
+                            if (values.length > 0 && values[0]) { // 店舗名がある行のみ
+                                const rowData = {};
+                                headers.forEach((header, index) => {
+                                    rowData[header] = values[index] || '';
+                                });
+                                data.push(rowData);
+                            }
+                        }
+                    }
+
+                    console.log('解析されたデータ:', data);
+                    return { headers, data };
+                } catch (error) {
+                    console.error('CSV解析エラー:', error);
+                    throw error;
+                }
+            }
+
+            // CSV行を解析（カンマとクォーテーションを適切に処理）
+            parseCSVLine(line) {
+                const result = [];
+                let current = '';
+                let inQuotes = false;
+
+                for (let i = 0; i < line.length; i++) {
+                    const char = line[i];
+                    const nextChar = line[i + 1];
+
+                    if (char === '"') {
+                        if (inQuotes && nextChar === '"') {
+                            current += '"';
+                            i++; // Skip next quote
+                        } else {
+                            inQuotes = !inQuotes;
+                        }
+                    } else if (char === ',' && !inQuotes) {
+                        result.push(current.trim());
+                        current = '';
+                    } else {
+                        current += char;
+                    }
+                }
+
+                result.push(current.trim());
+                return result;
+            }
+
+            // 取得したデータを店舗データ形式に変換
+            convertToStoreData(sheetsData) {
+                try {
+                    const convertedData = sheetsData.data.map(row => {
+                        // 店舗名から店舗IDを生成
+                        const storeName = row['店舗'] || row['店舗名'] || '';
+                        const storeId = this.getStoreIdFromName(storeName);
+
+                        if (!storeId) {
+                            console.warn('不明な店舗名:', storeName);
+                            return null;
+                        }
+
+                        return {
+                            id: storeId,
+                            name: storeName,
+                            salesTarget: this.parseNumber(row['売上目標'] || row['目標売上']),
+                            totalSales: this.parseNumber(row['売上実績'] || row['総売上']),
+                            salesDifference: this.parseNumber(row['売上差分'] || row['現在売り上げ状況']),
+                            accessAverage: this.parseNumber(row['アクセス平均']),
+                            diaryTarget: this.parseNumber(row['日記目標']),
+                            diaryAverage: this.parseNumber(row['日記平均']),
+                            reviewTarget: this.parseNumber(row['口コミ目標']),
+                            totalAccess: this.parseNumber(row['総アクセス数']),
+                            diaryPosts: this.parseNumber(row['写メ日記投稿数']),
+                            kiteneMessages: this.parseNumber(row['キテネ送信数']),
+                            reviewPosts: this.parseNumber(row['口コミ掲載数']),
+                            attendanceCount: this.parseNumber(row['出勤人数']),
+                            girlCount: this.parseNumber(row['女の子人数']),
+                            userCount: this.parseNumber(row['ユーザ数']),
+                            salesAchievementRate: this.parseNumber(row['売上達成率']) || 
+                                                 (this.parseNumber(row['売上実績']) / this.parseNumber(row['売上目標'])),
+                            diaryAchievementRate: this.parseNumber(row['日記達成率']) || 
+                                                 (this.parseNumber(row['日記平均']) / this.parseNumber(row['日記目標'])),
+                            reviewAchievementRate: this.parseNumber(row['口コミ達成率']) || 1.0,
+                            newCustomers: this.parseNumber(row['新規の数']) || 0
+                        };
+                    }).filter(store => store !== null);
+
+                    console.log('変換された店舗データ:', convertedData);
+                    return convertedData;
+                } catch (error) {
+                    console.error('データ変換エラー:', error);
+                    throw error;
+                }
+            }
+
+            // 数値文字列を数値に変換
+            parseNumber(value) {
+                if (!value) return 0;
+                // 文字列から数値以外を除去
+                const cleaned = String(value).replace(/[^\d.-]/g, '');
+                const number = parseFloat(cleaned);
+                return isNaN(number) ? 0 : number;
+            }
+
+            // 店舗名から店舗IDを取得
+            getStoreIdFromName(storeName) {
+                const mapping = {
+                    'シャブール': 'shabour',
+                    'ワンカラット': 'onecarat',
+                    'GO名古屋': 'go_nagoya',
+                    'GO福岡': 'go_fukuoka',
+                    'GO東京': 'go_tokyo',
+                    'GO横浜': 'go_yokohama',
+                    'オペラ錦': 'opera_nishiki',
+                    'CL名古屋': 'cl_nagoya',
+                    'CL東京': 'cl_tokyo',
+                    'CL四日市': 'cl_yokkaichi'
+                };
+                return mapping[storeName] || null;
+            }
+        }
+
+        // グローバルインスタンス
+        let googleSheetsSync = new GoogleSheetsSync();
+
         // チャート変数
         let salesChart = null;
         let accessChart = null;
@@ -1336,7 +1533,25 @@
                     };
                 }
 
-                console.log('全ボタンイベントリスナー設定完了');
+                // Google Sheets同期ボタン
+                const syncGoogleSheetsBtn = document.getElementById('syncGoogleSheetsBtn');
+                const setupSheetsBtn = document.getElementById('setupSheetsBtn');
+                
+                if (syncGoogleSheetsBtn) {
+                    syncGoogleSheetsBtn.onclick = function(e) {
+                        e.preventDefault();
+                        syncFromGoogleSheets();
+                    };
+                    console.log('syncGoogleSheetsBtn イベント設定完了');
+                }
+                
+                if (setupSheetsBtn) {
+                    setupSheetsBtn.onclick = function(e) {
+                        e.preventDefault();
+                        showGoogleSheetsSetup();
+                    };
+                    console.log('setupSheetsBtn イベント設定完了');
+                }
             }, 500);
         }
 
@@ -2963,7 +3178,7 @@
             
             const buttons = [
                 'addTaskBtn', 'newTaskBtn', 'quickActionBtn', 'addEventBtn',
-                'syncBtn', 'exportTasksBtn', 'exportKpiBtn'
+                'syncBtn', 'exportTasksBtn', 'exportKpiBtn', 'syncGoogleSheetsBtn'
             ];
             
             buttons.forEach(buttonId => {
@@ -2974,12 +3189,33 @@
             console.log('=== ボタンテスト完了 ===');
         };
 
+        window.testGoogleSheets = function() {
+            console.log('=== Google Sheets同期テスト ===');
+            syncFromGoogleSheets();
+        };
+
+        window.testGoogleSheetsUrl = function(url) {
+            console.log('=== Google Sheets URL変換テスト ===');
+            try {
+                const csvUrl = googleSheetsSync.convertToCSVUrl(url || 'https://docs.google.com/spreadsheets/d/1CSGBzK9au8VLEQFCpBJbVyMoTaRhO5hoQd_qk8XC_IQ/edit?gid=0#gid=0');
+                console.log('変換結果:', csvUrl);
+                return csvUrl;
+            } catch (error) {
+                console.error('変換エラー:', error);
+                return null;
+            }
+        };
+
         console.log('=== CLASSY業務管理システム初期化完了 ===');
         console.log('📊 店舗数:', storeData.length, '店舗（オペラ錦を含む）');
+        console.log('🔗 Google Sheets同期機能が追加されました');
+        console.log('');
         console.log('🚀 機能テスト:');
         console.log('- window.testTaskModal() でタスクモーダルをテスト');
         console.log('- window.testEventModal() でイベントモーダルをテスト');
         console.log('- window.testButtons() でボタンの存在確認');
+        console.log('- window.testGoogleSheets() でGoogle Sheets同期をテスト');
+        console.log('- window.testGoogleSheetsUrl(url) でURL変換をテスト');
         console.log('');
         console.log('⌨️ キーボードショートカット:');
         console.log('- Ctrl+K: タスク追加');
@@ -2987,9 +3223,15 @@
         console.log('- Ctrl+S: データ同期');
         console.log('- Esc: モーダル閉じる');
         console.log('');
+        console.log('📋 Google Sheets同期:');
+        console.log('1. Google Sheetsを「リンクを知っている全員が閲覧可能」に設定');
+        console.log('2. URLを入力フィールドに貼り付け');
+        console.log('3. 「Google Sheetsから同期」ボタンをクリック');
+        console.log('');
         console.log('💡 トラブルシューティング:');
-        console.log('- ボタンが効かない場合: ブラウザのコンソールでエラーを確認');
-        console.log('- モーダルが開かない場合: window.testTaskModal() でテスト実行');
+        console.log('- 同期エラーの場合: Sheetsの共有設定を確認');
+        console.log('- データが反映されない場合: 列名（ヘッダー）を確認');
+        console.log('- CORS エラーの場合: Sheetsを公開設定にしてください');
     </script>
 </body>
 </html>
