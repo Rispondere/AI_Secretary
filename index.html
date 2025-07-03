@@ -486,6 +486,7 @@
                             <option value="go_fukuoka">GO福岡</option>
                             <option value="go_tokyo">GO東京</option>
                             <option value="go_yokohama">GO横浜</option>
+                            <option value="opera_nishiki">オペラ錦</option>
                             <option value="cl_nagoya">CL名古屋</option>
                             <option value="cl_tokyo">CL東京</option>
                             <option value="cl_yokkaichi">CL四日市</option>
@@ -731,6 +732,7 @@
                             <option value="go_fukuoka">GO福岡</option>
                             <option value="go_tokyo">GO東京</option>
                             <option value="go_yokohama">GO横浜</option>
+                            <option value="opera_nishiki">オペラ錦</option>
                             <option value="cl_nagoya">CL名古屋</option>
                             <option value="cl_tokyo">CL東京</option>
                             <option value="cl_yokkaichi">CL四日市</option>
@@ -845,6 +847,7 @@
             'go_fukuoka': { name: 'GO福岡', shortName: 'GO福岡', type: 'GrandOpera' },
             'go_tokyo': { name: 'GO東京', shortName: 'GO東京', type: 'GrandOpera' },
             'go_yokohama': { name: 'GO横浜', shortName: 'GO横浜', type: 'GrandOpera' },
+            'opera_nishiki': { name: 'オペラ錦', shortName: 'オペラ錦', type: 'GrandOpera' },
             'cl_nagoya': { name: 'CL名古屋', shortName: 'CL名古屋', type: 'CLASSY' },
             'cl_tokyo': { name: 'CL東京', shortName: 'CL東京', type: 'CLASSY' },
             'cl_yokkaichi': { name: 'CL四日市', shortName: 'CL四日市', type: 'CLASSY' }
@@ -1075,6 +1078,28 @@
                     newCustomers: 0
                 },
                 {
+                    id: 'opera_nishiki',
+                    name: 'オペラ錦',
+                    salesTarget: 24000000,
+                    totalSales: 25123456,
+                    salesDifference: 1123456,
+                    accessAverage: 42350,
+                    diaryTarget: 220,
+                    diaryAverage: 235.6,
+                    reviewTarget: 180,
+                    totalAccess: 1273548,
+                    diaryPosts: 7068,
+                    kiteneMessages: 28934,
+                    reviewPosts: 195,
+                    attendanceCount: 480,
+                    girlCount: 650,
+                    userCount: 4200,
+                    salesAchievementRate: 1.0468,
+                    diaryAchievementRate: 1.0709,
+                    reviewAchievementRate: 1.0833,
+                    newCustomers: 58
+                },
+                {
                     id: 'cl_nagoya',
                     name: 'CL名古屋',
                     salesTarget: 6000000,
@@ -1176,88 +1201,237 @@
         }
 
         function setupButtonListeners() {
-            // タスク追加ボタン
-            const addTaskBtn = document.getElementById('addTaskBtn');
-            const newTaskBtn = document.getElementById('newTaskBtn');
-            const quickActionBtn = document.getElementById('quickActionBtn');
+            console.log('ボタンイベントリスナー設定開始');
             
-            if (addTaskBtn) addTaskBtn.addEventListener('click', () => openTaskModal());
-            if (newTaskBtn) newTaskBtn.addEventListener('click', () => openTaskModal());
-            if (quickActionBtn) quickActionBtn.addEventListener('click', showQuickActions);
+            // タスク追加ボタン - より確実に設定
+            setTimeout(() => {
+                const addTaskBtn = document.getElementById('addTaskBtn');
+                const newTaskBtn = document.getElementById('newTaskBtn');
+                const quickActionBtn = document.getElementById('quickActionBtn');
+                
+                if (addTaskBtn) {
+                    addTaskBtn.onclick = function(e) {
+                        e.preventDefault();
+                        console.log('addTaskBtn clicked');
+                        openTaskModal();
+                    };
+                    console.log('addTaskBtn イベント設定完了');
+                }
+                
+                if (newTaskBtn) {
+                    newTaskBtn.onclick = function(e) {
+                        e.preventDefault();
+                        console.log('newTaskBtn clicked');
+                        openTaskModal();
+                    };
+                    console.log('newTaskBtn イベント設定完了');
+                }
+                
+                if (quickActionBtn) {
+                    quickActionBtn.onclick = function(e) {
+                        e.preventDefault();
+                        console.log('quickActionBtn clicked');
+                        showQuickActions();
+                    };
+                    console.log('quickActionBtn イベント設定完了');
+                }
 
-            // イベント追加ボタン
-            const addEventBtn = document.getElementById('addEventBtn');
-            if (addEventBtn) addEventBtn.addEventListener('click', () => openEventModal());
+                // イベント追加ボタン
+                const addEventBtn = document.getElementById('addEventBtn');
+                if (addEventBtn) {
+                    addEventBtn.onclick = function(e) {
+                        e.preventDefault();
+                        console.log('addEventBtn clicked');
+                        openEventModal();
+                    };
+                    console.log('addEventBtn イベント設定完了');
+                }
 
-            // その他のボタン
-            const syncBtn = document.getElementById('syncBtn');
-            const exportTasksBtn = document.getElementById('exportTasksBtn');
-            const exportKpiBtn = document.getElementById('exportKpiBtn');
-            
-            if (syncBtn) syncBtn.addEventListener('click', syncAllData);
-            if (exportTasksBtn) exportTasksBtn.addEventListener('click', exportTasks);
-            if (exportKpiBtn) exportKpiBtn.addEventListener('click', exportKpiData);
+                // その他のボタン
+                const syncBtn = document.getElementById('syncBtn');
+                const exportTasksBtn = document.getElementById('exportTasksBtn');
+                const exportKpiBtn = document.getElementById('exportKpiBtn');
+                
+                if (syncBtn) {
+                    syncBtn.onclick = function(e) {
+                        e.preventDefault();
+                        syncAllData();
+                    };
+                }
+                if (exportTasksBtn) {
+                    exportTasksBtn.onclick = function(e) {
+                        e.preventDefault();
+                        exportTasks();
+                    };
+                }
+                if (exportKpiBtn) {
+                    exportKpiBtn.onclick = function(e) {
+                        e.preventDefault();
+                        exportKpiData();
+                    };
+                }
 
-            // カレンダーボタン
-            const todayBtn = document.getElementById('todayBtn');
-            const prevMonthBtn = document.getElementById('prevMonthBtn');
-            const nextMonthBtn = document.getElementById('nextMonthBtn');
-            
-            if (todayBtn) todayBtn.addEventListener('click', goToToday);
-            if (prevMonthBtn) prevMonthBtn.addEventListener('click', previousMonth);
-            if (nextMonthBtn) nextMonthBtn.addEventListener('click', nextMonth);
+                // カレンダーボタン
+                const todayBtn = document.getElementById('todayBtn');
+                const prevMonthBtn = document.getElementById('prevMonthBtn');
+                const nextMonthBtn = document.getElementById('nextMonthBtn');
+                
+                if (todayBtn) {
+                    todayBtn.onclick = function(e) {
+                        e.preventDefault();
+                        goToToday();
+                    };
+                }
+                if (prevMonthBtn) {
+                    prevMonthBtn.onclick = function(e) {
+                        e.preventDefault();
+                        previousMonth();
+                    };
+                }
+                if (nextMonthBtn) {
+                    nextMonthBtn.onclick = function(e) {
+                        e.preventDefault();
+                        nextMonth();
+                    };
+                }
 
-            // チャートボタン
-            const salesChartBtn = document.getElementById('salesChartBtn');
-            const achievementChartBtn = document.getElementById('achievementChartBtn');
-            
-            if (salesChartBtn) salesChartBtn.addEventListener('click', () => updateSalesChart('sales'));
-            if (achievementChartBtn) achievementChartBtn.addEventListener('click', () => updateSalesChart('achievement'));
+                // チャートボタン
+                const salesChartBtn = document.getElementById('salesChartBtn');
+                const achievementChartBtn = document.getElementById('achievementChartBtn');
+                
+                if (salesChartBtn) {
+                    salesChartBtn.onclick = function(e) {
+                        e.preventDefault();
+                        updateSalesChart('sales');
+                    };
+                }
+                if (achievementChartBtn) {
+                    achievementChartBtn.onclick = function(e) {
+                        e.preventDefault();
+                        updateSalesChart('achievement');
+                    };
+                }
 
-            // レポートボタン
-            const salesReportBtn = document.getElementById('salesReportBtn');
-            const kpiReportBtn = document.getElementById('kpiReportBtn');
-            const comprehensiveReportBtn = document.getElementById('comprehensiveReportBtn');
-            
-            if (salesReportBtn) salesReportBtn.addEventListener('click', () => generateReport('sales'));
-            if (kpiReportBtn) kpiReportBtn.addEventListener('click', () => generateReport('kpi'));
-            if (comprehensiveReportBtn) comprehensiveReportBtn.addEventListener('click', () => generateReport('comprehensive'));
+                // レポートボタン
+                const salesReportBtn = document.getElementById('salesReportBtn');
+                const kpiReportBtn = document.getElementById('kpiReportBtn');
+                const comprehensiveReportBtn = document.getElementById('comprehensiveReportBtn');
+                
+                if (salesReportBtn) {
+                    salesReportBtn.onclick = function(e) {
+                        e.preventDefault();
+                        generateReport('sales');
+                    };
+                }
+                if (kpiReportBtn) {
+                    kpiReportBtn.onclick = function(e) {
+                        e.preventDefault();
+                        generateReport('kpi');
+                    };
+                }
+                if (comprehensiveReportBtn) {
+                    comprehensiveReportBtn.onclick = function(e) {
+                        e.preventDefault();
+                        generateReport('comprehensive');
+                    };
+                }
+
+                console.log('全ボタンイベントリスナー設定完了');
+            }, 500);
         }
 
         function setupModalListeners() {
-            // タスクモーダル
-            const closeTaskModal = document.getElementById('closeTaskModal');
-            const saveTaskBtn = document.getElementById('saveTaskBtn');
-            const cancelTaskBtn = document.getElementById('cancelTaskBtn');
+            console.log('モーダルイベントリスナー設定開始');
             
-            if (closeTaskModal) closeTaskModal.addEventListener('click', () => hideModal('taskModal'));
-            if (saveTaskBtn) saveTaskBtn.addEventListener('click', saveTask);
-            if (cancelTaskBtn) cancelTaskBtn.addEventListener('click', () => hideModal('taskModal'));
+            setTimeout(() => {
+                // タスクモーダル
+                const closeTaskModal = document.getElementById('closeTaskModal');
+                const saveTaskBtn = document.getElementById('saveTaskBtn');
+                const cancelTaskBtn = document.getElementById('cancelTaskBtn');
+                
+                if (closeTaskModal) {
+                    closeTaskModal.onclick = function(e) {
+                        e.preventDefault();
+                        console.log('closeTaskModal clicked');
+                        hideModal('taskModal');
+                    };
+                    console.log('closeTaskModal イベント設定完了');
+                }
+                
+                if (saveTaskBtn) {
+                    saveTaskBtn.onclick = function(e) {
+                        e.preventDefault();
+                        console.log('saveTaskBtn clicked');
+                        saveTask();
+                    };
+                    console.log('saveTaskBtn イベント設定完了');
+                }
+                
+                if (cancelTaskBtn) {
+                    cancelTaskBtn.onclick = function(e) {
+                        e.preventDefault();
+                        console.log('cancelTaskBtn clicked');
+                        hideModal('taskModal');
+                    };
+                    console.log('cancelTaskBtn イベント設定完了');
+                }
 
-            // イベントモーダル
-            const closeEventModal = document.getElementById('closeEventModal');
-            const saveEventBtn = document.getElementById('saveEventBtn');
-            const cancelEventBtn = document.getElementById('cancelEventBtn');
-            
-            if (closeEventModal) closeEventModal.addEventListener('click', () => hideModal('eventModal'));
-            if (saveEventBtn) saveEventBtn.addEventListener('click', saveEvent);
-            if (cancelEventBtn) cancelEventBtn.addEventListener('click', () => hideModal('eventModal'));
+                // イベントモーダル
+                const closeEventModal = document.getElementById('closeEventModal');
+                const saveEventBtn = document.getElementById('saveEventBtn');
+                const cancelEventBtn = document.getElementById('cancelEventBtn');
+                
+                if (closeEventModal) {
+                    closeEventModal.onclick = function(e) {
+                        e.preventDefault();
+                        console.log('closeEventModal clicked');
+                        hideModal('eventModal');
+                    };
+                    console.log('closeEventModal イベント設定完了');
+                }
+                
+                if (saveEventBtn) {
+                    saveEventBtn.onclick = function(e) {
+                        e.preventDefault();
+                        console.log('saveEventBtn clicked');
+                        saveEvent();
+                    };
+                    console.log('saveEventBtn イベント設定完了');
+                }
+                
+                if (cancelEventBtn) {
+                    cancelEventBtn.onclick = function(e) {
+                        e.preventDefault();
+                        console.log('cancelEventBtn clicked');
+                        hideModal('eventModal');
+                    };
+                    console.log('cancelEventBtn イベント設定完了');
+                }
 
-            // モーダル背景クリックで閉じる
-            const taskModal = document.getElementById('taskModal');
-            const eventModal = document.getElementById('eventModal');
-            
-            if (taskModal) {
-                taskModal.addEventListener('click', (e) => {
-                    if (e.target === taskModal) hideModal('taskModal');
-                });
-            }
-            
-            if (eventModal) {
-                eventModal.addEventListener('click', (e) => {
-                    if (e.target === eventModal) hideModal('eventModal');
-                });
-            }
+                // モーダル背景クリックで閉じる
+                const taskModal = document.getElementById('taskModal');
+                const eventModal = document.getElementById('eventModal');
+                
+                if (taskModal) {
+                    taskModal.onclick = function(e) {
+                        if (e.target === taskModal) {
+                            console.log('taskModal background clicked');
+                            hideModal('taskModal');
+                        }
+                    };
+                }
+                
+                if (eventModal) {
+                    eventModal.onclick = function(e) {
+                        if (e.target === eventModal) {
+                            console.log('eventModal background clicked');
+                            hideModal('eventModal');
+                        }
+                    };
+                }
+
+                console.log('全モーダルイベントリスナー設定完了');
+            }, 500);
         }
 
         function setupFilterListeners() {
@@ -1946,9 +2120,17 @@
 
         // ===== タスク管理 =====
         function openTaskModal(taskId = null) {
+            console.log('openTaskModal called with taskId:', taskId);
+            
             editingTaskId = taskId;
             const modal = document.getElementById('taskModal');
             const title = document.getElementById('taskModalTitle');
+
+            if (!modal) {
+                console.error('taskModal element not found');
+                showNotification('タスクモーダルが見つかりません', 'error');
+                return;
+            }
 
             if (taskId) {
                 const task = tasks.find(t => t.id === taskId);
@@ -1959,6 +2141,7 @@
                     updateElement('taskPriority', task.priority, 'value');
                     updateElement('taskStore', task.store, 'value');
                     updateElement('taskDueDate', task.dueDate, 'value');
+                    console.log('タスク編集モードでフォームを設定しました');
                 }
             } else {
                 title.textContent = '新しいタスク';
@@ -1967,9 +2150,11 @@
                 updateElement('taskPriority', 'medium', 'value');
                 updateElement('taskStore', '', 'value');
                 updateElement('taskDueDate', '', 'value');
+                console.log('新規タスクモードでフォームをクリアしました');
             }
 
             showModal('taskModal');
+            console.log('タスクモーダル表示完了');
         }
 
         function saveTask() {
@@ -2078,8 +2263,16 @@
 
         // ===== イベント管理 =====
         function openEventModal(eventId = null) {
+            console.log('openEventModal called with eventId:', eventId);
+            
             editingEventId = eventId;
             const modal = document.getElementById('eventModal');
+
+            if (!modal) {
+                console.error('eventModal element not found');
+                showNotification('イベントモーダルが見つかりません', 'error');
+                return;
+            }
 
             if (eventId) {
                 const event = events.find(e => e.id === eventId);
@@ -2090,6 +2283,7 @@
                     updateElement('eventDate', event.date, 'value');
                     updateElement('eventStartTime', event.startTime, 'value');
                     updateElement('eventEndTime', event.endTime, 'value');
+                    console.log('イベント編集モードでフォームを設定しました');
                 }
             } else {
                 updateElement('eventTitle', '', 'value');
@@ -2098,9 +2292,11 @@
                 updateElement('eventDate', '', 'value');
                 updateElement('eventStartTime', '', 'value');
                 updateElement('eventEndTime', '', 'value');
+                console.log('新規イベントモードでフォームをクリアしました');
             }
 
             showModal('eventModal');
+            console.log('イベントモーダル表示完了');
         }
 
         function saveEvent() {
@@ -2539,17 +2735,26 @@
 
         // ===== モーダル管理 =====
         function showModal(modalId) {
+            console.log('showModal called with modalId:', modalId);
+            
             const modal = document.getElementById(modalId);
             if (modal) {
                 modal.classList.remove('hidden');
+                console.log('モーダル表示:', modalId, 'クラス:', modal.className);
                 
                 // フォーカスを最初の入力フィールドに移動
                 setTimeout(() => {
                     const firstInput = modal.querySelector('input, textarea, select');
                     if (firstInput) {
                         firstInput.focus();
+                        console.log('フォーカス設定:', firstInput.id);
                     }
                 }, 100);
+                
+                showNotification(`${modalId === 'taskModal' ? 'タスク' : 'イベント'}モーダルを開きました`, 'info');
+            } else {
+                console.error('モーダルが見つかりません:', modalId);
+                showNotification('モーダルの表示でエラーが発生しました', 'error');
             }
         }
 
@@ -2753,16 +2958,38 @@
             openEventModal();
         };
 
+        window.testButtons = function() {
+            console.log('=== ボタンテスト開始 ===');
+            
+            const buttons = [
+                'addTaskBtn', 'newTaskBtn', 'quickActionBtn', 'addEventBtn',
+                'syncBtn', 'exportTasksBtn', 'exportKpiBtn'
+            ];
+            
+            buttons.forEach(buttonId => {
+                const btn = document.getElementById(buttonId);
+                console.log(`${buttonId}:`, btn ? '✅ 存在' : '❌ 見つからない');
+            });
+            
+            console.log('=== ボタンテスト完了 ===');
+        };
+
         console.log('=== CLASSY業務管理システム初期化完了 ===');
+        console.log('📊 店舗数:', storeData.length, '店舗（オペラ錦を含む）');
         console.log('🚀 機能テスト:');
         console.log('- window.testTaskModal() でタスクモーダルをテスト');
         console.log('- window.testEventModal() でイベントモーダルをテスト');
+        console.log('- window.testButtons() でボタンの存在確認');
         console.log('');
         console.log('⌨️ キーボードショートカット:');
         console.log('- Ctrl+K: タスク追加');
         console.log('- Ctrl+E: 予定追加');
         console.log('- Ctrl+S: データ同期');
         console.log('- Esc: モーダル閉じる');
+        console.log('');
+        console.log('💡 トラブルシューティング:');
+        console.log('- ボタンが効かない場合: ブラウザのコンソールでエラーを確認');
+        console.log('- モーダルが開かない場合: window.testTaskModal() でテスト実行');
     </script>
 </body>
 </html>
