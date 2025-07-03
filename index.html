@@ -1241,29 +1241,40 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log('=== CLASSY業務管理システム初期化開始 ===');
             
-            // データ初期化
-            loadSampleData();
-            loadActualStoreData();
-            
-            // UI初期化
-            updateDateTime();
-            setInterval(updateDateTime, 60000);
-            
-            // イベントリスナー設定
-            setupEventListeners();
-            
-            // 初期ページ描画
-            renderCurrentPage();
-            
-            // チャート初期化（遅延）
-            setTimeout(() => {
-                initializeCharts();
-            }, 1000);
-            
-            // 初期化完了通知
-            showNotification('システム初期化完了！', 'success');
-            
-            console.log('=== 初期化完了 ===');
+            try {
+                // データ初期化
+                loadSampleData();
+                loadActualStoreData();
+                
+                // UI初期化
+                updateDateTime();
+                setInterval(updateDateTime, 60000);
+                
+                // イベントリスナー設定
+                setupEventListeners();
+                
+                // 初期ページ描画
+                renderCurrentPage();
+                
+                // チャート初期化（遅延）
+                setTimeout(() => {
+                    try {
+                        initializeCharts();
+                        console.log('チャート初期化完了');
+                    } catch (error) {
+                        console.error('チャート初期化エラー:', error);
+                    }
+                }, 1000);
+                
+                // 初期化完了通知
+                showNotification('システム初期化完了！', 'success');
+                
+                console.log('=== 初期化完了 ===');
+                
+            } catch (error) {
+                console.error('初期化エラー:', error);
+                showNotification('システム初期化でエラーが発生しました', 'error');
+            }
         });
 
         // ===== データ管理 =====
@@ -1554,34 +1565,143 @@
 
         // ===== イベントリスナー設定 =====
         function setupEventListeners() {
-            // ナビゲーション
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.addEventListener('click', function() {
-                    const page = this.getAttribute('data-page');
-                    showPage(page);
+            console.log('=== イベントリスナー設定開始 ===');
+            
+            try {
+                // ナビゲーション
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.addEventListener('click', function() {
+                        const page = this.getAttribute('data-page');
+                        showPage(page);
+                    });
                 });
+
+                // サイドバートグル
+                const menuToggle = document.getElementById('menuToggle');
+                const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+                const overlay = document.getElementById('overlay');
+                
+                if (menuToggle) menuToggle.addEventListener('click', toggleSidebar);
+                if (mobileMenuBtn) mobileMenuBtn.addEventListener('click', toggleSidebar);
+                if (overlay) overlay.addEventListener('click', closeSidebar);
+
+                // 基本ボタンのイベント設定
+                setupBasicButtons();
+                
+                // モーダルイベント
+                setupModalListeners();
+                
+                // フィルター
+                setupFilterListeners();
+
+                // キーボードショートカット
+                document.addEventListener('keydown', handleKeyboardShortcuts);
+                
+                console.log('=== イベントリスナー設定完了 ===');
+                
+            } catch (error) {
+                console.error('イベントリスナー設定エラー:', error);
+                showNotification('イベントリスナーの設定でエラーが発生しました', 'error');
+            }
+        }
+
+        function setupBasicButtons() {
+            console.log('基本ボタン設定開始');
+            
+            // 基本的なボタンのみ先に設定
+            const basicButtons = [
+                { id: 'addTaskBtn', func: () => openTaskModal() },
+                { id: 'newTaskBtn', func: () => openTaskModal() },
+                { id: 'quickActionBtn', func: showQuickActions },
+                { id: 'addEventBtn', func: () => openEventModal() },
+                { id: 'syncBtn', func: syncAllData }
+            ];
+
+            basicButtons.forEach(button => {
+                const element = document.getElementById(button.id);
+                if (element) {
+                    element.onclick = function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log(`${button.id} クリック`);
+                        try {
+                            button.func();
+                        } catch (error) {
+                            console.error(`${button.id} エラー:`, error);
+                        }
+                    };
+                    console.log(`${button.id} 設定完了`);
+                } else {
+                    console.warn(`${button.id} が見つかりません`);
+                }
             });
 
-            // サイドバートグル
-            const menuToggle = document.getElementById('menuToggle');
-            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-            const overlay = document.getElementById('overlay');
-            
-            if (menuToggle) menuToggle.addEventListener('click', toggleSidebar);
-            if (mobileMenuBtn) mobileMenuBtn.addEventListener('click', toggleSidebar);
-            if (overlay) overlay.addEventListener('click', closeSidebar);
+            // 遅延して追加ボタンを設定
+            setTimeout(() => {
+                setupAdvancedButtons();
+            }, 1000);
+        }
 
-            // ボタンイベント
-            setupButtonListeners();
+        function setupAdvancedButtons() {
+            console.log('拡張ボタン設定開始');
             
-            // モーダルイベント
-            setupModalListeners();
-            
-            // フィルター
-            setupFilterListeners();
+            try {
+                // Google Sheets同期ボタン
+                const syncGoogleSheetsBtn = document.getElementById('syncGoogleSheetsBtn');
+                if (syncGoogleSheetsBtn) {
+                    syncGoogleSheetsBtn.onclick = function(e) {
+                        e.preventDefault();
+                        syncFromGoogleSheets();
+                    };
+                    console.log('Google Sheets同期ボタン設定完了');
+                }
 
-            // キーボードショートカット
-            document.addEventListener('keydown', handleKeyboardShortcuts);
+                // 店舗選択ドロップダウン
+                const salesStoreSelect = document.getElementById('salesStoreSelect');
+                const kpiStoreSelect = document.getElementById('kpiStoreSelect');
+                
+                if (salesStoreSelect) {
+                    salesStoreSelect.onchange = function(e) {
+                        updateSalesAnalysis(e.target.value);
+                    };
+                    console.log('売上店舗選択設定完了');
+                }
+                
+                if (kpiStoreSelect) {
+                    kpiStoreSelect.onchange = function(e) {
+                        updateKpiAnalysis(e.target.value);
+                    };
+                    console.log('KPI店舗選択設定完了');
+                }
+
+                // その他のボタン
+                const otherButtons = [
+                    { id: 'exportTasksBtn', func: exportTasks },
+                    { id: 'exportKpiBtn', func: exportKpiData },
+                    { id: 'salesChartBtn', func: () => updateSalesChart('sales') },
+                    { id: 'achievementChartBtn', func: () => updateSalesChart('achievement') }
+                ];
+
+                otherButtons.forEach(button => {
+                    const element = document.getElementById(button.id);
+                    if (element) {
+                        element.onclick = function(e) {
+                            e.preventDefault();
+                            try {
+                                button.func();
+                            } catch (error) {
+                                console.error(`${button.id} エラー:`, error);
+                            }
+                        };
+                        console.log(`${button.id} 設定完了`);
+                    }
+                });
+
+                console.log('拡張ボタン設定完了');
+                
+            } catch (error) {
+                console.error('拡張ボタン設定エラー:', error);
+            }
         }
 
         function setupButtonListeners() {
