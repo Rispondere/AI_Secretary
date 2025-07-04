@@ -713,7 +713,9 @@
                 ];
             }
 
-            if (storeData.length === 0) {
+            // 10店舗すべてを確実に初期化
+            if (storeData.length < 10) {
+                console.log('店舗データを完全初期化します...');
                 storeData = [
                     {
                         id: 'shabour',
@@ -846,6 +848,7 @@
                         reviewAchievementRate: 1.0667
                     }
                 ];
+                console.log('店舗データ初期化完了:', storeData.length + '店舗');
             }
 
             saveToLocalStorage();
@@ -1134,7 +1137,12 @@
         function updateStoreDataFromSpreadsheet(data) {
             let updatedCount = 0;
             
-            console.log('スプレッドシートから受信したデータ:', data);
+            console.log('=== スプレッドシートデータ更新開始 ===');
+            console.log('受信データ行数:', data.length);
+            console.log('現在のstoreData店舗数:', storeData.length);
+            
+            // 現在のstoreDataの店舗IDリストを表示
+            console.log('現在登録されている店舗ID:', storeData.map(s => s.id));
             
             if (data.length > 0) {
                 const headers = Object.keys(data[0]);
@@ -1148,8 +1156,11 @@
                         console.log('行' + (index + 1) + ': 店舗名="' + storeName + '" -> ID="' + storeId + '"');
                         
                         if (storeId) {
+                            // デバッグ: 該当する店舗を検索
                             const existingStore = storeData.find(s => s.id === storeId);
+                            
                             if (existingStore) {
+                                console.log('店舗発見: ' + existingStore.name + ' (ID: ' + existingStore.id + ')');
                                 let storeUpdated = false;
                                 
                                 const salesActual = row['売上実績'] || row['sales'] || row['actual_sales'] || row['totalSales'] || row['売上'];
@@ -1164,7 +1175,7 @@
                                     if (!isNaN(salesValue)) {
                                         existingStore.totalSales = salesValue;
                                         storeUpdated = true;
-                                        console.log(existingStore.name + 'の売上実績を更新: ' + salesValue);
+                                        console.log('  売上実績更新: ¥' + salesValue.toLocaleString());
                                     }
                                 }
                                 
@@ -1173,7 +1184,7 @@
                                     if (!isNaN(targetValue)) {
                                         existingStore.salesTarget = targetValue;
                                         storeUpdated = true;
-                                        console.log(existingStore.name + 'の売上目標を更新: ' + targetValue);
+                                        console.log('  売上目標更新: ¥' + targetValue.toLocaleString());
                                     }
                                 }
                                 
@@ -1182,7 +1193,7 @@
                                     if (!isNaN(accessValue)) {
                                         existingStore.totalAccess = accessValue;
                                         storeUpdated = true;
-                                        console.log(existingStore.name + 'のアクセス数を更新: ' + accessValue);
+                                        console.log('  アクセス数更新: ' + accessValue.toLocaleString());
                                     }
                                 }
                                 
@@ -1191,6 +1202,7 @@
                                     if (!isNaN(diaryValue)) {
                                         existingStore.diaryPosts = diaryValue;
                                         storeUpdated = true;
+                                        console.log('  日記投稿数更新: ' + diaryValue);
                                     }
                                 }
                                 
@@ -1199,6 +1211,7 @@
                                     if (!isNaN(reviewValue)) {
                                         existingStore.reviewPosts = reviewValue;
                                         storeUpdated = true;
+                                        console.log('  口コミ数更新: ' + reviewValue);
                                     }
                                 }
                                 
@@ -1207,30 +1220,60 @@
                                     if (!isNaN(attendanceValue)) {
                                         existingStore.attendanceCount = attendanceValue;
                                         storeUpdated = true;
+                                        console.log('  出勤人数更新: ' + attendanceValue);
                                     }
                                 }
                                 
+                                // 達成率を再計算
                                 if (existingStore.salesTarget > 0) {
                                     existingStore.salesAchievementRate = existingStore.totalSales / existingStore.salesTarget;
+                                    console.log('  達成率再計算: ' + (existingStore.salesAchievementRate * 100).toFixed(1) + '%');
                                 }
                                 
                                 if (storeUpdated) {
                                     updatedCount++;
-                                    console.log(existingStore.name + 'のデータ更新完了');
+                                    console.log('✅ ' + existingStore.name + ' 更新完了');
+                                } else {
+                                    console.log('⚠️ ' + existingStore.name + ' データ変更なし');
                                 }
                             } else {
-                                console.warn('店舗ID "' + storeId + '" に対応する店舗データが見つかりません');
+                                console.error('❌ 店舗ID "' + storeId + '" に対応する店舗データが見つかりません');
+                                console.error('   利用可能な店舗ID:', storeData.map(s => s.id).join(', '));
+                                console.error('   店舗データ長:', storeData.length);
+                                
+                                // デバッグ: storeDataの内容を確認
+                                if (storeData.length === 0) {
+                                    console.error('⚠️ storeDataが空です。再初期化を実行します...');
+                                    // 強制的に再初期化
+                                    initializeData();
+                                    // 再度検索
+                                    const reSearchStore = storeData.find(s => s.id === storeId);
+                                    if (reSearchStore) {
+                                        console.log('✅ 再初期化後に店舗発見: ' + reSearchStore.name);
+                                    }
+                                }
                             }
                         } else {
-                            console.warn('店舗名 "' + storeName + '" に対応するIDが見つかりません');
+                            console.warn('⚠️ 店舗名 "' + storeName + '" に対応するIDが見つかりません');
+                            console.warn('   対応可能な店舗名:', Object.values(storeInfo).map(s => s.name).join(', '));
                         }
+                    } else {
+                        console.warn('⚠️ 行' + (index + 1) + ': 店舗名が空です');
                     }
                 });
                 
-                console.log('店舗データ更新完了: ' + updatedCount + '店舗更新');
-                console.log('更新後の全店舗データ:', storeData);
+                console.log('=== 更新完了 ===');
+                console.log('更新された店舗数: ' + updatedCount + '/' + data.length);
+                console.log('最終的なstoreData店舗数:', storeData.length);
+                
+                // 更新後の全店舗データをコンソールに出力（デバッグ用）
+                console.log('更新後の全店舗データ:');
+                storeData.forEach((store, index) => {
+                    console.log((index + 1) + '. ' + store.name + ' (ID: ' + store.id + ') - 売上: ¥' + (store.totalSales / 1000000).toFixed(1) + 'M');
+                });
+                
             } else {
-                console.warn('スプレッドシートからデータが読み込まれませんでした');
+                console.warn('⚠️ スプレッドシートからデータが読み込まれませんでした');
             }
             
             return updatedCount;
@@ -2264,9 +2307,18 @@
 
         // デバッグ・修復関数
         window.fixSpreadsheetNow = function() {
-            console.log('スプレッドシート同期修復実行');
+            console.log('=== スプレッドシート同期修復実行 ===');
             
             try {
+                // まずstoreDataが正しく初期化されているか確認
+                console.log('現在のstoreData店舗数:', storeData.length);
+                
+                if (storeData.length < 10) {
+                    console.log('⚠️ 店舗データが不完全です。強制再初期化を実行...');
+                    forceResetStoreData();
+                }
+                
+                // 修復データで同期実行
                 const emergencyData = generateCurrentBusinessData();
                 const parsed = parseCSV(emergencyData);
                 const updated = updateStoreDataFromSpreadsheet(parsed);
@@ -2279,13 +2331,192 @@
                 
                 showNotification('修復完了！' + updated + '店舗で動作中。', 'success');
                 
-                console.log('修復完了: ' + updated + '店舗更新');
-                return '修復完了: ' + updated + '店舗更新';
+                console.log('✅ 修復完了: ' + updated + '店舗更新');
+                console.log('最終店舗数:', storeData.length);
+                return '修復完了: ' + updated + '/' + storeData.length + '店舗更新';
                 
             } catch (error) {
-                console.error('修復エラー:', error);
+                console.error('❌ 修復エラー:', error);
                 return '修復エラー: ' + error.message;
             }
+        };
+
+        window.forceResetStoreData = function() {
+            console.log('=== 店舗データ強制リセット ===');
+            
+            // LocalStorageをクリア
+            localStorage.removeItem('classy_stores');
+            
+            // 店舗データを強制的に再設定
+            storeData = [
+                {
+                    id: 'shabour',
+                    name: 'シャブール',
+                    salesTarget: 33000000,
+                    totalSales: 29544738,
+                    totalAccess: 1967152,
+                    diaryPosts: 7560,
+                    reviewPosts: 344,
+                    attendanceCount: 687,
+                    salesAchievementRate: 0.8953,
+                    diaryAchievementRate: 0.9,
+                    reviewAchievementRate: 1.1467
+                },
+                {
+                    id: 'onecarat',
+                    name: 'ワンカラット',
+                    salesTarget: 17500000,
+                    totalSales: 18314356,
+                    totalAccess: 1241592,
+                    diaryPosts: 8528,
+                    reviewPosts: 156,
+                    attendanceCount: 514,
+                    salesAchievementRate: 1.0465,
+                    diaryAchievementRate: 1.0727,
+                    reviewAchievementRate: 0.78
+                },
+                {
+                    id: 'go_nagoya',
+                    name: 'GO名古屋',
+                    salesTarget: 28000000,
+                    totalSales: 29265025,
+                    totalAccess: 1349912,
+                    diaryPosts: 3605,
+                    reviewPosts: 216,
+                    attendanceCount: 518,
+                    salesAchievementRate: 1.0452,
+                    diaryAchievementRate: 0.6676,
+                    reviewAchievementRate: 1.0537
+                },
+                {
+                    id: 'go_fukuoka',
+                    name: 'GO福岡',
+                    salesTarget: 36000000,
+                    totalSales: 37050068,
+                    totalAccess: 1619670,
+                    diaryPosts: 7828,
+                    reviewPosts: 202,
+                    attendanceCount: 514,
+                    salesAchievementRate: 1.0292,
+                    diaryAchievementRate: 1.0437,
+                    reviewAchievementRate: 1.1222
+                },
+                {
+                    id: 'go_tokyo',
+                    name: 'GO東京',
+                    salesTarget: 28000000,
+                    totalSales: 27324427,
+                    totalAccess: 1182336,
+                    diaryPosts: 4164,
+                    reviewPosts: 116,
+                    attendanceCount: 457,
+                    salesAchievementRate: 0.9759,
+                    diaryAchievementRate: 0.5552,
+                    reviewAchievementRate: 0.7733
+                },
+                {
+                    id: 'go_yokohama',
+                    name: 'GO横浜',
+                    salesTarget: 23000000,
+                    totalSales: 22547274,
+                    totalAccess: 599756,
+                    diaryPosts: 5077,
+                    reviewPosts: 127,
+                    attendanceCount: 407,
+                    salesAchievementRate: 0.9803,
+                    diaryAchievementRate: 0.8462,
+                    reviewAchievementRate: 0.8759
+                },
+                {
+                    id: 'opera_nishiki',
+                    name: 'オペラ錦',
+                    salesTarget: 24000000,
+                    totalSales: 25123456,
+                    totalAccess: 1273548,
+                    diaryPosts: 7068,
+                    reviewPosts: 195,
+                    attendanceCount: 480,
+                    salesAchievementRate: 1.0468,
+                    diaryAchievementRate: 1.0709,
+                    reviewAchievementRate: 1.0833
+                },
+                {
+                    id: 'cl_nagoya',
+                    name: 'CL名古屋',
+                    salesTarget: 6000000,
+                    totalSales: 5300320,
+                    totalAccess: 514243,
+                    diaryPosts: 1851,
+                    reviewPosts: 113,
+                    attendanceCount: 197,
+                    salesAchievementRate: 0.8834,
+                    diaryAchievementRate: 0.7713,
+                    reviewAchievementRate: 0.7533
+                },
+                {
+                    id: 'cl_tokyo',
+                    name: 'CL東京',
+                    salesTarget: 7200000,
+                    totalSales: 6719328,
+                    totalAccess: 742231,
+                    diaryPosts: 2079,
+                    reviewPosts: 122,
+                    attendanceCount: 238,
+                    salesAchievementRate: 0.9332,
+                    diaryAchievementRate: 0.693,
+                    reviewAchievementRate: 0.6778
+                },
+                {
+                    id: 'cl_yokkaichi',
+                    name: 'CL四日市',
+                    salesTarget: 12500000,
+                    totalSales: 12943296,
+                    totalAccess: 881476,
+                    diaryPosts: 6301,
+                    reviewPosts: 256,
+                    attendanceCount: 356,
+                    salesAchievementRate: 1.0355,
+                    diaryAchievementRate: 1.0246,
+                    reviewAchievementRate: 1.0667
+                }
+            ];
+            
+            console.log('✅ 店舗データ強制リセット完了: ' + storeData.length + '店舗');
+            
+            // 確認用に全店舗を表示
+            storeData.forEach((store, index) => {
+                console.log((index + 1) + '. ' + store.name + ' (ID: ' + store.id + ')');
+            });
+            
+            saveToLocalStorage();
+            return storeData.length + '店舗でリセット完了';
+        };
+
+        window.checkStoreData = function() {
+            console.log('=== 店舗データ診断 ===');
+            console.log('storeData配列長:', storeData.length);
+            console.log('storeInfo定義数:', Object.keys(storeInfo).length);
+            
+            console.log('storeData内容:');
+            if (storeData.length > 0) {
+                storeData.forEach((store, index) => {
+                    console.log((index + 1) + '. ID: ' + store.id + ', 名前: ' + store.name);
+                });
+            } else {
+                console.log('⚠️ storeDataが空です');
+            }
+            
+            console.log('storeInfo定義:');
+            Object.entries(storeInfo).forEach(([id, info]) => {
+                const found = storeData.find(s => s.id === id);
+                console.log('- ' + id + ' (' + info.name + ') - ' + (found ? '✅' : '❌'));
+            });
+            
+            return {
+                storeDataCount: storeData.length,
+                storeInfoCount: Object.keys(storeInfo).length,
+                allFound: storeData.length === Object.keys(storeInfo).length
+            };
         };
 
         window.openSpreadsheet = function() {
@@ -2353,17 +2584,33 @@
             console.log('- ' + info.name + ' (' + id + ') - ' + info.type + 'ブランド');
         });
         
-        console.log('スプレッドシート同期について:');
-        console.log('現在、スプレッドシートが非公開のため直接同期できません。');
         console.log('');
-        console.log('今すぐ解決する方法:');
-        console.log('1. fixSpreadsheetNow() を実行 ← おすすめ！');
-        console.log('2. openSpreadsheet() でスプレッドシートを開いて公開設定');
-        console.log('3. testRealSync() で実際の同期をテスト');
-        console.log('4. showSyncStatus() で現在の状況を確認');
+        console.log('🔧 店舗データ問題解決コマンド:');
+        console.log('1. checkStoreData() - 店舗データ診断');
+        console.log('2. forceResetStoreData() - 店舗データ強制リセット');
+        console.log('3. fixSpreadsheetNow() - 修復実行（推奨）');
+        console.log('');
+        console.log('📊 その他のコマンド:');
+        console.log('- testSystem() : システム状態確認');
+        console.log('- showAllStores() : 全店舗データ表示');
+        console.log('- showSyncStatus() : 同期状況確認');
+        console.log('- openSpreadsheet() : スプレッドシートを開く');
         
+        console.log('');
         console.log('対象スプレッドシート:');
         console.log('https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/edit?gid=0#gid=0');
+        
+        // 初期診断を実行
+        setTimeout(() => {
+            console.log('');
+            console.log('=== 初期診断実行 ===');
+            const diagnosis = checkStoreData();
+            if (!diagnosis.allFound) {
+                console.log('⚠️ 店舗データに問題があります。forceResetStoreData() を実行してください。');
+            } else {
+                console.log('✅ 店舗データ正常: ' + diagnosis.storeDataCount + '店舗認識');
+            }
+        }, 1000);
     </script>
 </body>
 </html>
