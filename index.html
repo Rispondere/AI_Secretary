@@ -205,6 +205,31 @@
         .task-card.high-priority { border-left-color: #ef4444; }
         .task-card.medium-priority { border-left-color: #f59e0b; }
         .task-card.low-priority { border-left-color: #10b981; }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .sync-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sync-success { color: #10b981; }
+        .sync-error { color: #ef4444; }
+        .sync-loading { color: #3b82f6; }
     </style>
 </head>
 <body>
@@ -244,8 +269,14 @@
                 <div class="mt-6 p-4 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-16">
                     <div class="text-center">
                         <div class="text-2xl mb-2">📊</div>
-                        <div class="text-sm font-medium text-blue-800">データ同期</div>
-                        <div class="text-xs text-blue-600 mb-3" id="lastSync">未同期</div>
+                        <div class="text-sm font-medium text-blue-800">スプレッドシート連携</div>
+                        <div class="text-xs mb-3" id="syncStatus">
+                            <div class="sync-status">
+                                <span id="syncIcon">⏳</span>
+                                <span id="syncText">準備中</span>
+                            </div>
+                            <div class="text-xs text-gray-600 mt-1" id="lastSync">未同期</div>
+                        </div>
                         <button class="btn btn-primary w-full text-sm" id="syncBtn">
                             <i class="fas fa-sync-alt mr-2"></i>同期
                         </button>
@@ -287,22 +318,22 @@
                 <!-- 全体統計 -->
                 <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6">
                     <div class="glass-card p-4 text-center">
-                        <div class="text-2xl font-bold text-blue-600 mb-1" id="totalSales">¥189M</div>
+                        <div class="text-2xl font-bold text-blue-600 mb-1" id="totalSales">¥0M</div>
                         <div class="text-sm text-gray-600">総売上</div>
-                        <div class="text-xs text-green-600 mt-1">96.4%達成</div>
+                        <div class="text-xs text-green-600 mt-1" id="totalSalesRate">計算中</div>
                     </div>
                     <div class="glass-card p-4 text-center">
-                        <div class="text-2xl font-bold text-green-600 mb-1" id="totalAccess">10.1M</div>
+                        <div class="text-2xl font-bold text-green-600 mb-1" id="totalAccess">0</div>
                         <div class="text-sm text-gray-600">総アクセス数</div>
-                        <div class="text-xs text-green-600 mt-1">平均 1.1M</div>
+                        <div class="text-xs text-green-600 mt-1" id="avgAccess">平均計算中</div>
                     </div>
                     <div class="glass-card p-4 text-center">
-                        <div class="text-2xl font-bold text-purple-600 mb-1" id="totalAttendance">3,892</div>
+                        <div class="text-2xl font-bold text-purple-600 mb-1" id="totalAttendance">0</div>
                         <div class="text-sm text-gray-600">総出勤人数</div>
-                        <div class="text-xs text-orange-600 mt-1">平均 432人</div>
+                        <div class="text-xs text-orange-600 mt-1" id="avgAttendance">平均計算中</div>
                     </div>
                     <div class="glass-card p-4 text-center">
-                        <div class="text-2xl font-bold text-cyan-600 mb-1" id="achievingStores">4/10</div>
+                        <div class="text-2xl font-bold text-cyan-600 mb-1" id="achievingStores">0/0</div>
                         <div class="text-sm text-gray-600">目標達成店舗</div>
                         <div class="text-xs text-blue-600 mt-1">売上基準</div>
                     </div>
@@ -317,7 +348,7 @@
                         </button>
                     </div>
                     <div id="todayTasksList" class="space-y-3">
-                        <!-- タスクが動的に表示されます -->
+                        <div class="text-center text-gray-500 py-4">読み込み中...</div>
                     </div>
                 </div>
                 
@@ -325,7 +356,7 @@
                 <div class="glass-card p-4">
                     <h3 class="text-lg font-bold text-gray-900 mb-4">店舗状況</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="storesOverview">
-                        <!-- 店舗カードが動的に生成されます -->
+                        <div class="text-center text-gray-500 py-8">データを読み込み中...</div>
                     </div>
                 </div>
             </div>
@@ -358,7 +389,7 @@
                     
                     <!-- タスクリスト -->
                     <div id="tasksList" class="space-y-3">
-                        <!-- タスクが動的に表示されます -->
+                        <div class="text-center text-gray-500 py-4">読み込み中...</div>
                     </div>
                 </div>
             </div>
@@ -370,42 +401,40 @@
                         <h3 class="text-lg font-bold text-gray-900">売上分析</h3>
                         <select id="salesStoreSelect" class="input-field w-48">
                             <option value="">全店舗統合</option>
-                            <option value="shabour">シャブール</option>
-                            <option value="onecarat">ワンカラット</option>
-                            <option value="go_nagoya">GO名古屋</option>
-                            <option value="go_fukuoka">GO福岡</option>
-                            <option value="go_tokyo">GO東京</option>
-                            <option value="go_yokohama">GO横浜</option>
-                            <option value="opera_nishiki">オペラ錦</option>
-                            <option value="cl_nagoya">CL名古屋</option>
-                            <option value="cl_tokyo">CL東京</option>
-                            <option value="cl_yokkaichi">CL四日市</option>
                         </select>
                     </div>
                     
                     <!-- 売上統計 -->
                     <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6">
                         <div class="bg-blue-50 p-4 rounded-lg text-center">
-                            <div class="text-2xl font-bold text-blue-600" id="selectedSales">¥189M</div>
+                            <div class="text-2xl font-bold text-blue-600" id="selectedSales">¥0M</div>
                             <div class="text-sm text-gray-600">売上実績</div>
                         </div>
                         <div class="bg-green-50 p-4 rounded-lg text-center">
-                            <div class="text-2xl font-bold text-green-600" id="selectedTarget">¥196M</div>
+                            <div class="text-2xl font-bold text-green-600" id="selectedTarget">¥0M</div>
                             <div class="text-sm text-gray-600">売上目標</div>
                         </div>
                         <div class="bg-purple-50 p-4 rounded-lg text-center">
-                            <div class="text-2xl font-bold text-purple-600" id="selectedRate">96.4%</div>
+                            <div class="text-2xl font-bold text-purple-600" id="selectedRate">0%</div>
                             <div class="text-sm text-gray-600">達成率</div>
                         </div>
                         <div class="bg-orange-50 p-4 rounded-lg text-center">
-                            <div class="text-2xl font-bold text-orange-600" id="selectedAccess">10.1M</div>
+                            <div class="text-2xl font-bold text-orange-600" id="selectedAccess">0</div>
                             <div class="text-sm text-gray-600">アクセス数</div>
                         </div>
                     </div>
                     
+                    <!-- チャート -->
+                    <div class="bg-white p-4 rounded-lg">
+                        <canvas id="salesChart" width="400" height="200"></canvas>
+                    </div>
+                    
                     <!-- 店舗ランキング -->
-                    <div id="storeRanking" class="space-y-3">
-                        <!-- ランキングが動的に表示されます -->
+                    <div class="mt-6">
+                        <h4 class="text-lg font-bold text-gray-900 mb-4">店舗ランキング</h4>
+                        <div id="storeRanking" class="space-y-3">
+                            <div class="text-center text-gray-500 py-4">データを読み込み中...</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -417,35 +446,25 @@
                         <h3 class="text-lg font-bold text-gray-900">KPI管理</h3>
                         <select id="kpiStoreSelect" class="input-field w-48">
                             <option value="">全店舗統合</option>
-                            <option value="shabour">シャブール</option>
-                            <option value="onecarat">ワンカラット</option>
-                            <option value="go_nagoya">GO名古屋</option>
-                            <option value="go_fukuoka">GO福岡</option>
-                            <option value="go_tokyo">GO東京</option>
-                            <option value="go_yokohama">GO横浜</option>
-                            <option value="opera_nishiki">オペラ錦</option>
-                            <option value="cl_nagoya">CL名古屋</option>
-                            <option value="cl_tokyo">CL東京</option>
-                            <option value="cl_yokkaichi">CL四日市</option>
                         </select>
                     </div>
                     
                     <!-- KPIサマリー -->
                     <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6">
                         <div class="bg-blue-50 p-4 rounded-lg text-center">
-                            <div class="text-2xl font-bold text-blue-600" id="kpiDiaryPosts">47,593</div>
+                            <div class="text-2xl font-bold text-blue-600" id="kpiDiaryPosts">0</div>
                             <div class="text-sm text-gray-600">写メ日記投稿数</div>
                         </div>
                         <div class="bg-green-50 p-4 rounded-lg text-center">
-                            <div class="text-2xl font-bold text-green-600" id="kpiReviews">1,652</div>
+                            <div class="text-2xl font-bold text-green-600" id="kpiReviews">0</div>
                             <div class="text-sm text-gray-600">口コミ掲載数</div>
                         </div>
                         <div class="bg-purple-50 p-4 rounded-lg text-center">
-                            <div class="text-2xl font-bold text-purple-600" id="kpiKitene">171,512</div>
+                            <div class="text-2xl font-bold text-purple-600" id="kpiKitene">0</div>
                             <div class="text-sm text-gray-600">キテネ送信数</div>
                         </div>
                         <div class="bg-orange-50 p-4 rounded-lg text-center">
-                            <div class="text-2xl font-bold text-orange-600" id="kpiUsers">35,507</div>
+                            <div class="text-2xl font-bold text-orange-600" id="kpiUsers">0</div>
                             <div class="text-sm text-gray-600">総ユーザー数</div>
                         </div>
                     </div>
@@ -463,7 +482,7 @@
                                 </tr>
                             </thead>
                             <tbody id="kpiDataTable">
-                                <!-- データが動的に表示されます -->
+                                <tr><td colspan="5" class="text-center p-4 text-gray-500">データを読み込み中...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -495,7 +514,7 @@
                     
                     <!-- 今週の予定表示 -->
                     <div id="weeklySchedule" class="grid grid-cols-7 gap-2">
-                        <!-- 週間スケジュールがここに表示されます -->
+                        <div class="text-center text-gray-500 py-4">読み込み中...</div>
                     </div>
                 </div>
             </div>
@@ -506,7 +525,7 @@
     <div id="taskModal" class="modal hidden">
         <div class="modal-content">
             <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-bold text-gray-900">新しいタスク</h3>
+                <h3 class="text-lg font-bold text-gray-900" id="taskModalTitle">新しいタスク</h3>
                 <button id="closeTaskModal" class="text-gray-500 hover:text-gray-700">
                     <i class="fas fa-times"></i>
                 </button>
@@ -555,7 +574,7 @@
     <div id="eventModal" class="modal hidden">
         <div class="modal-content">
             <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-bold text-gray-900">新しい予定</h3>
+                <h3 class="text-lg font-bold text-gray-900" id="eventModalTitle">新しい予定</h3>
                 <button id="closeEventModal" class="text-gray-500 hover:text-gray-700">
                     <i class="fas fa-times"></i>
                 </button>
@@ -611,6 +630,16 @@
         let editingEventId = null;
         let currentMonth = new Date().getMonth();
         let currentYear = new Date().getFullYear();
+        let salesChart = null;
+
+        // Googleスプレッドシート設定
+        const SPREADSHEET_ID = '1CSGBzK9au8VLEQFCpBJbVyMoTaRhO5hoQd_qk8XC_IQ';
+        const API_KEY = 'AIzaSyDfEJXOGBZYjzPfz3IqQ_B8HNUW8D12345'; // 実際のAPIキーが必要
+        const RANGES = {
+            stores: 'シート1!A:Z',
+            tasks: 'タスク!A:Z',
+            events: 'イベント!A:Z'
+        };
 
         // 店舗情報
         const storeInfo = {
@@ -644,6 +673,9 @@
                 // 初期表示
                 renderCurrentPage();
                 
+                // スプレッドシートから自動同期
+                syncWithSpreadsheet();
+                
                 showNotification('システム初期化完了！', 'success');
                 console.log('初期化完了');
             } catch (error) {
@@ -654,173 +686,246 @@
 
         // ===== データ初期化 =====
         function initializeData() {
-            // サンプルタスクデータ
-            const today = new Date().toISOString().split('T')[0];
-            tasks = [
-                {
-                    id: 1,
-                    title: '6月売上レポート作成',
-                    description: '各店舗の6月売上データをまとめてレポート作成',
-                    priority: 'high',
-                    dueDate: today,
-                    completed: false,
-                    createdAt: new Date().toISOString()
-                },
-                {
-                    id: 2,
-                    title: 'GO福岡のKPI改善策検討',
-                    description: '売上好調なGO福岡の成功要因を他店に展開',
-                    priority: 'medium',
-                    dueDate: today,
-                    completed: false,
-                    createdAt: new Date().toISOString()
-                }
-            ];
+            // LocalStorageからデータを読み込み
+            loadFromLocalStorage();
+            
+            // 初期データが空の場合はサンプルデータを設定
+            if (tasks.length === 0) {
+                const today = new Date().toISOString().split('T')[0];
+                tasks = [
+                    {
+                        id: 1,
+                        title: '6月売上レポート作成',
+                        description: '各店舗の6月売上データをまとめてレポート作成',
+                        priority: 'high',
+                        dueDate: today,
+                        completed: false,
+                        createdAt: new Date().toISOString()
+                    },
+                    {
+                        id: 2,
+                        title: 'GO福岡のKPI改善策検討',
+                        description: '売上好調なGO福岡の成功要因を他店に展開',
+                        priority: 'medium',
+                        dueDate: today,
+                        completed: false,
+                        createdAt: new Date().toISOString()
+                    }
+                ];
+            }
 
-            // サンプルイベントデータ
-            events = [
-                {
-                    id: 1,
-                    title: '月次会議',
-                    description: '各店舗の実績報告',
-                    type: 'meeting',
-                    date: today
-                }
-            ];
+            if (events.length === 0) {
+                const today = new Date().toISOString().split('T')[0];
+                events = [
+                    {
+                        id: 1,
+                        title: '月次会議',
+                        description: '各店舗の実績報告',
+                        type: 'meeting',
+                        date: today
+                    }
+                ];
+            }
 
-            // 店舗データ
-            storeData = [
-                {
-                    id: 'shabour',
-                    name: 'シャブール',
-                    salesTarget: 33000000,
-                    totalSales: 29544738,
-                    totalAccess: 1967152,
-                    diaryPosts: 7560,
-                    reviewPosts: 344,
-                    attendanceCount: 687,
-                    salesAchievementRate: 0.8953,
-                    diaryAchievementRate: 0.9,
-                    reviewAchievementRate: 1.1467
-                },
-                {
-                    id: 'onecarat',
-                    name: 'ワンカラット',
-                    salesTarget: 17500000,
-                    totalSales: 18314356,
-                    totalAccess: 1241592,
-                    diaryPosts: 8528,
-                    reviewPosts: 156,
-                    attendanceCount: 514,
-                    salesAchievementRate: 1.0465,
-                    diaryAchievementRate: 1.0727,
-                    reviewAchievementRate: 0.78
-                },
-                {
-                    id: 'go_nagoya',
-                    name: 'GO名古屋',
-                    salesTarget: 28000000,
-                    totalSales: 29265025,
-                    totalAccess: 1349912,
-                    diaryPosts: 3605,
-                    reviewPosts: 216,
-                    attendanceCount: 518,
-                    salesAchievementRate: 1.0452,
-                    diaryAchievementRate: 0.6676,
-                    reviewAchievementRate: 1.0537
-                },
-                {
-                    id: 'go_fukuoka',
-                    name: 'GO福岡',
-                    salesTarget: 36000000,
-                    totalSales: 37050068,
-                    totalAccess: 1619670,
-                    diaryPosts: 7828,
-                    reviewPosts: 202,
-                    attendanceCount: 514,
-                    salesAchievementRate: 1.0292,
-                    diaryAchievementRate: 1.0437,
-                    reviewAchievementRate: 1.1222
-                },
-                {
-                    id: 'go_tokyo',
-                    name: 'GO東京',
-                    salesTarget: 28000000,
-                    totalSales: 27324427,
-                    totalAccess: 1182336,
-                    diaryPosts: 4164,
-                    reviewPosts: 116,
-                    attendanceCount: 457,
-                    salesAchievementRate: 0.9759,
-                    diaryAchievementRate: 0.5552,
-                    reviewAchievementRate: 0.7733
-                },
-                {
-                    id: 'go_yokohama',
-                    name: 'GO横浜',
-                    salesTarget: 23000000,
-                    totalSales: 22547274,
-                    totalAccess: 599756,
-                    diaryPosts: 5077,
-                    reviewPosts: 127,
-                    attendanceCount: 407,
-                    salesAchievementRate: 0.9803,
-                    diaryAchievementRate: 0.8462,
-                    reviewAchievementRate: 0.8759
-                },
-                {
-                    id: 'opera_nishiki',
-                    name: 'オペラ錦',
-                    salesTarget: 24000000,
-                    totalSales: 25123456,
-                    totalAccess: 1273548,
-                    diaryPosts: 7068,
-                    reviewPosts: 195,
-                    attendanceCount: 480,
-                    salesAchievementRate: 1.0468,
-                    diaryAchievementRate: 1.0709,
-                    reviewAchievementRate: 1.0833
-                },
-                {
-                    id: 'cl_nagoya',
-                    name: 'CL名古屋',
-                    salesTarget: 6000000,
-                    totalSales: 5300320,
-                    totalAccess: 514243,
-                    diaryPosts: 1851,
-                    reviewPosts: 113,
-                    attendanceCount: 197,
-                    salesAchievementRate: 0.8834,
-                    diaryAchievementRate: 0.7713,
-                    reviewAchievementRate: 0.7533
-                },
-                {
-                    id: 'cl_tokyo',
-                    name: 'CL東京',
-                    salesTarget: 7200000,
-                    totalSales: 6719328,
-                    totalAccess: 742231,
-                    diaryPosts: 2079,
-                    reviewPosts: 122,
-                    attendanceCount: 238,
-                    salesAchievementRate: 0.9332,
-                    diaryAchievementRate: 0.693,
-                    reviewAchievementRate: 0.6778
-                },
-                {
-                    id: 'cl_yokkaichi',
-                    name: 'CL四日市',
-                    salesTarget: 12500000,
-                    totalSales: 12943296,
-                    totalAccess: 881476,
-                    diaryPosts: 6301,
-                    reviewPosts: 256,
-                    attendanceCount: 356,
-                    salesAchievementRate: 1.0355,
-                    diaryAchievementRate: 1.0246,
-                    reviewAchievementRate: 1.0667
+            // 初期店舗データ
+            if (storeData.length === 0) {
+                storeData = [
+                    {
+                        id: 'shabour',
+                        name: 'シャブール',
+                        salesTarget: 33000000,
+                        totalSales: 29544738,
+                        totalAccess: 1967152,
+                        diaryPosts: 7560,
+                        reviewPosts: 344,
+                        attendanceCount: 687,
+                        salesAchievementRate: 0.8953,
+                        diaryAchievementRate: 0.9,
+                        reviewAchievementRate: 1.1467
+                    },
+                    {
+                        id: 'onecarat',
+                        name: 'ワンカラット',
+                        salesTarget: 17500000,
+                        totalSales: 18314356,
+                        totalAccess: 1241592,
+                        diaryPosts: 8528,
+                        reviewPosts: 156,
+                        attendanceCount: 514,
+                        salesAchievementRate: 1.0465,
+                        diaryAchievementRate: 1.0727,
+                        reviewAchievementRate: 0.78
+                    },
+                    {
+                        id: 'go_nagoya',
+                        name: 'GO名古屋',
+                        salesTarget: 28000000,
+                        totalSales: 29265025,
+                        totalAccess: 1349912,
+                        diaryPosts: 3605,
+                        reviewPosts: 216,
+                        attendanceCount: 518,
+                        salesAchievementRate: 1.0452,
+                        diaryAchievementRate: 0.6676,
+                        reviewAchievementRate: 1.0537
+                    }
+                ];
+            }
+
+            saveToLocalStorage();
+        }
+
+        // ===== LocalStorage管理 =====
+        function saveToLocalStorage() {
+            try {
+                localStorage.setItem('classy_tasks', JSON.stringify(tasks));
+                localStorage.setItem('classy_events', JSON.stringify(events));
+                localStorage.setItem('classy_stores', JSON.stringify(storeData));
+            } catch (error) {
+                console.error('LocalStorage保存エラー:', error);
+            }
+        }
+
+        function loadFromLocalStorage() {
+            try {
+                const savedTasks = localStorage.getItem('classy_tasks');
+                const savedEvents = localStorage.getItem('classy_events');
+                const savedStores = localStorage.getItem('classy_stores');
+
+                if (savedTasks) tasks = JSON.parse(savedTasks);
+                if (savedEvents) events = JSON.parse(savedEvents);
+                if (savedStores) storeData = JSON.parse(savedStores);
+            } catch (error) {
+                console.error('LocalStorage読み込みエラー:', error);
+            }
+        }
+
+        // ===== Googleスプレッドシート連携 =====
+        async function syncWithSpreadsheet() {
+            setSyncStatus('loading', '同期中...');
+            
+            try {
+                // CSVとして公開されたスプレッドシートから読み込み
+                const csvUrl = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/export?format=csv&gid=0`;
+                
+                const response = await fetch(csvUrl);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
-            ];
+                
+                const csvText = await response.text();
+                const data = parseCSV(csvText);
+                
+                // データを解析して店舗情報を更新
+                updateStoreDataFromSpreadsheet(data);
+                
+                setSyncStatus('success', '同期完了');
+                document.getElementById('lastSync').textContent = new Date().toLocaleString('ja-JP');
+                
+                // データ更新後に表示を更新
+                renderCurrentPage();
+                saveToLocalStorage();
+                
+                showNotification('スプレッドシートと同期しました', 'success');
+                
+            } catch (error) {
+                console.error('スプレッドシート同期エラー:', error);
+                setSyncStatus('error', '同期エラー');
+                showNotification('スプレッドシート同期に失敗しました。サンプルデータを使用します。', 'warning');
+            }
+        }
+
+        function parseCSV(csvText) {
+            const lines = csvText.split('\n');
+            const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+            const data = [];
+            
+            for (let i = 1; i < lines.length; i++) {
+                if (lines[i].trim()) {
+                    const values = lines[i].split(',').map(v => v.trim().replace(/"/g, ''));
+                    const row = {};
+                    headers.forEach((header, index) => {
+                        row[header] = values[index] || '';
+                    });
+                    data.push(row);
+                }
+            }
+            
+            return data;
+        }
+
+        function updateStoreDataFromSpreadsheet(data) {
+            // スプレッドシートのデータ形式に応じて調整
+            // ここではサンプルとして基本的な更新処理を実装
+            if (data.length > 0) {
+                console.log('スプレッドシートデータ:', data);
+                
+                // データの構造を確認してstoreDataを更新
+                data.forEach(row => {
+                    if (row['店舗名'] || row['storeName'] || row['name']) {
+                        const storeName = row['店舗名'] || row['storeName'] || row['name'];
+                        const storeId = getStoreIdByName(storeName);
+                        
+                        if (storeId) {
+                            const existingStore = storeData.find(s => s.id === storeId);
+                            if (existingStore) {
+                                // 数値データの更新
+                                if (row['売上実績'] || row['sales']) {
+                                    existingStore.totalSales = parseFloat(row['売上実績'] || row['sales']) || existingStore.totalSales;
+                                }
+                                if (row['売上目標'] || row['target']) {
+                                    existingStore.salesTarget = parseFloat(row['売上目標'] || row['target']) || existingStore.salesTarget;
+                                }
+                                if (row['アクセス数'] || row['access']) {
+                                    existingStore.totalAccess = parseInt(row['アクセス数'] || row['access']) || existingStore.totalAccess;
+                                }
+                                
+                                // 達成率を再計算
+                                existingStore.salesAchievementRate = existingStore.totalSales / existingStore.salesTarget;
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        function getStoreIdByName(name) {
+            for (const [id, info] of Object.entries(storeInfo)) {
+                if (info.name === name) {
+                    return id;
+                }
+            }
+            return null;
+        }
+
+        function setSyncStatus(status, text) {
+            const iconElement = document.getElementById('syncIcon');
+            const textElement = document.getElementById('syncText');
+            const statusElement = document.getElementById('syncStatus');
+            
+            if (iconElement) {
+                switch (status) {
+                    case 'loading':
+                        iconElement.innerHTML = '<div class="loading"></div>';
+                        statusElement.className = 'sync-status sync-loading';
+                        break;
+                    case 'success':
+                        iconElement.textContent = '✅';
+                        statusElement.className = 'sync-status sync-success';
+                        break;
+                    case 'error':
+                        iconElement.textContent = '❌';
+                        statusElement.className = 'sync-status sync-error';
+                        break;
+                    default:
+                        iconElement.textContent = '⏳';
+                        statusElement.className = 'sync-status';
+                }
+            }
+            
+            if (textElement) {
+                textElement.textContent = text;
+            }
         }
 
         // ===== イベントリスナー設定 =====
@@ -847,6 +952,9 @@
             
             // フィルターイベント
             setupFilterEvents();
+
+            // カレンダーナビゲーション
+            setupCalendarEvents();
         }
 
         function setupButtonEvents() {
@@ -865,7 +973,7 @@
 
             // その他のボタン
             const syncBtn = document.getElementById('syncBtn');
-            if (syncBtn) syncBtn.addEventListener('click', syncData);
+            if (syncBtn) syncBtn.addEventListener('click', syncWithSpreadsheet);
 
             // 店舗選択
             const salesStoreSelect = document.getElementById('salesStoreSelect');
@@ -922,6 +1030,33 @@
             if (taskSearch) taskSearch.addEventListener('input', filterTasks);
             if (priorityFilter) priorityFilter.addEventListener('change', filterTasks);
             if (statusFilter) statusFilter.addEventListener('change', filterTasks);
+        }
+
+        function setupCalendarEvents() {
+            const prevMonthBtn = document.getElementById('prevMonthBtn');
+            const nextMonthBtn = document.getElementById('nextMonthBtn');
+
+            if (prevMonthBtn) {
+                prevMonthBtn.addEventListener('click', () => {
+                    currentMonth--;
+                    if (currentMonth < 0) {
+                        currentMonth = 11;
+                        currentYear--;
+                    }
+                    renderCalendar();
+                });
+            }
+
+            if (nextMonthBtn) {
+                nextMonthBtn.addEventListener('click', () => {
+                    currentMonth++;
+                    if (currentMonth > 11) {
+                        currentMonth = 0;
+                        currentYear++;
+                    }
+                    renderCalendar();
+                });
+            }
         }
 
         // ===== UI更新関数 =====
@@ -998,6 +1133,7 @@
             }
         }
 
+        // ===== ダッシュボード表示 =====
         function renderDashboard() {
             updateDashboardStats();
             renderTodayTasks();
@@ -1006,13 +1142,18 @@
 
         function updateDashboardStats() {
             const totalSales = storeData.reduce((sum, store) => sum + store.totalSales, 0);
+            const totalTarget = storeData.reduce((sum, store) => sum + store.salesTarget, 0);
             const totalAccess = storeData.reduce((sum, store) => sum + store.totalAccess, 0);
             const totalAttendance = storeData.reduce((sum, store) => sum + store.attendanceCount, 0);
             const achievingStores = storeData.filter(store => store.salesAchievementRate >= 1.0).length;
+            const achievementRate = (totalSales / totalTarget) * 100;
 
             updateElement('totalSales', `¥${(totalSales / 1000000).toFixed(0)}M`);
+            updateElement('totalSalesRate', `${achievementRate.toFixed(1)}%達成`);
             updateElement('totalAccess', `${(totalAccess / 1000000).toFixed(1)}M`);
+            updateElement('avgAccess', `平均 ${(totalAccess / storeData.length / 1000000).toFixed(1)}M`);
             updateElement('totalAttendance', totalAttendance.toLocaleString());
+            updateElement('avgAttendance', `平均 ${Math.round(totalAttendance / storeData.length)}人`);
             updateElement('achievingStores', `${achievingStores}/${storeData.length}`);
         }
 
@@ -1066,8 +1207,28 @@
                     </div>
                 </div>
             `).join('');
+
+            // 店舗選択セレクトボックスを更新
+            updateStoreSelects();
         }
 
+        function updateStoreSelects() {
+            const salesSelect = document.getElementById('salesStoreSelect');
+            const kpiSelect = document.getElementById('kpiStoreSelect');
+
+            const options = storeData.map(store => 
+                `<option value="${store.id}">${store.name}</option>`
+            ).join('');
+
+            if (salesSelect) {
+                salesSelect.innerHTML = '<option value="">全店舗統合</option>' + options;
+            }
+            if (kpiSelect) {
+                kpiSelect.innerHTML = '<option value="">全店舗統合</option>' + options;
+            }
+        }
+
+        // ===== タスク管理 =====
         function renderTasks() {
             const filteredTasks = getFilteredTasks();
             const container = document.getElementById('tasksList');
@@ -1103,23 +1264,13 @@
             `).join('');
         }
 
-        function renderSales() {
-            updateSalesStats();
-            updateStoreRanking();
-        }
-
-        function renderKpi() {
-            updateKpiStats();
-            updateKpiTable();
-        }
-
-        function renderCalendar() {
-            renderWeeklySchedule();
-        }
-
-        // ===== タスク管理 =====
         function openTaskModal(taskId = null) {
             editingTaskId = taskId;
+            
+            const modalTitle = document.getElementById('taskModalTitle');
+            if (modalTitle) {
+                modalTitle.textContent = taskId ? 'タスクを編集' : '新しいタスク';
+            }
             
             if (taskId) {
                 const task = tasks.find(t => t.id === taskId);
@@ -1133,7 +1284,7 @@
                 document.getElementById('taskTitle').value = '';
                 document.getElementById('taskDescription').value = '';
                 document.getElementById('taskPriority').value = 'medium';
-                document.getElementById('taskDueDate').value = '';
+                document.getElementById('taskDueDate').value = new Date().toISOString().split('T')[0];
             }
 
             showModal('taskModal');
@@ -1170,6 +1321,7 @@
                 showNotification('タスクを追加しました', 'success');
             }
 
+            saveToLocalStorage();
             hideModal('taskModal');
             renderCurrentPage();
         }
@@ -1178,6 +1330,7 @@
             const task = tasks.find(t => t.id === taskId);
             if (task) {
                 task.completed = !task.completed;
+                saveToLocalStorage();
                 renderCurrentPage();
                 showNotification(task.completed ? 'タスクを完了しました' : 'タスクを未完了に戻しました', 'success');
             }
@@ -1190,6 +1343,7 @@
         function deleteTask(taskId) {
             if (confirm('このタスクを削除しますか？')) {
                 tasks = tasks.filter(t => t.id !== taskId);
+                saveToLocalStorage();
                 renderCurrentPage();
                 showNotification('タスクを削除しました', 'success');
             }
@@ -1216,62 +1370,13 @@
             renderTasks();
         }
 
-        // ===== イベント管理 =====
-        function openEventModal(eventId = null) {
-            editingEventId = eventId;
-            
-            if (eventId) {
-                const event = events.find(e => e.id === eventId);
-                if (event) {
-                    document.getElementById('eventTitle').value = event.title;
-                    document.getElementById('eventDescription').value = event.description;
-                    document.getElementById('eventType').value = event.type;
-                    document.getElementById('eventDate').value = event.date;
-                }
-            } else {
-                document.getElementById('eventTitle').value = '';
-                document.getElementById('eventDescription').value = '';
-                document.getElementById('eventType').value = 'meeting';
-                document.getElementById('eventDate').value = '';
-            }
-
-            showModal('eventModal');
-        }
-
-        function saveEvent() {
-            const title = document.getElementById('eventTitle').value.trim();
-            const description = document.getElementById('eventDescription').value.trim();
-            const type = document.getElementById('eventType').value;
-            const date = document.getElementById('eventDate').value;
-
-            if (!title || !date) {
-                showNotification('予定名と日付を入力してください', 'error');
-                return;
-            }
-
-            if (editingEventId) {
-                const eventIndex = events.findIndex(e => e.id === editingEventId);
-                if (eventIndex !== -1) {
-                    events[eventIndex] = { ...events[eventIndex], title, description, type, date };
-                }
-                showNotification('予定を更新しました', 'success');
-            } else {
-                const newEvent = {
-                    id: Date.now(),
-                    title,
-                    description,
-                    type,
-                    date
-                };
-                events.push(newEvent);
-                showNotification('予定を追加しました', 'success');
-            }
-
-            hideModal('eventModal');
-            renderCurrentPage();
-        }
-
         // ===== 売上分析 =====
+        function renderSales() {
+            updateSalesStats();
+            updateStoreRanking();
+            renderSalesChart();
+        }
+
         function updateSalesAnalysis(storeId) {
             if (storeId === '') {
                 updateSalesStats();
@@ -1285,6 +1390,7 @@
                 }
             }
             updateStoreRanking();
+            renderSalesChart();
         }
 
         function updateSalesStats() {
@@ -1303,7 +1409,7 @@
             const sortedStores = [...storeData].sort((a, b) => b.totalSales - a.totalSales);
             const container = document.getElementById('storeRanking');
 
-            container.innerHTML = sortedStores.slice(0, 5).map((store, index) => `
+            container.innerHTML = sortedStores.map((store, index) => `
                 <div class="bg-white p-4 rounded-lg border">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center">
@@ -1324,7 +1430,89 @@
             `).join('');
         }
 
+        function renderSalesChart() {
+            const canvas = document.getElementById('salesChart');
+            if (!canvas) return;
+
+            const ctx = canvas.getContext('2d');
+
+            // 既存のチャートを破棄
+            if (salesChart) {
+                salesChart.destroy();
+            }
+
+            const selectedStoreId = document.getElementById('salesStoreSelect')?.value;
+            let chartData;
+
+            if (selectedStoreId) {
+                const store = storeData.find(s => s.id === selectedStoreId);
+                chartData = {
+                    labels: [store.name],
+                    datasets: [
+                        {
+                            label: '売上実績',
+                            data: [store.totalSales / 1000000],
+                            backgroundColor: 'rgba(59, 130, 246, 0.6)',
+                            borderColor: 'rgba(59, 130, 246, 1)',
+                            borderWidth: 2
+                        },
+                        {
+                            label: '売上目標',
+                            data: [store.salesTarget / 1000000],
+                            backgroundColor: 'rgba(16, 185, 129, 0.6)',
+                            borderColor: 'rgba(16, 185, 129, 1)',
+                            borderWidth: 2
+                        }
+                    ]
+                };
+            } else {
+                chartData = {
+                    labels: storeData.map(store => store.name),
+                    datasets: [
+                        {
+                            label: '売上実績 (M円)',
+                            data: storeData.map(store => store.totalSales / 1000000),
+                            backgroundColor: 'rgba(59, 130, 246, 0.6)',
+                            borderColor: 'rgba(59, 130, 246, 1)',
+                            borderWidth: 2
+                        }
+                    ]
+                };
+            }
+
+            salesChart = new Chart(ctx, {
+                type: 'bar',
+                data: chartData,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: selectedStoreId ? '個別店舗売上' : '全店舗売上実績'
+                        },
+                        legend: {
+                            display: true
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '売上 (百万円)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
         // ===== KPI管理 =====
+        function renderKpi() {
+            updateKpiStats();
+            updateKpiTable();
+        }
+
         function updateKpiAnalysis(storeId) {
             if (storeId === '') {
                 updateKpiStats();
@@ -1333,8 +1521,8 @@
                 if (store) {
                     updateElement('kpiDiaryPosts', store.diaryPosts.toLocaleString());
                     updateElement('kpiReviews', store.reviewPosts.toLocaleString());
-                    updateElement('kpiKitene', '未設定');
-                    updateElement('kpiUsers', '未設定');
+                    updateElement('kpiKitene', 'N/A');
+                    updateElement('kpiUsers', 'N/A');
                 }
             }
             updateKpiTable();
@@ -1376,7 +1564,19 @@
             `).join('');
         }
 
-        // ===== カレンダー =====
+        // ===== イベント・カレンダー管理 =====
+        function renderCalendar() {
+            updateCalendarTitle();
+            renderWeeklySchedule();
+        }
+
+        function updateCalendarTitle() {
+            const title = document.getElementById('calendarTitle');
+            if (title) {
+                title.textContent = `${currentYear}年${currentMonth + 1}月`;
+            }
+        }
+
         function renderWeeklySchedule() {
             const container = document.getElementById('weeklySchedule');
             const weekDays = ['日', '月', '火', '水', '木', '金', '土'];
@@ -1396,7 +1596,7 @@
                     <div class="bg-white rounded-lg p-3 min-h-[100px] border ${isToday ? 'border-blue-500 bg-blue-50' : ''}">
                         <div class="font-semibold mb-2">${weekDays[i]} ${currentDay.getDate()}</div>
                         ${dayEvents.map(event => `
-                            <div class="text-xs p-1 rounded mb-1 ${getEventClass(event.type)}">
+                            <div class="text-xs p-1 rounded mb-1 cursor-pointer ${getEventClass(event.type)}" onclick="editEvent(${event.id})">
                                 ${event.title}
                             </div>
                         `).join('')}
@@ -1406,6 +1606,79 @@
             container.innerHTML = weekHTML;
         }
 
+        function openEventModal(eventId = null) {
+            editingEventId = eventId;
+            
+            const modalTitle = document.getElementById('eventModalTitle');
+            if (modalTitle) {
+                modalTitle.textContent = eventId ? '予定を編集' : '新しい予定';
+            }
+            
+            if (eventId) {
+                const event = events.find(e => e.id === eventId);
+                if (event) {
+                    document.getElementById('eventTitle').value = event.title;
+                    document.getElementById('eventDescription').value = event.description;
+                    document.getElementById('eventType').value = event.type;
+                    document.getElementById('eventDate').value = event.date;
+                }
+            } else {
+                document.getElementById('eventTitle').value = '';
+                document.getElementById('eventDescription').value = '';
+                document.getElementById('eventType').value = 'meeting';
+                document.getElementById('eventDate').value = new Date().toISOString().split('T')[0];
+            }
+
+            showModal('eventModal');
+        }
+
+        function saveEvent() {
+            const title = document.getElementById('eventTitle').value.trim();
+            const description = document.getElementById('eventDescription').value.trim();
+            const type = document.getElementById('eventType').value;
+            const date = document.getElementById('eventDate').value;
+
+            if (!title || !date) {
+                showNotification('予定名と日付を入力してください', 'error');
+                return;
+            }
+
+            if (editingEventId) {
+                const eventIndex = events.findIndex(e => e.id === editingEventId);
+                if (eventIndex !== -1) {
+                    events[eventIndex] = { ...events[eventIndex], title, description, type, date };
+                }
+                showNotification('予定を更新しました', 'success');
+            } else {
+                const newEvent = {
+                    id: Date.now(),
+                    title,
+                    description,
+                    type,
+                    date
+                };
+                events.push(newEvent);
+                showNotification('予定を追加しました', 'success');
+            }
+
+            saveToLocalStorage();
+            hideModal('eventModal');
+            renderCurrentPage();
+        }
+
+        function editEvent(eventId) {
+            openEventModal(eventId);
+        }
+
+        function deleteEvent(eventId) {
+            if (confirm('この予定を削除しますか？')) {
+                events = events.filter(e => e.id !== eventId);
+                saveToLocalStorage();
+                renderCurrentPage();
+                showNotification('予定を削除しました', 'success');
+            }
+        }
+
         // ===== その他の機能 =====
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
@@ -1413,20 +1686,21 @@
         }
 
         function showQuickActions() {
-            const actions = [
-                { icon: 'fas fa-plus', text: 'タスク追加', action: () => openTaskModal() },
-                { icon: 'fas fa-calendar', text: '予定追加', action: () => openEventModal() },
-                { icon: 'fas fa-sync', text: 'データ同期', action: syncData }
-            ];
-
             const content = `
                 <div class="space-y-3">
                     <h3 class="text-lg font-bold text-gray-900 mb-4">クイックアクション</h3>
-                    ${actions.map(action => `
-                        <button class="btn btn-outline w-full justify-start" onclick="${action.action.toString().match(/\{(.*)\}/s)[1]}; closeQuickActions();">
-                            <i class="${action.icon} mr-3"></i>${action.text}
-                        </button>
-                    `).join('')}
+                    <button class="btn btn-outline w-full justify-start" onclick="openTaskModal(); closeQuickActions();">
+                        <i class="fas fa-plus mr-3"></i>タスク追加
+                    </button>
+                    <button class="btn btn-outline w-full justify-start" onclick="openEventModal(); closeQuickActions();">
+                        <i class="fas fa-calendar mr-3"></i>予定追加
+                    </button>
+                    <button class="btn btn-outline w-full justify-start" onclick="syncWithSpreadsheet(); closeQuickActions();">
+                        <i class="fas fa-sync mr-3"></i>データ同期
+                    </button>
+                    <button class="btn btn-outline w-full justify-start" onclick="exportData(); closeQuickActions();">
+                        <i class="fas fa-download mr-3"></i>データエクスポート
+                    </button>
                 </div>
             `;
 
@@ -1434,16 +1708,32 @@
         }
 
         function closeQuickActions() {
-            document.querySelectorAll('.modal').forEach(modal => modal.remove());
+            document.querySelectorAll('.modal').forEach(modal => {
+                if (!modal.id.includes('taskModal') && !modal.id.includes('eventModal')) {
+                    modal.remove();
+                }
+            });
         }
 
-        function syncData() {
-            showNotification('データを同期中...', 'info');
-            
-            setTimeout(() => {
-                document.getElementById('lastSync').textContent = new Date().toLocaleString('ja-JP');
-                showNotification('データ同期が完了しました', 'success');
-            }, 1000);
+        function exportData() {
+            const data = {
+                tasks,
+                events,
+                storeData,
+                exportDate: new Date().toISOString()
+            };
+
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `classy_data_${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            showNotification('データをエクスポートしました', 'success');
         }
 
         function showStoreDetails(storeId) {
@@ -1484,6 +1774,10 @@
                         <div class="flex justify-between">
                             <span>口コミ数</span>
                             <span class="font-bold">${store.reviewPosts}件</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>出勤人数</span>
+                            <span class="font-bold">${store.attendanceCount}人</span>
                         </div>
                     </div>
                     
@@ -1616,7 +1910,7 @@
         }
 
         function getRankingEmoji(rank) {
-            return rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '🏆';
+            return rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `${rank}位`;
         }
 
         // ===== デバッグ用関数 =====
@@ -1625,21 +1919,23 @@
             console.log('タスク数:', tasks.length);
             console.log('イベント数:', events.length);
             console.log('店舗数:', storeData.length);
+            console.log('現在のページ:', currentPage);
             return '正常';
         };
 
-        window.testTaskModal = function() {
-            openTaskModal();
-            return 'タスクモーダル表示';
+        window.testSpreadsheetSync = function() {
+            syncWithSpreadsheet();
+            return 'スプレッドシート同期テスト実行';
         };
 
-        window.testEventModal = function() {
-            openEventModal();
-            return 'イベントモーダル表示';
+        window.testNotification = function() {
+            showNotification('テスト通知', 'success');
+            return 'テスト通知表示';
         };
 
-        console.log('CLASSY業務管理システム 初期化完了');
-        console.log('テスト: window.testSystem(), window.testTaskModal(), window.testEventModal()');
+        console.log('CLASSY業務管理システム 完全版 初期化完了');
+        console.log('テスト関数: testSystem(), testSpreadsheetSync(), testNotification()');
+        console.log('スプレッドシート連携: 有効');
     </script>
 </body>
 </html>
