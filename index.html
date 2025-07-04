@@ -632,7 +632,7 @@
         let currentYear = new Date().getFullYear();
         let salesChart = null;
 
-        // スプレッドシート設定
+        // Googleスプレッドシート設定
         const SPREADSHEET_ID = '1CSGBzK9au8VLEQFCpBJbVyMoTaRhO5hoQd_qk8XC_IQ';
 
         // 店舗情報
@@ -659,7 +659,11 @@
                 setInterval(updateDateTime, 60000);
                 setupEventListeners();
                 renderCurrentPage();
-                syncWithSpreadsheet();
+                
+                setTimeout(() => {
+                    syncWithSpreadsheet();
+                }, 1000);
+                
                 showNotification('システム初期化完了！', 'success');
                 console.log('初期化完了');
             } catch (error) {
@@ -709,7 +713,6 @@
                 ];
             }
 
-            // 10店舗すべての初期データを設定
             if (storeData.length === 0) {
                 storeData = [
                     {
@@ -877,6 +880,7 @@
         async function syncWithSpreadsheet() {
             setSyncStatus('loading', '同期中...');
             console.log('スプレッドシート同期開始');
+            console.log('対象スプレッドシート: https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/edit?gid=0#gid=0');
             
             try {
                 let csvText = null;
@@ -934,7 +938,7 @@
                     }
                 }
                 
-                // アクセスできない場合
+                // アクセスできない場合の処理
                 if (!csvText || csvText.trim().length === 0) {
                     console.log('アクセス失敗分析:');
                     
@@ -973,7 +977,7 @@
                 saveToLocalStorage();
                 
                 const message = accessMethod.includes('代替') 
-                    ? '代替データで同期しました（' + updatedCount + '店舗更新）スプレッドシートを公開設定にすると実データと同期できます'
+                    ? '代替データで同期しました（' + updatedCount + '店舗更新）'
                     : accessMethod + 'でデータを同期しました（' + updatedCount + '店舗更新）';
                 
                 showNotification(message, accessMethod.includes('代替') ? 'warning' : 'success');
@@ -998,13 +1002,11 @@
         }
 
         function generateCurrentBusinessData() {
-            // 現在時刻に基づく動的なビジネスデータ
             const now = new Date();
             const hour = now.getHours();
             const minute = now.getMinutes();
             const dayOfMonth = now.getDate();
             
-            // 時間と日付に基づく変動係数
             const timeVariation = 1 + (Math.sin((hour * 60 + minute) / 100) * 0.05);
             const dateVariation = 1 + (Math.sin(dayOfMonth / 10) * 0.03);
             const finalVariation = timeVariation * dateVariation;
@@ -1024,6 +1026,38 @@
                 "CL四日市," + Math.floor(12943296 * finalVariation) + ",12500000," + Math.floor(881476 * finalVariation) + "," + Math.floor(6301 * finalVariation) + "," + Math.floor(256 * finalVariation) + "," + Math.floor(356 * finalVariation);
         }
 
+        function showSpreadsheetSetupGuide() {
+            const guide = "スプレッドシート公開設定ガイド:\n\n" +
+                "1. スプレッドシートを開く:\n" +
+                "   https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID + "/edit?gid=0#gid=0\n\n" +
+                "2. 右上の「共有」ボタンをクリック\n\n" +
+                "3. 「制限付き」を「リンクを知っている全員」に変更\n\n" +
+                "4. 役割を「閲覧者」に設定\n\n" +
+                "5. 「完了」をクリック\n\n" +
+                "6. このシステムで再度「同期」ボタンをクリック\n\n" +
+                "または「ファイル」→「ウェブに公開」でも可能です";
+            
+            console.log(guide);
+            
+            showCustomModal('スプレッドシート設定ガイド', 
+                '<div class="space-y-4 text-sm">' +
+                '<p class="font-bold text-blue-600">スプレッドシートを公開設定にしてください：</p>' +
+                '<ol class="list-decimal list-inside space-y-2">' +
+                '<li>スプレッドシートを開く</li>' +
+                '<li>右上の「共有」ボタンをクリック</li>' +
+                '<li>「制限付き」を「リンクを知っている全員」に変更</li>' +
+                '<li>役割を「閲覧者」に設定</li>' +
+                '<li>「完了」をクリック</li>' +
+                '<li>このシステムで再度「同期」ボタンをクリック</li>' +
+                '</ol>' +
+                '<a href="https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/edit?gid=0#gid=0" ' +
+                'target="_blank" class="btn btn-primary">' +
+                'スプレッドシートを開く' +
+                '</a>' +
+                '</div>'
+            );
+        }
+
         function parseCSV(csvText) {
             try {
                 const lines = csvText.split('\n').filter(line => line.trim());
@@ -1032,7 +1066,6 @@
                     return [];
                 }
                 
-                // ヘッダー行を処理
                 const headerLine = lines[0];
                 const headers = [];
                 let currentHeader = '';
@@ -1055,7 +1088,6 @@
                 
                 const data = [];
                 
-                // データ行を処理
                 for (let lineIndex = 1; lineIndex < lines.length; lineIndex++) {
                     const line = lines[lineIndex].trim();
                     if (!line) continue;
@@ -1077,13 +1109,11 @@
                     }
                     values.push(currentValue.trim().replace(/"/g, ''));
                     
-                    // 行データオブジェクトを作成
                     const row = {};
                     headers.forEach((header, index) => {
                         row[header] = values[index] || '';
                     });
                     
-                    // 店舗名がある行のみ追加
                     const storeName = row['店舗名'] || row['storeName'] || row['name'] || '';
                     if (storeName.trim()) {
                         data.push(row);
@@ -1248,38 +1278,6 @@
             }
             
             return null;
-        }
-
-        function showSpreadsheetSetupGuide() {
-            const guide = "スプレッドシート公開設定ガイド:\n\n" +
-                "1. スプレッドシートを開く:\n" +
-                "   https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID + "/edit?gid=0#gid=0\n\n" +
-                "2. 右上の「共有」ボタンをクリック\n\n" +
-                "3. 「制限付き」を「リンクを知っている全員」に変更\n\n" +
-                "4. 役割を「閲覧者」に設定\n\n" +
-                "5. 「完了」をクリック\n\n" +
-                "6. このシステムで再度「同期」ボタンをクリック\n\n" +
-                "または「ファイル」→「ウェブに公開」でも可能です";
-            
-            console.log(guide);
-            
-            showCustomModal('スプレッドシート設定ガイド', 
-                '<div class="space-y-4 text-sm">' +
-                '<p class="font-bold text-blue-600">スプレッドシートを公開設定にしてください：</p>' +
-                '<ol class="list-decimal list-inside space-y-2">' +
-                '<li>スプレッドシートを開く</li>' +
-                '<li>右上の「共有」ボタンをクリック</li>' +
-                '<li>「制限付き」を「リンクを知っている全員」に変更</li>' +
-                '<li>役割を「閲覧者」に設定</li>' +
-                '<li>「完了」をクリック</li>' +
-                '<li>このシステムで再度「同期」ボタンをクリック</li>' +
-                '</ol>' +
-                '<a href="https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/edit?gid=0#gid=0" ' +
-                'target="_blank" class="btn btn-primary">' +
-                'スプレッドシートを開く' +
-                '</a>' +
-                '</div>'
-            );
         }
 
         function setSyncStatus(status, text) {
@@ -1665,7 +1663,7 @@
             if (editingTaskId) {
                 const taskIndex = tasks.findIndex(t => t.id === editingTaskId);
                 if (taskIndex !== -1) {
-                    tasks[taskIndex] = Object.assign({}, tasks[taskIndex], {title: title, description: description, priority: priority, dueDate: dueDate});
+                    tasks[taskIndex] = Object.assign({}, tasks[taskIndex], { title: title, description: description, priority: priority, dueDate: dueDate });
                 }
                 showNotification('タスクを更新しました', 'success');
             } else {
@@ -2005,7 +2003,7 @@
             if (editingEventId) {
                 const eventIndex = events.findIndex(e => e.id === editingEventId);
                 if (eventIndex !== -1) {
-                    events[eventIndex] = Object.assign({}, events[eventIndex], {title: title, description: description, type: type, date: date});
+                    events[eventIndex] = Object.assign({}, events[eventIndex], { title: title, description: description, type: type, date: date });
                 }
                 showNotification('予定を更新しました', 'success');
             } else {
@@ -2185,12 +2183,11 @@
         // 通知システム
         function showNotification(message, type = 'info') {
             const notification = document.createElement('div');
-            notification.className = 'notification border-l-4 ' + (
-                type === 'success' ? 'border-green-500 bg-green-50 text-green-800' :
+            notification.className = 'notification border-l-4 ' + 
+                (type === 'success' ? 'border-green-500 bg-green-50 text-green-800' :
                 type === 'error' ? 'border-red-500 bg-red-50 text-red-800' :
                 type === 'warning' ? 'border-yellow-500 bg-yellow-50 text-yellow-800' :
-                'border-blue-500 bg-blue-50 text-blue-800'
-            );
+                'border-blue-500 bg-blue-50 text-blue-800');
 
             const icon = type === 'success' ? 'check-circle' :
                         type === 'error' ? 'exclamation-circle' :
@@ -2265,7 +2262,7 @@
             return rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank + '位';
         }
 
-        // デバッグ用関数
+        // デバッグ・修復関数
         window.fixSpreadsheetNow = function() {
             console.log('スプレッドシート同期修復実行');
             
@@ -2291,6 +2288,36 @@
             }
         };
 
+        window.openSpreadsheet = function() {
+            const url = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/edit?gid=0#gid=0';
+            window.open(url, '_blank');
+            console.log('スプレッドシートを新しいタブで開きました');
+            return 'スプレッドシートを開きました';
+        };
+
+        window.testRealSync = function() {
+            console.log('実際の同期テスト実行');
+            syncWithSpreadsheet();
+            return '同期テスト実行';
+        };
+
+        window.showSyncStatus = function() {
+            console.log('現在の同期状況:');
+            console.log('対象スプレッドシート:', SPREADSHEET_ID);
+            console.log('店舗データ数:', storeData.length);
+            console.log('最終同期:', document.getElementById('lastSync')?.textContent || '未同期');
+            console.log('同期状態:', document.getElementById('syncText')?.textContent || '不明');
+            
+            console.log('認識されている店舗:');
+            storeData.forEach((store, index) => {
+                const achievement = (store.salesAchievementRate * 100).toFixed(1);
+                const status = store.salesAchievementRate >= 1.0 ? '達成' : '未達成';
+                console.log((index + 1) + '. ' + store.name + ' - 達成率: ' + achievement + '% ' + status);
+            });
+            
+            return storeData.length + '店舗認識済み';
+        };
+
         window.testSystem = function() {
             console.log('=== システムテスト ===');
             console.log('タスク数:', tasks.length);
@@ -2298,11 +2325,9 @@
             console.log('店舗数:', storeData.length);
             console.log('現在のページ:', currentPage);
             
-            console.log('\n=== 店舗一覧 ===');
+            console.log('店舗一覧:');
             storeData.forEach((store, index) => {
-                console.log((index + 1) + '. ' + store.name + ' (' + store.id + ')');
-                console.log('   売上: ¥' + (store.totalSales / 1000000).toFixed(1) + 'M / ¥' + (store.salesTarget / 1000000).toFixed(1) + 'M (' + (store.salesAchievementRate * 100).toFixed(1) + '%)');
-                console.log('   アクセス: ' + store.totalAccess.toLocaleString());
+                console.log((index + 1) + '. ' + store.name + ' (¥' + (store.totalSales / 1000000).toFixed(1) + 'M)');
             });
             
             return '正常 - ' + storeData.length + '店舗認識';
@@ -2311,50 +2336,34 @@
         window.showAllStores = function() {
             console.log('=== 全店舗データ詳細 ===');
             storeData.forEach(store => {
-                console.log('\n店舗: ' + store.name + ' (' + store.id + ')');
+                console.log('店舗: ' + store.name + ' (' + store.id + ')');
                 console.log('ブランド: ' + (storeInfo[store.id]?.type || ''));
                 console.log('売上実績: ¥' + store.totalSales.toLocaleString());
                 console.log('売上目標: ¥' + store.salesTarget.toLocaleString());
                 console.log('達成率: ' + (store.salesAchievementRate * 100).toFixed(1) + '%');
-                console.log('アクセス数: ' + store.totalAccess.toLocaleString());
-                console.log('日記投稿: ' + store.diaryPosts + '件');
-                console.log('口コミ: ' + store.reviewPosts + '件');
-                console.log('出勤人数: ' + store.attendanceCount + '人');
+                console.log('---');
             });
             return storeData.length + '店舗の詳細情報を表示';
         };
 
-        // 初期化メッセージ
+        // 初期化完了メッセージ
         console.log('CLASSY業務管理システム 完全版 初期化完了');
         console.log('=== 利用可能な店舗数: ' + Object.keys(storeInfo).length + ' ===');
         Object.entries(storeInfo).forEach(([id, info]) => {
             console.log('- ' + info.name + ' (' + id + ') - ' + info.type + 'ブランド');
         });
         
-        console.log('\n【スプレッドシート同期について】');
+        console.log('スプレッドシート同期について:');
         console.log('現在、スプレッドシートが非公開のため直接同期できません。');
         console.log('');
         console.log('今すぐ解決する方法:');
         console.log('1. fixSpreadsheetNow() を実行 ← おすすめ！');
-        console.log('2. testSystem() でシステム状態確認');
-        console.log('3. showAllStores() で全店舗データ表示');
-        console.log('');
+        console.log('2. openSpreadsheet() でスプレッドシートを開いて公開設定');
+        console.log('3. testRealSync() で実際の同期をテスト');
+        console.log('4. showSyncStatus() で現在の状況を確認');
         
-        console.log('スプレッドシート公開設定手順:');
-        console.log('1. 右上の「共有」ボタンをクリック');
-        console.log('2. 「制限付き」を「リンクを知っている全員」に変更');
-        console.log('3. 権限を「閲覧者」に設定');
-        console.log('4. 「完了」をクリック');
-        console.log('5. このシステムで「同期」ボタンをクリック');
-        
-        console.log('\n対象スプレッドシート:');
+        console.log('対象スプレッドシート:');
         console.log('https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/edit?gid=0#gid=0');
-        
-        // 初期化完了後に自動修復実行
-        setTimeout(() => {
-            console.log('\n=== 自動修復を実行します ===');
-            fixSpreadsheetNow();
-        }, 2000);
     </script>
 </body>
 </html>
