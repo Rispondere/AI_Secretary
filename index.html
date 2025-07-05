@@ -1268,7 +1268,7 @@
         function updateStoreDataFromSpreadsheet(data) {
             let updatedCount = 0;
             
-            console.log('=== 改良版KPI構造での同期開始 ===');
+            console.log('=== 日次進捗対応KPI構造での同期開始 ===');
             console.log('受信データ行数:', data.length);
             console.log('現在のstoreData店舗数:', storeData.length);
             
@@ -1296,10 +1296,17 @@
                                 const accessCount = row['アクセス数'] || row['access'] || row['totalAccess'] || row['アクセス'] || row['PV'];
                                 const attendance = row['出勤人数'] || row['attendance'] || row['attendanceCount'] || row['出勤'] || row['人数'];
                                 
-                                // 新しいKPI項目の処理
+                                // 日次進捗管理項目
+                                const updateDate = row['更新日'] || row['update_date'] || row['date'];
+                                const dailySalesTarget = row['日次目標売上'] || row['daily_sales_target'];
+                                const dailyDiaryTarget = row['日次目標日記'] || row['daily_diary_target'];
+                                const elapsedDays = row['経過日数'] || row['elapsed_days'];
+                                const remainingDays = row['残り日数'] || row['remaining_days'];
+                                
+                                // KPI項目の処理
                                 const diaryCount = row['写メ日記投稿数'] || row['日記投稿数'] || row['diary'] || row['diaryPosts'] || row['日記'];
                                 const diaryTarget = row['写メ日記月間目標'] || row['写メ日記目標'] || row['日記目標'] || row['diaryTarget'];
-                                const diaryDailyAvg = row['日記1日平均'] || row['diary_daily_avg'];
+                                const diaryDailyAvg = row['日記平均'] || row['diary_daily_avg'] || row['日記1日平均'];
                                 
                                 const reviewCount = row['口コミ総数'] || row['口コミ数'] || row['review'] || row['reviewPosts'] || row['口コミ'];
                                 const reviewTarget = row['口コミ月間目標'] || row['口コミ目標'] || row['reviewTarget'];
@@ -1308,7 +1315,7 @@
                                 const kiteneTarget = row['キテネ月間目標'] || row['キテネ目標'] || row['kiteneTarget'];
                                 const kiteneDailyAvg = row['キテネ1日平均'] || row['kitene_daily_avg'];
                                 
-                                // 新追加項目
+                                // 追加項目
                                 const castCount = row['在籍キャスト数'] || row['cast_count'] || row['キャスト数'];
                                 const brandType = row['ブランド'] || row['brand'] || row['type'];
                                 const focusKPI = row['重点KPI'] || row['focus_kpi'] || row['priority'];
@@ -1331,6 +1338,49 @@
                                         existingStore.salesTarget = targetValue;
                                         storeUpdated = true;
                                         console.log('  売上目標更新: ¥' + targetValue.toLocaleString());
+                                    }
+                                }
+                                
+                                // 日次進捗管理項目の更新
+                                if (updateDate !== undefined && updateDate !== '') {
+                                    existingStore.updateDate = updateDate;
+                                    storeUpdated = true;
+                                    console.log('  更新日更新: ' + updateDate);
+                                }
+                                
+                                if (dailySalesTarget !== undefined && dailySalesTarget !== '') {
+                                    const dailySalesValue = parseFloat(dailySalesTarget.toString().replace(/[,円￥]/g, ''));
+                                    if (!isNaN(dailySalesValue)) {
+                                        existingStore.dailySalesTarget = dailySalesValue;
+                                        storeUpdated = true;
+                                        console.log('  日次売上目標更新: ¥' + dailySalesValue.toLocaleString());
+                                    }
+                                }
+                                
+                                if (dailyDiaryTarget !== undefined && dailyDiaryTarget !== '') {
+                                    const dailyDiaryValue = parseFloat(dailyDiaryTarget.toString());
+                                    if (!isNaN(dailyDiaryValue)) {
+                                        existingStore.dailyDiaryTarget = dailyDiaryValue;
+                                        storeUpdated = true;
+                                        console.log('  日次日記目標更新: ' + dailyDiaryValue);
+                                    }
+                                }
+                                
+                                if (elapsedDays !== undefined && elapsedDays !== '') {
+                                    const elapsedValue = parseInt(elapsedDays.toString());
+                                    if (!isNaN(elapsedValue)) {
+                                        existingStore.elapsedDays = elapsedValue;
+                                        storeUpdated = true;
+                                        console.log('  経過日数更新: ' + elapsedValue + '日');
+                                    }
+                                }
+                                
+                                if (remainingDays !== undefined && remainingDays !== '') {
+                                    const remainingValue = parseInt(remainingDays.toString());
+                                    if (!isNaN(remainingValue)) {
+                                        existingStore.remainingDays = remainingValue;
+                                        storeUpdated = true;
+                                        console.log('  残り日数更新: ' + remainingValue + '日');
                                     }
                                 }
                                 
@@ -1358,6 +1408,15 @@
                                         existingStore.diaryTarget = diaryTargetValue;
                                         storeUpdated = true;
                                         console.log('  写メ日記目標更新: ' + diaryTargetValue);
+                                    }
+                                }
+                                
+                                if (diaryDailyAvg !== undefined && diaryDailyAvg !== '') {
+                                    const diaryAvgValue = parseFloat(diaryDailyAvg.toString());
+                                    if (!isNaN(diaryAvgValue)) {
+                                        existingStore.diaryDailyAvg = diaryAvgValue;
+                                        storeUpdated = true;
+                                        console.log('  日記平均更新: ' + diaryAvgValue.toFixed(1) + '件/日');
                                     }
                                 }
                                 
@@ -1397,6 +1456,15 @@
                                     }
                                 }
                                 
+                                if (kiteneDailyAvg !== undefined && kiteneDailyAvg !== '') {
+                                    const kiteneAvgValue = parseFloat(kiteneDailyAvg.toString());
+                                    if (!isNaN(kiteneAvgValue)) {
+                                        existingStore.kiteneDailyAvg = kiteneAvgValue;
+                                        storeUpdated = true;
+                                        console.log('  キテネ平均更新: ' + kiteneAvgValue.toFixed(1) + '件/日');
+                                    }
+                                }
+                                
                                 if (attendance !== undefined && attendance !== '') {
                                     const attendanceValue = parseInt(attendance.toString().replace(/[,]/g, ''));
                                     if (!isNaN(attendanceValue)) {
@@ -1406,7 +1474,7 @@
                                     }
                                 }
                                 
-                                // 新しい項目の処理
+                                // その他の項目の処理
                                 if (castCount !== undefined && castCount !== '') {
                                     const castValue = parseInt(castCount.toString().replace(/[,]/g, ''));
                                     if (!isNaN(castValue)) {
@@ -1440,13 +1508,18 @@
                                     console.log('  備考更新: ' + memo);
                                 }
 
-                                // 平均値の計算（営業日数を30日として計算）
-                                const businessDays = 30;
-                                if (existingStore.diaryPosts > 0) {
-                                    existingStore.diaryDailyAvg = Math.round(existingStore.diaryPosts / businessDays);
+                                // 日次進捗率の計算
+                                if (existingStore.elapsedDays > 0 && existingStore.dailySalesTarget > 0) {
+                                    const expectedSales = existingStore.dailySalesTarget * existingStore.elapsedDays;
+                                    existingStore.dailyProgressRate = existingStore.totalSales / expectedSales;
                                 }
-                                if (existingStore.kiteneCount > 0) {
-                                    existingStore.kiteneDailyAvg = Math.round(existingStore.kiteneCount / businessDays);
+                                
+                                // 月末予測の計算
+                                if (existingStore.elapsedDays > 0 && existingStore.remainingDays > 0) {
+                                    const dailyAvgSales = existingStore.totalSales / existingStore.elapsedDays;
+                                    const totalDays = existingStore.elapsedDays + existingStore.remainingDays;
+                                    const predictedTotalSales = dailyAvgSales * totalDays;
+                                    existingStore.monthEndPrediction = predictedTotalSales / existingStore.salesTarget;
                                 }
 
                                 // 各種達成率を再計算
@@ -1466,8 +1539,8 @@
                                     existingStore.kiteneAchievementRate = existingStore.kiteneCount / existingStore.kiteneTarget;
                                 }
                                 
-                                console.log('  達成率再計算: 売上' + (existingStore.salesAchievementRate * 100).toFixed(1) + '% / 日記' + (existingStore.diaryAchievementRate * 100).toFixed(1) + '% / 口コミ' + (existingStore.reviewAchievementRate * 100).toFixed(1) + '%');
-                                console.log('  平均値: 日記' + (existingStore.diaryDailyAvg || 0) + '件/日 / キテネ' + (existingStore.kiteneDailyAvg || 0) + '件/日');
+                                console.log('  達成率: 売上' + (existingStore.salesAchievementRate * 100).toFixed(1) + '% / 日記' + (existingStore.diaryAchievementRate * 100).toFixed(1) + '% / 口コミ' + (existingStore.reviewAchievementRate * 100).toFixed(1) + '%');
+                                console.log('  日次進捗: ' + ((existingStore.dailyProgressRate || 0) * 100).toFixed(1) + '% / 月末予測: ' + ((existingStore.monthEndPrediction || 0) * 100).toFixed(1) + '%');
                                 
                                 if (storeUpdated) {
                                     updatedCount++;
@@ -1484,7 +1557,7 @@
                     }
                 });
                 
-                console.log('=== 改良版KPI同期完了 ===');
+                console.log('=== 日次進捗対応KPI同期完了 ===');
                 console.log('更新された店舗数: ' + updatedCount + '/' + data.length);
                 
             } else {
