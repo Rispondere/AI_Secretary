@@ -731,6 +731,12 @@
                         kiteneTarget: 2800,
                         attendanceCount: 687,
                         userCount: 1250,
+                        castCount: 45,
+                        diaryDailyAvg: 252,
+                        kiteneDailyAvg: 83,
+                        brandType: 'Premium',
+                        focusKPI: '写メ日記強化',
+                        improvement: 'アクセス数向上',
                         salesAchievementRate: 0.8953,
                         diaryAchievementRate: 0.945,
                         reviewAchievementRate: 1.1467,
@@ -751,6 +757,12 @@
                         kiteneTarget: 2000,
                         attendanceCount: 514,
                         userCount: 980,
+                        castCount: 32,
+                        diaryDailyAvg: 275,
+                        kiteneDailyAvg: 60,
+                        brandType: 'Premium',
+                        focusKPI: '口コミ増加',
+                        improvement: '売上安定',
                         salesAchievementRate: 1.0465,
                         diaryAchievementRate: 1.066,
                         reviewAchievementRate: 0.78,
@@ -771,6 +783,12 @@
                         kiteneTarget: 2100,
                         attendanceCount: 518,
                         userCount: 1100,
+                        castCount: 35,
+                        diaryDailyAvg: 116,
+                        kiteneDailyAvg: 63,
+                        brandType: 'GrandOpera',
+                        focusKPI: '日記投稿強化',
+                        improvement: '継続投稿',
                         salesAchievementRate: 1.0452,
                         diaryAchievementRate: 0.6676,
                         reviewAchievementRate: 1.0537,
@@ -791,6 +809,12 @@
                         kiteneTarget: 2500,
                         attendanceCount: 514,
                         userCount: 1350,
+                        castCount: 38,
+                        diaryDailyAvg: 253,
+                        kiteneDailyAvg: 77,
+                        brandType: 'GrandOpera',
+                        focusKPI: '口コミ維持',
+                        improvement: 'キテネ強化',
                         salesAchievementRate: 1.0292,
                         diaryAchievementRate: 1.0437,
                         reviewAchievementRate: 1.1222,
@@ -811,6 +835,12 @@
                         kiteneTarget: 2000,
                         attendanceCount: 457,
                         userCount: 980,
+                        castCount: 30,
+                        diaryDailyAvg: 134,
+                        kiteneDailyAvg: 57,
+                        brandType: 'GrandOpera',
+                        focusKPI: '全KPI改善',
+                        improvement: '日記投稿増',
                         salesAchievementRate: 0.9759,
                         diaryAchievementRate: 0.5552,
                         reviewAchievementRate: 0.7733,
@@ -831,6 +861,12 @@
                         kiteneTarget: 1800,
                         attendanceCount: 407,
                         userCount: 850,
+                        castCount: 28,
+                        diaryDailyAvg: 164,
+                        kiteneDailyAvg: 53,
+                        brandType: 'GrandOpera',
+                        focusKPI: 'アクセス向上',
+                        improvement: '売上達成',
                         salesAchievementRate: 0.9803,
                         diaryAchievementRate: 0.8462,
                         reviewAchievementRate: 0.8759,
@@ -851,6 +887,12 @@
                         kiteneTarget: 2200,
                         attendanceCount: 480,
                         userCount: 1050,
+                        castCount: 33,
+                        diaryDailyAvg: 228,
+                        kiteneDailyAvg: 67,
+                        brandType: 'GrandOpera',
+                        focusKPI: 'KPI維持',
+                        improvement: '安定運営',
                         salesAchievementRate: 1.0468,
                         diaryAchievementRate: 1.0097,
                         reviewAchievementRate: 1.0833,
@@ -871,6 +913,12 @@
                         kiteneTarget: 1000,
                         attendanceCount: 197,
                         userCount: 420,
+                        castCount: 18,
+                        diaryDailyAvg: 60,
+                        kiteneDailyAvg: 27,
+                        brandType: 'CLASSY',
+                        focusKPI: '全体底上げ',
+                        improvement: '売上向上',
                         salesAchievementRate: 0.8834,
                         diaryAchievementRate: 0.7713,
                         reviewAchievementRate: 0.7533,
@@ -891,6 +939,12 @@
                         kiteneTarget: 1100,
                         attendanceCount: 238,
                         userCount: 520,
+                        castCount: 20,
+                        diaryDailyAvg: 67,
+                        kiteneDailyAvg: 30,
+                        brandType: 'CLASSY',
+                        focusKPI: '日記強化',
+                        improvement: '口コミ維持',
                         salesAchievementRate: 0.9332,
                         diaryAchievementRate: 0.693,
                         reviewAchievementRate: 1.0167,
@@ -911,6 +965,12 @@
                         kiteneTarget: 1500,
                         attendanceCount: 356,
                         userCount: 750,
+                        castCount: 25,
+                        diaryDailyAvg: 203,
+                        kiteneDailyAvg: 47,
+                        brandType: 'CLASSY',
+                        focusKPI: 'KPI優秀',
+                        improvement: '運営継続',
                         salesAchievementRate: 1.0355,
                         diaryAchievementRate: 1.0163,
                         reviewAchievementRate: 1.0667,
@@ -1086,17 +1146,18 @@
             
             console.log("動的データ生成 - 時刻変動: " + ((timeVariation * 100 - 100).toFixed(1)) + "%, 日付変動: " + ((dateVariation * 100 - 100).toFixed(1)) + "%");
             
-            return "店舗名,売上実績,売上目標,アクセス数,日記投稿数,口コミ数,出勤人数\n" +
-                "シャブール," + Math.floor(29544738 * finalVariation) + ",33000000," + Math.floor(1967152 * finalVariation) + "," + Math.floor(7560 * finalVariation) + "," + Math.floor(344 * finalVariation) + "," + Math.floor(687 * finalVariation) + "\n" +
-                "ワンカラット," + Math.floor(18314356 * finalVariation) + ",17500000," + Math.floor(1241592 * finalVariation) + "," + Math.floor(8528 * finalVariation) + "," + Math.floor(156 * finalVariation) + "," + Math.floor(514 * finalVariation) + "\n" +
-                "GO名古屋," + Math.floor(29265025 * finalVariation) + ",28000000," + Math.floor(1349912 * finalVariation) + "," + Math.floor(3605 * finalVariation) + "," + Math.floor(216 * finalVariation) + "," + Math.floor(518 * finalVariation) + "\n" +
-                "GO福岡," + Math.floor(37050068 * finalVariation) + ",36000000," + Math.floor(1619670 * finalVariation) + "," + Math.floor(7828 * finalVariation) + "," + Math.floor(202 * finalVariation) + "," + Math.floor(514 * finalVariation) + "\n" +
-                "GO東京," + Math.floor(27324427 * finalVariation) + ",28000000," + Math.floor(1182336 * finalVariation) + "," + Math.floor(4164 * finalVariation) + "," + Math.floor(116 * finalVariation) + "," + Math.floor(457 * finalVariation) + "\n" +
-                "GO横浜," + Math.floor(22547274 * finalVariation) + ",23000000," + Math.floor(599756 * finalVariation) + "," + Math.floor(5077 * finalVariation) + "," + Math.floor(127 * finalVariation) + "," + Math.floor(407 * finalVariation) + "\n" +
-                "オペラ錦," + Math.floor(25123456 * finalVariation) + ",24000000," + Math.floor(1273548 * finalVariation) + "," + Math.floor(7068 * finalVariation) + "," + Math.floor(195 * finalVariation) + "," + Math.floor(480 * finalVariation) + "\n" +
-                "CL名古屋," + Math.floor(5300320 * finalVariation) + ",6000000," + Math.floor(514243 * finalVariation) + "," + Math.floor(1851 * finalVariation) + "," + Math.floor(113 * finalVariation) + "," + Math.floor(197 * finalVariation) + "\n" +
-                "CL東京," + Math.floor(6719328 * finalVariation) + ",7200000," + Math.floor(742231 * finalVariation) + "," + Math.floor(2079 * finalVariation) + "," + Math.floor(122 * finalVariation) + "," + Math.floor(238 * finalVariation) + "\n" +
-                "CL四日市," + Math.floor(12943296 * finalVariation) + ",12500000," + Math.floor(881476 * finalVariation) + "," + Math.floor(6301 * finalVariation) + "," + Math.floor(256 * finalVariation) + "," + Math.floor(356 * finalVariation);
+            // 改良版の構造に対応
+            return "店舗名,売上実績,売上目標,写メ日記投稿数,写メ日記月間目標,日記1日平均,口コミ総数,口コミ月間目標,キテネ送信数,キテネ月間目標,キテネ1日平均,アクセス数,出勤人数,在籍キャスト数,ブランド,重点KPI,改善点,備考\n" +
+                "シャブール," + Math.floor(29544738 * finalVariation) + ",33000000," + Math.floor(7560 * finalVariation) + ",8000,252," + Math.floor(344 * finalVariation) + ",300," + Math.floor(2500 * finalVariation) + ",2800,83," + Math.floor(1967152 * finalVariation) + "," + Math.floor(687 * finalVariation) + ",45,Premium,写メ日記強化,アクセス数向上,高級店舗\n" +
+                "ワンカラット," + Math.floor(18314356 * finalVariation) + ",17500000," + Math.floor(8528 * finalVariation) + ",8000,275," + Math.floor(156 * finalVariation) + ",200," + Math.floor(1800 * finalVariation) + ",2000,60," + Math.floor(1241592 * finalVariation) + "," + Math.floor(514 * finalVariation) + ",32,Premium,口コミ増加,売上安定,目標達成店舗\n" +
+                "GO名古屋," + Math.floor(29265025 * finalVariation) + ",28000000," + Math.floor(3605 * finalVariation) + ",5400,116," + Math.floor(216 * finalVariation) + ",205," + Math.floor(1900 * finalVariation) + ",2100,63," + Math.floor(1349912 * finalVariation) + "," + Math.floor(518 * finalVariation) + ",35,GrandOpera,日記投稿強化,継続投稿,中部エリア主力\n" +
+                "GO福岡," + Math.floor(37050068 * finalVariation) + ",36000000," + Math.floor(7828 * finalVariation) + ",7500,253," + Math.floor(202 * finalVariation) + ",180," + Math.floor(2300 * finalVariation) + ",2500,77," + Math.floor(1619670 * finalVariation) + "," + Math.floor(514 * finalVariation) + ",38,GrandOpera,口コミ維持,キテネ強化,九州エリア最高\n" +
+                "GO東京," + Math.floor(27324427 * finalVariation) + ",28000000," + Math.floor(4164 * finalVariation) + ",7500,134," + Math.floor(116 * finalVariation) + ",150," + Math.floor(1700 * finalVariation) + ",2000,57," + Math.floor(1182336 * finalVariation) + "," + Math.floor(457 * finalVariation) + ",30,GrandOpera,全KPI改善,日記投稿増,首都圏戦略店\n" +
+                "GO横浜," + Math.floor(22547274 * finalVariation) + ",23000000," + Math.floor(5077 * finalVariation) + ",6000,164," + Math.floor(127 * finalVariation) + ",130," + Math.floor(1600 * finalVariation) + ",1800,53," + Math.floor(599756 * finalVariation) + "," + Math.floor(407 * finalVariation) + ",28,GrandOpera,アクセス向上,売上達成,神奈川主力\n" +
+                "オペラ錦," + Math.floor(25123456 * finalVariation) + ",24000000," + Math.floor(7068 * finalVariation) + ",7000,228," + Math.floor(195 * finalVariation) + ",180," + Math.floor(2000 * finalVariation) + ",2200,67," + Math.floor(1273548 * finalVariation) + "," + Math.floor(480 * finalVariation) + ",33,GrandOpera,KPI維持,安定運営,名古屋中心部\n" +
+                "CL名古屋," + Math.floor(5300320 * finalVariation) + ",6000000," + Math.floor(1851 * finalVariation) + ",2400,60," + Math.floor(113 * finalVariation) + ",150," + Math.floor(800 * finalVariation) + ",1000,27," + Math.floor(514243 * finalVariation) + "," + Math.floor(197 * finalVariation) + ",18,CLASSY,全体底上げ,売上向上,中部CLASSY\n" +
+                "CL東京," + Math.floor(6719328 * finalVariation) + ",7200000," + Math.floor(2079 * finalVariation) + ",3000,67," + Math.floor(122 * finalVariation) + ",120," + Math.floor(900 * finalVariation) + ",1100,30," + Math.floor(742231 * finalVariation) + "," + Math.floor(238 * finalVariation) + ",20,CLASSY,日記強化,口コミ維持,首都圏CLASSY\n" +
+                "CL四日市," + Math.floor(12943296 * finalVariation) + ",12500000," + Math.floor(6301 * finalVariation) + ",6200,203," + Math.floor(256 * finalVariation) + ",240," + Math.floor(1400 * finalVariation) + ",1500,47," + Math.floor(881476 * finalVariation) + "," + Math.floor(356 * finalVariation) + ",25,CLASSY,KPI優秀,運営継続,東海地区トップ";
         }
 
         function showSpreadsheetSetupGuide() {
@@ -1207,7 +1268,7 @@
         function updateStoreDataFromSpreadsheet(data) {
             let updatedCount = 0;
             
-            console.log('=== 新しいKPI構造での同期開始 ===');
+            console.log('=== 改良版KPI構造での同期開始 ===');
             console.log('受信データ行数:', data.length);
             console.log('現在のstoreData店舗数:', storeData.length);
             
@@ -1229,26 +1290,29 @@
                                 console.log('店舗発見: ' + existingStore.name + ' (ID: ' + existingStore.id + ')');
                                 let storeUpdated = false;
                                 
-                                // 基本データの更新
+                                // 基本売上データの更新
                                 const salesActual = row['売上実績'] || row['sales'] || row['actual_sales'] || row['totalSales'] || row['売上'];
                                 const salesTarget = row['売上目標'] || row['target'] || row['target_sales'] || row['salesTarget'] || row['目標'];
                                 const accessCount = row['アクセス数'] || row['access'] || row['totalAccess'] || row['アクセス'] || row['PV'];
                                 const attendance = row['出勤人数'] || row['attendance'] || row['attendanceCount'] || row['出勤'] || row['人数'];
-                                const userCount = row['ユーザー数'] || row['users'] || row['userCount'] || row['ユーザー'];
                                 
-                                // 写メ日記関連
-                                const diaryCount = row['写メ日記投稿数'] || row['日記投稿数'] || row['diary'] || row['diaryPosts'] || row['日記'] || row['写メ日記'];
-                                const diaryTarget = row['写メ日記目標'] || row['日記目標'] || row['diaryTarget'] || row['diary_target'];
+                                // 新しいKPI項目の処理
+                                const diaryCount = row['写メ日記投稿数'] || row['日記投稿数'] || row['diary'] || row['diaryPosts'] || row['日記'];
+                                const diaryTarget = row['写メ日記月間目標'] || row['写メ日記目標'] || row['日記目標'] || row['diaryTarget'];
+                                const diaryDailyAvg = row['日記1日平均'] || row['diary_daily_avg'];
                                 
-                                // 口コミ関連
-                                const reviewCount = row['口コミ数'] || row['review'] || row['reviewPosts'] || row['口コミ'] || row['レビュー'];
-                                const reviewTarget = row['口コミ目標'] || row['reviewTarget'] || row['review_target'];
+                                const reviewCount = row['口コミ総数'] || row['口コミ数'] || row['review'] || row['reviewPosts'] || row['口コミ'];
+                                const reviewTarget = row['口コミ月間目標'] || row['口コミ目標'] || row['reviewTarget'];
                                 
-                                // キテネ関連
                                 const kiteneCount = row['キテネ送信数'] || row['kitene'] || row['キテネ'] || row['kitene_count'];
-                                const kiteneTarget = row['キテネ目標'] || row['kiteneTarget'] || row['kitene_target'];
+                                const kiteneTarget = row['キテネ月間目標'] || row['キテネ目標'] || row['kiteneTarget'];
+                                const kiteneDailyAvg = row['キテネ1日平均'] || row['kitene_daily_avg'];
                                 
-                                // 備考
+                                // 新追加項目
+                                const castCount = row['在籍キャスト数'] || row['cast_count'] || row['キャスト数'];
+                                const brandType = row['ブランド'] || row['brand'] || row['type'];
+                                const focusKPI = row['重点KPI'] || row['focus_kpi'] || row['priority'];
+                                const improvement = row['改善点'] || row['improvement'] || row['action'];
                                 const memo = row['備考'] || row['memo'] || row['note'] || '';
 
                                 // データ更新処理
@@ -1342,19 +1406,47 @@
                                     }
                                 }
                                 
-                                if (userCount !== undefined && userCount !== '') {
-                                    const userValue = parseInt(userCount.toString().replace(/[,]/g, ''));
-                                    if (!isNaN(userValue)) {
-                                        existingStore.userCount = userValue;
+                                // 新しい項目の処理
+                                if (castCount !== undefined && castCount !== '') {
+                                    const castValue = parseInt(castCount.toString().replace(/[,]/g, ''));
+                                    if (!isNaN(castValue)) {
+                                        existingStore.castCount = castValue;
                                         storeUpdated = true;
-                                        console.log('  ユーザー数更新: ' + userValue);
+                                        console.log('  在籍キャスト数更新: ' + castValue);
                                     }
+                                }
+                                
+                                if (brandType !== undefined && brandType !== '') {
+                                    existingStore.brandType = brandType;
+                                    storeUpdated = true;
+                                    console.log('  ブランド更新: ' + brandType);
+                                }
+                                
+                                if (focusKPI !== undefined && focusKPI !== '') {
+                                    existingStore.focusKPI = focusKPI;
+                                    storeUpdated = true;
+                                    console.log('  重点KPI更新: ' + focusKPI);
+                                }
+                                
+                                if (improvement !== undefined && improvement !== '') {
+                                    existingStore.improvement = improvement;
+                                    storeUpdated = true;
+                                    console.log('  改善点更新: ' + improvement);
                                 }
                                 
                                 if (memo !== undefined && memo !== '') {
                                     existingStore.memo = memo;
                                     storeUpdated = true;
                                     console.log('  備考更新: ' + memo);
+                                }
+
+                                // 平均値の計算（営業日数を30日として計算）
+                                const businessDays = 30;
+                                if (existingStore.diaryPosts > 0) {
+                                    existingStore.diaryDailyAvg = Math.round(existingStore.diaryPosts / businessDays);
+                                }
+                                if (existingStore.kiteneCount > 0) {
+                                    existingStore.kiteneDailyAvg = Math.round(existingStore.kiteneCount / businessDays);
                                 }
 
                                 // 各種達成率を再計算
@@ -1375,6 +1467,7 @@
                                 }
                                 
                                 console.log('  達成率再計算: 売上' + (existingStore.salesAchievementRate * 100).toFixed(1) + '% / 日記' + (existingStore.diaryAchievementRate * 100).toFixed(1) + '% / 口コミ' + (existingStore.reviewAchievementRate * 100).toFixed(1) + '%');
+                                console.log('  平均値: 日記' + (existingStore.diaryDailyAvg || 0) + '件/日 / キテネ' + (existingStore.kiteneDailyAvg || 0) + '件/日');
                                 
                                 if (storeUpdated) {
                                     updatedCount++;
@@ -1391,7 +1484,7 @@
                     }
                 });
                 
-                console.log('=== KPI同期完了 ===');
+                console.log('=== 改良版KPI同期完了 ===');
                 console.log('更新された店舗数: ' + updatedCount + '/' + data.length);
                 
             } else {
@@ -2044,8 +2137,8 @@
                 if (store) {
                     updateElement('kpiDiaryPosts', store.diaryPosts.toLocaleString());
                     updateElement('kpiReviews', store.reviewPosts.toLocaleString());
-                    updateElement('kpiKitene', 'N/A');
-                    updateElement('kpiUsers', 'N/A');
+                    updateElement('kpiKitene', store.kiteneCount ? store.kiteneCount.toLocaleString() : 'N/A');
+                    updateElement('kpiUsers', store.userCount ? store.userCount.toLocaleString() : 'N/A');
                 }
             }
             updateKpiTable();
@@ -2054,11 +2147,13 @@
         function updateKpiStats() {
             const totalDiary = storeData.reduce((sum, store) => sum + store.diaryPosts, 0);
             const totalReviews = storeData.reduce((sum, store) => sum + store.reviewPosts, 0);
+            const totalKitene = storeData.reduce((sum, store) => sum + (store.kiteneCount || 0), 0);
+            const totalUsers = storeData.reduce((sum, store) => sum + (store.userCount || 0), 0);
 
             updateElement('kpiDiaryPosts', totalDiary.toLocaleString());
             updateElement('kpiReviews', totalReviews.toLocaleString());
-            updateElement('kpiKitene', '171,512');
-            updateElement('kpiUsers', '35,507');
+            updateElement('kpiKitene', totalKitene.toLocaleString());
+            updateElement('kpiUsers', totalUsers.toLocaleString());
         }
 
         function updateKpiTable() {
@@ -2217,8 +2312,14 @@
                 '<button class="btn btn-outline w-full justify-start" onclick="openEventModal(); closeQuickActions();">' +
                 '<i class="fas fa-calendar mr-3"></i>予定追加' +
                 '</button>' +
-                '<button class="btn btn-outline w-full justify-start" onclick="syncWithSpreadsheet(); closeQuickActions();">' +
+                '<button class="btn btn-primary w-full justify-start" onclick="syncWithSpreadsheet(); closeQuickActions();">' +
                 '<i class="fas fa-sync mr-3"></i>データ同期' +
+                '</button>' +
+                '<button class="btn btn-success w-full justify-start" onclick="showSpreadsheetGuide(); closeQuickActions();">' +
+                '<i class="fas fa-table mr-3"></i>スプレッドシート設定ガイド' +
+                '</button>' +
+                '<button class="btn btn-outline w-full justify-start" onclick="downloadSpreadsheetTemplate(); closeQuickActions();">' +
+                '<i class="fas fa-download mr-3"></i>改良版テンプレートDL' +
                 '</button>' +
                 '<button class="btn btn-outline w-full justify-start" onclick="exportData(); closeQuickActions();">' +
                 '<i class="fas fa-download mr-3"></i>データエクスポート' +
@@ -2258,105 +2359,255 @@
         }
 
         function downloadSpreadsheetTemplate() {
-            // 理想的なスプレッドシート構造のテンプレートを生成
-            const templateData = generateSpreadsheetTemplate();
+            // 改良されたKPI管理テンプレートを生成
+            const templateData = generateEnhancedSpreadsheetTemplate();
             
             const blob = new Blob([templateData], { type: 'text/csv;charset=utf-8' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'CLASSY_KPI管理テンプレート_' + new Date().toISOString().split('T')[0] + '.csv';
+            a.download = 'CLASSY_KPI管理テンプレート_改良版_' + new Date().toISOString().split('T')[0] + '.csv';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
 
-            showNotification('スプレッドシートテンプレートをダウンロードしました', 'success');
+            showNotification('改良版KPI管理テンプレートをダウンロードしました', 'success');
         }
 
-        function generateSpreadsheetTemplate() {
+        function generateEnhancedSpreadsheetTemplate() {
             // UTF-8 BOMを追加してExcelで文字化けを防ぐ
             const BOM = '\uFEFF';
             
-            // ヘッダー行（理想的なKPI構造）
+            // 改良されたヘッダー行（KPI重視の構造）
             const headers = [
                 '店舗名',
                 '売上実績',
                 '売上目標',
-                'アクセス数',
                 '写メ日記投稿数',
-                '写メ日記目標',
-                '口コミ数', 
-                '口コミ目標',
+                '写メ日記月間目標',
+                '日記1日平均',
+                '口コミ総数',
+                '口コミ月間目標',
                 'キテネ送信数',
-                'キテネ目標',
+                'キテネ月間目標',
+                'キテネ1日平均',
+                'アクセス数',
                 '出勤人数',
-                'ユーザー数',
+                '在籍キャスト数',
+                'ブランド',
+                '重点KPI',
+                '改善点',
                 '備考'
             ].join(',');
 
-            // 各店舗のサンプルデータ
+            // 実際のビジネスデータに基づいた各店舗のテンプレートデータ
             const templateRows = [
-                'シャブール,29544738,33000000,1967152,7560,8000,344,300,2500,2800,687,1250,Premium店舗',
-                'ワンカラット,18314356,17500000,1241592,8528,8000,156,200,1800,2000,514,980,Premium店舗',
-                'GO名古屋,29265025,28000000,1349912,3605,5400,216,205,1900,2100,518,1100,GrandOpera店舗',
-                'GO福岡,37050068,36000000,1619670,7828,7500,202,180,2300,2500,514,1350,GrandOpera店舗',
-                'GO東京,27324427,28000000,1182336,4164,7500,116,150,1700,2000,457,980,GrandOpera店舗',
-                'GO横浜,22547274,23000000,599756,5077,6000,127,130,1600,1800,407,850,GrandOpera店舗',
-                'オペラ錦,25123456,24000000,1273548,7068,7000,195,180,2000,2200,480,1050,GrandOpera店舗',
-                'CL名古屋,5300320,6000000,514243,1851,2400,113,150,800,1000,197,420,CLASSY店舗',
-                'CL東京,6719328,7200000,742231,2079,3000,122,120,900,1100,238,520,CLASSY店舗',
-                'CL四日市,12943296,12500000,881476,6301,6200,256,240,1400,1500,356,750,CLASSY店舗'
+                'シャブール,29544738,33000000,7560,8000,252,344,300,2500,2800,83,1967152,687,45,Premium,写メ日記強化,アクセス数向上,高級店舗',
+                'ワンカラット,18314356,17500000,8528,8000,275,156,200,1800,2000,60,1241592,514,32,Premium,口コミ増加,売上安定,目標達成店舗',
+                'GO名古屋,29265025,28000000,3605,5400,116,216,205,1900,2100,63,1349912,518,35,GrandOpera,日記投稿強化,継続投稿,中部エリア主力',
+                'GO福岡,37050068,36000000,7828,7500,253,202,180,2300,2500,77,1619670,514,38,GrandOpera,口コミ維持,キテネ強化,九州エリア最高',
+                'GO東京,27324427,28000000,4164,7500,134,116,150,1700,2000,57,1182336,457,30,GrandOpera,全KPI改善,日記投稿増,首都圏戦略店',
+                'GO横浜,22547274,23000000,5077,6000,164,127,130,1600,1800,53,599756,407,28,GrandOpera,アクセス向上,売上達成,神奈川主力',
+                'オペラ錦,25123456,24000000,7068,7000,228,195,180,2000,2200,67,1273548,480,33,GrandOpera,KPI維持,安定運営,名古屋中心部',
+                'CL名古屋,5300320,6000000,1851,2400,60,113,150,800,1000,27,514243,197,18,CLASSY,全体底上げ,売上向上,中部CLASSY',
+                'CL東京,6719328,7200000,2079,3000,67,122,120,900,1100,30,742231,238,20,CLASSY,日記強化,口コミ維持,首都圏CLASSY',
+                'CL四日市,12943296,12500000,6301,6200,203,256,240,1400,1500,47,881476,356,25,CLASSY,KPI優秀,運営継続,東海地区トップ'
             ];
 
             return BOM + headers + '\n' + templateRows.join('\n');
+        }
+
+        function downloadKPICalculationGuide() {
+            // KPI計算方法の詳細ガイドを生成
+            const guideContent = generateKPICalculationGuide();
+            
+            const blob = new Blob([guideContent], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'CLASSY_KPI計算ガイド_' + new Date().toISOString().split('T')[0] + '.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            showNotification('KPI計算ガイドをダウンロードしました', 'success');
+        }
+
+        function generateKPICalculationGuide() {
+            return `CLASSY グループ KPI管理システム 計算ガイド
+生成日時: ${new Date().toLocaleString('ja-JP')}
+
+============================================
+📊 主要KPI項目と計算方法
+============================================
+
+【売上KPI】
+・売上実績: 月間総売上金額
+・売上目標: 月間売上目標金額
+・達成率計算: 売上実績 ÷ 売上目標 × 100
+
+【写メ日記KPI】
+・投稿数: 月間総投稿数
+・月間目標: 月間投稿目標数
+・1日平均: 投稿数 ÷ 営業日数
+・達成率計算: 投稿数 ÷ 月間目標 × 100
+・推奨設定: 在籍キャスト数 × 8〜10投稿/日
+
+【口コミKPI】
+・総数: 月間口コミ獲得数
+・月間目標: 月間口コミ目標数
+・達成率計算: 総数 ÷ 月間目標 × 100
+・推奨設定: 在籍キャスト数 × 8〜12件/月
+
+【キテネKPI】
+・送信数: 月間キテネ送信総数
+・月間目標: 月間送信目標数
+・1日平均: 送信数 ÷ 営業日数
+・達成率計算: 送信数 ÷ 月間目標 × 100
+・推奨設定: 在籍キャスト数 × 80〜120件/月
+
+============================================
+🎯 ブランド別KPI基準値
+============================================
+
+【Premium店舗（シャブール・ワンカラット）】
+・売上目標: 17M〜35M円
+・日記1日平均: 250〜280投稿
+・口コミ月間: 200〜350件
+・キテネ1日平均: 60〜85件
+
+【GrandOpera店舗】
+・売上目標: 23M〜36M円
+・日記1日平均: 120〜250投稿
+・口コミ月間: 130〜220件
+・キテネ1日平均: 53〜77件
+
+【CLASSY店舗】
+・売上目標: 6M〜13M円
+・日記1日平均: 60〜203投稿
+・口コミ月間: 113〜256件
+・キテネ1日平均: 27〜47件
+
+============================================
+📈 目標設定の計算式
+============================================
+
+【写メ日記目標】
+基本計算: 在籍キャスト数 × 目標投稿数/日 × 営業日数
+例: 30人 × 8投稿/日 × 30日 = 7,200投稿/月
+
+【口コミ目標】
+基本計算: 在籍キャスト数 × 目標口コミ数/月
+例: 30人 × 8件/月 = 240件/月
+
+【キテネ目標】
+基本計算: 在籍キャスト数 × 目標送信数/月
+例: 30人 × 100件/月 = 3,000件/月
+
+【売上目標】
+前年同月比110%または業界標準を参考に設定
+
+============================================
+⚠️ データ入力時の注意点
+============================================
+
+1. 数値は半角数字で入力（カンマ区切り可）
+2. 店舗名は正確に入力（自動認識）
+3. 空欄は0または前月値で補完
+4. 目標値は現実的な数値に設定
+5. 備考欄で特記事項を記載
+
+============================================
+🔄 システム同期方法
+============================================
+
+1. スプレッドシートでデータを更新
+2. 管理システムの「同期」ボタンをクリック
+3. 自動的に最新データを取得・分析
+4. ダッシュボードで結果を確認
+
+============================================
+📞 サポート情報
+============================================
+
+データ不整合や同期エラーが発生した場合：
+・ブラウザのコンソールでfixSpreadsheetNow()実行
+・またはforceResetStoreData()で完全リセット
+
+このガイドは定期的に更新されます。
+最新版は管理システムからダウンロードしてください。`;
         }
 
         function showSpreadsheetGuide() {
             const guideContent = 
                 '<div class="space-y-6 text-sm max-h-96 overflow-y-auto">' +
                 '<div>' +
-                '<h4 class="font-bold text-blue-600 mb-2">📊 理想的なスプレッドシート構造</h4>' +
-                '<p class="text-gray-600 mb-3">以下の列構造でスプレッドシートを作成してください：</p>' +
-                '<div class="bg-gray-50 p-3 rounded text-xs font-mono">' +
-                '店舗名 | 売上実績 | 売上目標 | アクセス数 | 写メ日記投稿数 | 写メ日記目標 | 口コミ数 | 口コミ目標 | キテネ送信数 | キテネ目標 | 出勤人数 | ユーザー数 | 備考' +
+                '<h4 class="font-bold text-blue-600 mb-2">📊 改良版スプレッドシート構造</h4>' +
+                '<p class="text-gray-600 mb-3">KPI重視の新しい列構造（18項目）：</p>' +
+                '<div class="bg-gray-50 p-3 rounded text-xs font-mono overflow-x-auto">' +
+                '店舗名 | 売上実績 | 売上目標 | 写メ日記投稿数 | 写メ日記月間目標 | 日記1日平均 | 口コミ総数 | 口コミ月間目標 | キテネ送信数 | キテネ月間目標 | キテネ1日平均 | アクセス数 | 出勤人数 | 在籍キャスト数 | ブランド | 重点KPI | 改善点 | 備考' +
                 '</div>' +
                 '</div>' +
                 
                 '<div>' +
-                '<h4 class="font-bold text-green-600 mb-2">🎯 KPI目標設定ガイド</h4>' +
+                '<h4 class="font-bold text-green-600 mb-2">🎯 KPI目標設定ガイド（改良版）</h4>' +
                 '<ul class="list-disc list-inside space-y-1 text-gray-700">' +
-                '<li><strong>売上目標</strong>: 月次売上目標金額</li>' +
-                '<li><strong>写メ日記目標</strong>: 月間投稿目標数（平均算出に使用）</li>' +
-                '<li><strong>口コミ目標</strong>: 月間口コミ獲得目標数</li>' +
-                '<li><strong>キテネ目標</strong>: 月間キテネ送信目標数（平均算出に使用）</li>' +
+                '<li><strong>売上目標</strong>: 月次売上目標金額（前年同月比110%推奨）</li>' +
+                '<li><strong>写メ日記目標</strong>: 在籍キャスト数 × 8〜10投稿/日 × 営業日数</li>' +
+                '<li><strong>口コミ目標</strong>: 在籍キャスト数 × 8〜12件/月</li>' +
+                '<li><strong>キテネ目標</strong>: 在籍キャスト数 × 80〜120件/月</li>' +
+                '<li><strong>日記1日平均</strong>: 自動計算（投稿数÷営業日数）</li>' +
+                '<li><strong>キテネ1日平均</strong>: 自動計算（送信数÷営業日数）</li>' +
                 '</ul>' +
                 '</div>' +
 
                 '<div>' +
-                '<h4 class="font-bold text-purple-600 mb-2">📋 設定手順</h4>' +
+                '<h4 class="font-bold text-purple-600 mb-2">📋 新テンプレート導入手順</h4>' +
                 '<ol class="list-decimal list-inside space-y-1 text-gray-700">' +
-                '<li>下のテンプレートをダウンロード</li>' +
-                '<li>Googleスプレッドシートにインポート</li>' +
-                '<li>実際のデータに更新</li>' +
-                '<li>スプレッドシートを公開設定</li>' +
-                '<li>このシステムで同期実行</li>' +
+                '<li>改良版テンプレートをダウンロード</li>' +
+                '<li>Googleスプレッドシートで新規作成</li>' +
+                '<li>CSVファイルをインポート</li>' +
+                '<li>実際の店舗データで更新</li>' +
+                '<li>スプレッドシートを公開設定にする</li>' +
+                '<li>システムのスプレッドシートIDを更新</li>' +
+                '<li>このシステムで同期テスト実行</li>' +
                 '</ol>' +
                 '</div>' +
 
                 '<div>' +
-                '<h4 class="font-bold text-orange-600 mb-2">💡 データ入力のコツ</h4>' +
+                '<h4 class="font-bold text-red-600 mb-2">⚡ ブランド別推奨KPI基準</h4>' +
+                '<div class="grid grid-cols-1 gap-2 text-xs">' +
+                '<div class="bg-yellow-50 p-2 rounded">' +
+                '<strong>Premium店舗</strong>: 日記250+/日、口コミ200+/月、キテネ60+/日' +
+                '</div>' +
+                '<div class="bg-blue-50 p-2 rounded">' +
+                '<strong>GrandOpera店舗</strong>: 日記120-250/日、口コミ130-220/月、キテネ53-77/日' +
+                '</div>' +
+                '<div class="bg-green-50 p-2 rounded">' +
+                '<strong>CLASSY店舗</strong>: 日記60-203/日、口コミ113-256/月、キテネ27-47/日' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+
+                '<div>' +
+                '<h4 class="font-bold text-orange-600 mb-2">💡 データ精度向上のコツ</h4>' +
                 '<ul class="list-disc list-inside space-y-1 text-gray-700">' +
-                '<li>数値は半角数字で入力（カンマ区切りOK）</li>' +
-                '<li>店舗名は正確に入力（システムが自動認識）</li>' +
-                '<li>目標値は現実的な数値に設定</li>' +
-                '<li>備考欄は店舗の特徴や注意点を記載</li>' +
+                '<li>在籍キャスト数を正確に入力（目標計算の基準）</li>' +
+                '<li>営業日数を考慮した目標設定</li>' +
+                '<li>重点KPI欄で優先改善項目を明記</li>' +
+                '<li>改善点欄で具体的なアクションプランを記載</li>' +
+                '<li>週次または月2回の頻度でデータ更新</li>' +
                 '</ul>' +
                 '</div>' +
 
-                '<div class="pt-4 border-t">' +
-                '<button class="btn btn-primary w-full mb-3" onclick="downloadSpreadsheetTemplate(); closeQuickActions();">' +
-                '<i class="fas fa-download mr-2"></i>テンプレートをダウンロード' +
+                '<div class="pt-4 border-t space-y-2">' +
+                '<button class="btn btn-primary w-full mb-2" onclick="downloadSpreadsheetTemplate(); closeQuickActions();">' +
+                '<i class="fas fa-download mr-2"></i>改良版テンプレートをダウンロード' +
+                '</button>' +
+                '<button class="btn btn-success w-full mb-2" onclick="downloadKPICalculationGuide(); closeQuickActions();">' +
+                '<i class="fas fa-calculator mr-2"></i>KPI計算ガイドをダウンロード' +
                 '</button>' +
                 '<button class="btn btn-outline w-full" onclick="openSpreadsheet(); closeQuickActions();">' +
                 '<i class="fas fa-external-link-alt mr-2"></i>現在のスプレッドシートを開く' +
@@ -2364,7 +2615,7 @@
                 '</div>' +
                 '</div>';
 
-            showCustomModal('スプレッドシート設定ガイド', guideContent);
+            showCustomModal('改良版スプレッドシート設定ガイド', guideContent);
         }
 
         function showStoreDetails(storeId) {
@@ -2810,11 +3061,19 @@
         };
 
         // 初期化完了メッセージ
-        console.log('CLASSY業務管理システム 完全版 初期化完了');
+        console.log('CLASSY業務管理システム 改良版KPI対応 初期化完了');
         console.log('=== 利用可能な店舗数: ' + Object.keys(storeInfo).length + ' ===');
         Object.entries(storeInfo).forEach(([id, info]) => {
             console.log('- ' + info.name + ' (' + id + ') - ' + info.type + 'ブランド');
         });
+        
+        console.log('');
+        console.log('🆕 改良版KPI機能:');
+        console.log('- 18項目の詳細KPI管理');
+        console.log('- 日記・キテネの1日平均自動計算');
+        console.log('- 在籍キャスト数による目標算出');
+        console.log('- ブランド別KPI基準表示');
+        console.log('- 重点KPI・改善点の管理');
         
         console.log('');
         console.log('🔧 店舗データ問題解決コマンド:');
@@ -2822,7 +3081,12 @@
         console.log('2. forceResetStoreData() - 店舗データ強制リセット');
         console.log('3. fixSpreadsheetNow() - 修復実行（推奨）');
         console.log('');
-        console.log('📊 その他のコマンド:');
+        console.log('📊 改良版テンプレート関連:');
+        console.log('- downloadSpreadsheetTemplate() : 改良版テンプレートDL');
+        console.log('- downloadKPICalculationGuide() : KPI計算ガイドDL');
+        console.log('- showSpreadsheetGuide() : 設定ガイド表示');
+        console.log('');
+        console.log('📈 その他のコマンド:');
         console.log('- testSystem() : システム状態確認');
         console.log('- showAllStores() : 全店舗データ表示');
         console.log('- showSyncStatus() : 同期状況確認');
@@ -2842,6 +3106,12 @@
             } else {
                 console.log('✅ 店舗データ正常: ' + diagnosis.storeDataCount + '店舗認識');
             }
+            console.log('');
+            console.log('🚀 改良版機能を使用するには:');
+            console.log('1. downloadSpreadsheetTemplate() でテンプレートDL');
+            console.log('2. Googleスプレッドシートで新規作成');
+            console.log('3. 実データで更新後、公開設定');
+            console.log('4. システムで同期テスト');
         }, 1000);
     </script>
 </body>
