@@ -713,7 +713,7 @@
                 ];
             }
 
-            // 10店舗すべてを確実に初期化
+            // 10店舗すべてを確実に初期化（新しいKPI項目を追加）
             if (storeData.length < 10) {
                 console.log('店舗データを完全初期化します...');
                 storeData = [
@@ -724,11 +724,18 @@
                         totalSales: 29544738,
                         totalAccess: 1967152,
                         diaryPosts: 7560,
+                        diaryTarget: 8000,
                         reviewPosts: 344,
+                        reviewTarget: 300,
+                        kiteneCount: 2500,
+                        kiteneTarget: 2800,
                         attendanceCount: 687,
+                        userCount: 1250,
                         salesAchievementRate: 0.8953,
-                        diaryAchievementRate: 0.9,
-                        reviewAchievementRate: 1.1467
+                        diaryAchievementRate: 0.945,
+                        reviewAchievementRate: 1.1467,
+                        kiteneAchievementRate: 0.8929,
+                        memo: 'Premium店舗'
                     },
                     {
                         id: 'onecarat',
@@ -737,11 +744,18 @@
                         totalSales: 18314356,
                         totalAccess: 1241592,
                         diaryPosts: 8528,
+                        diaryTarget: 8000,
                         reviewPosts: 156,
+                        reviewTarget: 200,
+                        kiteneCount: 1800,
+                        kiteneTarget: 2000,
                         attendanceCount: 514,
+                        userCount: 980,
                         salesAchievementRate: 1.0465,
-                        diaryAchievementRate: 1.0727,
-                        reviewAchievementRate: 0.78
+                        diaryAchievementRate: 1.066,
+                        reviewAchievementRate: 0.78,
+                        kiteneAchievementRate: 0.9,
+                        memo: 'Premium店舗'
                     },
                     {
                         id: 'go_nagoya',
@@ -750,11 +764,18 @@
                         totalSales: 29265025,
                         totalAccess: 1349912,
                         diaryPosts: 3605,
+                        diaryTarget: 5400,
                         reviewPosts: 216,
+                        reviewTarget: 205,
+                        kiteneCount: 1900,
+                        kiteneTarget: 2100,
                         attendanceCount: 518,
+                        userCount: 1100,
                         salesAchievementRate: 1.0452,
                         diaryAchievementRate: 0.6676,
-                        reviewAchievementRate: 1.0537
+                        reviewAchievementRate: 1.0537,
+                        kiteneAchievementRate: 0.9048,
+                        memo: 'GrandOpera店舗'
                     },
                     {
                         id: 'go_fukuoka',
@@ -763,11 +784,18 @@
                         totalSales: 37050068,
                         totalAccess: 1619670,
                         diaryPosts: 7828,
+                        diaryTarget: 7500,
                         reviewPosts: 202,
+                        reviewTarget: 180,
+                        kiteneCount: 2300,
+                        kiteneTarget: 2500,
                         attendanceCount: 514,
+                        userCount: 1350,
                         salesAchievementRate: 1.0292,
                         diaryAchievementRate: 1.0437,
-                        reviewAchievementRate: 1.1222
+                        reviewAchievementRate: 1.1222,
+                        kiteneAchievementRate: 0.92,
+                        memo: 'GrandOpera店舗・売上好調'
                     },
                     {
                         id: 'go_tokyo',
@@ -776,11 +804,18 @@
                         totalSales: 27324427,
                         totalAccess: 1182336,
                         diaryPosts: 4164,
+                        diaryTarget: 7500,
                         reviewPosts: 116,
+                        reviewTarget: 150,
+                        kiteneCount: 1700,
+                        kiteneTarget: 2000,
                         attendanceCount: 457,
+                        userCount: 980,
                         salesAchievementRate: 0.9759,
                         diaryAchievementRate: 0.5552,
-                        reviewAchievementRate: 0.7733
+                        reviewAchievementRate: 0.7733,
+                        kiteneAchievementRate: 0.85,
+                        memo: 'GrandOpera店舗・KPI改善必要'
                     },
                     {
                         id: 'go_yokohama',
@@ -789,11 +824,18 @@
                         totalSales: 22547274,
                         totalAccess: 599756,
                         diaryPosts: 5077,
+                        diaryTarget: 6000,
                         reviewPosts: 127,
+                        reviewTarget: 130,
+                        kiteneCount: 1600,
+                        kiteneTarget: 1800,
                         attendanceCount: 407,
+                        userCount: 850,
                         salesAchievementRate: 0.9803,
                         diaryAchievementRate: 0.8462,
-                        reviewAchievementRate: 0.8759
+                        reviewAchievementRate: 0.8759,
+                        kiteneAchievementRate: 0.8889,
+                        memo: 'GrandOpera店舗'
                     },
                     {
                         id: 'opera_nishiki',
@@ -802,11 +844,18 @@
                         totalSales: 25123456,
                         totalAccess: 1273548,
                         diaryPosts: 7068,
+                        diaryTarget: 7000,
                         reviewPosts: 195,
+                        reviewTarget: 180,
+                        kiteneCount: 2000,
+                        kiteneTarget: 2200,
                         attendanceCount: 480,
+                        userCount: 1050,
                         salesAchievementRate: 1.0468,
-                        diaryAchievementRate: 1.0709,
-                        reviewAchievementRate: 1.0833
+                        diaryAchievementRate: 1.0097,
+                        reviewAchievementRate: 1.0833,
+                        kiteneAchievementRate: 0.9091,
+                        memo: 'GrandOpera店舗・安定運営'
                     },
                     {
                         id: 'cl_nagoya',
@@ -815,11 +864,18 @@
                         totalSales: 5300320,
                         totalAccess: 514243,
                         diaryPosts: 1851,
+                        diaryTarget: 2400,
                         reviewPosts: 113,
+                        reviewTarget: 150,
+                        kiteneCount: 800,
+                        kiteneTarget: 1000,
                         attendanceCount: 197,
+                        userCount: 420,
                         salesAchievementRate: 0.8834,
                         diaryAchievementRate: 0.7713,
-                        reviewAchievementRate: 0.7533
+                        reviewAchievementRate: 0.7533,
+                        kiteneAchievementRate: 0.8,
+                        memo: 'CLASSY店舗'
                     },
                     {
                         id: 'cl_tokyo',
@@ -828,11 +884,18 @@
                         totalSales: 6719328,
                         totalAccess: 742231,
                         diaryPosts: 2079,
+                        diaryTarget: 3000,
                         reviewPosts: 122,
+                        reviewTarget: 120,
+                        kiteneCount: 900,
+                        kiteneTarget: 1100,
                         attendanceCount: 238,
+                        userCount: 520,
                         salesAchievementRate: 0.9332,
                         diaryAchievementRate: 0.693,
-                        reviewAchievementRate: 0.6778
+                        reviewAchievementRate: 1.0167,
+                        kiteneAchievementRate: 0.8182,
+                        memo: 'CLASSY店舗'
                     },
                     {
                         id: 'cl_yokkaichi',
@@ -841,11 +904,18 @@
                         totalSales: 12943296,
                         totalAccess: 881476,
                         diaryPosts: 6301,
+                        diaryTarget: 6200,
                         reviewPosts: 256,
+                        reviewTarget: 240,
+                        kiteneCount: 1400,
+                        kiteneTarget: 1500,
                         attendanceCount: 356,
+                        userCount: 750,
                         salesAchievementRate: 1.0355,
-                        diaryAchievementRate: 1.0246,
-                        reviewAchievementRate: 1.0667
+                        diaryAchievementRate: 1.0163,
+                        reviewAchievementRate: 1.0667,
+                        kiteneAchievementRate: 0.9333,
+                        memo: 'CLASSY店舗・KPI好調'
                     }
                 ];
                 console.log('店舗データ初期化完了:', storeData.length + '店舗');
@@ -1137,12 +1207,9 @@
         function updateStoreDataFromSpreadsheet(data) {
             let updatedCount = 0;
             
-            console.log('=== スプレッドシートデータ更新開始 ===');
+            console.log('=== 新しいKPI構造での同期開始 ===');
             console.log('受信データ行数:', data.length);
             console.log('現在のstoreData店舗数:', storeData.length);
-            
-            // 現在のstoreDataの店舗IDリストを表示
-            console.log('現在登録されている店舗ID:', storeData.map(s => s.id));
             
             if (data.length > 0) {
                 const headers = Object.keys(data[0]);
@@ -1156,20 +1223,35 @@
                         console.log('行' + (index + 1) + ': 店舗名="' + storeName + '" -> ID="' + storeId + '"');
                         
                         if (storeId) {
-                            // デバッグ: 該当する店舗を検索
                             const existingStore = storeData.find(s => s.id === storeId);
                             
                             if (existingStore) {
                                 console.log('店舗発見: ' + existingStore.name + ' (ID: ' + existingStore.id + ')');
                                 let storeUpdated = false;
                                 
+                                // 基本データの更新
                                 const salesActual = row['売上実績'] || row['sales'] || row['actual_sales'] || row['totalSales'] || row['売上'];
                                 const salesTarget = row['売上目標'] || row['target'] || row['target_sales'] || row['salesTarget'] || row['目標'];
                                 const accessCount = row['アクセス数'] || row['access'] || row['totalAccess'] || row['アクセス'] || row['PV'];
-                                const diaryCount = row['日記投稿数'] || row['diary'] || row['diaryPosts'] || row['日記'] || row['写メ日記'];
-                                const reviewCount = row['口コミ数'] || row['review'] || row['reviewPosts'] || row['口コミ'] || row['レビュー'];
                                 const attendance = row['出勤人数'] || row['attendance'] || row['attendanceCount'] || row['出勤'] || row['人数'];
+                                const userCount = row['ユーザー数'] || row['users'] || row['userCount'] || row['ユーザー'];
                                 
+                                // 写メ日記関連
+                                const diaryCount = row['写メ日記投稿数'] || row['日記投稿数'] || row['diary'] || row['diaryPosts'] || row['日記'] || row['写メ日記'];
+                                const diaryTarget = row['写メ日記目標'] || row['日記目標'] || row['diaryTarget'] || row['diary_target'];
+                                
+                                // 口コミ関連
+                                const reviewCount = row['口コミ数'] || row['review'] || row['reviewPosts'] || row['口コミ'] || row['レビュー'];
+                                const reviewTarget = row['口コミ目標'] || row['reviewTarget'] || row['review_target'];
+                                
+                                // キテネ関連
+                                const kiteneCount = row['キテネ送信数'] || row['kitene'] || row['キテネ'] || row['kitene_count'];
+                                const kiteneTarget = row['キテネ目標'] || row['kiteneTarget'] || row['kitene_target'];
+                                
+                                // 備考
+                                const memo = row['備考'] || row['memo'] || row['note'] || '';
+
+                                // データ更新処理
                                 if (salesActual !== undefined && salesActual !== '') {
                                     const salesValue = parseFloat(salesActual.toString().replace(/[,円￥]/g, ''));
                                     if (!isNaN(salesValue)) {
@@ -1202,7 +1284,16 @@
                                     if (!isNaN(diaryValue)) {
                                         existingStore.diaryPosts = diaryValue;
                                         storeUpdated = true;
-                                        console.log('  日記投稿数更新: ' + diaryValue);
+                                        console.log('  写メ日記投稿数更新: ' + diaryValue);
+                                    }
+                                }
+                                
+                                if (diaryTarget !== undefined && diaryTarget !== '') {
+                                    const diaryTargetValue = parseInt(diaryTarget.toString().replace(/[,]/g, ''));
+                                    if (!isNaN(diaryTargetValue)) {
+                                        existingStore.diaryTarget = diaryTargetValue;
+                                        storeUpdated = true;
+                                        console.log('  写メ日記目標更新: ' + diaryTargetValue);
                                     }
                                 }
                                 
@@ -1215,6 +1306,33 @@
                                     }
                                 }
                                 
+                                if (reviewTarget !== undefined && reviewTarget !== '') {
+                                    const reviewTargetValue = parseInt(reviewTarget.toString().replace(/[,]/g, ''));
+                                    if (!isNaN(reviewTargetValue)) {
+                                        existingStore.reviewTarget = reviewTargetValue;
+                                        storeUpdated = true;
+                                        console.log('  口コミ目標更新: ' + reviewTargetValue);
+                                    }
+                                }
+                                
+                                if (kiteneCount !== undefined && kiteneCount !== '') {
+                                    const kiteneValue = parseInt(kiteneCount.toString().replace(/[,]/g, ''));
+                                    if (!isNaN(kiteneValue)) {
+                                        existingStore.kiteneCount = kiteneValue;
+                                        storeUpdated = true;
+                                        console.log('  キテネ送信数更新: ' + kiteneValue);
+                                    }
+                                }
+                                
+                                if (kiteneTarget !== undefined && kiteneTarget !== '') {
+                                    const kiteneTargetValue = parseInt(kiteneTarget.toString().replace(/[,]/g, ''));
+                                    if (!isNaN(kiteneTargetValue)) {
+                                        existingStore.kiteneTarget = kiteneTargetValue;
+                                        storeUpdated = true;
+                                        console.log('  キテネ目標更新: ' + kiteneTargetValue);
+                                    }
+                                }
+                                
                                 if (attendance !== undefined && attendance !== '') {
                                     const attendanceValue = parseInt(attendance.toString().replace(/[,]/g, ''));
                                     if (!isNaN(attendanceValue)) {
@@ -1224,11 +1342,39 @@
                                     }
                                 }
                                 
-                                // 達成率を再計算
+                                if (userCount !== undefined && userCount !== '') {
+                                    const userValue = parseInt(userCount.toString().replace(/[,]/g, ''));
+                                    if (!isNaN(userValue)) {
+                                        existingStore.userCount = userValue;
+                                        storeUpdated = true;
+                                        console.log('  ユーザー数更新: ' + userValue);
+                                    }
+                                }
+                                
+                                if (memo !== undefined && memo !== '') {
+                                    existingStore.memo = memo;
+                                    storeUpdated = true;
+                                    console.log('  備考更新: ' + memo);
+                                }
+
+                                // 各種達成率を再計算
                                 if (existingStore.salesTarget > 0) {
                                     existingStore.salesAchievementRate = existingStore.totalSales / existingStore.salesTarget;
-                                    console.log('  達成率再計算: ' + (existingStore.salesAchievementRate * 100).toFixed(1) + '%');
                                 }
+                                
+                                if (existingStore.diaryTarget > 0) {
+                                    existingStore.diaryAchievementRate = existingStore.diaryPosts / existingStore.diaryTarget;
+                                }
+                                
+                                if (existingStore.reviewTarget > 0) {
+                                    existingStore.reviewAchievementRate = existingStore.reviewPosts / existingStore.reviewTarget;
+                                }
+                                
+                                if (existingStore.kiteneTarget > 0) {
+                                    existingStore.kiteneAchievementRate = existingStore.kiteneCount / existingStore.kiteneTarget;
+                                }
+                                
+                                console.log('  達成率再計算: 売上' + (existingStore.salesAchievementRate * 100).toFixed(1) + '% / 日記' + (existingStore.diaryAchievementRate * 100).toFixed(1) + '% / 口コミ' + (existingStore.reviewAchievementRate * 100).toFixed(1) + '%');
                                 
                                 if (storeUpdated) {
                                     updatedCount++;
@@ -1238,39 +1384,15 @@
                                 }
                             } else {
                                 console.error('❌ 店舗ID "' + storeId + '" に対応する店舗データが見つかりません');
-                                console.error('   利用可能な店舗ID:', storeData.map(s => s.id).join(', '));
-                                console.error('   店舗データ長:', storeData.length);
-                                
-                                // デバッグ: storeDataの内容を確認
-                                if (storeData.length === 0) {
-                                    console.error('⚠️ storeDataが空です。再初期化を実行します...');
-                                    // 強制的に再初期化
-                                    initializeData();
-                                    // 再度検索
-                                    const reSearchStore = storeData.find(s => s.id === storeId);
-                                    if (reSearchStore) {
-                                        console.log('✅ 再初期化後に店舗発見: ' + reSearchStore.name);
-                                    }
-                                }
                             }
                         } else {
                             console.warn('⚠️ 店舗名 "' + storeName + '" に対応するIDが見つかりません');
-                            console.warn('   対応可能な店舗名:', Object.values(storeInfo).map(s => s.name).join(', '));
                         }
-                    } else {
-                        console.warn('⚠️ 行' + (index + 1) + ': 店舗名が空です');
                     }
                 });
                 
-                console.log('=== 更新完了 ===');
+                console.log('=== KPI同期完了 ===');
                 console.log('更新された店舗数: ' + updatedCount + '/' + data.length);
-                console.log('最終的なstoreData店舗数:', storeData.length);
-                
-                // 更新後の全店舗データをコンソールに出力（デバッグ用）
-                console.log('更新後の全店舗データ:');
-                storeData.forEach((store, index) => {
-                    console.log((index + 1) + '. ' + store.name + ' (ID: ' + store.id + ') - 売上: ¥' + (store.totalSales / 1000000).toFixed(1) + 'M');
-                });
                 
             } else {
                 console.warn('⚠️ スプレッドシートからデータが読み込まれませんでした');
@@ -2133,6 +2255,116 @@
             URL.revokeObjectURL(url);
 
             showNotification('データをエクスポートしました', 'success');
+        }
+
+        function downloadSpreadsheetTemplate() {
+            // 理想的なスプレッドシート構造のテンプレートを生成
+            const templateData = generateSpreadsheetTemplate();
+            
+            const blob = new Blob([templateData], { type: 'text/csv;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'CLASSY_KPI管理テンプレート_' + new Date().toISOString().split('T')[0] + '.csv';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            showNotification('スプレッドシートテンプレートをダウンロードしました', 'success');
+        }
+
+        function generateSpreadsheetTemplate() {
+            // UTF-8 BOMを追加してExcelで文字化けを防ぐ
+            const BOM = '\uFEFF';
+            
+            // ヘッダー行（理想的なKPI構造）
+            const headers = [
+                '店舗名',
+                '売上実績',
+                '売上目標',
+                'アクセス数',
+                '写メ日記投稿数',
+                '写メ日記目標',
+                '口コミ数', 
+                '口コミ目標',
+                'キテネ送信数',
+                'キテネ目標',
+                '出勤人数',
+                'ユーザー数',
+                '備考'
+            ].join(',');
+
+            // 各店舗のサンプルデータ
+            const templateRows = [
+                'シャブール,29544738,33000000,1967152,7560,8000,344,300,2500,2800,687,1250,Premium店舗',
+                'ワンカラット,18314356,17500000,1241592,8528,8000,156,200,1800,2000,514,980,Premium店舗',
+                'GO名古屋,29265025,28000000,1349912,3605,5400,216,205,1900,2100,518,1100,GrandOpera店舗',
+                'GO福岡,37050068,36000000,1619670,7828,7500,202,180,2300,2500,514,1350,GrandOpera店舗',
+                'GO東京,27324427,28000000,1182336,4164,7500,116,150,1700,2000,457,980,GrandOpera店舗',
+                'GO横浜,22547274,23000000,599756,5077,6000,127,130,1600,1800,407,850,GrandOpera店舗',
+                'オペラ錦,25123456,24000000,1273548,7068,7000,195,180,2000,2200,480,1050,GrandOpera店舗',
+                'CL名古屋,5300320,6000000,514243,1851,2400,113,150,800,1000,197,420,CLASSY店舗',
+                'CL東京,6719328,7200000,742231,2079,3000,122,120,900,1100,238,520,CLASSY店舗',
+                'CL四日市,12943296,12500000,881476,6301,6200,256,240,1400,1500,356,750,CLASSY店舗'
+            ];
+
+            return BOM + headers + '\n' + templateRows.join('\n');
+        }
+
+        function showSpreadsheetGuide() {
+            const guideContent = 
+                '<div class="space-y-6 text-sm max-h-96 overflow-y-auto">' +
+                '<div>' +
+                '<h4 class="font-bold text-blue-600 mb-2">📊 理想的なスプレッドシート構造</h4>' +
+                '<p class="text-gray-600 mb-3">以下の列構造でスプレッドシートを作成してください：</p>' +
+                '<div class="bg-gray-50 p-3 rounded text-xs font-mono">' +
+                '店舗名 | 売上実績 | 売上目標 | アクセス数 | 写メ日記投稿数 | 写メ日記目標 | 口コミ数 | 口コミ目標 | キテネ送信数 | キテネ目標 | 出勤人数 | ユーザー数 | 備考' +
+                '</div>' +
+                '</div>' +
+                
+                '<div>' +
+                '<h4 class="font-bold text-green-600 mb-2">🎯 KPI目標設定ガイド</h4>' +
+                '<ul class="list-disc list-inside space-y-1 text-gray-700">' +
+                '<li><strong>売上目標</strong>: 月次売上目標金額</li>' +
+                '<li><strong>写メ日記目標</strong>: 月間投稿目標数（平均算出に使用）</li>' +
+                '<li><strong>口コミ目標</strong>: 月間口コミ獲得目標数</li>' +
+                '<li><strong>キテネ目標</strong>: 月間キテネ送信目標数（平均算出に使用）</li>' +
+                '</ul>' +
+                '</div>' +
+
+                '<div>' +
+                '<h4 class="font-bold text-purple-600 mb-2">📋 設定手順</h4>' +
+                '<ol class="list-decimal list-inside space-y-1 text-gray-700">' +
+                '<li>下のテンプレートをダウンロード</li>' +
+                '<li>Googleスプレッドシートにインポート</li>' +
+                '<li>実際のデータに更新</li>' +
+                '<li>スプレッドシートを公開設定</li>' +
+                '<li>このシステムで同期実行</li>' +
+                '</ol>' +
+                '</div>' +
+
+                '<div>' +
+                '<h4 class="font-bold text-orange-600 mb-2">💡 データ入力のコツ</h4>' +
+                '<ul class="list-disc list-inside space-y-1 text-gray-700">' +
+                '<li>数値は半角数字で入力（カンマ区切りOK）</li>' +
+                '<li>店舗名は正確に入力（システムが自動認識）</li>' +
+                '<li>目標値は現実的な数値に設定</li>' +
+                '<li>備考欄は店舗の特徴や注意点を記載</li>' +
+                '</ul>' +
+                '</div>' +
+
+                '<div class="pt-4 border-t">' +
+                '<button class="btn btn-primary w-full mb-3" onclick="downloadSpreadsheetTemplate(); closeQuickActions();">' +
+                '<i class="fas fa-download mr-2"></i>テンプレートをダウンロード' +
+                '</button>' +
+                '<button class="btn btn-outline w-full" onclick="openSpreadsheet(); closeQuickActions();">' +
+                '<i class="fas fa-external-link-alt mr-2"></i>現在のスプレッドシートを開く' +
+                '</button>' +
+                '</div>' +
+                '</div>';
+
+            showCustomModal('スプレッドシート設定ガイド', guideContent);
         }
 
         function showStoreDetails(storeId) {
