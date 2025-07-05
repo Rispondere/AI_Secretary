@@ -992,7 +992,7 @@
                 loadActivityLogs(); // 活動ログの読み込み追加
                 
                 if (tasks.length === 0) {
-                    const today = new Date().toISOString().split('T')[0];
+                    const today = getDateString(new Date());
                     tasks = [
                         {
                             id: 1,
@@ -1016,7 +1016,7 @@
                 }
 
                 if (events.length === 0) {
-                    const today = new Date().toISOString().split('T')[0];
+                    const today = getDateString(new Date());
                     events = [
                         {
                             id: 1,
