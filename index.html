@@ -314,6 +314,10 @@
                         <i class="fas fa-calendar mr-3"></i>
                         <span>カレンダー</span>
                     </div>
+                    <div class="nav-item" data-page="records">
+                        <i class="fas fa-database mr-3"></i>
+                        <span>データ記録</span>
+                    </div>
                 </nav>
                 
                 <div class="mt-6 p-4 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-16">
@@ -578,6 +582,151 @@
                     </div>
                 </div>
             </div>
+            
+            <!-- データ記録ページ -->
+            <div id="recordsPage" class="page-content p-4 hidden">
+                <!-- データ保存状況 -->
+                <div class="glass-card p-4 mb-6">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4">データ保存状況</h3>
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+                        <div class="bg-blue-50 p-4 rounded-lg text-center">
+                            <div class="text-2xl font-bold text-blue-600" id="totalTasksCount">0</div>
+                            <div class="text-sm text-gray-600">保存済みタスク</div>
+                            <div class="text-xs text-blue-600 mt-1" id="completedTasksCount">完了: 0件</div>
+                        </div>
+                        <div class="bg-green-50 p-4 rounded-lg text-center">
+                            <div class="text-2xl font-bold text-green-600" id="totalEventsCount">0</div>
+                            <div class="text-sm text-gray-600">保存済み予定</div>
+                            <div class="text-xs text-green-600 mt-1" id="upcomingEventsCount">今後: 0件</div>
+                        </div>
+                        <div class="bg-purple-50 p-4 rounded-lg text-center">
+                            <div class="text-2xl font-bold text-purple-600" id="dataSize">0KB</div>
+                            <div class="text-sm text-gray-600">データサイズ</div>
+                            <div class="text-xs text-purple-600 mt-1" id="lastBackup">最終バックアップ</div>
+                        </div>
+                    </div>
+                    
+                    <!-- 保存場所説明 -->
+                    <div class="bg-yellow-50 p-4 rounded-lg mb-4">
+                        <h4 class="font-semibold text-yellow-800 mb-2">📍 現在のデータ保存場所</h4>
+                        <ul class="text-sm text-yellow-700 space-y-1">
+                            <li><strong>メイン保存:</strong> ブラウザのLocalStorage（このPC専用）</li>
+                            <li><strong>バックアップ:</strong> 手動エクスポート・GoogleDriveアップロード対応</li>
+                            <li><strong>同期:</strong> Googleスプレッドシートと双方向同期</li>
+                            <li><strong>復元:</strong> JSONファイルからのインポート機能</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- データバックアップ・復元 -->
+                <div class="glass-card p-4 mb-6">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4">データバックアップ・復元</h3>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- バックアップ操作 -->
+                        <div>
+                            <h4 class="font-semibold text-gray-800 mb-3">📤 データバックアップ</h4>
+                            <div class="space-y-3">
+                                <button class="btn btn-primary w-full" id="fullBackupBtn">
+                                    <i class="fas fa-download mr-2"></i>完全バックアップ（JSON）
+                                </button>
+                                <button class="btn btn-success w-full" id="autoBackupBtn">
+                                    <i class="fas fa-cloud-upload-alt mr-2"></i>自動バックアップ開始
+                                </button>
+                                <button class="btn btn-outline w-full" id="csvExportBtn">
+                                    <i class="fas fa-file-csv mr-2"></i>CSV形式でエクスポート
+                                </button>
+                                <button class="btn btn-outline w-full" id="spreadsheetSyncBtn">
+                                    <i class="fas fa-sync mr-2"></i>スプレッドシートに記録
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- 復元操作 -->
+                        <div>
+                            <h4 class="font-semibold text-gray-800 mb-3">📥 データ復元・インポート</h4>
+                            <div class="space-y-3">
+                                <div>
+                                    <input type="file" id="importFileInput" accept=".json,.csv" class="hidden">
+                                    <button class="btn btn-primary w-full" onclick="document.getElementById('importFileInput').click()">
+                                        <i class="fas fa-upload mr-2"></i>ファイルから復元
+                                    </button>
+                                </div>
+                                <button class="btn btn-outline w-full" id="resetDataBtn">
+                                    <i class="fas fa-redo mr-2"></i>初期データにリセット
+                                </button>
+                                <button class="btn btn-outline w-full" id="mergeDataBtn">
+                                    <i class="fas fa-code-branch mr-2"></i>データ統合モード
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- データ履歴・ログ -->
+                <div class="glass-card p-4 mb-6">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4">データ履歴・活動ログ</h3>
+                    
+                    <!-- フィルター -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 mb-4">
+                        <select id="logTypeFilter" class="input-field">
+                            <option value="">すべての活動</option>
+                            <option value="task">タスク操作</option>
+                            <option value="event">予定操作</option>
+                            <option value="sync">データ同期</option>
+                            <option value="backup">バックアップ</option>
+                        </select>
+                        <input type="date" id="logDateFilter" class="input-field">
+                        <button class="btn btn-outline" id="clearLogsBtn">
+                            <i class="fas fa-trash mr-2"></i>ログクリア
+                        </button>
+                    </div>
+                    
+                    <!-- 活動ログリスト -->
+                    <div id="activityLogsList" class="space-y-2 max-h-96 overflow-y-auto">
+                        <div class="text-center text-gray-500 py-4">活動ログを読み込み中...</div>
+                    </div>
+                </div>
+                
+                <!-- データ統計・分析 -->
+                <div class="glass-card p-4">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4">データ統計・分析</h3>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- タスク統計 -->
+                        <div>
+                            <h4 class="font-semibold text-gray-800 mb-3">📋 タスク統計</h4>
+                            <div id="taskStatistics" class="space-y-2">
+                                <div class="text-center text-gray-500 py-4">統計を計算中...</div>
+                            </div>
+                        </div>
+                        
+                        <!-- 予定統計 -->
+                        <div>
+                            <h4 class="font-semibold text-gray-800 mb-3">📅 予定統計</h4>
+                            <div id="eventStatistics" class="space-y-2">
+                                <div class="text-center text-gray-500 py-4">統計を計算中...</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- データ整合性チェック -->
+                    <div class="mt-6 p-4 bg-gray-50 rounded-lg">
+                        <h4 class="font-semibold text-gray-800 mb-3">🔍 データ整合性チェック</h4>
+                        <div class="flex space-x-3">
+                            <button class="btn btn-outline" id="checkDataIntegrityBtn">
+                                <i class="fas fa-check-circle mr-2"></i>整合性チェック実行
+                            </button>
+                            <button class="btn btn-outline" id="repairDataBtn">
+                                <i class="fas fa-tools mr-2"></i>データ修復実行
+                            </button>
+                            <div id="integrityStatus" class="flex items-center">
+                                <span class="text-gray-500">チェック待機中</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     
@@ -686,16 +835,64 @@
         let tasks = [];
         let events = [];
         let storeData = [];
+        let activityLogs = [];
         let editingTaskId = null;
         let editingEventId = null;
         let currentMonth = new Date().getMonth();
         let currentYear = new Date().getFullYear();
         let salesChart = null;
+        let autoBackupInterval = null;
 
         // Googleスプレッドシート設定
         const SPREADSHEET_ID = '1CSGBzK9au8VLEQFCpBJbVyMoTaRhO5hoQd_qk8XC_IQ';
 
-        // 店舗情報
+        // 活動ログ記録機能
+        function addActivityLog(type, action, details = '') {
+            try {
+                const log = {
+                    id: Date.now(),
+                    type: type, // 'task', 'event', 'sync', 'backup', 'system'
+                    action: action, // 'create', 'update', 'delete', 'export', 'import'
+                    details: details,
+                    timestamp: new Date().toISOString(),
+                    date: new Date().toLocaleDateString('ja-JP')
+                };
+                
+                activityLogs.unshift(log); // 新しいログを先頭に追加
+                
+                // ログが1000件を超えたら古いものを削除
+                if (activityLogs.length > 1000) {
+                    activityLogs = activityLogs.slice(0, 1000);
+                }
+                
+                saveActivityLogs();
+                console.log(`活動ログ記録: ${type} - ${action} - ${details}`);
+            } catch (error) {
+                console.error('活動ログ記録エラー:', error);
+            }
+        }
+
+        function saveActivityLogs() {
+            try {
+                localStorage.setItem('classy_activity_logs', JSON.stringify(activityLogs));
+            } catch (error) {
+                console.error('活動ログ保存エラー:', error);
+            }
+        }
+
+        function loadActivityLogs() {
+            try {
+                const saved = localStorage.getItem('classy_activity_logs');
+                if (saved) {
+                    activityLogs = JSON.parse(saved);
+                }
+            } catch (error) {
+                console.error('活動ログ読み込みエラー:', error);
+                activityLogs = [];
+            }
+        }
+
+        // 店舗情報定義（修正版）
         const storeInfo = {
             'shabour': { name: 'シャブール', type: 'Premium' },
             'onecarat': { name: 'ワンカラット', type: 'Premium' },
@@ -777,6 +974,9 @@
                     syncWithSpreadsheet();
                 }, 1000);
                 
+                // システム初期化の活動ログを記録
+                addActivityLog('system', 'start', 'CLASSY業務管理システム完全版起動');
+                
                 showNotification('システム初期化完了！すべての機能が利用可能です', 'success');
                 console.log('完全版初期化完了 - すべての機能が動作します');
             } catch (error) {
@@ -789,6 +989,7 @@
         function initializeData() {
             try {
                 loadFromLocalStorage();
+                loadActivityLogs(); // 活動ログの読み込み追加
                 
                 if (tasks.length === 0) {
                     const today = new Date().toISOString().split('T')[0];
@@ -1109,6 +1310,7 @@
                 localStorage.setItem('classy_tasks', JSON.stringify(tasks));
                 localStorage.setItem('classy_events', JSON.stringify(events));
                 localStorage.setItem('classy_stores', JSON.stringify(storeData));
+                saveActivityLogs(); // 活動ログも保存
                 console.log('LocalStorageに保存完了');
             } catch (error) {
                 console.error('LocalStorage保存エラー:', error);
@@ -1718,6 +1920,7 @@
                 setupModalEvents();
                 setupFilterEvents();
                 setupCalendarEvents();
+                setupRecordsEvents();
 
                 console.log('イベントリスナー設定完了');
             } catch (error) {
@@ -1852,6 +2055,44 @@
             }
         }
 
+        function setupRecordsEvents() {
+            try {
+                // データ記録ページのイベント設定
+                const fullBackupBtn = document.getElementById('fullBackupBtn');
+                const autoBackupBtn = document.getElementById('autoBackupBtn');
+                const csvExportBtn = document.getElementById('csvExportBtn');
+                const spreadsheetSyncBtn = document.getElementById('spreadsheetSyncBtn');
+                const resetDataBtn = document.getElementById('resetDataBtn');
+                const mergeDataBtn = document.getElementById('mergeDataBtn');
+                const importFileInput = document.getElementById('importFileInput');
+                const clearLogsBtn = document.getElementById('clearLogsBtn');
+                const checkDataIntegrityBtn = document.getElementById('checkDataIntegrityBtn');
+                const repairDataBtn = document.getElementById('repairDataBtn');
+
+                if (fullBackupBtn) fullBackupBtn.addEventListener('click', performFullBackup);
+                if (autoBackupBtn) autoBackupBtn.addEventListener('click', toggleAutoBackup);
+                if (csvExportBtn) csvExportBtn.addEventListener('click', exportToCSV);
+                if (spreadsheetSyncBtn) spreadsheetSyncBtn.addEventListener('click', syncWithSpreadsheet);
+                if (resetDataBtn) resetDataBtn.addEventListener('click', resetAllData);
+                if (mergeDataBtn) mergeDataBtn.addEventListener('click', enableMergeMode);
+                if (importFileInput) importFileInput.addEventListener('change', handleFileImport);
+                if (clearLogsBtn) clearLogsBtn.addEventListener('click', clearActivityLogs);
+                if (checkDataIntegrityBtn) checkDataIntegrityBtn.addEventListener('click', checkDataIntegrity);
+                if (repairDataBtn) repairDataBtn.addEventListener('click', repairData);
+
+                // ログフィルター
+                const logTypeFilter = document.getElementById('logTypeFilter');
+                const logDateFilter = document.getElementById('logDateFilter');
+                
+                if (logTypeFilter) logTypeFilter.addEventListener('change', filterActivityLogs);
+                if (logDateFilter) logDateFilter.addEventListener('change', filterActivityLogs);
+
+                console.log('データ記録イベント設定完了');
+            } catch (error) {
+                console.error('データ記録イベント設定エラー:', error);
+            }
+        }
+
         // UI更新関数
         function updateDateTime() {
             try {
@@ -1907,7 +2148,8 @@
                     tasks: 'タスク管理',
                     sales: '売上分析',
                     kpi: 'KPI管理',
-                    calendar: 'カレンダー'
+                    calendar: 'カレンダー',
+                    records: 'データ記録'
                 };
                 
                 const titleElement = document.getElementById('currentPageTitle');
@@ -1950,6 +2192,9 @@
                     case 'calendar':
                         renderCalendar();
                         break;
+                    case 'records':
+                        renderRecords();
+                        break;
                     default:
                         console.warn(`未知のページ: ${currentPage}`);
                 }
@@ -1959,1464 +2204,3 @@
                 showNotification('ページの表示でエラーが発生しました', 'error');
             }
         }
-
-        // ダッシュボード表示
-        function renderDashboard() {
-            try {
-                console.log('ダッシュボードレンダリング開始');
-                updateDashboardStats();
-                renderTodayTasks();
-                renderStoresOverview();
-                console.log('ダッシュボードレンダリング完了');
-            } catch (error) {
-                console.error('ダッシュボードレンダリングエラー:', error);
-            }
-        }
-
-        function updateDashboardStats() {
-            try {
-                const totalSales = storeData.reduce((sum, store) => sum + (store.totalSales || 0), 0);
-                const totalTarget = storeData.reduce((sum, store) => sum + (store.salesTarget || 0), 0);
-                const totalAccess = storeData.reduce((sum, store) => sum + (store.totalAccess || 0), 0);
-                const totalAttendance = storeData.reduce((sum, store) => sum + (store.attendanceCount || 0), 0);
-                const achievingStores = storeData.filter(store => (store.salesAchievementRate || 0) >= 1.0).length;
-                const achievementRate = totalTarget > 0 ? (totalSales / totalTarget) * 100 : 0;
-
-                // 経過日数達成率の計算
-                const monthProgress = calculateMonthProgress();
-                const expectedAchievement = calculateExpectedAchievementRate(totalSales, totalTarget, monthProgress.progressRate);
-
-                updateElement('totalSales', '¥' + (totalSales / 1000000).toFixed(0) + 'M');
-                updateElement('totalSalesRate', achievementRate.toFixed(1) + '%達成');
-                updateElement('totalAccess', (totalAccess / 1000000).toFixed(1) + 'M');
-                updateElement('avgAccess', '平均 ' + (totalAccess / Math.max(storeData.length, 1) / 1000000).toFixed(1) + 'M');
-                updateElement('totalAttendance', totalAttendance.toLocaleString());
-                updateElement('avgAttendance', '平均 ' + Math.round(totalAttendance / Math.max(storeData.length, 1)) + '人');
-                updateElement('achievingStores', achievingStores + '/' + storeData.length);
-                updateElement('expectedRate', expectedAchievement.percentage + '%');
-                updateElement('monthProgress', monthProgress.currentDay + '/' + monthProgress.daysInMonth + '日経過 (' + expectedAchievement.message + ')');
-
-                console.log('ダッシュボード統計更新完了');
-            } catch (error) {
-                console.error('ダッシュボード統計更新エラー:', error);
-            }
-        }
-
-        function renderTodayTasks() {
-            try {
-                const today = new Date().toISOString().split('T')[0];
-                const todayTasks = tasks.filter(task => task.dueDate === today && !task.completed);
-                const container = document.getElementById('todayTasksList');
-
-                if (!container) return;
-
-                if (todayTasks.length === 0) {
-                    container.innerHTML = '<div class="text-center text-gray-500 py-4">今日のタスクはありません</div>';
-                    return;
-                }
-
-                container.innerHTML = todayTasks.map(task => 
-                    `<div class="task-card ${task.priority}-priority">
-                        <div class="flex items-center">
-                            <input type="checkbox" onchange="toggleTask(${task.id})" class="mr-3">
-                            <div class="flex-1">
-                                <div class="font-semibold text-gray-900">${escapeHtml(task.title)}</div>
-                                <div class="text-sm text-gray-600">${escapeHtml(task.description)}</div>
-                            </div>
-                            <span class="px-2 py-1 text-xs rounded ${getPriorityBadgeClass(task.priority)}">${getPriorityText(task.priority)}</span>
-                        </div>
-                    </div>`
-                ).join('');
-
-                console.log('今日のタスク表示完了');
-            } catch (error) {
-                console.error('今日のタスク表示エラー:', error);
-            }
-        }
-
-        function renderStoresOverview() {
-            try {
-                const container = document.getElementById('storesOverview');
-                if (!container) return;
-
-                const monthProgress = calculateMonthProgress();
-                
-                container.innerHTML = storeData.map(store => {
-                    const expectedAchievement = calculateExpectedAchievementRate(
-                        store.totalSales || 0, 
-                        store.salesTarget || 0, 
-                        monthProgress.progressRate
-                    );
-                    return `<div class="bg-white p-4 rounded-lg border cursor-pointer hover:shadow-lg transition-all" onclick="showStoreDetails('${store.id}')">
-                        <div class="flex items-center justify-between mb-3">
-                            <h4 class="font-semibold text-gray-900">${escapeHtml(store.name)}</h4>
-                            <span class="text-lg">${getBrandEmoji(storeInfo[store.id]?.type)}</span>
-                        </div>
-                        <div class="space-y-2">
-                            <div class="flex justify-between text-sm">
-                                <span>売上達成率</span>
-                                <span class="font-bold ${(store.salesAchievementRate || 0) >= 1.0 ? 'text-green-600' : 'text-red-600'}">
-                                    ${((store.salesAchievementRate || 0) * 100).toFixed(1)}%
-                                </span>
-                            </div>
-                            <div class="flex justify-between text-sm">
-                                <span>経過日数達成率</span>
-                                <span class="font-bold progress-indicator indicator-${expectedAchievement.status}">
-                                    ${expectedAchievement.percentage}% ${expectedAchievement.message}
-                                </span>
-                            </div>
-                            <div class="flex justify-between text-sm">
-                                <span>売上実績</span>
-                                <span class="font-bold text-blue-600">¥${((store.totalSales || 0) / 1000000).toFixed(1)}M</span>
-                            </div>
-                            <div class="w-full bg-gray-200 rounded-full h-2">
-                                <div class="bg-blue-500 h-2 rounded-full" style="width: ${Math.min(100, (store.salesAchievementRate || 0) * 100)}%"></div>
-                            </div>
-                        </div>
-                    </div>`;
-                }).join('');
-
-                updateStoreSelects();
-                console.log('店舗概要表示完了');
-            } catch (error) {
-                console.error('店舗概要表示エラー:', error);
-            }
-        }
-
-        function updateStoreSelects() {
-            try {
-                const salesSelect = document.getElementById('salesStoreSelect');
-                const kpiSelect = document.getElementById('kpiStoreSelect');
-
-                const options = storeData.map(store => 
-                    `<option value="${store.id}">${escapeHtml(store.name)}</option>`
-                ).join('');
-
-                if (salesSelect) {
-                    salesSelect.innerHTML = '<option value="">全店舗統合</option>' + options;
-                }
-                if (kpiSelect) {
-                    kpiSelect.innerHTML = '<option value="">全店舗統合</option>' + options;
-                }
-
-                console.log('店舗セレクト更新完了');
-            } catch (error) {
-                console.error('店舗セレクト更新エラー:', error);
-            }
-        }
-
-        // タスク管理
-        function renderTasks() {
-            try {
-                console.log('タスク管理レンダリング開始');
-                const filteredTasks = getFilteredTasks();
-                const container = document.getElementById('tasksList');
-
-                if (!container) return;
-
-                if (filteredTasks.length === 0) {
-                    container.innerHTML = '<div class="text-center text-gray-500 py-8">条件に一致するタスクがありません</div>';
-                    return;
-                }
-
-                container.innerHTML = filteredTasks.map(task => 
-                    `<div class="task-card ${task.completed ? 'completed' : ''} ${task.priority}-priority">
-                        <div class="flex items-center">
-                            <input type="checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTask(${task.id})" class="mr-3">
-                            <div class="flex-1">
-                                <div class="font-semibold text-gray-900 ${task.completed ? 'line-through' : ''}">${escapeHtml(task.title)}</div>
-                                <div class="text-sm text-gray-600">${escapeHtml(task.description)}</div>
-                                <div class="text-xs text-gray-500 mt-1">期限: ${formatDate(task.dueDate)}</div>
-                            </div>
-                            <div class="flex items-center space-x-2">
-                                <span class="px-2 py-1 text-xs rounded ${getPriorityBadgeClass(task.priority)}">${getPriorityText(task.priority)}</span>
-                                <button onclick="editTask(${task.id})" class="text-blue-600 hover:text-blue-800">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button onclick="deleteTask(${task.id})" class="text-red-600 hover:text-red-800">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>`
-                ).join('');
-
-                console.log('タスク管理レンダリング完了');
-            } catch (error) {
-                console.error('タスク管理レンダリングエラー:', error);
-            }
-        }
-
-        function openTaskModal(taskId = null) {
-            try {
-                editingTaskId = taskId;
-                
-                const modalTitle = document.getElementById('taskModalTitle');
-                if (modalTitle) {
-                    modalTitle.textContent = taskId ? 'タスクを編集' : '新しいタスク';
-                }
-                
-                if (taskId) {
-                    const task = tasks.find(t => t.id === taskId);
-                    if (task) {
-                        document.getElementById('taskTitle').value = task.title || '';
-                        document.getElementById('taskDescription').value = task.description || '';
-                        document.getElementById('taskPriority').value = task.priority || 'medium';
-                        document.getElementById('taskDueDate').value = task.dueDate || '';
-                    }
-                } else {
-                    document.getElementById('taskTitle').value = '';
-                    document.getElementById('taskDescription').value = '';
-                    document.getElementById('taskPriority').value = 'medium';
-                    document.getElementById('taskDueDate').value = new Date().toISOString().split('T')[0];
-                }
-
-                showModal('taskModal');
-                console.log('タスクモーダル表示');
-            } catch (error) {
-                console.error('タスクモーダル表示エラー:', error);
-                showNotification('タスクモーダルの表示でエラーが発生しました', 'error');
-            }
-        }
-
-        function saveTask() {
-            try {
-                const title = document.getElementById('taskTitle').value.trim();
-                const description = document.getElementById('taskDescription').value.trim();
-                const priority = document.getElementById('taskPriority').value;
-                const dueDate = document.getElementById('taskDueDate').value;
-
-                if (!title) {
-                    showNotification('タスク名を入力してください', 'error');
-                    return;
-                }
-
-                if (editingTaskId) {
-                    const taskIndex = tasks.findIndex(t => t.id === editingTaskId);
-                    if (taskIndex !== -1) {
-                        tasks[taskIndex] = { 
-                            ...tasks[taskIndex], 
-                            title, 
-                            description, 
-                            priority, 
-                            dueDate,
-                            updatedAt: new Date().toISOString()
-                        };
-                    }
-                    showNotification('タスクを更新しました', 'success');
-                } else {
-                    const newTask = {
-                        id: Date.now(),
-                        title,
-                        description,
-                        priority,
-                        dueDate,
-                        completed: false,
-                        createdAt: new Date().toISOString()
-                    };
-                    tasks.push(newTask);
-                    showNotification('タスクを追加しました', 'success');
-                }
-
-                saveToLocalStorage();
-                hideModal('taskModal');
-                renderCurrentPage();
-                console.log('タスク保存完了');
-            } catch (error) {
-                console.error('タスク保存エラー:', error);
-                showNotification('タスクの保存でエラーが発生しました', 'error');
-            }
-        }
-
-        function toggleTask(taskId) {
-            try {
-                const task = tasks.find(t => t.id === taskId);
-                if (task) {
-                    task.completed = !task.completed;
-                    task.updatedAt = new Date().toISOString();
-                    saveToLocalStorage();
-                    renderCurrentPage();
-                    showNotification(task.completed ? 'タスクを完了しました' : 'タスクを未完了に戻しました', 'success');
-                }
-            } catch (error) {
-                console.error('タスク切り替えエラー:', error);
-                showNotification('タスクの状態変更でエラーが発生しました', 'error');
-            }
-        }
-
-        function editTask(taskId) {
-            openTaskModal(taskId);
-        }
-
-        function deleteTask(taskId) {
-            try {
-                if (confirm('このタスクを削除しますか？')) {
-                    tasks = tasks.filter(t => t.id !== taskId);
-                    saveToLocalStorage();
-                    renderCurrentPage();
-                    showNotification('タスクを削除しました', 'success');
-                }
-            } catch (error) {
-                console.error('タスク削除エラー:', error);
-                showNotification('タスクの削除でエラーが発生しました', 'error');
-            }
-        }
-
-        function getFilteredTasks() {
-            try {
-                const searchTerm = document.getElementById('taskSearch')?.value.toLowerCase() || '';
-                const priorityFilter = document.getElementById('priorityFilter')?.value || '';
-                const statusFilter = document.getElementById('statusFilter')?.value || '';
-
-                return tasks.filter(task => {
-                    const matchesSearch = (task.title || '').toLowerCase().includes(searchTerm) || 
-                                        (task.description || '').toLowerCase().includes(searchTerm);
-                    const matchesPriority = !priorityFilter || task.priority === priorityFilter;
-                    const matchesStatus = !statusFilter || 
-                                        (statusFilter === 'completed' && task.completed) ||
-                                        (statusFilter === 'pending' && !task.completed);
-
-                    return matchesSearch && matchesPriority && matchesStatus;
-                });
-            } catch (error) {
-                console.error('タスクフィルタリングエラー:', error);
-                return tasks;
-            }
-        }
-
-        function filterTasks() {
-            renderTasks();
-        }
-
-        // 売上分析
-        function renderSales() {
-            try {
-                console.log('売上分析レンダリング開始');
-                updateSalesStats();
-                updateStoreRanking();
-                renderSalesChart();
-                console.log('売上分析レンダリング完了');
-            } catch (error) {
-                console.error('売上分析レンダリングエラー:', error);
-            }
-        }
-
-        function updateSalesAnalysis(storeId) {
-            try {
-                if (storeId === '') {
-                    updateSalesStats();
-                } else {
-                    const store = storeData.find(s => s.id === storeId);
-                    if (store) {
-                        const monthProgress = calculateMonthProgress();
-                        const expectedAchievement = calculateExpectedAchievementRate(
-                            store.totalSales || 0, 
-                            store.salesTarget || 0, 
-                            monthProgress.progressRate
-                        );
-                        
-                        updateElement('selectedSales', '¥' + ((store.totalSales || 0) / 1000000).toFixed(1) + 'M');
-                        updateElement('selectedTarget', '¥' + ((store.salesTarget || 0) / 1000000).toFixed(1) + 'M');
-                        updateElement('selectedRate', ((store.salesAchievementRate || 0) * 100).toFixed(1) + '%');
-                        updateElement('selectedAccess', ((store.totalAccess || 0) / 1000000).toFixed(1) + 'M');
-                        updateElement('salesExpectedRate', expectedAchievement.percentage + '%');
-                    }
-                }
-                updateStoreRanking();
-                renderSalesChart();
-                console.log('売上分析更新完了');
-            } catch (error) {
-                console.error('売上分析更新エラー:', error);
-            }
-        }
-
-        function updateSalesStats() {
-            try {
-                const totalSales = storeData.reduce((sum, store) => sum + (store.totalSales || 0), 0);
-                const totalTarget = storeData.reduce((sum, store) => sum + (store.salesTarget || 0), 0);
-                const totalAccess = storeData.reduce((sum, store) => sum + (store.totalAccess || 0), 0);
-                const achievementRate = totalTarget > 0 ? (totalSales / totalTarget) * 100 : 0;
-                
-                const monthProgress = calculateMonthProgress();
-                const expectedAchievement = calculateExpectedAchievementRate(totalSales, totalTarget, monthProgress.progressRate);
-
-                updateElement('selectedSales', '¥' + (totalSales / 1000000).toFixed(0) + 'M');
-                updateElement('selectedTarget', '¥' + (totalTarget / 1000000).toFixed(0) + 'M');
-                updateElement('selectedRate', achievementRate.toFixed(1) + '%');
-                updateElement('selectedAccess', (totalAccess / 1000000).toFixed(1) + 'M');
-                updateElement('salesExpectedRate', expectedAchievement.percentage + '%');
-            } catch (error) {
-                console.error('売上統計更新エラー:', error);
-            }
-        }
-
-        function updateStoreRanking() {
-            try {
-                const sortedStores = [...storeData].sort((a, b) => (b.totalSales || 0) - (a.totalSales || 0));
-                const container = document.getElementById('storeRanking');
-                
-                if (!container) return;
-
-                const monthProgress = calculateMonthProgress();
-
-                container.innerHTML = sortedStores.map((store, index) => {
-                    const expectedAchievement = calculateExpectedAchievementRate(
-                        store.totalSales || 0, 
-                        store.salesTarget || 0, 
-                        monthProgress.progressRate
-                    );
-                    return `<div class="bg-white p-4 rounded-lg border">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center">
-                                <span class="text-xl mr-3">${getRankingEmoji(index + 1)}</span>
-                                <div>
-                                    <div class="font-semibold text-gray-900">${escapeHtml(store.name)}</div>
-                                    <div class="text-sm text-gray-600">達成率: ${((store.salesAchievementRate || 0) * 100).toFixed(1)}%</div>
-                                    <div class="text-xs progress-indicator indicator-${expectedAchievement.status}">経過日数: ${expectedAchievement.percentage}% ${expectedAchievement.message}</div>
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <div class="font-bold text-lg text-blue-600">¥${((store.totalSales || 0) / 1000000).toFixed(1)}M</div>
-                                <div class="text-xs ${(store.salesAchievementRate || 0) >= 1.0 ? 'text-green-600' : 'text-red-600'}">
-                                    ${(store.salesAchievementRate || 0) >= 1.0 ? '達成' : '未達成'}
-                                </div>
-                            </div>
-                        </div>
-                    </div>`;
-                }).join('');
-
-                console.log('店舗ランキング更新完了');
-            } catch (error) {
-                console.error('店舗ランキング更新エラー:', error);
-            }
-        }
-
-        function renderSalesChart() {
-            try {
-                const canvas = document.getElementById('salesChart');
-                if (!canvas) return;
-
-                const ctx = canvas.getContext('2d');
-
-                if (salesChart) {
-                    salesChart.destroy();
-                }
-
-                const selectedStoreId = document.getElementById('salesStoreSelect')?.value;
-                let chartData;
-
-                if (selectedStoreId) {
-                    const store = storeData.find(s => s.id === selectedStoreId);
-                    if (store) {
-                        chartData = {
-                            labels: [store.name],
-                            datasets: [
-                                {
-                                    label: '売上実績',
-                                    data: [(store.totalSales || 0) / 1000000],
-                                    backgroundColor: 'rgba(59, 130, 246, 0.6)',
-                                    borderColor: 'rgba(59, 130, 246, 1)',
-                                    borderWidth: 2
-                                },
-                                {
-                                    label: '売上目標',
-                                    data: [(store.salesTarget || 0) / 1000000],
-                                    backgroundColor: 'rgba(16, 185, 129, 0.6)',
-                                    borderColor: 'rgba(16, 185, 129, 1)',
-                                    borderWidth: 2
-                                }
-                            ]
-                        };
-                    }
-                } else {
-                    chartData = {
-                        labels: storeData.map(store => store.name),
-                        datasets: [
-                            {
-                                label: '売上実績 (M円)',
-                                data: storeData.map(store => (store.totalSales || 0) / 1000000),
-                                backgroundColor: 'rgba(59, 130, 246, 0.6)',
-                                borderColor: 'rgba(59, 130, 246, 1)',
-                                borderWidth: 2
-                            }
-                        ]
-                    };
-                }
-
-                if (chartData) {
-                    salesChart = new Chart(ctx, {
-                        type: 'bar',
-                        data: chartData,
-                        options: {
-                            responsive: true,
-                            plugins: {
-                                title: {
-                                    display: true,
-                                    text: selectedStoreId ? '個別店舗売上' : '全店舗売上実績'
-                                },
-                                legend: {
-                                    display: true
-                                }
-                            },
-                            scales: {
-                                y: {
-                                    beginAtZero: true,
-                                    title: {
-                                        display: true,
-                                        text: '売上 (百万円)'
-                                    }
-                                }
-                            }
-                        }
-                    });
-                }
-
-                console.log('売上チャート表示完了');
-            } catch (error) {
-                console.error('売上チャート表示エラー:', error);
-            }
-        }
-
-        // KPI管理
-        function renderKpi() {
-            try {
-                console.log('KPI管理レンダリング開始');
-                updateKpiStats();
-                updateKpiTable();
-                console.log('KPI管理レンダリング完了');
-            } catch (error) {
-                console.error('KPI管理レンダリングエラー:', error);
-            }
-        }
-
-        function updateKpiAnalysis(storeId) {
-            try {
-                if (storeId === '') {
-                    updateKpiStats();
-                } else {
-                    const store = storeData.find(s => s.id === storeId);
-                    if (store) {
-                        updateElement('kpiDiaryPosts', (store.diaryPosts || 0).toLocaleString());
-                        updateElement('kpiReviews', (store.reviewPosts || 0).toLocaleString());
-                        updateElement('kpiKitene', (store.kiteneCount || 0).toLocaleString());
-                        updateElement('kpiUsers', (store.userCount || 0).toLocaleString());
-                    }
-                }
-                updateKpiTable();
-                console.log('KPI分析更新完了');
-            } catch (error) {
-                console.error('KPI分析更新エラー:', error);
-            }
-        }
-
-        function updateKpiStats() {
-            try {
-                const totalDiary = storeData.reduce((sum, store) => sum + (store.diaryPosts || 0), 0);
-                const totalReviews = storeData.reduce((sum, store) => sum + (store.reviewPosts || 0), 0);
-                const totalKitene = storeData.reduce((sum, store) => sum + (store.kiteneCount || 0), 0);
-                const totalUsers = storeData.reduce((sum, store) => sum + (store.userCount || 0), 0);
-
-                updateElement('kpiDiaryPosts', totalDiary.toLocaleString());
-                updateElement('kpiReviews', totalReviews.toLocaleString());
-                updateElement('kpiKitene', totalKitene.toLocaleString());
-                updateElement('kpiUsers', totalUsers.toLocaleString());
-            } catch (error) {
-                console.error('KPI統計更新エラー:', error);
-            }
-        }
-
-        function updateKpiTable() {
-            try {
-                const container = document.getElementById('kpiDataTable');
-                if (!container) return;
-
-                const monthProgress = calculateMonthProgress();
-                
-                container.innerHTML = storeData.map(store => {
-                    const expectedAchievement = calculateExpectedAchievementRate(
-                        store.totalSales || 0, 
-                        store.salesTarget || 0, 
-                        monthProgress.progressRate
-                    );
-                    return `<tr class="hover:bg-gray-50">
-                        <td class="p-3 font-medium">${escapeHtml(store.name)}</td>
-                        <td class="p-3">
-                            <span class="px-2 py-1 rounded text-xs font-semibold ${(store.salesAchievementRate || 0) >= 1.0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
-                                ${((store.salesAchievementRate || 0) * 100).toFixed(1)}%
-                            </span>
-                        </td>
-                        <td class="p-3">
-                            <span class="px-2 py-1 rounded text-xs font-semibold ${(store.diaryAchievementRate || 0) >= 1.0 ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">
-                                ${((store.diaryAchievementRate || 0) * 100).toFixed(1)}%
-                            </span>
-                        </td>
-                        <td class="p-3">
-                            <span class="px-2 py-1 rounded text-xs font-semibold ${(store.reviewAchievementRate || 0) >= 1.0 ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">
-                                ${((store.reviewAchievementRate || 0) * 100).toFixed(1)}%
-                            </span>
-                        </td>
-                        <td class="p-3 font-bold text-purple-600">${(store.totalAccess || 0).toLocaleString()}</td>
-                        <td class="p-3">
-                            <span class="px-2 py-1 rounded text-xs font-semibold progress-indicator indicator-${expectedAchievement.status}">
-                                ${expectedAchievement.percentage}% ${expectedAchievement.message}
-                            </span>
-                        </td>
-                    </tr>`;
-                }).join('');
-
-                console.log('KPIテーブル更新完了');
-            } catch (error) {
-                console.error('KPIテーブル更新エラー:', error);
-            }
-        }
-
-        // カレンダー管理（月全体表示対応）
-        function renderCalendar() {
-            try {
-                console.log('カレンダーレンダリング開始');
-                updateCalendarTitle();
-                renderMonthlyCalendar();
-                console.log('カレンダーレンダリング完了');
-            } catch (error) {
-                console.error('カレンダーレンダリングエラー:', error);
-            }
-        }
-
-        function updateCalendarTitle() {
-            try {
-                const title = document.getElementById('calendarTitle');
-                if (title) {
-                    title.textContent = `${currentYear}年${currentMonth + 1}月`;
-                }
-            } catch (error) {
-                console.error('カレンダータイトル更新エラー:', error);
-            }
-        }
-
-        function renderMonthlyCalendar() {
-            try {
-                const container = document.getElementById('monthlyCalendar');
-                if (!container) return;
-
-                const today = new Date();
-                const firstDay = new Date(currentYear, currentMonth, 1);
-                const lastDay = new Date(currentYear, currentMonth + 1, 0);
-                const daysInMonth = lastDay.getDate();
-                const startDay = firstDay.getDay(); // 0=日曜日
-                
-                // カレンダーの日付を生成（6週間分、42日）
-                const calendarDays = [];
-                
-                // 前月の最後の日付を取得
-                const prevMonth = new Date(currentYear, currentMonth, 0);
-                const prevMonthDays = prevMonth.getDate();
-                
-                // 前月の日付を追加
-                for (let i = startDay - 1; i >= 0; i--) {
-                    calendarDays.push({
-                        date: prevMonthDays - i,
-                        isCurrentMonth: false,
-                        isPrevMonth: true,
-                        fullDate: new Date(currentYear, currentMonth - 1, prevMonthDays - i)
-                    });
-                }
-                
-                // 今月の日付を追加
-                for (let date = 1; date <= daysInMonth; date++) {
-                    calendarDays.push({
-                        date: date,
-                        isCurrentMonth: true,
-                        fullDate: new Date(currentYear, currentMonth, date)
-                    });
-                }
-                
-                // 来月の日付を追加（42日になるまで）
-                const remainingDays = 42 - calendarDays.length;
-                for (let date = 1; date <= remainingDays; date++) {
-                    calendarDays.push({
-                        date: date,
-                        isCurrentMonth: false,
-                        isNextMonth: true,
-                        fullDate: new Date(currentYear, currentMonth + 1, date)
-                    });
-                }
-                
-                // 曜日ヘッダー
-                const weekDays = ['日', '月', '火', '水', '木', '金', '土'];
-                let calendarHTML = weekDays.map((day, index) => 
-                    `<div class="text-center font-semibold p-2 bg-gray-100 ${index === 0 ? 'text-red-600' : index === 6 ? 'text-blue-600' : 'text-gray-700'}">${day}</div>`
-                ).join('');
-                
-                // カレンダーの日付を追加
-                calendarDays.forEach((dayInfo, index) => {
-                    const dayOfWeek = index % 7;
-                    const isToday = today.getFullYear() === dayInfo.fullDate.getFullYear() && 
-                                   today.getMonth() === dayInfo.fullDate.getMonth() && 
-                                   today.getDate() === dayInfo.fullDate.getDate();
-                    
-                    const dateStr = dayInfo.fullDate.toISOString().split('T')[0];
-                    const dayEvents = events.filter(event => event.date === dateStr);
-                    
-                    let dayClass = 'calendar-day';
-                    if (isToday) dayClass += ' today';
-                    if (!dayInfo.isCurrentMonth) dayClass += ' other-month';
-                    if (dayOfWeek === 0) dayClass += ' sunday';
-                    if (dayOfWeek === 6) dayClass += ' saturday';
-                    
-                    calendarHTML += 
-                        `<div class="${dayClass}" onclick="addEventToDate('${dateStr}')">
-                            <div class="font-semibold">${dayInfo.date}</div>
-                            ${dayEvents.map(event => 
-                                `<div class="text-xs p-1 rounded mb-1 cursor-pointer ${getEventClass(event.type)}" onclick="editEvent(${event.id}); event.stopPropagation();">
-                                    ${escapeHtml(event.title)}
-                                </div>`
-                            ).join('')}
-                        </div>`;
-                });
-                
-                container.innerHTML = calendarHTML;
-                console.log('月間カレンダー表示完了');
-            } catch (error) {
-                console.error('月間カレンダー表示エラー:', error);
-            }
-        }
-
-        function addEventToDate(dateStr) {
-            try {
-                document.getElementById('eventDate').value = dateStr;
-                openEventModal();
-            } catch (error) {
-                console.error('日付イベント追加エラー:', error);
-            }
-        }
-
-        function openEventModal(eventId = null) {
-            try {
-                editingEventId = eventId;
-                
-                const modalTitle = document.getElementById('eventModalTitle');
-                if (modalTitle) {
-                    modalTitle.textContent = eventId ? '予定を編集' : '新しい予定';
-                }
-                
-                if (eventId) {
-                    const event = events.find(e => e.id === eventId);
-                    if (event) {
-                        document.getElementById('eventTitle').value = event.title || '';
-                        document.getElementById('eventDescription').value = event.description || '';
-                        document.getElementById('eventType').value = event.type || 'meeting';
-                        document.getElementById('eventDate').value = event.date || '';
-                    }
-                } else {
-                    document.getElementById('eventTitle').value = '';
-                    document.getElementById('eventDescription').value = '';
-                    document.getElementById('eventType').value = 'meeting';
-                    if (!document.getElementById('eventDate').value) {
-                        document.getElementById('eventDate').value = new Date().toISOString().split('T')[0];
-                    }
-                }
-
-                showModal('eventModal');
-                console.log('イベントモーダル表示');
-            } catch (error) {
-                console.error('イベントモーダル表示エラー:', error);
-                showNotification('予定モーダルの表示でエラーが発生しました', 'error');
-            }
-        }
-
-        function saveEvent() {
-            try {
-                const title = document.getElementById('eventTitle').value.trim();
-                const description = document.getElementById('eventDescription').value.trim();
-                const type = document.getElementById('eventType').value;
-                const date = document.getElementById('eventDate').value;
-
-                if (!title || !date) {
-                    showNotification('予定名と日付を入力してください', 'error');
-                    return;
-                }
-
-                if (editingEventId) {
-                    const eventIndex = events.findIndex(e => e.id === editingEventId);
-                    if (eventIndex !== -1) {
-                        events[eventIndex] = { 
-                            ...events[eventIndex], 
-                            title, 
-                            description, 
-                            type, 
-                            date,
-                            updatedAt: new Date().toISOString()
-                        };
-                    }
-                    showNotification('予定を更新しました', 'success');
-                } else {
-                    const newEvent = {
-                        id: Date.now(),
-                        title,
-                        description,
-                        type,
-                        date,
-                        createdAt: new Date().toISOString()
-                    };
-                    events.push(newEvent);
-                    showNotification('予定を追加しました', 'success');
-                }
-
-                saveToLocalStorage();
-                hideModal('eventModal');
-                renderCurrentPage();
-                console.log('イベント保存完了');
-            } catch (error) {
-                console.error('イベント保存エラー:', error);
-                showNotification('予定の保存でエラーが発生しました', 'error');
-            }
-        }
-
-        function editEvent(eventId) {
-            openEventModal(eventId);
-        }
-
-        function deleteEvent(eventId) {
-            try {
-                if (confirm('この予定を削除しますか？')) {
-                    events = events.filter(e => e.id !== eventId);
-                    saveToLocalStorage();
-                    renderCurrentPage();
-                    showNotification('予定を削除しました', 'success');
-                }
-            } catch (error) {
-                console.error('イベント削除エラー:', error);
-                showNotification('予定の削除でエラーが発生しました', 'error');
-            }
-        }
-
-        // その他の機能
-        function toggleSidebar() {
-            try {
-                const sidebar = document.getElementById('sidebar');
-                if (sidebar) {
-                    sidebar.classList.toggle('active');
-                }
-            } catch (error) {
-                console.error('サイドバー切り替えエラー:', error);
-            }
-        }
-
-        function showQuickActions() {
-            try {
-                const content = 
-                    `<div class="space-y-3">
-                        <h3 class="text-lg font-bold text-gray-900 mb-4">クイックアクション</h3>
-                        <button class="btn btn-outline w-full justify-start" onclick="openTaskModal(); closeQuickActions();">
-                            <i class="fas fa-plus mr-3"></i>タスク追加
-                        </button>
-                        <button class="btn btn-outline w-full justify-start" onclick="openEventModal(); closeQuickActions();">
-                            <i class="fas fa-calendar mr-3"></i>予定追加
-                        </button>
-                        <button class="btn btn-primary w-full justify-start" onclick="syncWithSpreadsheet(); closeQuickActions();">
-                            <i class="fas fa-sync mr-3"></i>データ同期
-                        </button>
-                        <button class="btn btn-success w-full justify-start" onclick="showMonthProgress(); closeQuickActions();">
-                            <i class="fas fa-chart-line mr-3"></i>月次進捗確認
-                        </button>
-                        <button class="btn btn-success w-full justify-start" onclick="showStoreProgress(); closeQuickActions();">
-                            <i class="fas fa-store mr-3"></i>店舗別進捗確認
-                        </button>
-                        <button class="btn btn-outline w-full justify-start" onclick="exportData(); closeQuickActions();">
-                            <i class="fas fa-download mr-3"></i>データエクスポート
-                        </button>
-                    </div>`;
-
-                showCustomModal('クイックアクション', content);
-            } catch (error) {
-                console.error('クイックアクション表示エラー:', error);
-            }
-        }
-
-        function closeQuickActions() {
-            try {
-                document.querySelectorAll('.modal').forEach(modal => {
-                    if (!modal.id || (!modal.id.includes('taskModal') && !modal.id.includes('eventModal'))) {
-                        modal.remove();
-                    }
-                });
-            } catch (error) {
-                console.error('クイックアクション閉じるエラー:', error);
-            }
-        }
-
-        function exportData() {
-            try {
-                const data = {
-                    tasks: tasks,
-                    events: events,
-                    storeData: storeData,
-                    exportDate: new Date().toISOString(),
-                    version: '1.0.0'
-                };
-
-                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `classy_data_${new Date().toISOString().split('T')[0]}.json`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-
-                showNotification('データをエクスポートしました', 'success');
-                console.log('データエクスポート完了');
-            } catch (error) {
-                console.error('データエクスポートエラー:', error);
-                showNotification('データエクスポートでエラーが発生しました', 'error');
-            }
-        }
-
-        function showStoreDetails(storeId) {
-            try {
-                const store = storeData.find(s => s.id === storeId);
-                if (!store) return;
-
-                const monthProgress = calculateMonthProgress();
-                const expectedAchievement = calculateExpectedAchievementRate(
-                    store.totalSales || 0, 
-                    store.salesTarget || 0, 
-                    monthProgress.progressRate
-                );
-
-                const content = 
-                    `<div class="space-y-4">
-                        <div class="text-center">
-                            <h3 class="text-xl font-bold text-gray-900">${escapeHtml(store.name)}</h3>
-                            <p class="text-gray-600">${escapeHtml((storeInfo[storeId]?.type || '') + 'ブランド')}</p>
-                        </div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="text-center">
-                                <div class="text-lg font-bold text-blue-600">${((store.salesAchievementRate || 0) * 100).toFixed(1)}%</div>
-                                <div class="text-sm text-gray-600">売上達成率</div>
-                            </div>
-                            <div class="text-center">
-                                <div class="text-lg font-bold progress-indicator indicator-${expectedAchievement.status}">${expectedAchievement.percentage}%</div>
-                                <div class="text-sm text-gray-600">経過日数達成率</div>
-                                <div class="text-xs text-gray-500">${expectedAchievement.message}</div>
-                            </div>
-                        </div>
-                        <div class="space-y-2">
-                            <div class="flex justify-between">
-                                <span>売上実績</span>
-                                <span class="font-bold">¥${((store.totalSales || 0) / 1000000).toFixed(1)}M</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span>売上目標</span>
-                                <span class="font-bold">¥${((store.salesTarget || 0) / 1000000).toFixed(1)}M</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span>日記投稿数</span>
-                                <span class="font-bold">${(store.diaryPosts || 0)}件</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span>口コミ数</span>
-                                <span class="font-bold">${(store.reviewPosts || 0)}件</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span>出勤人数</span>
-                                <span class="font-bold">${(store.attendanceCount || 0)}人</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span>月進捗</span>
-                                <span class="font-bold">${monthProgress.currentDay}/${monthProgress.daysInMonth}日 (${monthProgress.progressPercentage}%)</span>
-                            </div>
-                        </div>
-                        <button class="btn btn-outline w-full" onclick="closeQuickActions()">閉じる</button>
-                    </div>`;
-
-                showCustomModal(`${store.name} 詳細`, content);
-            } catch (error) {
-                console.error('店舗詳細表示エラー:', error);
-            }
-        }
-
-        // 新しいコンソールコマンド
-        function showMonthProgress() {
-            try {
-                const monthProgress = calculateMonthProgress();
-                const totalSales = storeData.reduce((sum, store) => sum + (store.totalSales || 0), 0);
-                const totalTarget = storeData.reduce((sum, store) => sum + (store.salesTarget || 0), 0);
-                const expectedAchievement = calculateExpectedAchievementRate(totalSales, totalTarget, monthProgress.progressRate);
-                
-                console.log('=== 月次進捗レポート ===');
-                console.log('現在日付: ' + new Date().toLocaleDateString('ja-JP'));
-                console.log(`月進捗: ${monthProgress.currentDay}/${monthProgress.daysInMonth}日経過 (${monthProgress.progressPercentage}%)`);
-                console.log(`残り日数: ${monthProgress.remainingDays}日`);
-                console.log('');
-                console.log('全体売上進捗:');
-                console.log(`- 実績: ¥${(totalSales / 1000000).toFixed(1)}M`);
-                console.log(`- 目標: ¥${(totalTarget / 1000000).toFixed(1)}M`);
-                console.log(`- 達成率: ${((totalSales / totalTarget) * 100).toFixed(1)}%`);
-                console.log(`- 経過日数達成率: ${expectedAchievement.percentage}% ${expectedAchievement.message}`);
-                
-                showNotification('月次進捗をコンソールに表示しました', 'success');
-                return monthProgress;
-            } catch (error) {
-                console.error('月次進捗表示エラー:', error);
-                return null;
-            }
-        }
-
-        function showStoreProgress() {
-            try {
-                const monthProgress = calculateMonthProgress();
-                
-                console.log('=== 店舗別進捗レポート ===');
-                console.log(`基準日: ${new Date().toLocaleDateString('ja-JP')} (${monthProgress.currentDay}/${monthProgress.daysInMonth}日経過)`);
-                console.log('');
-                
-                storeData.forEach((store, index) => {
-                    const expectedAchievement = calculateExpectedAchievementRate(
-                        store.totalSales || 0, 
-                        store.salesTarget || 0, 
-                        monthProgress.progressRate
-                    );
-                    console.log(`${index + 1}. ${store.name} (${storeInfo[store.id]?.type || ''})`);
-                    console.log(`   売上: ¥${((store.totalSales || 0) / 1000000).toFixed(1)}M / ¥${((store.salesTarget || 0) / 1000000).toFixed(1)}M (${((store.salesAchievementRate || 0) * 100).toFixed(1)}%)`);
-                    console.log(`   経過日数達成率: ${expectedAchievement.percentage}% ${expectedAchievement.message}`);
-                    console.log(`   KPI達成率: 日記${((store.diaryAchievementRate || 0) * 100).toFixed(1)}% / 口コミ${((store.reviewAchievementRate || 0) * 100).toFixed(1)}%`);
-                    console.log(`   アクセス数: ${(store.totalAccess || 0).toLocaleString()}`);
-                    console.log('');
-                });
-                
-                showNotification('店舗別進捗をコンソールに表示しました', 'success');
-                return `${storeData.length}店舗の進捗表示完了`;
-            } catch (error) {
-                console.error('店舗別進捗表示エラー:', error);
-                return null;
-            }
-        }
-
-        function showSpreadsheetSetupGuide() {
-            try {
-                const guide = `スプレッドシート公開設定ガイド:
-
-1. スプレッドシートを開く:
-   https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/edit?gid=0#gid=0
-
-2. 右上の「共有」ボタンをクリック
-
-3. 「制限付き」を「リンクを知っている全員」に変更
-
-4. 役割を「閲覧者」に設定
-
-5. 「完了」をクリック
-
-6. このシステムで再度「同期」ボタンをクリック
-
-または「ファイル」→「ウェブに公開」でも可能です`;
-                
-                console.log(guide);
-                
-                showCustomModal('スプレッドシート設定ガイド', 
-                    `<div class="space-y-4 text-sm">
-                        <p class="font-bold text-blue-600">スプレッドシートを公開設定にしてください：</p>
-                        <ol class="list-decimal list-inside space-y-2">
-                            <li>スプレッドシートを開く</li>
-                            <li>右上の「共有」ボタンをクリック</li>
-                            <li>「制限付き」を「リンクを知っている全員」に変更</li>
-                            <li>役割を「閲覧者」に設定</li>
-                            <li>「完了」をクリック</li>
-                            <li>このシステムで再度「同期」ボタンをクリック</li>
-                        </ol>
-                        <a href="https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/edit?gid=0#gid=0" 
-                        target="_blank" class="btn btn-primary">
-                            スプレッドシートを開く
-                        </a>
-                    </div>`
-                );
-            } catch (error) {
-                console.error('スプレッドシート設定ガイド表示エラー:', error);
-            }
-        }
-
-        // モーダル管理
-        function showModal(modalId) {
-            try {
-                const modal = document.getElementById(modalId);
-                if (modal) {
-                    modal.classList.remove('hidden');
-                }
-            } catch (error) {
-                console.error('モーダル表示エラー:', error);
-            }
-        }
-
-        function hideModal(modalId) {
-            try {
-                const modal = document.getElementById(modalId);
-                if (modal) {
-                    modal.classList.add('hidden');
-                }
-                editingTaskId = null;
-                editingEventId = null;
-            } catch (error) {
-                console.error('モーダル非表示エラー:', error);
-            }
-        }
-
-        function showCustomModal(title, content) {
-            try {
-                const modal = document.createElement('div');
-                modal.className = 'modal';
-                modal.innerHTML = 
-                    `<div class="modal-content">
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="text-lg font-bold text-gray-900">${escapeHtml(title)}</h3>
-                            <button onclick="this.closest('.modal').remove()" class="text-gray-500 hover:text-gray-700">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                        ${content}
-                    </div>`;
-
-                document.body.appendChild(modal);
-
-                modal.addEventListener('click', (e) => {
-                    if (e.target === modal) {
-                        modal.remove();
-                    }
-                });
-            } catch (error) {
-                console.error('カスタムモーダル表示エラー:', error);
-            }
-        }
-
-        // 通知システム
-        function showNotification(message, type = 'info') {
-            try {
-                const notification = document.createElement('div');
-                notification.className = 'notification border-l-4 ' + 
-                    (type === 'success' ? 'border-green-500 bg-green-50 text-green-800' :
-                    type === 'error' ? 'border-red-500 bg-red-50 text-red-800' :
-                    type === 'warning' ? 'border-yellow-500 bg-yellow-50 text-yellow-800' :
-                    'border-blue-500 bg-blue-50 text-blue-800');
-
-                const icon = type === 'success' ? 'check-circle' :
-                            type === 'error' ? 'exclamation-circle' :
-                            type === 'warning' ? 'exclamation-triangle' : 'info-circle';
-
-                notification.innerHTML = 
-                    `<div class="flex items-center">
-                        <i class="fas fa-${icon} mr-2"></i>
-                        <span class="font-medium">${escapeHtml(message)}</span>
-                        <button onclick="this.parentElement.parentElement.remove()" class="ml-auto text-gray-500 hover:text-gray-700">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>`;
-
-                document.body.appendChild(notification);
-
-                setTimeout(() => {
-                    if (notification.parentNode) {
-                        notification.remove();
-                    }
-                }, 5000);
-            } catch (error) {
-                console.error('通知表示エラー:', error);
-            }
-        }
-
-        // ユーティリティ関数
-        function updateElement(id, value) {
-            try {
-                const element = document.getElementById(id);
-                if (element) {
-                    element.textContent = value;
-                }
-            } catch (error) {
-                console.error('要素更新エラー:', error);
-            }
-        }
-
-        function formatDate(dateString) {
-            try {
-                if (!dateString) return '';
-                const date = new Date(dateString);
-                return date.toLocaleDateString('ja-JP');
-            } catch (error) {
-                console.error('日付フォーマットエラー:', error);
-                return dateString;
-            }
-        }
-
-        function escapeHtml(text) {
-            try {
-                if (!text) return '';
-                const div = document.createElement('div');
-                div.textContent = text;
-                return div.innerHTML;
-            } catch (error) {
-                console.error('HTMLエスケープエラー:', error);
-                return text;
-            }
-        }
-
-        function getPriorityText(priority) {
-            const priorities = { high: '高', medium: '中', low: '低' };
-            return priorities[priority] || priority;
-        }
-
-        function getPriorityBadgeClass(priority) {
-            const classes = {
-                high: 'bg-red-100 text-red-800',
-                medium: 'bg-yellow-100 text-yellow-800',
-                low: 'bg-green-100 text-green-800'
-            };
-            return classes[priority] || 'bg-gray-100 text-gray-800';
-        }
-
-        function getEventClass(eventType) {
-            const classes = {
-                meeting: 'bg-blue-100 text-blue-800',
-                shooting: 'bg-green-100 text-green-800',
-                holiday: 'bg-red-100 text-red-800',
-                deadline: 'bg-orange-100 text-orange-800'
-            };
-            return classes[eventType] || 'bg-gray-100 text-gray-800';
-        }
-
-        function getBrandEmoji(brand) {
-            const emojis = {
-                'CLASSY': '💎',
-                'GrandOpera': '🎭',
-                'Premium': '🌟'
-            };
-            return emojis[brand] || '🏪';
-        }
-
-        function getRankingEmoji(rank) {
-            return rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `${rank}位`;
-        }
-
-        // デバッグ・修復関数（グローバルに公開）
-        window.fixSpreadsheetNow = function() {
-            console.log('=== スプレッドシート同期修復実行 ===');
-            
-            try {
-                // まずstoreDataが正しく初期化されているか確認
-                console.log('現在のstoreData店舗数:', storeData.length);
-                
-                if (storeData.length < 10) {
-                    console.log('⚠️ 店舗データが不完全です。強制再初期化を実行...');
-                    forceResetStoreData();
-                }
-                
-                // 修復データで同期実行
-                const emergencyData = generateCurrentBusinessData();
-                const parsed = parseCSV(emergencyData);
-                const updated = updateStoreDataFromSpreadsheet(parsed);
-                
-                setSyncStatus('success', '修復完了');
-                document.getElementById('lastSync').textContent = new Date().toLocaleString('ja-JP') + ' (修復済み)';
-                
-                renderCurrentPage();
-                saveToLocalStorage();
-                
-                showNotification(`修復完了！${updated}店舗で動作中。`, 'success');
-                
-                console.log(`✅ 修復完了: ${updated}店舗更新`);
-                console.log('最終店舗数:', storeData.length);
-                return `修復完了: ${updated}/${storeData.length}店舗更新`;
-                
-            } catch (error) {
-                console.error('❌ 修復エラー:', error);
-                return `修復エラー: ${error.message}`;
-            }
-        };
-
-        window.forceResetStoreData = function() {
-            console.log('=== 店舗データ強制リセット ===');
-            
-            try {
-                // LocalStorageをクリア
-                localStorage.removeItem('classy_stores');
-                
-                // initializeDataを再実行
-                initializeData();
-                
-                console.log(`✅ 店舗データ強制リセット完了: ${storeData.length}店舗`);
-                
-                // 確認用に全店舗を表示
-                storeData.forEach((store, index) => {
-                    console.log(`${index + 1}. ${store.name} (ID: ${store.id})`);
-                });
-                
-                renderCurrentPage();
-                return `${storeData.length}店舗でリセット完了`;
-            } catch (error) {
-                console.error('店舗データリセットエラー:', error);
-                return `リセットエラー: ${error.message}`;
-            }
-        };
-
-        window.checkStoreData = function() {
-            console.log('=== 店舗データ診断 ===');
-            console.log('storeData配列長:', storeData.length);
-            console.log('storeInfo定義数:', Object.keys(storeInfo).length);
-            
-            console.log('storeData内容:');
-            if (storeData.length > 0) {
-                storeData.forEach((store, index) => {
-                    console.log(`${index + 1}. ID: ${store.id}, 名前: ${store.name}`);
-                });
-            } else {
-                console.log('⚠️ storeDataが空です');
-            }
-            
-            console.log('storeInfo定義:');
-            Object.entries(storeInfo).forEach(([id, info]) => {
-                const found = storeData.find(s => s.id === id);
-                console.log(`- ${id} (${info.name}) - ${found ? '✅' : '❌'}`);
-            });
-            
-            return {
-                storeDataCount: storeData.length,
-                storeInfoCount: Object.keys(storeInfo).length,
-                allFound: storeData.length === Object.keys(storeInfo).length
-            };
-        };
-
-        window.openSpreadsheet = function() {
-            const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/edit?gid=0#gid=0`;
-            window.open(url, '_blank');
-            console.log('スプレッドシートを新しいタブで開きました');
-            return 'スプレッドシートを開きました';
-        };
-
-        window.testRealSync = function() {
-            console.log('実際の同期テスト実行');
-            syncWithSpreadsheet();
-            return '同期テスト実行';
-        };
-
-        window.showSyncStatus = function() {
-            console.log('現在の同期状況:');
-            console.log('対象スプレッドシート:', SPREADSHEET_ID);
-            console.log('店舗データ数:', storeData.length);
-            console.log('最終同期:', document.getElementById('lastSync')?.textContent || '未同期');
-            console.log('同期状態:', document.getElementById('syncText')?.textContent || '不明');
-            
-            console.log('認識されている店舗:');
-            storeData.forEach((store, index) => {
-                const achievement = ((store.salesAchievementRate || 0) * 100).toFixed(1);
-                const status = (store.salesAchievementRate || 0) >= 1.0 ? '達成' : '未達成';
-                console.log(`${index + 1}. ${store.name} - 達成率: ${achievement}% ${status}`);
-            });
-            
-            return `${storeData.length}店舗認識済み`;
-        };
-
-        window.testSystem = function() {
-            console.log('=== システムテスト ===');
-            console.log('タスク数:', tasks.length);
-            console.log('イベント数:', events.length);
-            console.log('店舗数:', storeData.length);
-            console.log('現在のページ:', currentPage);
-            
-            console.log('店舗一覧:');
-            storeData.forEach((store, index) => {
-                console.log(`${index + 1}. ${store.name} (¥${((store.totalSales || 0) / 1000000).toFixed(1)}M)`);
-            });
-            
-            return `正常 - ${storeData.length}店舗認識`;
-        };
-
-        window.showAllStores = function() {
-            console.log('=== 全店舗データ詳細 ===');
-            storeData.forEach(store => {
-                console.log(`店舗: ${store.name} (${store.id})`);
-                console.log(`ブランド: ${storeInfo[store.id]?.type || ''}`);
-                console.log(`売上実績: ¥${(store.totalSales || 0).toLocaleString()}`);
-                console.log(`売上目標: ¥${(store.salesTarget || 0).toLocaleString()}`);
-                console.log(`達成率: ${((store.salesAchievementRate || 0) * 100).toFixed(1)}%`);
-                console.log('---');
-            });
-            return `${storeData.length}店舗の詳細情報を表示`;
-        };
-
-        // 初期化完了メッセージ
-        console.log('CLASSY業務管理システム 完全版 初期化完了');
-        console.log(`=== 利用可能な店舗数: ${Object.keys(storeInfo).length} ===`);
-        Object.entries(storeInfo).forEach(([id, info]) => {
-            console.log(`- ${info.name} (${id}) - ${info.type}ブランド`);
-        });
-        
-        console.log('');
-        console.log('🆕 完全版機能:');
-        console.log('- 経過日数による期待達成率表示');
-        console.log('- 月全体カレンダー表示（42日間）');
-        console.log('- 進捗インジケーター（🔥順調、⚠️要注意、📈安定）');
-        console.log('- ダッシュボード・売上分析・KPI管理の5列表示');
-        console.log('- 完全なエラーハンドリング');
-        console.log('- データ永続化（LocalStorage）');
-        console.log('- スプレッドシート同期（複数方式対応）');
-        
-        console.log('');
-        console.log('📊 利用可能なコンソールコマンド:');
-        console.log('- showMonthProgress() : 月次進捗と期待達成率を確認');
-        console.log('- showStoreProgress() : 店舗別進捗状況を詳細表示');
-        console.log('- checkStoreData() : 店舗データ診断');
-        console.log('- forceResetStoreData() : 店舗データ強制リセット');
-        console.log('- fixSpreadsheetNow() : 修復実行（推奨）');
-        console.log('- testSystem() : システム状態確認');
-        console.log('- showAllStores() : 全店舗データ表示');
-        console.log('- openSpreadsheet() : スプレッドシートを開く');
-        
-        console.log('');
-        console.log('🎯 経過日数達成率の計算式:');
-        console.log('- 現在の売上実績 ÷ 売上目標 ÷ 月進捗率 × 100');
-        console.log('- 110%以上: 🔥順調 (期待以上)');
-        console.log('- 100-109%: 📈安定 (期待通り)');
-        console.log('- 90-99%: ⚠️要注意 (期待以下)');
-        console.log('- 90%未満: 🚨要改善 (大幅遅れ)');
-        
-        console.log('');
-        console.log('📅 カレンダー機能:');
-        console.log('- 月全体表示（6週間 × 7日 = 42日）');
-        console.log('- 前月・来月の日付も表示');
-        console.log('- 日曜日（赤）・土曜日（青）の色分け');
-        console.log('- 日付クリックで予定追加');
-        console.log('- 予定の編集・削除機能');
-        
-        console.log('');
-        console.log('💾 データ管理:');
-        console.log('- LocalStorageによる自動保存');
-        console.log('- エクスポート・インポート機能');
-        console.log('- スプレッドシート連携');
-        console.log('- エラー自動復旧機能');
-        
-        setTimeout(() => {
-            console.log('');
-            console.log('=== 自動システム診断 ===');
-            const diagnosis = checkStoreData();
-            if (!diagnosis.allFound) {
-                console.log('⚠️ 店舗データに問題があります。forceResetStoreData() を実行してください。');
-            } else {
-                console.log(`✅ 店舗データ正常: ${diagnosis.storeDataCount}店舗認識`);
-            }
-            
-            const monthProgress = calculateMonthProgress();
-            console.log(`現在の月進捗: ${monthProgress.currentDay}/${monthProgress.daysInMonth}日 (${monthProgress.progressPercentage}%)`);
-            console.log(`タスク: ${tasks.length}件 / イベント: ${events.length}件`);
-            
-            console.log('');
-            console.log('🚀 システム完全稼働中！');
-            console.log('💡 使用方法:');
-            console.log('1. showMonthProgress() で全体進捗確認');
-            console.log('2. showStoreProgress() で各店舗状況確認');
-            console.log('3. カレンダーで日付クリックして予定追加');
-            console.log('4. 経過日数達成率で改善必要店舗を特定');
-            console.log('5. 同期ボタンでスプレッドシート連携');
-        }, 1000);
-
-    </script>
-</body>
-</html>
