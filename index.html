@@ -166,6 +166,10 @@
                         <i class="fas fa-database mr-3"></i>
                         <span>データ記録</span>
                     </div>
+                    <div class="nav-item" onclick="showPage('sync')">
+                        <i class="fas fa-sync mr-3"></i>
+                        <span>シート同期</span>
+                    </div>
                 </nav>
                 
                 <div class="mt-6 p-4 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-16">
@@ -478,6 +482,116 @@
                     </div>
                 </div>
             </div>
+
+            <!-- シート同期ページ -->
+            <div id="syncPage" class="page-content p-4 hidden">
+                <div class="glass-card p-4 mb-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-bold text-gray-900">🔄 Google Sheets同期</h3>
+                        <div class="flex items-center space-x-2">
+                            <div id="syncStatus" class="px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+                                未接続
+                            </div>
+                            <button class="btn btn-primary" onclick="syncWithGoogleSheets()">
+                                <i class="fas fa-sync mr-2"></i>今すぐ同期
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+                        <div class="bg-blue-50 p-4 rounded-lg text-center">
+                            <div class="text-2xl font-bold text-blue-600" id="lastSyncTime">未同期</div>
+                            <div class="text-sm text-gray-600">最終同期時刻</div>
+                            <div class="text-xs text-blue-600 mt-1" id="syncDataCount">0件のデータ</div>
+                        </div>
+                        <div class="bg-green-50 p-4 rounded-lg text-center">
+                            <div class="text-2xl font-bold text-green-600" id="sheetsDataCount">0</div>
+                            <div class="text-sm text-gray-600">スプレッドシート店舗数</div>
+                            <div class="text-xs text-green-600 mt-1" id="autoSyncStatus">自動同期: OFF</div>
+                        </div>
+                        <div class="bg-purple-50 p-4 rounded-lg text-center">
+                            <div class="text-2xl font-bold text-purple-600" id="syncErrors">0</div>
+                            <div class="text-sm text-gray-600">同期エラー</div>
+                            <div class="text-xs text-purple-600 mt-1" id="lastError">エラーなし</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card p-4 mb-6">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4">同期設定</h3>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="font-semibold text-gray-800 mb-3">📊 スプレッドシート設定</h4>
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2">シートURL</label>
+                                    <input type="text" id="sheetUrl" class="input-field text-xs" 
+                                           value="https://docs.google.com/spreadsheets/d/1CSGBzK9au8VLEQFCpBJbVyMoTaRhO5hoQd_qk8XC_IQ"
+                                           placeholder="Google SheetsのURL">
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <input type="checkbox" id="autoSync" class="rounded">
+                                    <label for="autoSync" class="text-sm text-gray-700">自動同期を有効にする（5分間隔）</label>
+                                </div>
+                                <button class="btn btn-outline w-full" onclick="testSheetConnection()">
+                                    <i class="fas fa-link mr-2"></i>接続テスト
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-semibold text-gray-800 mb-3">⚙️ 同期オプション</h4>
+                            <div class="space-y-3">
+                                <div class="flex items-center space-x-2">
+                                    <input type="checkbox" id="syncSales" class="rounded" checked>
+                                    <label for="syncSales" class="text-sm text-gray-700">売上データ同期</label>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <input type="checkbox" id="syncKPI" class="rounded" checked>
+                                    <label for="syncKPI" class="text-sm text-gray-700">KPIデータ同期</label>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <input type="checkbox" id="syncAccess" class="rounded" checked>
+                                    <label for="syncAccess" class="text-sm text-gray-700">アクセス数同期</label>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <input type="checkbox" id="backupBeforeSync" class="rounded" checked>
+                                    <label for="backupBeforeSync" class="text-sm text-gray-700">同期前にバックアップ</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card p-4 mb-6">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4">リアルタイムデータ比較</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full bg-white rounded-lg text-sm">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="text-left p-3 font-semibold">店舗名</th>
+                                    <th class="text-left p-3 font-semibold">ローカル売上</th>
+                                    <th class="text-left p-3 font-semibold">シート売上</th>
+                                    <th class="text-left p-3 font-semibold">差分</th>
+                                    <th class="text-left p-3 font-semibold">最終更新</th>
+                                    <th class="text-left p-3 font-semibold">ステータス</th>
+                                </tr>
+                            </thead>
+                            <tbody id="syncComparisonTable">
+                                <tr><td colspan="6" class="text-center p-4 text-gray-500">同期データを読み込み中...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="glass-card p-4">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4">同期ログ</h3>
+                    <div id="syncLogsList" class="space-y-2 max-h-96 overflow-y-auto">
+                        <div class="text-center text-gray-500 py-4">同期ログを読み込み中...</div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     
@@ -597,11 +711,17 @@
                 <button class="btn btn-primary" onclick="openEventModal(); hideModal('quickActionModal');">
                     <i class="fas fa-calendar mr-2"></i>予定追加
                 </button>
+                <button class="btn btn-success" onclick="syncWithGoogleSheets(); hideModal('quickActionModal');">
+                    <i class="fas fa-sync mr-2"></i>シート同期
+                </button>
                 <button class="btn btn-outline" onclick="performFullBackup(); hideModal('quickActionModal');">
                     <i class="fas fa-download mr-2"></i>バックアップ
                 </button>
                 <button class="btn btn-outline" onclick="testAllFunctions(); hideModal('quickActionModal');">
                     <i class="fas fa-check mr-2"></i>動作テスト
+                </button>
+                <button class="btn btn-outline" onclick="testSheetConnection(); hideModal('quickActionModal');">
+                    <i class="fas fa-link mr-2"></i>接続テスト
                 </button>
             </div>
         </div>
@@ -614,11 +734,14 @@
         let events = [];
         let storeData = [];
         let activityLogs = [];
+        let syncLogs = [];
         let editingTaskId = null;
         let editingEventId = null;
         let currentMonth = new Date().getMonth();
         let currentYear = new Date().getFullYear();
         let salesChart = null;
+        let autoSyncInterval = null;
+        let lastSyncData = null;
 
         // 店舗情報定義
         const storeInfo = {
@@ -829,6 +952,12 @@
             updateDateTime();
             setInterval(updateDateTime, 60000);
             renderCurrentPage();
+            
+            // 自動同期を開始（設定されている場合）
+            const autoSync = localStorage.getItem('classy_auto_sync') === 'true';
+            if (autoSync) {
+                startAutoSync();
+            }
             
             console.log('システム初期化完了');
             showNotification('システムが正常に起動しました', 'success');
@@ -1047,11 +1176,13 @@
                 const savedEvents = localStorage.getItem('classy_events');
                 const savedStores = localStorage.getItem('classy_stores');
                 const savedLogs = localStorage.getItem('classy_logs');
+                const savedSyncLogs = localStorage.getItem('classy_sync_logs');
 
                 if (savedTasks) tasks = JSON.parse(savedTasks);
                 if (savedEvents) events = JSON.parse(savedEvents);
                 if (savedStores) storeData = JSON.parse(savedStores);
                 if (savedLogs) activityLogs = JSON.parse(savedLogs);
+                if (savedSyncLogs) syncLogs = JSON.parse(savedSyncLogs);
             } catch (error) {
                 console.error('読み込みエラー:', error);
             }
@@ -1159,7 +1290,8 @@
                 sales: '売上分析',
                 kpi: 'KPI管理',
                 calendar: 'カレンダー',
-                records: 'データ記録'
+                records: 'データ記録',
+                sync: 'シート同期'
             };
             updateElement('currentPageTitle', titles[pageName]);
 
@@ -1192,6 +1324,9 @@
                     break;
                 case 'records':
                     renderRecords();
+                    break;
+                case 'sync':
+                    renderSync();
                     break;
             }
         }
@@ -1846,6 +1981,522 @@
             renderActivityLogs();
         }
 
+        // Google Sheets同期
+        function renderSync() {
+            updateSyncStats();
+            renderSyncComparison();
+            renderSyncLogs();
+        }
+
+        function updateSyncStats() {
+            const lastSync = localStorage.getItem('classy_last_sync');
+            const autoSync = localStorage.getItem('classy_auto_sync') === 'true';
+            const syncErrors = syncLogs.filter(log => log.type === 'error').length;
+            
+            updateElement('lastSyncTime', lastSync ? new Date(lastSync).toLocaleString('ja-JP') : '未同期');
+            updateElement('syncDataCount', lastSyncData ? `${lastSyncData.length}件のデータ` : '0件のデータ');
+            updateElement('sheetsDataCount', lastSyncData ? lastSyncData.length.toString() : '0');
+            updateElement('autoSyncStatus', autoSync ? '自動同期: ON' : '自動同期: OFF');
+            updateElement('syncErrors', syncErrors.toString());
+            updateElement('lastError', syncErrors > 0 ? '同期エラーあり' : 'エラーなし');
+            
+            const statusElement = document.getElementById('syncStatus');
+            if (statusElement) {
+                if (lastSync && (Date.now() - new Date(lastSync).getTime()) < 10 * 60 * 1000) {
+                    statusElement.className = 'px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800';
+                    statusElement.textContent = '接続中';
+                } else {
+                    statusElement.className = 'px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600';
+                    statusElement.textContent = '未接続';
+                }
+            }
+            
+            // 自動同期チェックボックスの状態を更新
+            const autoSyncCheckbox = document.getElementById('autoSync');
+            if (autoSyncCheckbox) {
+                autoSyncCheckbox.checked = autoSync;
+            }
+        }
+
+        async function syncWithGoogleSheets() {
+            const sheetUrl = document.getElementById('sheetUrl')?.value;
+            if (!sheetUrl) {
+                showNotification('スプレッドシートのURLを入力してください', 'error');
+                return;
+            }
+
+            updateSyncStatus('同期中...', 'syncing');
+            
+            try {
+                // バックアップ作成（オプション）
+                if (document.getElementById('backupBeforeSync')?.checked) {
+                    addSyncLog('info', 'sync', '同期前バックアップ作成中');
+                }
+
+                // Google SheetsからCSV形式でデータを取得
+                const csvUrl = convertToCSVUrl(sheetUrl);
+                const response = await fetch(csvUrl);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: スプレッドシートにアクセスできません`);
+                }
+
+                const csvText = await response.text();
+                const sheetData = parseCSVData(csvText);
+                
+                if (sheetData.length === 0) {
+                    throw new Error('スプレッドシートにデータが見つかりません');
+                }
+
+                // データを内部形式に変換
+                const convertedData = convertSheetDataToStoreData(sheetData);
+                
+                // 現在のデータと比較
+                const differences = compareStoreData(storeData, convertedData);
+                
+                // 選択的同期
+                if (document.getElementById('syncSales')?.checked) {
+                    updateSalesData(convertedData, differences);
+                }
+                if (document.getElementById('syncKPI')?.checked) {
+                    updateKPIData(convertedData, differences);
+                }
+                if (document.getElementById('syncAccess')?.checked) {
+                    updateAccessData(convertedData, differences);
+                }
+
+                // 同期完了
+                lastSyncData = sheetData;
+                localStorage.setItem('classy_last_sync', new Date().toISOString());
+                
+                addSyncLog('success', 'sync', `${convertedData.length}店舗のデータを同期完了`);
+                showNotification(`${convertedData.length}店舗のデータを同期しました`, 'success');
+                
+                updateSyncStatus('同期完了', 'success');
+                
+                // データ保存
+                saveToLocalStorage();
+                renderCurrentPage();
+                
+            } catch (error) {
+                console.error('同期エラー:', error);
+                addSyncLog('error', 'sync', `同期失敗: ${error.message}`);
+                showNotification(`同期エラー: ${error.message}`, 'error');
+                updateSyncStatus('同期失敗', 'error');
+            }
+        }
+
+        function convertToCSVUrl(sheetUrl) {
+            // Google SheetsのURLをCSV形式に変換
+            const sheetId = extractSheetId(sheetUrl);
+            return `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=0`;
+        }
+
+        function extractSheetId(url) {
+            const match = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+            return match ? match[1] : '';
+        }
+
+        function parseCSVData(csvText) {
+            const lines = csvText.split('\n');
+            const headers = lines[0].split(',').map(h => h.replace(/"/g, '').trim());
+            const data = [];
+
+            for (let i = 1; i < lines.length; i++) {
+                if (lines[i].trim() === '') continue;
+                
+                const values = parseCSVLine(lines[i]);
+                if (values[0] && values[0].trim() !== '') {  // 店舗名が存在する行のみ
+                    const row = {};
+                    headers.forEach((header, index) => {
+                        row[header] = values[index] || '';
+                    });
+                    data.push(row);
+                }
+            }
+
+            return data;
+        }
+
+        function parseCSVLine(line) {
+            const result = [];
+            let current = '';
+            let inQuotes = false;
+            
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+                
+                if (char === '"') {
+                    inQuotes = !inQuotes;
+                } else if (char === ',' && !inQuotes) {
+                    result.push(current.trim());
+                    current = '';
+                } else {
+                    current += char;
+                }
+            }
+            
+            result.push(current.trim());
+            return result;
+        }
+
+        function convertSheetDataToStoreData(sheetData) {
+            return sheetData.map(row => {
+                const storeName = row['店舗名'] || '';
+                const storeId = getStoreIdByName(storeName);
+                
+                return {
+                    id: storeId,
+                    name: storeName,
+                    salesTarget: parseNumber(row['売上目標']),
+                    totalSales: parseNumber(row['売上実績']),
+                    totalAccess: parseNumber(row['アクセス数']),
+                    diaryPosts: parseNumber(row['写メ日記投稿数']),
+                    diaryTarget: parseNumber(row['写メ日記月間目標']),
+                    reviewPosts: parseNumber(row['口コミ総数']),
+                    reviewTarget: parseNumber(row['口コミ月間目標']),
+                    kiteneCount: parseNumber(row['キテネ送信数']),
+                    kiteneTarget: parseNumber(row['キテネ月間目標']),
+                    attendanceCount: parseNumber(row['出勤人数']),
+                    userCount: parseNumber(row['在籍キャスト数']),
+                    lastUpdated: row['更新日'] || new Date().toISOString().split('T')[0],
+                    brand: row['ブランド'] || '',
+                    priority: row['重点KPI'] || '',
+                    improvement: row['改善点'] || '',
+                    note: row['備考'] || ''
+                };
+            }).filter(store => store.id); // IDが取得できた店舗のみ
+        }
+
+        function getStoreIdByName(name) {
+            const nameMap = {
+                'シャブール': 'shabour',
+                'ワンカラット': 'onecarat',
+                'GO名古屋': 'go_nagoya',
+                'GO福岡': 'go_fukuoka',
+                'GO東京': 'go_tokyo',
+                'GO横浜': 'go_yokohama',
+                'オペラ錦': 'opera_nishiki',
+                'CL名古屋': 'cl_nagoya',
+                'CL東京': 'cl_tokyo',
+                'CL四日市': 'cl_yokkaichi'
+            };
+            return nameMap[name] || null;
+        }
+
+        function parseNumber(value) {
+            if (typeof value === 'string') {
+                return parseInt(value.replace(/[,円¥]/g, '')) || 0;
+            }
+            return parseInt(value) || 0;
+        }
+
+        function compareStoreData(localData, sheetData) {
+            const differences = [];
+            
+            sheetData.forEach(sheetStore => {
+                const localStore = localData.find(local => local.id === sheetStore.id);
+                
+                if (!localStore) {
+                    differences.push({
+                        storeId: sheetStore.id,
+                        storeName: sheetStore.name,
+                        type: 'new',
+                        field: 'all',
+                        localValue: null,
+                        sheetValue: sheetStore
+                    });
+                    return;
+                }
+
+                // 各フィールドを比較
+                const fieldsToCompare = ['totalSales', 'diaryPosts', 'reviewPosts', 'kiteneCount', 'totalAccess', 'attendanceCount'];
+                
+                fieldsToCompare.forEach(field => {
+                    if (localStore[field] !== sheetStore[field]) {
+                        differences.push({
+                            storeId: sheetStore.id,
+                            storeName: sheetStore.name,
+                            type: 'updated',
+                            field: field,
+                            localValue: localStore[field],
+                            sheetValue: sheetStore[field],
+                            difference: sheetStore[field] - localStore[field]
+                        });
+                    }
+                });
+            });
+
+            return differences;
+        }
+
+        function updateSalesData(sheetData, differences) {
+            sheetData.forEach(sheetStore => {
+                const localIndex = storeData.findIndex(local => local.id === sheetStore.id);
+                
+                if (localIndex !== -1) {
+                    // 売上関連データを更新
+                    storeData[localIndex].totalSales = sheetStore.totalSales;
+                    storeData[localIndex].salesTarget = sheetStore.salesTarget;
+                    storeData[localIndex].salesAchievementRate = sheetStore.salesTarget > 0 ? 
+                        sheetStore.totalSales / sheetStore.salesTarget : 0;
+                    storeData[localIndex].lastUpdated = sheetStore.lastUpdated;
+                } else {
+                    // 新しい店舗の場合は追加
+                    const newStore = {...sheetStore};
+                    newStore.salesAchievementRate = newStore.salesTarget > 0 ? 
+                        newStore.totalSales / newStore.salesTarget : 0;
+                    storeData.push(newStore);
+                }
+            });
+        }
+
+        function updateKPIData(sheetData, differences) {
+            sheetData.forEach(sheetStore => {
+                const localIndex = storeData.findIndex(local => local.id === sheetStore.id);
+                
+                if (localIndex !== -1) {
+                    // KPI関連データを更新
+                    storeData[localIndex].diaryPosts = sheetStore.diaryPosts;
+                    storeData[localIndex].diaryTarget = sheetStore.diaryTarget;
+                    storeData[localIndex].reviewPosts = sheetStore.reviewPosts;
+                    storeData[localIndex].reviewTarget = sheetStore.reviewTarget;
+                    storeData[localIndex].kiteneCount = sheetStore.kiteneCount;
+                    storeData[localIndex].kiteneTarget = sheetStore.kiteneTarget;
+                    
+                    // 達成率を再計算
+                    storeData[localIndex].diaryAchievementRate = sheetStore.diaryTarget > 0 ? 
+                        sheetStore.diaryPosts / sheetStore.diaryTarget : 0;
+                    storeData[localIndex].reviewAchievementRate = sheetStore.reviewTarget > 0 ? 
+                        sheetStore.reviewPosts / sheetStore.reviewTarget : 0;
+                    storeData[localIndex].kiteneAchievementRate = sheetStore.kiteneTarget > 0 ? 
+                        sheetStore.kiteneCount / sheetStore.kiteneTarget : 0;
+                }
+            });
+        }
+
+        function updateAccessData(sheetData, differences) {
+            sheetData.forEach(sheetStore => {
+                const localIndex = storeData.findIndex(local => local.id === sheetStore.id);
+                
+                if (localIndex !== -1) {
+                    // アクセス・出勤関連データを更新
+                    storeData[localIndex].totalAccess = sheetStore.totalAccess;
+                    storeData[localIndex].attendanceCount = sheetStore.attendanceCount;
+                    storeData[localIndex].userCount = sheetStore.userCount;
+                }
+            });
+        }
+
+        function renderSyncComparison() {
+            const container = document.getElementById('syncComparisonTable');
+            
+            if (!lastSyncData || lastSyncData.length === 0) {
+                container.innerHTML = '<tr><td colspan="6" class="text-center p-4 text-gray-500">同期データがありません</td></tr>';
+                return;
+            }
+
+            const sheetStoreData = convertSheetDataToStoreData(lastSyncData);
+            
+            container.innerHTML = storeData.map(localStore => {
+                const sheetStore = sheetStoreData.find(sheet => sheet.id === localStore.id);
+                
+                if (!sheetStore) {
+                    return `<tr class="hover:bg-red-50">
+                        <td class="p-3 font-medium">${escapeHtml(localStore.name)}</td>
+                        <td class="p-3 text-blue-600">¥${((localStore.totalSales || 0) / 1000000).toFixed(1)}M</td>
+                        <td class="p-3 text-gray-400">-</td>
+                        <td class="p-3 text-red-600">シートにデータなし</td>
+                        <td class="p-3 text-xs text-gray-500">${formatDate(localStore.lastUpdated)}</td>
+                        <td class="p-3"><span class="px-2 py-1 bg-red-100 text-red-800 rounded text-xs">未同期</span></td>
+                    </tr>`;
+                }
+
+                const salesDiff = (sheetStore.totalSales || 0) - (localStore.totalSales || 0);
+                const isUpToDate = Math.abs(salesDiff) < 1000; // 1000円未満の差は同期済みとみなす
+                
+                return `<tr class="hover:bg-gray-50">
+                    <td class="p-3 font-medium">${escapeHtml(localStore.name)}</td>
+                    <td class="p-3 text-blue-600">¥${((localStore.totalSales || 0) / 1000000).toFixed(1)}M</td>
+                    <td class="p-3 text-green-600">¥${((sheetStore.totalSales || 0) / 1000000).toFixed(1)}M</td>
+                    <td class="p-3 ${salesDiff === 0 ? 'text-gray-500' : salesDiff > 0 ? 'text-green-600' : 'text-red-600'}">
+                        ${salesDiff === 0 ? '同期済み' : (salesDiff > 0 ? '+' : '') + (salesDiff / 1000000).toFixed(1) + 'M'}
+                    </td>
+                    <td class="p-3 text-xs text-gray-500">${formatDate(sheetStore.lastUpdated)}</td>
+                    <td class="p-3">
+                        <span class="px-2 py-1 ${isUpToDate ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'} rounded text-xs">
+                            ${isUpToDate ? '同期済み' : '要同期'}
+                        </span>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        function addSyncLog(type, action, message) {
+            const log = {
+                id: Date.now(),
+                type: type,  // success, error, info, warning
+                action: action,  // sync, test, auto_sync
+                message: message,
+                timestamp: new Date().toISOString()
+            };
+            
+            syncLogs.unshift(log);
+            if (syncLogs.length > 50) {
+                syncLogs = syncLogs.slice(0, 50);
+            }
+            
+            localStorage.setItem('classy_sync_logs', JSON.stringify(syncLogs));
+        }
+
+        function renderSyncLogs() {
+            const container = document.getElementById('syncLogsList');
+
+            if (syncLogs.length === 0) {
+                container.innerHTML = '<div class="text-center text-gray-500 py-4">まだ同期ログがありません</div>';
+                return;
+            }
+
+            container.innerHTML = syncLogs.slice(0, 20).map(log => 
+                `<div class="bg-white p-3 rounded border-l-4 ${getSyncLogBorderClass(log.type)}">
+                    <div class="flex items-center justify-between">
+                        <div class="flex-1">
+                            <div class="text-sm font-medium text-gray-900">${getSyncLogIcon(log.type)} ${escapeHtml(log.message)}</div>
+                            <div class="text-xs text-gray-500 mt-1">${formatDateTime(log.timestamp)}</div>
+                        </div>
+                        <span class="px-2 py-1 text-xs rounded ${getSyncLogBadgeClass(log.type)}">${getSyncLogTypeText(log.type)}</span>
+                    </div>
+                </div>`
+            ).join('');
+        }
+
+        function getSyncLogIcon(type) {
+            switch (type) {
+                case 'success': return '✅';
+                case 'error': return '❌';
+                case 'warning': return '⚠️';
+                case 'info': return 'ℹ️';
+                default: return '📝';
+            }
+        }
+
+        function getSyncLogBorderClass(type) {
+            switch (type) {
+                case 'success': return 'border-green-500';
+                case 'error': return 'border-red-500';
+                case 'warning': return 'border-yellow-500';
+                case 'info': return 'border-blue-500';
+                default: return 'border-gray-500';
+            }
+        }
+
+        function getSyncLogBadgeClass(type) {
+            switch (type) {
+                case 'success': return 'bg-green-100 text-green-800';
+                case 'error': return 'bg-red-100 text-red-800';
+                case 'warning': return 'bg-yellow-100 text-yellow-800';
+                case 'info': return 'bg-blue-100 text-blue-800';
+                default: return 'bg-gray-100 text-gray-800';
+            }
+        }
+
+        function getSyncLogTypeText(type) {
+            switch (type) {
+                case 'success': return '成功';
+                case 'error': return 'エラー';
+                case 'warning': return '警告';
+                case 'info': return '情報';
+                default: return '不明';
+            }
+        }
+
+        function updateSyncStatus(message, type) {
+            const statusElement = document.getElementById('syncStatus');
+            if (statusElement) {
+                let className = 'px-3 py-1 rounded-full text-xs font-medium ';
+                switch (type) {
+                    case 'syncing':
+                        className += 'bg-blue-100 text-blue-800';
+                        break;
+                    case 'success':
+                        className += 'bg-green-100 text-green-800';
+                        break;
+                    case 'error':
+                        className += 'bg-red-100 text-red-800';
+                        break;
+                    default:
+                        className += 'bg-gray-100 text-gray-600';
+                }
+                statusElement.className = className;
+                statusElement.textContent = message;
+            }
+        }
+
+        async function testSheetConnection() {
+            const sheetUrl = document.getElementById('sheetUrl')?.value;
+            if (!sheetUrl) {
+                showNotification('スプレッドシートのURLを入力してください', 'error');
+                return;
+            }
+
+            updateSyncStatus('接続テスト中...', 'syncing');
+            
+            try {
+                const csvUrl = convertToCSVUrl(sheetUrl);
+                const response = await fetch(csvUrl);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: アクセスできません`);
+                }
+
+                const csvText = await response.text();
+                const testData = parseCSVData(csvText);
+                
+                addSyncLog('success', 'test', `接続テスト成功: ${testData.length}行のデータを確認`);
+                showNotification(`接続成功！${testData.length}行のデータが見つかりました`, 'success');
+                updateSyncStatus('接続成功', 'success');
+                
+            } catch (error) {
+                console.error('接続テストエラー:', error);
+                addSyncLog('error', 'test', `接続テスト失敗: ${error.message}`);
+                showNotification(`接続失敗: ${error.message}`, 'error');
+                updateSyncStatus('接続失敗', 'error');
+            }
+        }
+
+        function toggleAutoSync() {
+            const autoSync = document.getElementById('autoSync')?.checked;
+            localStorage.setItem('classy_auto_sync', autoSync.toString());
+            
+            if (autoSync) {
+                startAutoSync();
+                addSyncLog('info', 'auto_sync', '自動同期を開始しました');
+                showNotification('自動同期を開始しました（5分間隔）', 'success');
+            } else {
+                stopAutoSync();
+                addSyncLog('info', 'auto_sync', '自動同期を停止しました');
+                showNotification('自動同期を停止しました', 'info');
+            }
+            
+            updateSyncStats();
+        }
+
+        function startAutoSync() {
+            stopAutoSync(); // 既存のインターバルをクリア
+            
+            autoSyncInterval = setInterval(async () => {
+                addSyncLog('info', 'auto_sync', '自動同期を実行中...');
+                await syncWithGoogleSheets();
+            }, 5 * 60 * 1000); // 5分間隔
+        }
+
+        function stopAutoSync() {
+            if (autoSyncInterval) {
+                clearInterval(autoSyncInterval);
+                autoSyncInterval = null;
+            }
+        }
+
         function updateRecordsStats() {
             const today = getDateString(new Date());
             const completedTasks = tasks.filter(t => t.completed).length;
@@ -2077,6 +2728,13 @@
                 }
             });
 
+            // 自動同期チェックボックスのイベントリスナー
+            document.addEventListener('change', function(e) {
+                if (e.target.id === 'autoSync') {
+                    toggleAutoSync();
+                }
+            });
+
             // キーボードショートカット
             document.addEventListener('keydown', function(e) {
                 if (e.ctrlKey || e.metaKey) {
@@ -2092,6 +2750,10 @@
                         case 'k':
                             e.preventDefault();
                             showQuickActions();
+                            break;
+                        case 'r':
+                            e.preventDefault();
+                            syncWithGoogleSheets();
                             break;
                     }
                 }
@@ -2137,6 +2799,9 @@
         window.showQuickActions = showQuickActions;
         window.showStoreDetails = showStoreDetails;
         window.testAllFunctions = testAllFunctions;
+        window.syncWithGoogleSheets = syncWithGoogleSheets;
+        window.testSheetConnection = testSheetConnection;
+        window.toggleAutoSync = toggleAutoSync;
     </script>
 </body>
 </html>
