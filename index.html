@@ -185,7 +185,7 @@
                         <div class="text-2xl mb-2">🎉</div>
                         <div class="text-sm font-medium text-blue-800">新OAuth2設定</div>
                         <div class="text-xs mb-3">
-                            <span class="text-green-600">✅ SPAクライアント準備完了</span>
+                            <span class="text-green-600">✅ Webアプリケーション準備完了</span>
                         </div>
                         <button class="btn btn-primary w-full text-sm" onclick="testAllFunctions()">
                             <i class="fas fa-check mr-2"></i>動作テスト
@@ -792,24 +792,24 @@
                                        value="189292467710-31g262giiiiull9q585dk4fdqnd07427.apps.googleusercontent.com"
                                        readonly>
                                 <div class="text-xs text-green-600 mt-1">
-                                    ✅ SPA（単一ページアプリケーション）タイプで設定済み
+                                    ✅ Webアプリケーションタイプ（PKCE対応）で設定済み
                                 </div>
                             </div>
                             
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">認証方式</label>
                                 <select id="authMethod" class="input-field text-sm mb-2" onchange="updateAuthMethodInfo()">
-                                    <option value="pkce">PKCE認証（SPA専用）</option>
+                                    <option value="pkce">PKCE認証（Webアプリ + PKCE）</option>
                                     <option value="debug">デバッグモード</option>
                                 </select>
                                 
                                 <div id="authMethodInfo" class="bg-green-50 p-3 rounded-lg">
                                     <div class="flex items-center space-x-2">
                                         <i class="fas fa-shield-alt text-green-600"></i>
-                                        <span class="text-sm font-medium text-green-800">PKCE認証（SPA専用）</span>
+                                        <span class="text-sm font-medium text-green-800">PKCE認証（Webアプリ + PKCE）</span>
                                     </div>
                                     <p class="text-xs text-green-700 mt-1">
-                                        単一ページアプリケーション専用の認証方式。client_secret不要で最もセキュアです。
+                                        Webアプリケーションタイプ + PKCE認証。client_secret不要で最もセキュアです。
                                     </p>
                                 </div>
                             </div>
@@ -860,13 +860,13 @@
                             <div class="bg-green-50 p-4 rounded-lg">
                                 <h4 class="font-semibold text-green-800 mb-2">🎉 新しいOAuth2クライアント設定完了</h4>
                                 <div class="text-sm text-green-700 space-y-2">
-                                    <p><strong>✅ 最新設定:</strong> 単一ページアプリケーション (SPA) タイプで正常動作中</p>
+                                    <p><strong>✅ 最新設定:</strong> Webアプリケーションタイプ（PKCE対応）で正常動作中</p>
                                     <p><strong>🔐 クライアントID:</strong> `189292...07427.apps.googleusercontent.com`</p>
                                     <p><strong>🚀 利点:</strong></p>
                                     <ul class="list-disc list-inside space-y-1 ml-2">
                                         <li>client_secretエラー完全解消</li>
                                         <li>PKCE認証による強固なセキュリティ</li>
-                                        <li>SPA環境に完全最適化</li>
+                                        <li>Webアプリケーション環境に完全最適化</li>
                                         <li>Google Calendar & Tasks API使用可能</li>
                                     </ul>
                                 </div>
@@ -1275,7 +1275,7 @@
 
         // システム初期化
         function initializeSystem() {
-            console.log('システム初期化開始 - 新しいSPAクライアント使用');
+            console.log('システム初期化開始 - 新しいWebアプリケーションクライアント使用');
             
             // 新しいクライアントIDでリダイレクトURIを動的に設定
             const redirectUriInput = document.getElementById('redirectUri');
@@ -1332,10 +1332,10 @@
             
             setTimeout(() => updateAuthMethodInfo(), 100);
             
-            addGoogleLog('success', 'auth', '🎉 新しいSPAクライアントID設定完了 - 認証システム準備完了');
+            addGoogleLog('success', 'auth', '🎉 新しいWebアプリケーションクライアントID設定完了 - 認証システム準備完了');
             
             console.log('システム初期化完了');
-            showNotification('🚀 システムが正常に起動しました（新SPAクライアントID設定完了）', 'success');
+            showNotification('🚀 システムが正常に起動しました（新Webアプリケーションクライアントで設定完了）', 'success');
         }
 
         function initializeStoreData() {
@@ -3575,7 +3575,7 @@ Googleカレンダーの手動インポート方法：
             const state = generateRandomState();
             localStorage.setItem('oauth_state', state);
 
-            // SPAクライアントでは常にPKCEを使用（標準認証は使用しない）
+            // Webアプリケーションクライアントでは常にPKCEを使用（標準認証は使用しない）
             initiatePKCEAuth(scopes, state);
         }
 
@@ -3591,7 +3591,7 @@ Googleカレンダーの手動インポート方法：
                     clientId: GOOGLE_CONFIG.clientId,
                     clientIdValid: GOOGLE_CONFIG.clientId.includes('189292467710-31g262giiiiull9q585dk4fdqnd07427'),
                     redirectUri: GOOGLE_CONFIG.redirectUri,
-                    clientType: 'SPA (Single Page Application)',
+                    clientType: 'Webアプリケーション（PKCE対応）',
                     pkceSupport: true,
                     secretRequired: false,
                     status: 'Ready for Authentication'
@@ -3626,67 +3626,9 @@ Googleカレンダーの手動インポート方法：
                 });
                 
                 const authUrl = `https://accounts.google.com/o/oauth2/auth?${params}`;
-                addGoogleLog('info', 'auth', '🔐 新SPAクライアント - PKCE認証フローを開始');
+                addGoogleLog('info', 'auth', '🔐 新Webアプリケーションクライアント - PKCE認証フローを開始');
                 window.location.href = authUrl;
             });
-        }
-
-        function initiateStandardAuth(scopes, state) {
-            const params = new URLSearchParams({
-                client_id: GOOGLE_CONFIG.clientId,
-                redirect_uri: GOOGLE_CONFIG.redirectUri,
-                scope: scopes.join(' '),
-                response_type: 'code',
-                access_type: 'offline',
-                prompt: 'consent',
-                state: state
-            });
-            
-            const authUrl = `https://accounts.google.com/o/oauth2/auth?${params}`;
-            addGoogleLog('info', 'auth', '🔐 新SPAクライアント - 標準認証フローを開始');
-            window.location.href = authUrl;
-        }
-
-        async function initiateProxyAuth() {
-            try {
-                addGoogleLog('info', 'auth', 'プロキシ認証を試行中');
-                
-                const proxyUrl = 'https://script.google.com/macros/s/YOUR_GAS_ID/exec';
-                const scopes = ['https://www.googleapis.com/auth/calendar', 'https://www.googleapis.com/auth/tasks'];
-                
-                const response = await fetch(proxyUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        action: 'getAuthToken',
-                        scopes: scopes
-                    })
-                });
-
-                if (!response.ok) {
-                    throw new Error('プロキシ認証に失敗しました');
-                }
-
-                const data = await response.json();
-                
-                if (data.token) {
-                    accessToken = data.token;
-                    tokenExpiresAt = new Date(Date.now() + (data.expiresIn * 1000));
-                    
-                    saveTokens();
-                    addGoogleLog('success', 'auth', 'プロキシ認証完了');
-                    showNotification('プロキシ経由でGoogle認証が完了しました', 'success');
-                    updateOAuthStats();
-                } else {
-                    throw new Error('有効なトークンが取得できませんでした');
-                }
-
-            } catch (error) {
-                addGoogleLog('error', 'auth', `プロキシ認証失敗: ${error.message}`);
-                showNotification(`プロキシ認証エラー: ${error.message}`, 'error');
-            }
         }
 
         function generateRandomState() {
@@ -3730,7 +3672,7 @@ Googleカレンダーの手動インポート方法：
                     throw new Error('PKCE code_verifierが見つかりません。認証を再開してください。');
                 }
 
-                // SPAクライアントでは常にPKCE認証のみ使用
+                // Webアプリケーションクライアントでは常にPKCE認証のみ使用
                 await exchangeWithPKCE(code, codeVerifier);
 
             } catch (error) {
@@ -3749,7 +3691,7 @@ Googleカレンダーの手動インポート方法：
         }
 
         async function exchangeWithPKCE(code, codeVerifier) {
-            addGoogleLog('info', 'auth', 'PKCE認証実行中（SPA専用）');
+            addGoogleLog('info', 'auth', 'PKCE認証実行中（Webアプリケーション専用）');
 
             const tokenRequestBody = new URLSearchParams({
                 client_id: GOOGLE_CONFIG.clientId,
@@ -3779,7 +3721,7 @@ Googleカレンダーの手動インポート方法：
                 console.error('PKCE Error Response:', errorData);
                 
                 if (errorData.includes('client_secret is missing')) {
-                    throw new Error(`OAuth2設定エラー: Google Cloud ConsoleでクライアントタイプがまだWebアプリケーションになっている可能性があります。SPAタイプに変更してください。\n\n詳細エラー: ${errorData}`);
+                    throw new Error(`OAuth2設定エラー: Google Cloud ConsoleでクライアントタイプがまだWebアプリケーションになっている可能性があります。正しく設定してください。\n\n詳細エラー: ${errorData}`);
                 }
                 
                 throw new Error(`PKCE認証失敗: ${response.status} - ${errorData}`);
@@ -3798,9 +3740,6 @@ Googleカレンダーの手動インポート方法：
                 autoInitialSync();
             }, 1000);
         }
-
-        // 標準認証は削除（SPAクライアントでは使用しない）
-        // exchangeAsPublicClient 関数は削除済み
 
         async function autoInitialSync() {
             try {
@@ -3829,17 +3768,17 @@ Googleカレンダーの手動インポート方法：
             tokenExpiresAt = new Date(Date.now() + (tokenData.expires_in * 1000));
 
             saveTokens();
-            showNotification('🎉 Google認証完了！新しいSPAクライアントで安全に接続されました。', 'success');
+            showNotification('🎉 Google認証完了！新しいWebアプリケーションクライアントで安全に接続されました。', 'success');
             updateOAuthStats();
         }
 
         function showClientTypeError() {
-            // 新しいSPAタイプクライアントの成功メッセージを表示
+            // 新しいWebアプリケーションタイプクライアントの成功メッセージを表示
             const successMessage = `
 🎉 新しいOAuth2クライアント設定完了！
 
 ✅ クライアントID: 189292467710-31g262giiiiull9q585dk4fdqnd07427
-✅ 設定タイプ: 単一ページアプリケーション (SPA)
+✅ 設定タイプ: Webアプリケーション（PKCE対応）
 ✅ セキュリティ: PKCE認証対応
 ✅ ステータス: client_secret不要で正常動作
 
@@ -3847,7 +3786,7 @@ Googleカレンダーの手動インポート方法：
             `;
             
             showNotification(successMessage, 'success');
-            addGoogleLog('success', 'auth', '新しいOAuth2 SPAクライアントが正常に動作中');
+            addGoogleLog('success', 'auth', '新しいOAuth2 Webアプリケーションクライアントが正常に動作中');
         }
 
         function saveTokens() {
@@ -3885,7 +3824,7 @@ Googleカレンダーの手動インポート方法：
             }
 
             try {
-                addGoogleLog('info', 'auth', 'アクセストークンを更新中（Public Client）');
+                addGoogleLog('info', 'auth', 'アクセストークンを更新中（Webアプリケーション）');
 
                 const response = await fetch('https://oauth2.googleapis.com/token', {
                     method: 'POST',
@@ -3952,8 +3891,8 @@ Googleカレンダーの手動インポート方法：
                 pkce: {
                     icon: 'shield-alt',
                     color: 'green',
-                    title: 'PKCE認証（SPA専用）',
-                    description: '単一ページアプリケーション専用の認証方式。client_secret不要で最もセキュアです。'
+                    title: 'PKCE認証（Webアプリ + PKCE）',
+                    description: 'Webアプリケーションタイプ + PKCE認証。client_secret不要で最もセキュアです。'
                 },
                 debug: {
                     icon: 'bug',
@@ -3973,55 +3912,6 @@ Googleカレンダーの手動インポート方法：
                 </div>
                 <p class="text-xs text-${info.color}-700 mt-1">${info.description}</p>
             `;
-        }
-
-        function showManualTokenInput() {
-            const token = prompt(`
-Google OAuth2アクセストークンを手動で入力してください：
-
-取得方法：
-1. Google OAuth2 Playground (https://developers.google.com/oauthplayground/) にアクセス
-2. Step 1: scope設定 (calendar, tasks)
-3. Step 2: 認証コード取得
-4. Step 3: アクセストークン取得
-5. アクセストークンをコピー
-
-アクセストークン:`);
-
-            if (token && token.trim()) {
-                accessToken = token.trim();
-                tokenExpiresAt = new Date(Date.now() + 3600 * 1000);
-                
-                saveTokens();
-                addGoogleLog('success', 'auth', '手動トークン入力完了');
-                showNotification('手動でアクセストークンを設定しました', 'success');
-                updateOAuthStats();
-            }
-        }
-
-        async function testWithoutAuth() {
-            try {
-                addGoogleLog('info', 'auth', '認証なしテスト実行');
-                
-                const sampleTasks = [
-                    { id: 'test1', title: 'サンプルタスク1', completed: false },
-                    { id: 'test2', title: 'サンプルタスク2', completed: true }
-                ];
-                
-                const sampleEvents = [
-                    { id: 'event1', summary: 'サンプル会議', start: { date: getDateString(new Date()) } }
-                ];
-
-                addGoogleLog('success', 'auth', 'サンプルデータでのテスト完了');
-                showNotification('認証なしでのテストが完了しました。サンプルデータを使用します。', 'info');
-                
-                console.log('Sample tasks:', sampleTasks);
-                console.log('Sample events:', sampleEvents);
-                
-            } catch (error) {
-                addGoogleLog('error', 'auth', `認証なしテスト失敗: ${error.message}`);
-                showNotification(`テストエラー: ${error.message}`, 'error');
-            }
         }
 
         async function makeGoogleAPICall(url, options = {}) {
@@ -4467,9 +4357,6 @@ Google OAuth2アクセストークンを手動で入力してください：
         window.syncGoogleTasksAPI = syncGoogleTasksAPI;
         window.syncGoogleCalendarAPI = syncGoogleCalendarAPI;
         window.updateAuthMethodInfo = updateAuthMethodInfo;
-        window.initiateProxyAuth = initiateProxyAuth;
-        window.showManualTokenInput = showManualTokenInput;
-        window.testWithoutAuth = testWithoutAuth;
         window.testGoogleConnection = testGoogleConnection;
     </script>
 </body>
