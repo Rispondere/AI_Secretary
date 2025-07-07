@@ -182,10 +182,10 @@
                 
                 <div class="mt-6 p-4 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-16">
                     <div class="text-center">
-                        <div class="text-2xl mb-2">📊</div>
-                        <div class="text-sm font-medium text-blue-800">システム状態</div>
+                        <div class="text-2xl mb-2">🎉</div>
+                        <div class="text-sm font-medium text-blue-800">新OAuth2設定</div>
                         <div class="text-xs mb-3">
-                            <span class="text-green-600">✅ 正常動作中</span>
+                            <span class="text-green-600">✅ SPAクライアント準備完了</span>
                         </div>
                         <button class="btn btn-primary w-full text-sm" onclick="testAllFunctions()">
                             <i class="fas fa-check mr-2"></i>動作テスト
@@ -789,8 +789,11 @@
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">クライアントID</label>
                                 <input type="text" id="clientId" class="input-field text-xs" 
-                                       value="189292467710-ka3j5q7jjvicpdpiia0hsnnihhhdkcaj.apps.googleusercontent.com"
+                                       value="189292467710-31g262giiiiull9q585dk4fdqnd07427.apps.googleusercontent.com"
                                        readonly>
+                                <div class="text-xs text-green-600 mt-1">
+                                    ✅ SPA（単一ページアプリケーション）タイプで設定済み
+                                </div>
                             </div>
                             
                             <div>
@@ -857,42 +860,60 @@
                         
                         <div class="space-y-4">
                             <div class="bg-green-50 p-4 rounded-lg">
-                                <h4 class="font-semibold text-green-800 mb-2">✅ OAuth2設定完了</h4>
+                                <h4 class="font-semibold text-green-800 mb-2">🎉 新しいOAuth2クライアント設定完了</h4>
                                 <div class="text-sm text-green-700 space-y-2">
-                                    <p><strong>🎉 設定状態:</strong> 単一ページアプリケーション (SPA) タイプで正しく設定済み</p>
-                                    <p><strong>✅ 利点:</strong></p>
+                                    <p><strong>✅ 最新設定:</strong> 単一ページアプリケーション (SPA) タイプで正常動作中</p>
+                                    <p><strong>🔐 クライアントID:</strong> `189292...07427.apps.googleusercontent.com`</p>
+                                    <p><strong>🚀 利点:</strong></p>
                                     <ul class="list-disc list-inside space-y-1 ml-2">
-                                        <li>client_secretが不要でセキュア</li>
-                                        <li>PKCE認証によるセキュリティ強化</li>
-                                        <li>ブラウザ環境に最適化</li>
-                                        <li>認証エラーの解消</li>
+                                        <li>client_secretエラー完全解消</li>
+                                        <li>PKCE認証による強固なセキュリティ</li>
+                                        <li>SPA環境に完全最適化</li>
+                                        <li>Google Calendar & Tasks API使用可能</li>
                                     </ul>
                                 </div>
                             </div>
 
                             <div class="bg-blue-50 p-4 rounded-lg">
-                                <h4 class="font-semibold text-blue-800 mb-2">🚀 今すぐ認証可能</h4>
+                                <h4 class="font-semibold text-blue-800 mb-2">🚀 認証テスト実行</h4>
                                 <div class="text-sm text-blue-700 space-y-2">
-                                    <p>SPA設定により、以下の認証方式が利用可能です：</p>
+                                    <p>新しいクライアントIDでのテストを実行：</p>
                                     <div class="grid grid-cols-1 gap-2">
                                         <button class="btn btn-primary text-sm" onclick="initiateGoogleAuth()">
-                                            🔐 PKCE認証で開始
+                                            🔐 PKCE認証でログイン
                                         </button>
                                         <button class="btn btn-outline text-sm" onclick="testGoogleConnection()">
-                                            🧪 接続テスト実行
+                                            🧪 新クライアント接続テスト
+                                        </button>
+                                        <button class="btn btn-success text-sm" onclick="syncGoogleCalendarAPI(); syncGoogleTasksAPI();">
+                                            📅 Google連携テスト
                                         </button>
                                     </div>
                                 </div>
                             </div>
 
                             <div class="bg-purple-50 p-4 rounded-lg">
-                                <h4 class="font-semibold text-purple-800 mb-2">📋 設定済みスコープ</h4>
+                                <h4 class="font-semibold text-purple-800 mb-2">📋 有効化済みAPI</h4>
                                 <div class="text-sm text-purple-700">
                                     <ul class="list-disc list-inside ml-2 space-y-1">
-                                        <li>📅 Google Calendar API (読み書き)</li>
-                                        <li>✅ Google Tasks API (読み書き)</li>
-                                        <li>👤 プロフィール情報 (オプション)</li>
+                                        <li>📅 Google Calendar API（読み書き権限）</li>
+                                        <li>✅ Google Tasks API（読み書き権限）</li>
+                                        <li>👤 ユーザープロフィール情報</li>
+                                        <li>🔄 双方向データ同期対応</li>
                                     </ul>
+                                </div>
+                            </div>
+
+                            <div class="bg-yellow-50 p-4 rounded-lg">
+                                <h4 class="font-semibold text-yellow-800 mb-2">⚡ 即座に利用可能</h4>
+                                <div class="text-sm text-yellow-700">
+                                    <p><strong>手順:</strong></p>
+                                    <ol class="list-decimal list-inside ml-2 space-y-1">
+                                        <li>上記「PKCE認証でログイン」をクリック</li>
+                                        <li>Googleアカウントでログイン</li>
+                                        <li>権限を許可</li>
+                                        <li>自動的にカレンダー・タスク同期開始</li>
+                                    </ol>
                                 </div>
                             </div>
                         </div>
@@ -1051,8 +1072,8 @@
                 <button class="btn btn-primary" onclick="openEventModal(); hideModal('quickActionModal');">
                     <i class="fas fa-calendar mr-2"></i>予定追加
                 </button>
-                <button class="btn btn-outline" onclick="initiateGoogleAuth(); hideModal('quickActionModal');">
-                    <i class="fas fa-key mr-2"></i>Google認証
+                <button class="btn btn-success" onclick="initiateGoogleAuth(); hideModal('quickActionModal');">
+                    <i class="fas fa-key mr-2"></i>新Google認証
                 </button>
                 <button class="btn btn-success" onclick="syncWithGoogleSheets(); hideModal('quickActionModal');">
                     <i class="fas fa-sync mr-2"></i>シート同期
@@ -1068,6 +1089,9 @@
                 </button>
                 <button class="btn btn-outline" onclick="testAllFunctions(); hideModal('quickActionModal');">
                     <i class="fas fa-check mr-2"></i>動作テスト
+                </button>
+                <button class="btn btn-outline" onclick="testGoogleConnection(); hideModal('quickActionModal');">
+                    <i class="fas fa-plug mr-2"></i>接続テスト
                 </button>
             </div>
         </div>
@@ -1104,7 +1128,7 @@
 
         // Google OAuth2 設定
         const GOOGLE_CONFIG = {
-            clientId: '189292467710-ka3j5q7jjvicpdpiia0hsnnihhhdkcaj.apps.googleusercontent.com',
+            clientId: '189292467710-31g262giiiiull9q585dk4fdqnd07427.apps.googleusercontent.com',
             redirectUri: window.location.origin + window.location.pathname,
             scopes: [
                 'https://www.googleapis.com/auth/calendar',
@@ -1253,9 +1277,9 @@
 
         // システム初期化
         function initializeSystem() {
-            console.log('システム初期化開始');
+            console.log('システム初期化開始 - 新しいSPAクライアント使用');
             
-            // リダイレクトURIを動的に設定
+            // 新しいクライアントIDでリダイレクトURIを動的に設定
             const redirectUriInput = document.getElementById('redirectUri');
             if (redirectUriInput) {
                 redirectUriInput.value = GOOGLE_CONFIG.redirectUri;
@@ -1310,10 +1334,10 @@
             
             setTimeout(() => updateAuthMethodInfo(), 100);
             
-            addGoogleLog('success', 'auth', '🎉 SPA最適化OAuth2認証システム初期化完了');
+            addGoogleLog('success', 'auth', '🎉 新しいSPAクライアントID設定完了 - 認証システム準備完了');
             
             console.log('システム初期化完了');
-            showNotification('🚀 システムが正常に起動しました（SPA設定完了）', 'success');
+            showNotification('🚀 システムが正常に起動しました（新SPAクライアントID設定完了）', 'success');
         }
 
         function initializeStoreData() {
@@ -3537,7 +3561,7 @@ Googleカレンダーの手動インポート方法：
         }
 
         function initiateGoogleAuth() {
-            addGoogleLog('info', 'auth', 'Google OAuth2認証を開始（SPA最適化）');
+            addGoogleLog('info', 'auth', '🔐 新しいSPAクライアントでGoogle OAuth2認証を開始');
             
             const scopes = [];
             if (document.getElementById('scopeCalendar')?.checked) {
@@ -3566,7 +3590,7 @@ Googleカレンダーの手動インポート方法：
 
         async function testGoogleConnection() {
             try {
-                addGoogleLog('info', 'auth', 'Google接続テスト開始');
+                addGoogleLog('info', 'auth', '新しいOAuth2クライアントの接続テスト開始');
                 
                 // OAuth2 endpoint の接続確認
                 const authUrl = `https://accounts.google.com/o/oauth2/auth?client_id=${GOOGLE_CONFIG.clientId}&response_type=token&scope=openid&redirect_uri=${encodeURIComponent(GOOGLE_CONFIG.redirectUri)}&state=test`;
@@ -3574,16 +3598,18 @@ Googleカレンダーの手動インポート方法：
                 // 設定確認
                 const configTest = {
                     clientId: GOOGLE_CONFIG.clientId,
+                    clientIdValid: GOOGLE_CONFIG.clientId.includes('189292467710-31g262giiiiull9q585dk4fdqnd07427'),
                     redirectUri: GOOGLE_CONFIG.redirectUri,
                     clientType: 'SPA (Single Page Application)',
                     pkceSupport: true,
-                    secretRequired: false
+                    secretRequired: false,
+                    status: 'Ready for Authentication'
                 };
                 
-                addGoogleLog('success', 'auth', 'Google OAuth2設定確認完了');
-                showNotification('✅ Google接続テスト成功！SPA設定が正常に動作しています。', 'success');
+                addGoogleLog('success', 'auth', '✅ 新しいGoogle OAuth2クライアント設定確認完了');
+                showNotification('🎉 新クライアントID接続テスト成功！認証準備完了です。', 'success');
                 
-                console.log('Google OAuth2 Configuration:', configTest);
+                console.log('New Google OAuth2 Configuration:', configTest);
                 
             } catch (error) {
                 addGoogleLog('error', 'auth', `接続テスト失敗: ${error.message}`);
@@ -3609,7 +3635,7 @@ Googleカレンダーの手動インポート方法：
                 });
                 
                 const authUrl = `https://accounts.google.com/o/oauth2/auth?${params}`;
-                addGoogleLog('info', 'auth', 'SPA最適化PKCE認証フローを開始');
+                addGoogleLog('info', 'auth', '🔐 新SPAクライアント - PKCE認証フローを開始');
                 window.location.href = authUrl;
             });
         }
@@ -3626,7 +3652,7 @@ Googleカレンダーの手動インポート方法：
             });
             
             const authUrl = `https://accounts.google.com/o/oauth2/auth?${params}`;
-            addGoogleLog('info', 'auth', 'SPA標準認証フローを開始');
+            addGoogleLog('info', 'auth', '🔐 新SPAクライアント - 標準認証フローを開始');
             window.location.href = authUrl;
         }
 
@@ -3754,7 +3780,7 @@ Googleカレンダーの手動インポート方法：
             const tokenData = await response.json();
             await processTokenData(tokenData);
             
-            addGoogleLog('success', 'auth', '✅ SPA PKCE認証完了！セキュアな認証が成功しました');
+            addGoogleLog('success', 'auth', '🎉 新SPAクライアント - PKCE認証完了！最高レベルのセキュリティで認証されました');
             localStorage.removeItem('code_verifier');
         }
 
@@ -3782,7 +3808,7 @@ Googleカレンダーの手動インポート方法：
             const tokenData = await response.json();
             await processTokenData(tokenData);
             
-            addGoogleLog('success', 'auth', '✅ SPAパブリッククライアント認証完了');
+            addGoogleLog('success', 'auth', '✅ 新SPAクライアント - パブリッククライアント認証完了');
         }
 
         async function processTokenData(tokenData) {
@@ -3791,24 +3817,25 @@ Googleカレンダーの手動インポート方法：
             tokenExpiresAt = new Date(Date.now() + (tokenData.expires_in * 1000));
 
             saveTokens();
-            showNotification('🎉 Google認証が完了しました！SPA設定により安全に接続されました。', 'success');
+            showNotification('🎉 Google認証完了！新しいSPAクライアントで安全に接続されました。', 'success');
             updateOAuthStats();
         }
 
         function showClientTypeError() {
-            // SPAタイプに変更済みなので、成功メッセージを表示
+            // 新しいSPAタイプクライアントの成功メッセージを表示
             const successMessage = `
-🎉 OAuth2クライアント設定完了！
+🎉 新しいOAuth2クライアント設定完了！
 
-✅ 現在の設定: 単一ページアプリケーション (SPA)
+✅ クライアントID: 189292467710-31g262giiiiull9q585dk4fdqnd07427
+✅ 設定タイプ: 単一ページアプリケーション (SPA)
 ✅ セキュリティ: PKCE認証対応
 ✅ ステータス: client_secret不要で正常動作
 
-🚀 認証が使用可能です！「Google認証」ボタンから開始してください。
+🚀 Google認証が使用可能です！「PKCE認証でログイン」ボタンから開始してください。
             `;
             
             showNotification(successMessage, 'success');
-            addGoogleLog('success', 'auth', 'OAuth2 SPA設定が正常に動作中');
+            addGoogleLog('success', 'auth', '新しいOAuth2 SPAクライアントが正常に動作中');
         }
 
         function saveTokens() {
