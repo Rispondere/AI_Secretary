@@ -186,7 +186,8 @@
                         <div class="text-sm font-medium text-blue-800">新OAuth2設定</div>
                         <div class="text-xs mb-3">
                             <span class="text-green-600">✅ Webアプリケーション準備完了</span><br>
-                            <span class="text-orange-600">⚠️ client_secret設定が必要</span>
+                            <span class="text-orange-600">⚠️ client_secret設定が必要</span><br>
+                            <span class="text-blue-600">📋 設定ガイド利用可能</span>
                         </div>
                         <button class="btn btn-primary w-full text-sm" onclick="testAllFunctions()">
                             <i class="fas fa-check mr-2"></i>動作テスト
@@ -832,6 +833,24 @@
                                 <div class="text-xs text-gray-500 mt-1">
                                     現在のページのURLが自動設定されます
                                 </div>
+                                <div class="text-xs text-red-600 mt-1">
+                                    ⚠️ Google Cloud Consoleの「承認済みのリダイレクトURI」に完全一致で登録してください
+                                </div>
+                            </div>
+                            
+                            <div class="bg-yellow-50 p-3 rounded-lg">
+                                <h4 class="font-semibold text-yellow-800 mb-2">🔍 設定確認</h4>
+                                <div class="space-y-2">
+                                    <button class="btn btn-outline w-full text-sm" onclick="showGoogleCloudConsoleGuide()">
+                                        📋 Google Cloud Console設定ガイド
+                                    </button>
+                                    <button class="btn btn-outline w-full text-sm" onclick="testWebClientConfiguration()">
+                                        🧪 クライアント設定テスト
+                                    </button>
+                                    <button class="btn btn-outline w-full text-sm" onclick="copyCurrentUrlToClipboard()">
+                                        📎 現在のURLをコピー
+                                    </button>
+                                </div>
                             </div>
                             
                             <div>
@@ -897,28 +916,34 @@
                                 </div>
                             </div>
 
-                            <div class="bg-yellow-50 p-4 rounded-lg">
-                                <h4 class="font-semibold text-yellow-800 mb-2">⚠️ 重要な注意点</h4>
-                                <div class="text-sm text-yellow-700 space-y-2">
-                                    <p><strong>Webアプリケーションタイプの特徴:</strong></p>
+                            <div class="bg-red-50 p-4 rounded-lg">
+                                <h4 class="font-semibold text-red-800 mb-2">🚨 エラー解決方法</h4>
+                                <div class="text-sm text-red-700 space-y-2">
+                                    <p><strong>「invalid_client」エラーの場合:</strong></p>
                                     <ul class="list-disc list-inside space-y-1 ml-2">
-                                        <li>PKCEを使用してもclient_secretが必要</li>
-                                        <li>セキュリティを保つため、シークレットは安全に管理</li>
-                                        <li>本番環境では環境変数での管理を推奨</li>
-                                        <li>ブラウザのローカルストレージに暗号化して保存</li>
+                                        <li>クライアントIDが正しくコピーされているか確認</li>
+                                        <li>クライアントシークレットが正しくコピーされているか確認</li>
+                                        <li>リダイレクトURIが完全一致で設定されているか確認</li>
+                                        <li>Google Cloud ConsoleでOAuth同意画面が設定されているか確認</li>
+                                        <li>Calendar APIとTasks APIが有効化されているか確認</li>
                                     </ul>
                                 </div>
                             </div>
 
-                            <div class="bg-purple-50 p-4 rounded-lg">
-                                <h4 class="font-semibold text-purple-800 mb-2">📋 利用可能なAPI</h4>
-                                <div class="text-sm text-purple-700">
-                                    <ul class="list-disc list-inside ml-2 space-y-1">
-                                        <li>📅 Google Calendar API（読み書き権限）</li>
-                                        <li>✅ Google Tasks API（読み書き権限）</li>
-                                        <li>👤 ユーザープロフィール情報</li>
-                                        <li>🔄 双方向データ同期対応</li>
-                                    </ul>
+                            <div class="bg-yellow-50 p-4 rounded-lg">
+                                <h4 class="font-semibold text-yellow-800 mb-2">🔍 診断・テストツール</h4>
+                                <div class="text-sm text-yellow-700 space-y-2">
+                                    <div class="grid grid-cols-1 gap-2">
+                                        <button class="btn btn-outline text-sm" onclick="showGoogleCloudConsoleGuide()">
+                                            📋 詳細設定ガイド
+                                        </button>
+                                        <button class="btn btn-outline text-sm" onclick="testWebClientConfiguration()">
+                                            🧪 設定診断テスト
+                                        </button>
+                                        <button class="btn btn-outline text-sm" onclick="copyCurrentUrlToClipboard()">
+                                            📎 リダイレクトURLコピー
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1284,6 +1309,9 @@
         // システム初期化
         function initializeSystem() {
             console.log('システム初期化開始 - 新しいWebアプリケーションクライアント使用');
+            
+            // リダイレクトURIを正確に設定
+            GOOGLE_CONFIG.redirectUri = window.location.origin + window.location.pathname;
             
             // 新しいクライアントIDでリダイレクトURIを動的に設定
             const redirectUriInput = document.getElementById('redirectUri');
@@ -3582,8 +3610,16 @@ Googleカレンダーの手動インポート方法：
             // client_secretの確認
             const clientSecret = document.getElementById('clientSecret')?.value || GOOGLE_CONFIG.clientSecret;
             if (!clientSecret) {
-                showNotification('クライアントシークレットが設定されていません。Google Cloud Consoleから取得して入力してください。', 'error');
+                showNotification('クライアントシークレットが設定されていません。\n\n1. 「Google Cloud Console設定ガイド」ボタンをクリック\n2. 手順に従ってクライアントシークレットを取得\n3. OAuth設定で入力してください', 'error');
                 return;
+            }
+            
+            // リダイレクトURIの確認
+            const currentUrl = window.location.origin + window.location.pathname;
+            GOOGLE_CONFIG.redirectUri = currentUrl;
+            const redirectUriInput = document.getElementById('redirectUri');
+            if (redirectUriInput) {
+                redirectUriInput.value = currentUrl;
             }
             
             const scopes = [];
@@ -3604,33 +3640,146 @@ Googleカレンダーの手動インポート方法：
             initiatePKCEAuth(scopes, state);
         }
 
-        async function testGoogleConnection() {
+        async function testWebClientConfiguration() {
             try {
-                addGoogleLog('info', 'auth', '新しいOAuth2クライアントの接続テスト開始');
+                addGoogleLog('info', 'auth', '🔍 Webアプリケーションクライアント設定テスト開始');
                 
-                // OAuth2 endpoint の接続確認
-                const authUrl = `https://accounts.google.com/o/oauth2/auth?client_id=${GOOGLE_CONFIG.clientId}&response_type=token&scope=openid&redirect_uri=${encodeURIComponent(GOOGLE_CONFIG.redirectUri)}&state=test`;
+                const clientId = document.getElementById('clientId')?.value || GOOGLE_CONFIG.clientId;
+                const clientSecret = document.getElementById('clientSecret')?.value || GOOGLE_CONFIG.clientSecret;
+                const redirectUri = document.getElementById('redirectUri')?.value || GOOGLE_CONFIG.redirectUri;
                 
                 // 設定確認
-                const configTest = {
-                    clientId: GOOGLE_CONFIG.clientId,
-                    clientIdValid: GOOGLE_CONFIG.clientId.includes('189292467710-31g262giiiiull9q585dk4fdqnd07427'),
-                    redirectUri: GOOGLE_CONFIG.redirectUri,
-                    clientType: 'Webアプリケーション（PKCE対応）',
-                    pkceSupport: true,
-                    secretRequired: false,
-                    status: 'Ready for Authentication'
+                const configCheck = {
+                    clientId: clientId,
+                    clientIdValid: clientId && clientId.includes('.apps.googleusercontent.com'),
+                    clientSecret: clientSecret,
+                    clientSecretValid: clientSecret && clientSecret.length > 10,
+                    redirectUri: redirectUri,
+                    redirectUriValid: redirectUri && (redirectUri.startsWith('http://') || redirectUri.startsWith('https://')),
+                    currentUrl: window.location.href,
+                    urlMatch: redirectUri === window.location.origin + window.location.pathname
                 };
                 
-                addGoogleLog('success', 'auth', '✅ 新しいGoogle OAuth2クライアント設定確認完了');
-                showNotification('🎉 新クライアントID接続テスト成功！認証準備完了です。', 'success');
+                console.log('🔍 OAuth2 設定確認:', configCheck);
                 
-                console.log('New Google OAuth2 Configuration:', configTest);
+                let issues = [];
+                if (!configCheck.clientIdValid) {
+                    issues.push('❌ クライアントIDが無効または未設定');
+                }
+                if (!configCheck.clientSecretValid) {
+                    issues.push('❌ クライアントシークレットが無効または未設定');
+                }
+                if (!configCheck.redirectUriValid) {
+                    issues.push('❌ リダイレクトURIが無効');
+                }
+                if (!configCheck.urlMatch) {
+                    issues.push('❌ リダイレクトURIと現在のURLが不一致');
+                }
+                
+                if (issues.length === 0) {
+                    addGoogleLog('success', 'auth', '✅ クライアント設定確認完了 - 設定に問題ありません');
+                    showNotification('✅ クライアント設定に問題ありません！認証を試行してください。', 'success');
+                } else {
+                    addGoogleLog('warning', 'auth', `⚠️ 設定に問題があります: ${issues.join(', ')}`);
+                    showNotification(`設定を確認してください:\n${issues.join('\n')}`, 'warning');
+                }
+                
+                // デバッグ情報をコンソールに出力
+                console.log('🔧 デバッグ情報:');
+                console.log('- Client ID:', clientId);
+                console.log('- Client Secret設定済み:', !!clientSecret);
+                console.log('- Redirect URI:', redirectUri);
+                console.log('- Current URL:', window.location.href);
+                console.log('- URL Match:', configCheck.urlMatch);
                 
             } catch (error) {
-                addGoogleLog('error', 'auth', `接続テスト失敗: ${error.message}`);
-                showNotification(`接続テストエラー: ${error.message}`, 'error');
+                addGoogleLog('error', 'auth', `設定テスト失敗: ${error.message}`);
+                showNotification(`設定テストエラー: ${error.message}`, 'error');
             }
+        }
+
+        function showGoogleCloudConsoleGuide() {
+            const guideModal = document.createElement('div');
+            guideModal.className = 'modal';
+            guideModal.innerHTML = `
+                <div class="modal-content max-w-4xl">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-bold text-gray-900">📋 Google Cloud Console設定ガイド</h3>
+                        <button onclick="this.closest('.modal').remove()" class="text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="space-y-6">
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                            <h4 class="font-semibold text-blue-800 mb-3">🔑 OAuth2クライアント作成手順</h4>
+                            <ol class="list-decimal list-inside space-y-2 text-sm text-blue-700">
+                                <li><strong>Google Cloud Console</strong>にアクセス: <a href="https://console.cloud.google.com/" target="_blank" class="underline">https://console.cloud.google.com/</a></li>
+                                <li>左側メニューから <strong>「APIs & Services」</strong> → <strong>「認証情報」</strong></li>
+                                <li><strong>「+ 認証情報を作成」</strong> → <strong>「OAuth 2.0 クライアント ID」</strong></li>
+                                <li>アプリケーションの種類: <strong>「Webアプリケーション」</strong>を選択</li>
+                                <li>名前: <strong>「CLASSY Business Management」</strong>（任意）</li>
+                                <li><strong>承認済みのリダイレクトURI</strong>に以下を追加:</li>
+                            </ol>
+                        </div>
+                        
+                        <div class="bg-yellow-50 p-4 rounded-lg">
+                            <h4 class="font-semibold text-yellow-800 mb-3">📎 リダイレクトURI設定</h4>
+                            <div class="space-y-2">
+                                <p class="text-sm text-yellow-700">以下のURLを <strong>完全に一致</strong> するように設定してください:</p>
+                                <div class="bg-white p-3 rounded border font-mono text-sm" id="currentUrlDisplay">
+                                    ${window.location.origin + window.location.pathname}
+                                </div>
+                                <button class="btn btn-outline btn-sm" onclick="copyCurrentUrlToClipboard()">
+                                    📎 URLをコピー
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-green-50 p-4 rounded-lg">
+                            <h4 class="font-semibold text-green-800 mb-3">✅ 作成完了後</h4>
+                            <ol class="list-decimal list-inside space-y-2 text-sm text-green-700">
+                                <li><strong>「クライアントID」</strong>をコピー</li>
+                                <li><strong>「クライアントシークレット」</strong>をコピー</li>
+                                <li>本システムのOAuth設定画面で両方を入力</li>
+                                <li>「PKCE認証でログイン」をクリックして認証開始</li>
+                            </ol>
+                        </div>
+                        
+                        <div class="bg-red-50 p-4 rounded-lg">
+                            <h4 class="font-semibold text-red-800 mb-3">⚠️ よくある問題と解決方法</h4>
+                            <ul class="list-disc list-inside space-y-2 text-sm text-red-700">
+                                <li><strong>「invalid_client」エラー</strong>: クライアントIDまたはシークレットが間違っている</li>
+                                <li><strong>「redirect_uri_mismatch」エラー</strong>: リダイレクトURIが完全一致していない</li>
+                                <li><strong>「client_secret is missing」エラー</strong>: シークレットが入力されていない</li>
+                                <li><strong>「unauthorized」エラー</strong>: Google Cloud Consoleでクライアントが無効化されている</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="flex space-x-3">
+                            <button class="btn btn-primary flex-1" onclick="this.closest('.modal').remove()">
+                                理解しました
+                            </button>
+                            <a href="https://console.cloud.google.com/apis/credentials" target="_blank" class="btn btn-outline">
+                                Google Cloud Consoleを開く
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(guideModal);
+            addGoogleLog('info', 'guide', 'Google Cloud Console設定ガイドを表示');
+        }
+
+        function copyCurrentUrlToClipboard() {
+            const url = window.location.origin + window.location.pathname;
+            navigator.clipboard.writeText(url).then(() => {
+                showNotification('📎 現在のURLをクリップボードにコピーしました', 'success');
+                addGoogleLog('info', 'util', 'リダイレクトURIをクリップボードにコピー');
+            }).catch(err => {
+                showNotification('コピーに失敗しました。手動でURLをコピーしてください: ' + url, 'warning');
+            });
         }
 
         function initiatePKCEAuth(scopes, state) {
@@ -3754,13 +3903,46 @@ Googleカレンダーの手動インポート方法：
                 const errorData = await response.text();
                 console.error('PKCE Error Response:', errorData);
                 
-                if (errorData.includes('client_secret is missing')) {
-                    throw new Error(`client_secretが必要です。Google Cloud Consoleの認証情報ページから「クライアントシークレット」をコピーして、OAuth設定で入力してください。\n\n手順:\n1. Google Cloud Console → APIs & Services → 認証情報\n2. 作成したOAuth2クライアントIDをクリック\n3. 「クライアントシークレット」をコピー\n4. 本システムのOAuth設定画面で入力\n\n詳細エラー: ${errorData}`);
-                } else if (errorData.includes('invalid_client')) {
-                    throw new Error(`クライアント設定が無効です。以下を確認してください:\n1. クライアントIDが正しい\n2. クライアントシークレットが正しい\n3. リダイレクトURIが正しく設定されている\n\n詳細エラー: ${errorData}`);
+                let errorObj;
+                try {
+                    errorObj = JSON.parse(errorData);
+                } catch (e) {
+                    errorObj = { error: 'unknown', error_description: errorData };
                 }
                 
-                throw new Error(`PKCE認証失敗: ${response.status} - ${errorData}`);
+                if (errorData.includes('client_secret is missing') || errorObj.error === 'invalid_request') {
+                    throw new Error(`client_secretが必要です。Google Cloud Consoleの認証情報ページから「クライアントシークレット」をコピーして、OAuth設定で入力してください。\n\n手順:\n1. Google Cloud Console → APIs & Services → 認証情報\n2. 作成したOAuth2クライアントIDをクリック\n3. 「クライアントシークレット」をコピー\n4. 本システムのOAuth設定画面で入力\n\n詳細エラー: ${errorData}`);
+                } 
+                else if (errorData.includes('invalid_client') || errorObj.error === 'invalid_client') {
+                    // 詳細な診断情報を収集
+                    const currentUrl = window.location.origin + window.location.pathname;
+                    const redirectUri = GOOGLE_CONFIG.redirectUri;
+                    const clientId = GOOGLE_CONFIG.clientId;
+                    
+                    let diagnosis = [];
+                    if (!clientId || !clientId.includes('.apps.googleusercontent.com')) {
+                        diagnosis.push('❌ クライアントIDの形式が正しくない');
+                    }
+                    if (!clientSecret) {
+                        diagnosis.push('❌ クライアントシークレットが設定されていない');
+                    }
+                    if (redirectUri !== currentUrl) {
+                        diagnosis.push(`❌ リダイレクトURI不一致\n   設定値: ${redirectUri}\n   現在のURL: ${currentUrl}`);
+                    }
+                    
+                    const diagnosisText = diagnosis.length > 0 ? 
+                        `\n\n🔍 診断結果:\n${diagnosis.join('\n')}` : 
+                        '\n\n🔍 基本設定は正しいため、Google Cloud Consoleでの設定を確認してください。';
+                    
+                    throw new Error(`クライアント設定が無効です。以下を確認してください:\n\n1. Google Cloud Consoleでクライアントが正しく作成されている\n2. クライアントIDが正確にコピーされている\n3. クライアントシークレットが正確にコピーされている\n4. リダイレクトURIが完全一致で設定されている: ${currentUrl}\n5. OAuth同意画面が設定されている\n6. 必要なAPIが有効化されている${diagnosisText}\n\n📋 詳細な設定ガイドを表示するには「Google Cloud Console設定ガイド」ボタンをクリックしてください。\n\n詳細エラー: ${errorData}`);
+                }
+                else if (errorData.includes('redirect_uri_mismatch')) {
+                    const currentUrl = window.location.origin + window.location.pathname;
+                    throw new Error(`リダイレクトURI不一致エラー。Google Cloud Consoleで以下のURLを完全一致で設定してください:\n\n${currentUrl}\n\n設定手順:\n1. Google Cloud Console → APIs & Services → 認証情報\n2. 作成したOAuth2クライアントIDをクリック\n3. 「承認済みのリダイレクトURI」に上記URLを追加\n4. 保存\n\n詳細エラー: ${errorData}`);
+                }
+                else {
+                    throw new Error(`PKCE認証失敗: ${response.status} - ${errorData}\n\n一般的な解決方法:\n1. Google Cloud Console設定を確認\n2. クライアントIDとシークレットを再確認\n3. リダイレクトURIの完全一致を確認\n4. OAuth同意画面の設定を確認`);
+                }
             }
 
             const tokenData = await response.json();
@@ -4419,7 +4601,10 @@ Googleカレンダーの手動インポート方法：
         window.syncGoogleTasksAPI = syncGoogleTasksAPI;
         window.syncGoogleCalendarAPI = syncGoogleCalendarAPI;
         window.updateAuthMethodInfo = updateAuthMethodInfo;
-        window.testGoogleConnection = testGoogleConnection;
+        window.testGoogleConnection = testWebClientConfiguration;
+        window.testWebClientConfiguration = testWebClientConfiguration;
+        window.showGoogleCloudConsoleGuide = showGoogleCloudConsoleGuide;
+        window.copyCurrentUrlToClipboard = copyCurrentUrlToClipboard;
     </script>
 </body>
 </html>
