@@ -140,8 +140,6 @@
                     <div class="text-sm text-gray-600">業務管理システム</div>
                     <div class="text-xs text-blue-600 font-medium">動作確認版</div>
                 </div>
-    </div>
-        </div>
                 
                 <nav class="space-y-2">
                     <div class="nav-item active" onclick="showPage('dashboard')">
@@ -400,7 +398,6 @@
                     </div>
                 </div>
             </div>
-            </div>
             
             <!-- カレンダーページ -->
             <div id="calendarPage" class="page-content p-4 hidden">
@@ -524,14 +521,11 @@
                             <div class="text-2xl font-bold text-purple-600" id="syncErrors">0</div>
                             <div class="text-sm text-gray-600">同期エラー</div>
                             <div class="text-xs text-purple-600 mt-1" id="lastError">エラーなし</div>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="glass-card p-4 mb-6">
-                    <h3 class="text-lg font-bold text-gray-900 mb-4">🔄 リアルタイム同期設定</h3>
                     <h3 class="text-lg font-bold text-gray-900 mb-4">同期設定</h3>
                     
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -545,7 +539,7 @@
                                            placeholder="Google SheetsのURL">
                                 </div>
                                 <div class="flex items-center space-x-2">
-                                    <input type="checkbox" id="autoSync" class="rounded">
+                                    <input type="checkbox" id="autoSync" class="rounded" onchange="toggleAutoSync()">
                                     <label for="autoSync" class="text-sm text-gray-700">自動同期を有効にする（5分間隔）</label>
                                 </div>
                                 <button class="btn btn-outline w-full" onclick="testSheetConnection()">
@@ -739,120 +733,6 @@
                     </div>
                 </div>
 
-                <div class="glass-card p-4 mb-6">
-                    <h3 class="text-lg font-bold text-gray-900 mb-4">🔄 同期データマッピング</h3>
-                    
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div>
-                            <h4 class="font-semibold text-gray-800 mb-3">📅 カレンダーイベント → 業務予定</h4>
-                            <div class="overflow-x-auto">
-                                <table class="w-full text-sm bg-white rounded">
-                                    <thead class="bg-gray-50">
-                                        <tr>
-                                            <th class="text-left p-2">Googleカレンダー</th>
-                                            <th class="text-left p-2">業務管理システム</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr class="border-t">
-                                            <td class="p-2">イベントタイトル</td>
-                                            <td class="p-2">予定名</td>
-                                        </tr>
-                                        <tr class="border-t">
-                                            <td class="p-2">説明</td>
-                                            <td class="p-2">詳細説明</td>
-                                        </tr>
-                                        <tr class="border-t">
-                                            <td class="p-2">開始時間</td>
-                                            <td class="p-2">予定日</td>
-                                        </tr>
-                                        <tr class="border-t">
-                                            <td class="p-2">場所</td>
-                                            <td class="p-2">説明に追加</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        
-                        <div>
-                            <h4 class="font-semibold text-gray-800 mb-3">✅ Googleタスク → 業務タスク</h4>
-                            <div class="overflow-x-auto">
-                                <table class="w-full text-sm bg-white rounded">
-                                    <thead class="bg-gray-50">
-                                        <tr>
-                                            <th class="text-left p-2">Googleタスク</th>
-                                            <th class="text-left p-2">業務管理システム</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr class="border-t">
-                                            <td class="p-2">タスクタイトル</td>
-                                            <td class="p-2">タスク名</td>
-                                        </tr>
-                                        <tr class="border-t">
-                                            <td class="p-2">メモ</td>
-                                            <td class="p-2">説明</td>
-                                        </tr>
-                                        <tr class="border-t">
-                                            <td class="p-2">期限</td>
-                                            <td class="p-2">期限</td>
-                                        </tr>
-                                        <tr class="border-t">
-                                            <td class="p-2">完了状態</td>
-                                            <td class="p-2">完了フラグ</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="glass-card p-4 mb-6">
-                    <h3 class="text-lg font-bold text-gray-900 mb-4">📊 同期統計</h3>
-                    <div class="overflow-x-auto">
-                        <table class="w-full bg-white rounded-lg text-sm">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th class="text-left p-3 font-semibold">サービス</th>
-                                    <th class="text-left p-3 font-semibold">最終同期</th>
-                                    <th class="text-left p-3 font-semibold">同期件数</th>
-                                    <th class="text-left p-3 font-semibold">エラー</th>
-                                    <th class="text-left p-3 font-semibold">ステータス</th>
-                                    <th class="text-left p-3 font-semibold">操作</th>
-                                </tr>
-                            </thead>
-                            <tbody id="googleSyncStatsTable">
-                                <tr>
-                                    <td class="p-3 font-medium">📅 Googleカレンダー</td>
-                                    <td class="p-3 text-gray-500" id="calendarLastSync">未同期</td>
-                                    <td class="p-3" id="calendarSyncCount">0件</td>
-                                    <td class="p-3" id="calendarErrors">0</td>
-                                    <td class="p-3"><span class="px-2 py-1 bg-gray-100 text-gray-800 rounded text-xs">待機中</span></td>
-                                    <td class="p-3">
-                                        <button class="btn btn-outline text-xs" onclick="resetGoogleCalendarSync()">
-                                            <i class="fas fa-redo mr-1"></i>リセット
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="p-3 font-medium">✅ Googleタスク</td>
-                                    <td class="p-3 text-gray-500" id="taskLastSync">未同期</td>
-                                    <td class="p-3" id="taskSyncCount">0件</td>
-                                    <td class="p-3" id="taskErrors">0</td>
-                                    <td class="p-3"><span class="px-2 py-1 bg-gray-100 text-gray-800 rounded text-xs">待機中</span></td>
-                                    <td class="p-3">
-                                        <button class="btn btn-outline text-xs" onclick="resetGoogleTaskSync()">
-                                            <i class="fas fa-redo mr-1"></i>リセット
-                                        </button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
                 <div class="glass-card p-4">
                     <h3 class="text-lg font-bold text-gray-900 mb-4">Google 連携ログ</h3>
                     <div id="googleLogsList" class="space-y-2 max-h-96 overflow-y-auto">
@@ -915,7 +795,7 @@
                             
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">認証方式</label>
-                                <select id="authMethod" class="input-field text-sm mb-2">
+                                <select id="authMethod" class="input-field text-sm mb-2" onchange="updateAuthMethodInfo()">
                                     <option value="auto">自動選択（推奨）</option>
                                     <option value="pkce">PKCE認証</option>
                                     <option value="standard">標準認証</option>
@@ -966,132 +846,48 @@
                                     <i class="fas fa-sign-out-alt mr-2"></i>認証解除
                                 </button>
                             </div>
-
-                            <div class="border-t pt-3">
-                                <button class="btn btn-success w-full mb-2" onclick="initiateProxyAuth()">
-                                    <i class="fas fa-server mr-2"></i>プロキシ認証を試行
-                                </button>
-                                <p class="text-xs text-gray-600">
-                                    通常の認証が失敗する場合の代替手段
-                                </p>
-                            </div>
                         </div>
                     </div>
 
-                <div class="glass-card p-4">
-                    <h3 class="text-lg font-bold text-gray-900 mb-4">🛠️ トラブルシューティング</h3>
-                    
-                    <div class="space-y-4">
-                        <div class="bg-yellow-50 p-4 rounded-lg">
-                            <h4 class="font-semibold text-yellow-800 mb-2">❌ "client_secret is missing" エラー</h4>
-                            <div class="text-sm text-yellow-700 space-y-2">
-                                <p><strong>原因:</strong> OAuth2クライアントが「Webアプリケーション」タイプで設定されています</p>
-                                <p><strong>解決法:</strong></p>
-                                <ol class="list-decimal list-inside space-y-1 ml-2">
-                                    <li>Google Cloud Console → APIs & Services → 認証情報</li>
-                                    <li>OAuth 2.0 クライアント ID を選択</li>
-                                    <li>アプリケーションの種類を変更:</li>
-                                    <ul class="list-disc list-inside ml-4">
-                                        <li>✅ <strong>単一ページアプリケーション (SPA)</strong> - 推奨</li>
-                                        <li>✅ デスクトップアプリケーション - 代替</li>
-                                        <li>❌ Webアプリケーション - 非対応</li>
-                                    </ul>
-                                    <li>承認済みJavaScript生成元とリダイレクトURIを設定</li>
-                                </ol>
-                            </div>
-                        </div>
-
-                        <div class="bg-blue-50 p-4 rounded-lg">
-                            <h4 class="font-semibold text-blue-800 mb-2">⚡ 代替認証方法</h4>
-                            <div class="text-sm text-blue-700 space-y-2">
-                                <p>通常の認証が失敗する場合:</p>
-                                <div class="grid grid-cols-1 gap-2">
-                                    <button class="btn btn-outline text-sm" onclick="initiateProxyAuth()">
-                                        🔄 プロキシ認証を試行
-                                    </button>
-                                    <button class="btn btn-outline text-sm" onclick="showManualTokenInput()">
-                                        🔑 手動トークン入力
-                                    </button>
-                                    <button class="btn btn-outline text-sm" onclick="testWithoutAuth()">
-                                        🧪 認証なしテスト
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="bg-green-50 p-4 rounded-lg">
-                            <h4 class="font-semibold text-green-800 mb-2">✅ 推奨設定</h4>
-                            <div class="text-sm text-green-700">
-                                <p><strong>Google Cloud Console 設定:</strong></p>
-                                <ul class="list-disc list-inside ml-2 space-y-1">
-                                    <li>アプリケーションタイプ: 単一ページアプリケーション (SPA)</li>
-                                    <li>承認済みJavaScript生成元: <code>https://rispondere.github.io</code></li>
-                                    <li>承認済みリダイレクトURI: <code>https://rispondere.github.io/AI_Secretary/</code></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                </div>
-
-                <div class="glass-card p-4 mb-6">
-                    <h3 class="text-lg font-bold text-gray-900 mb-4">🔄 リアルタイム同期設定</h3>
-                    
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <div>
-                            <h4 class="font-semibold text-gray-800 mb-3">📅 カレンダー同期</h4>
-                            <div class="space-y-3">
-                                <div class="flex items-center space-x-2">
-                                    <input type="checkbox" id="autoSyncCalendarAPI" class="rounded">
-                                    <label for="autoSyncCalendarAPI" class="text-sm">自動同期（15分間隔）</label>
-                                </div>
-                                <div class="flex items-center space-x-2">
-                                    <input type="checkbox" id="bidirectionalCalendar" class="rounded">
-                                    <label for="bidirectionalCalendar" class="text-sm">双方向同期</label>
-                                </div>
-                                <select id="calendarSyncRange" class="input-field text-sm">
-                                    <option value="7">過去7日〜未来30日</option>
-                                    <option value="30">過去30日〜未来90日</option>
-                                    <option value="90">過去90日〜未来180日</option>
-                                </select>
-                            </div>
-                        </div>
+                    <div class="glass-card p-4">
+                        <h3 class="text-lg font-bold text-gray-900 mb-4">🛠️ トラブルシューティング</h3>
                         
-                        <div>
-                            <h4 class="font-semibold text-gray-800 mb-3">✅ タスク同期</h4>
-                            <div class="space-y-3">
-                                <div class="flex items-center space-x-2">
-                                    <input type="checkbox" id="autoSyncTasksAPI" class="rounded">
-                                    <label for="autoSyncTasksAPI" class="text-sm">自動同期（10分間隔）</label>
+                        <div class="space-y-4">
+                            <div class="bg-yellow-50 p-4 rounded-lg">
+                                <h4 class="font-semibold text-yellow-800 mb-2">❌ "client_secret is missing" エラー</h4>
+                                <div class="text-sm text-yellow-700 space-y-2">
+                                    <p><strong>原因:</strong> OAuth2クライアントが「Webアプリケーション」タイプで設定されています</p>
+                                    <p><strong>解決法:</strong></p>
+                                    <ol class="list-decimal list-inside space-y-1 ml-2">
+                                        <li>Google Cloud Console → APIs & Services → 認証情報</li>
+                                        <li>OAuth 2.0 クライアント ID を選択</li>
+                                        <li>アプリケーションの種類を変更:</li>
+                                        <ul class="list-disc list-inside ml-4">
+                                            <li>✅ <strong>単一ページアプリケーション (SPA)</strong> - 推奨</li>
+                                            <li>✅ デスクトップアプリケーション - 代替</li>
+                                            <li>❌ Webアプリケーション - 非対応</li>
+                                        </ul>
+                                        <li>承認済みJavaScript生成元とリダイレクトURIを設定</li>
+                                    </ol>
                                 </div>
-                                <div class="flex items-center space-x-2">
-                                    <input type="checkbox" id="bidirectionalTasks" class="rounded" checked>
-                                    <label for="bidirectionalTasks" class="text-sm">双方向同期</label>
-                                </div>
-                                <select id="taskSyncScope" class="input-field text-sm">
-                                    <option value="@default">デフォルトリスト</option>
-                                    <option value="all">全タスクリスト</option>
-                                    <option value="primary">メインタスクのみ</option>
-                                </select>
                             </div>
-                        </div>
-                        
-                        <div>
-                            <h4 class="font-semibold text-gray-800 mb-3">🔧 詳細設定</h4>
-                            <div class="space-y-3">
-                                <div class="flex items-center space-x-2">
-                                    <input type="checkbox" id="conflictResolution" class="rounded" checked>
-                                    <label for="conflictResolution" class="text-sm">競合自動解決</label>
+
+                            <div class="bg-blue-50 p-4 rounded-lg">
+                                <h4 class="font-semibold text-blue-800 mb-2">⚡ 代替認証方法</h4>
+                                <div class="text-sm text-blue-700 space-y-2">
+                                    <p>通常の認証が失敗する場合:</p>
+                                    <div class="grid grid-cols-1 gap-2">
+                                        <button class="btn btn-outline text-sm" onclick="initiateProxyAuth()">
+                                            🔄 プロキシ認証を試行
+                                        </button>
+                                        <button class="btn btn-outline text-sm" onclick="showManualTokenInput()">
+                                            🔑 手動トークン入力
+                                        </button>
+                                        <button class="btn btn-outline text-sm" onclick="testWithoutAuth()">
+                                            🧪 認証なしテスト
+                                        </button>
+                                    </div>
                                 </div>
-                                <div class="flex items-center space-x-2">
-                                    <input type="checkbox" id="preserveLocalChanges" class="rounded">
-                                    <label for="preserveLocalChanges" class="text-sm">ローカル変更優先</label>
-                                </div>
-                                <select id="syncPriority" class="input-field text-sm">
-                                    <option value="google">Google優先</option>
-                                    <option value="local">ローカル優先</option>
-                                    <option value="timestamp">最新タイムスタンプ優先</option>
-                                </select>
                             </div>
                         </div>
                     </div>
@@ -1311,7 +1107,7 @@
             ]
         };
 
-        // PKCE (Proof Key for Code Exchange) のための関数
+        // PKCE関数
         function generateCodeVerifier() {
             const array = new Uint32Array(56/2);
             window.crypto.getRandomValues(array);
@@ -1412,105 +1208,6 @@
             }
         }
 
-        // 認証方式の説明を動的に更新
-        function updateAuthMethodInfo() {
-            const method = document.getElementById('authMethod')?.value;
-            const infoDiv = document.getElementById('authMethodInfo');
-            
-            if (!infoDiv) return;
-
-            const infoMap = {
-                auto: {
-                    icon: 'info-circle',
-                    color: 'blue',
-                    title: '自動選択モード',
-                    description: '最適な認証方式を自動的に選択します。エラーが発生した場合は他の方式を試行します。'
-                },
-                pkce: {
-                    icon: 'shield-alt',
-                    color: 'green',
-                    title: 'PKCE認証',
-                    description: 'Proof Key for Code Exchange。最もセキュアな認証方式ですが、SPA設定が必要です。'
-                },
-                standard: {
-                    icon: 'key',
-                    color: 'yellow',
-                    title: '標準認証',
-                    description: '従来のOAuth2フロー。PKCEが使用できない場合の代替手段です。'
-                },
-                proxy: {
-                    icon: 'server',
-                    color: 'purple',
-                    title: 'プロキシ認証',
-                    description: 'Google Apps Script経由での認証。直接認証が失敗する場合の最終手段です。'
-                }
-            };
-
-            const info = infoMap[method] || infoMap.auto;
-            
-            infoDiv.className = `bg-${info.color}-50 p-3 rounded-lg`;
-            infoDiv.innerHTML = `
-                <div class="flex items-center space-x-2">
-                    <i class="fas fa-${info.icon} text-${info.color}-600"></i>
-                    <span class="text-sm font-medium text-${info.color}-800">${info.title}</span>
-                </div>
-                <p class="text-xs text-${info.color}-700 mt-1">${info.description}</p>
-            `;
-        }
-
-        // 手動トークン入力
-        function showManualTokenInput() {
-            const token = prompt(`
-Google OAuth2アクセストークンを手動で入力してください：
-
-取得方法：
-1. Google OAuth2 Playground (https://developers.google.com/oauthplayground/) にアクセス
-2. Step 1: scope設定 (calendar, tasks)
-3. Step 2: 認証コード取得
-4. Step 3: アクセストークン取得
-5. アクセストークンをコピー
-
-アクセストークン:`);
-
-            if (token && token.trim()) {
-                accessToken = token.trim();
-                tokenExpiresAt = new Date(Date.now() + 3600 * 1000); // 1時間後に期限切れ
-                
-                saveTokens();
-                addGoogleLog('success', 'auth', '手動トークン入力完了');
-                showNotification('手動でアクセストークンを設定しました', 'success');
-                updateOAuthStats();
-            }
-        }
-
-        // 認証なしテスト
-        async function testWithoutAuth() {
-            try {
-                addGoogleLog('info', 'auth', '認証なしテスト実行');
-                
-                // 公開APIやモックデータでのテスト
-                const sampleTasks = [
-                    { id: 'test1', title: 'サンプルタスク1', completed: false },
-                    { id: 'test2', title: 'サンプルタスク2', completed: true }
-                ];
-                
-                const sampleEvents = [
-                    { id: 'event1', summary: 'サンプル会議', start: { date: getDateString(new Date()) } }
-                ];
-
-                addGoogleLog('success', 'auth', 'サンプルデータでのテスト完了');
-                showNotification('認証なしでのテストが完了しました。サンプルデータを使用します。', 'info');
-                
-                // サンプルデータを表示
-                console.log('Sample tasks:', sampleTasks);
-                console.log('Sample events:', sampleEvents);
-                
-            } catch (error) {
-                addGoogleLog('error', 'auth', `認証なしテスト失敗: ${error.message}`);
-                showNotification(`テストエラー: ${error.message}`, 'error');
-            }
-        }
-
         function getPriorityBadgeClass(priority) {
             switch (priority) {
                 case 'high': return 'bg-red-100 text-red-800';
@@ -1548,55 +1245,10 @@ Google OAuth2アクセストークンを手動で入力してください：
             }
         }
 
-        function getLogIcon(type) {
-            switch (type) {
-                case 'task': return '📋';
-                case 'event': return '📅';
-                case 'backup': return '💾';
-                case 'system': return '⚙️';
-                default: return '📝';
-            }
-        }
-
-        function getLogBorderClass(type) {
-            switch (type) {
-                case 'task': return 'border-blue-500';
-                case 'event': return 'border-green-500';
-                case 'backup': return 'border-purple-500';
-                case 'system': return 'border-orange-500';
-                default: return 'border-gray-500';
-            }
-        }
-
-        function getLogBadgeClass(action) {
-            switch (action) {
-                case 'create': return 'bg-green-100 text-green-800';
-                case 'update': return 'bg-blue-100 text-blue-800';
-                case 'delete': return 'bg-red-100 text-red-800';
-                case 'export': return 'bg-purple-100 text-purple-800';
-                case 'import': return 'bg-yellow-100 text-yellow-800';
-                case 'reset': return 'bg-orange-100 text-orange-800';
-                default: return 'bg-gray-100 text-gray-800';
-            }
-        }
-
-        function getLogActionText(action) {
-            switch (action) {
-                case 'create': return '作成';
-                case 'update': return '更新';
-                case 'delete': return '削除';
-                case 'export': return 'エクスポート';
-                case 'import': return 'インポート';
-                case 'reset': return 'リセット';
-                default: return '操作';
-            }
-        }
-
         // システム初期化
         function initializeSystem() {
             console.log('システム初期化開始');
             
-            // データ初期化
             loadFromLocalStorage();
             
             if (tasks.length === 0) {
@@ -1632,27 +1284,20 @@ Google OAuth2アクセストークンを手動で入力してください：
                 initializeStoreData();
             }
 
-            // UI初期化
             updateDateTime();
             setInterval(updateDateTime, 60000);
             renderCurrentPage();
             
-            // 自動同期を開始（設定されている場合）
             const autoSync = localStorage.getItem('classy_auto_sync') === 'true';
             if (autoSync) {
                 startAutoSync();
             }
             
-            // Google自動同期を開始
             startGoogleAutoSync();
-            
-            // OAuth認証状態をチェック
             loadSavedTokens();
             
-            // 認証方式の説明を初期化
             setTimeout(() => updateAuthMethodInfo(), 100);
             
-            // セキュリティログ
             addGoogleLog('info', 'auth', 'PKCE対応OAuth2認証システム初期化完了');
             
             console.log('システム初期化完了');
@@ -1861,6 +1506,8 @@ Google OAuth2アクセストークンを手動で入力してください：
                 localStorage.setItem('classy_events', JSON.stringify(events));
                 localStorage.setItem('classy_stores', JSON.stringify(storeData));
                 localStorage.setItem('classy_logs', JSON.stringify(activityLogs));
+                localStorage.setItem('classy_sync_logs', JSON.stringify(syncLogs));
+                localStorage.setItem('classy_google_logs', JSON.stringify(googleLogs));
             } catch (error) {
                 console.error('保存エラー:', error);
             }
@@ -2687,6 +2334,183 @@ Google OAuth2アクセストークンを手動で入力してください：
             renderActivityLogs();
         }
 
+        function updateRecordsStats() {
+            const today = getDateString(new Date());
+            const completedTasks = tasks.filter(t => t.completed).length;
+            const upcomingEvents = events.filter(e => e.date > today).length;
+            const dataSize = Math.round((JSON.stringify({tasks, events, storeData, activityLogs}).length) / 1024);
+            
+            updateElement('totalTasksCount', tasks.length.toString());
+            updateElement('completedTasksCount', `完了: ${completedTasks}件`);
+            updateElement('totalEventsCount', events.length.toString());
+            updateElement('upcomingEventsCount', `今後: ${upcomingEvents}件`);
+            updateElement('dataSize', `${dataSize}KB`);
+            updateElement('lastBackup', localStorage.getItem('classy_last_backup') || '未実行');
+        }
+
+        function renderActivityLogs() {
+            const container = document.getElementById('activityLogsList');
+
+            if (activityLogs.length === 0) {
+                container.innerHTML = '<div class="text-center text-gray-500 py-4">まだ活動ログがありません</div>';
+                return;
+            }
+
+            container.innerHTML = activityLogs.slice(0, 20).map(log => 
+                `<div class="bg-white p-3 rounded border-l-4 ${getLogBorderClass(log.type)}">
+                    <div class="flex items-center justify-between">
+                        <div class="flex-1">
+                            <div class="text-sm font-medium text-gray-900">${getLogIcon(log.type)} ${escapeHtml(log.details)}</div>
+                            <div class="text-xs text-gray-500 mt-1">${formatDateTime(log.timestamp)}</div>
+                        </div>
+                        <span class="px-2 py-1 text-xs rounded ${getLogBadgeClass(log.action)}">${getLogActionText(log.action)}</span>
+                    </div>
+                </div>`
+            ).join('');
+        }
+
+        function getLogIcon(type) {
+            switch (type) {
+                case 'task': return '📋';
+                case 'event': return '📅';
+                case 'backup': return '💾';
+                case 'system': return '⚙️';
+                default: return '📝';
+            }
+        }
+
+        function getLogBorderClass(type) {
+            switch (type) {
+                case 'task': return 'border-blue-500';
+                case 'event': return 'border-green-500';
+                case 'backup': return 'border-purple-500';
+                case 'system': return 'border-orange-500';
+                default: return 'border-gray-500';
+            }
+        }
+
+        function getLogBadgeClass(action) {
+            switch (action) {
+                case 'create': return 'bg-green-100 text-green-800';
+                case 'update': return 'bg-blue-100 text-blue-800';
+                case 'delete': return 'bg-red-100 text-red-800';
+                case 'export': return 'bg-purple-100 text-purple-800';
+                case 'import': return 'bg-yellow-100 text-yellow-800';
+                case 'reset': return 'bg-orange-100 text-orange-800';
+                default: return 'bg-gray-100 text-gray-800';
+            }
+        }
+
+        function getLogActionText(action) {
+            switch (action) {
+                case 'create': return '作成';
+                case 'update': return '更新';
+                case 'delete': return '削除';
+                case 'export': return 'エクスポート';
+                case 'import': return 'インポート';
+                case 'reset': return 'リセット';
+                default: return '操作';
+            }
+        }
+
+        function performFullBackup() {
+            const data = {
+                tasks: tasks,
+                events: events,
+                storeData: storeData,
+                activityLogs: activityLogs,
+                exportDate: new Date().toISOString(),
+                version: '1.0.0'
+            };
+
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `classy_backup_${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            localStorage.setItem('classy_last_backup', new Date().toLocaleString('ja-JP'));
+            addActivityLog('backup', 'export', '完全バックアップ実行');
+            showNotification('バックアップを作成しました', 'success');
+            updateRecordsStats();
+        }
+
+        function exportToCSV() {
+            const tasksCsv = [
+                ['ID', 'タイトル', '説明', '優先度', '期限', '完了状態', '作成日'],
+                ...tasks.map(task => [
+                    task.id,
+                    task.title,
+                    task.description,
+                    task.priority,
+                    task.dueDate,
+                    task.completed ? '完了' : '未完了',
+                    formatDate(task.createdAt)
+                ])
+            ].map(row => row.map(cell => `"${(cell || '').toString().replace(/"/g, '""')}"`).join(',')).join('\n');
+
+            const csvContent = `タスク一覧\n${tasksCsv}`;
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `classy_data_${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            addActivityLog('backup', 'export', 'CSVエクスポート実行');
+            showNotification('CSVファイルをエクスポートしました', 'success');
+        }
+
+        function resetAllData() {
+            if (confirm('すべてのデータをリセットしますか？この操作は取り消せません。')) {
+                localStorage.clear();
+                tasks = [];
+                events = [];
+                storeData = [];
+                activityLogs = [];
+                
+                initializeStoreData();
+                addActivityLog('system', 'reset', 'データ完全リセット実行');
+                saveToLocalStorage();
+                renderCurrentPage();
+                
+                showNotification('すべてのデータをリセットしました', 'info');
+            }
+        }
+
+        function handleFileImport(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    if (data.tasks) tasks = data.tasks;
+                    if (data.events) events = data.events;
+                    if (data.storeData) storeData = data.storeData;
+                    if (data.activityLogs) activityLogs = data.activityLogs;
+                    
+                    addActivityLog('backup', 'import', `ファイル復元: ${file.name}`);
+                    showNotification('データを復元しました', 'success');
+                    
+                    saveToLocalStorage();
+                    renderCurrentPage();
+                } catch (parseError) {
+                    showNotification('ファイルの形式が正しくありません', 'error');
+                }
+            };
+            reader.readAsText(file);
+        }
+
         // Google Sheets同期
         function renderSync() {
             updateSyncStats();
@@ -2717,7 +2541,6 @@ Google OAuth2アクセストークンを手動で入力してください：
                 }
             }
             
-            // 自動同期チェックボックスの状態を更新
             const autoSyncCheckbox = document.getElementById('autoSync');
             if (autoSyncCheckbox) {
                 autoSyncCheckbox.checked = autoSync;
@@ -2734,12 +2557,10 @@ Google OAuth2アクセストークンを手動で入力してください：
             updateSyncStatus('同期中...', 'syncing');
             
             try {
-                // バックアップ作成（オプション）
                 if (document.getElementById('backupBeforeSync')?.checked) {
                     addSyncLog('info', 'sync', '同期前バックアップ作成中');
                 }
 
-                // Google SheetsからCSV形式でデータを取得
                 const csvUrl = convertToCSVUrl(sheetUrl);
                 const response = await fetch(csvUrl);
                 
@@ -2754,13 +2575,9 @@ Google OAuth2アクセストークンを手動で入力してください：
                     throw new Error('スプレッドシートにデータが見つかりません');
                 }
 
-                // データを内部形式に変換
                 const convertedData = convertSheetDataToStoreData(sheetData);
-                
-                // 現在のデータと比較
                 const differences = compareStoreData(storeData, convertedData);
                 
-                // 選択的同期
                 if (document.getElementById('syncSales')?.checked) {
                     updateSalesData(convertedData, differences);
                 }
@@ -2771,7 +2588,6 @@ Google OAuth2アクセストークンを手動で入力してください：
                     updateAccessData(convertedData, differences);
                 }
 
-                // 同期完了
                 lastSyncData = sheetData;
                 localStorage.setItem('classy_last_sync', new Date().toISOString());
                 
@@ -2780,7 +2596,6 @@ Google OAuth2アクセストークンを手動で入力してください：
                 
                 updateSyncStatus('同期完了', 'success');
                 
-                // データ保存
                 saveToLocalStorage();
                 renderCurrentPage();
                 
@@ -2793,7 +2608,6 @@ Google OAuth2アクセストークンを手動で入力してください：
         }
 
         function convertToCSVUrl(sheetUrl) {
-            // Google SheetsのURLをCSV形式に変換
             const sheetId = extractSheetId(sheetUrl);
             return `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=0`;
         }
@@ -2812,7 +2626,7 @@ Google OAuth2アクセストークンを手動で入力してください：
                 if (lines[i].trim() === '') continue;
                 
                 const values = parseCSVLine(lines[i]);
-                if (values[0] && values[0].trim() !== '') {  // 店舗名が存在する行のみ
+                if (values[0] && values[0].trim() !== '') {
                     const row = {};
                     headers.forEach((header, index) => {
                         row[header] = values[index] || '';
@@ -2871,7 +2685,7 @@ Google OAuth2アクセストークンを手動で入力してください：
                     improvement: row['改善点'] || '',
                     note: row['備考'] || ''
                 };
-            }).filter(store => store.id); // IDが取得できた店舗のみ
+            }).filter(store => store.id);
         }
 
         function getStoreIdByName(name) {
@@ -2915,7 +2729,6 @@ Google OAuth2アクセストークンを手動で入力してください：
                     return;
                 }
 
-                // 各フィールドを比較
                 const fieldsToCompare = ['totalSales', 'diaryPosts', 'reviewPosts', 'kiteneCount', 'totalAccess', 'attendanceCount'];
                 
                 fieldsToCompare.forEach(field => {
@@ -2941,14 +2754,12 @@ Google OAuth2アクセストークンを手動で入力してください：
                 const localIndex = storeData.findIndex(local => local.id === sheetStore.id);
                 
                 if (localIndex !== -1) {
-                    // 売上関連データを更新
                     storeData[localIndex].totalSales = sheetStore.totalSales;
                     storeData[localIndex].salesTarget = sheetStore.salesTarget;
                     storeData[localIndex].salesAchievementRate = sheetStore.salesTarget > 0 ? 
                         sheetStore.totalSales / sheetStore.salesTarget : 0;
                     storeData[localIndex].lastUpdated = sheetStore.lastUpdated;
                 } else {
-                    // 新しい店舗の場合は追加
                     const newStore = {...sheetStore};
                     newStore.salesAchievementRate = newStore.salesTarget > 0 ? 
                         newStore.totalSales / newStore.salesTarget : 0;
@@ -2962,7 +2773,6 @@ Google OAuth2アクセストークンを手動で入力してください：
                 const localIndex = storeData.findIndex(local => local.id === sheetStore.id);
                 
                 if (localIndex !== -1) {
-                    // KPI関連データを更新
                     storeData[localIndex].diaryPosts = sheetStore.diaryPosts;
                     storeData[localIndex].diaryTarget = sheetStore.diaryTarget;
                     storeData[localIndex].reviewPosts = sheetStore.reviewPosts;
@@ -2970,7 +2780,6 @@ Google OAuth2アクセストークンを手動で入力してください：
                     storeData[localIndex].kiteneCount = sheetStore.kiteneCount;
                     storeData[localIndex].kiteneTarget = sheetStore.kiteneTarget;
                     
-                    // 達成率を再計算
                     storeData[localIndex].diaryAchievementRate = sheetStore.diaryTarget > 0 ? 
                         sheetStore.diaryPosts / sheetStore.diaryTarget : 0;
                     storeData[localIndex].reviewAchievementRate = sheetStore.reviewTarget > 0 ? 
@@ -2986,7 +2795,6 @@ Google OAuth2アクセストークンを手動で入力してください：
                 const localIndex = storeData.findIndex(local => local.id === sheetStore.id);
                 
                 if (localIndex !== -1) {
-                    // アクセス・出勤関連データを更新
                     storeData[localIndex].totalAccess = sheetStore.totalAccess;
                     storeData[localIndex].attendanceCount = sheetStore.attendanceCount;
                     storeData[localIndex].userCount = sheetStore.userCount;
@@ -3019,7 +2827,7 @@ Google OAuth2アクセストークンを手動で入力してください：
                 }
 
                 const salesDiff = (sheetStore.totalSales || 0) - (localStore.totalSales || 0);
-                const isUpToDate = Math.abs(salesDiff) < 1000; // 1000円未満の差は同期済みとみなす
+                const isUpToDate = Math.abs(salesDiff) < 1000;
                 
                 return `<tr class="hover:bg-gray-50">
                     <td class="p-3 font-medium">${escapeHtml(localStore.name)}</td>
@@ -3041,8 +2849,8 @@ Google OAuth2アクセストークンを手動で入力してください：
         function addSyncLog(type, action, message) {
             const log = {
                 id: Date.now(),
-                type: type,  // success, error, info, warning
-                action: action,  // sync, test, auto_sync
+                type: type,
+                action: action,
                 message: message,
                 timestamp: new Date().toISOString()
             };
@@ -3188,12 +2996,12 @@ Google OAuth2アクセストークンを手動で入力してください：
         }
 
         function startAutoSync() {
-            stopAutoSync(); // 既存のインターバルをクリア
+            stopAutoSync();
             
             autoSyncInterval = setInterval(async () => {
                 addSyncLog('info', 'auto_sync', '自動同期を実行中...');
                 await syncWithGoogleSheets();
-            }, 5 * 60 * 1000); // 5分間隔
+            }, 5 * 60 * 1000);
         }
 
         function stopAutoSync() {
@@ -3224,7 +3032,6 @@ Google OAuth2アクセストークンを手動で入力してください：
             updateElement('googleErrors', googleErrors.toString());
             updateElement('lastGoogleError', googleErrors > 0 ? '同期エラーあり' : 'エラーなし');
             
-            // ステータス更新
             const statusElement = document.getElementById('googleStatus');
             if (statusElement) {
                 if (lastCalendarSync || lastTaskSync) {
@@ -3235,15 +3042,6 @@ Google OAuth2アクセストークンを手動で入力してください：
                     statusElement.textContent = '未設定';
                 }
             }
-
-            // 統計テーブル更新
-            updateElement('calendarLastSync', lastCalendarSync ? formatDateTime(lastCalendarSync) : '未同期');
-            updateElement('calendarSyncCount', `${googleCalendarData.length}件`);
-            updateElement('calendarErrors', googleLogs.filter(log => log.type === 'error' && log.service === 'calendar').length.toString());
-            
-            updateElement('taskLastSync', lastTaskSync ? formatDateTime(lastTaskSync) : '未同期');
-            updateElement('taskSyncCount', `${tasks.filter(task => task.googleId).length}件`);
-            updateElement('taskErrors', googleLogs.filter(log => log.type === 'error' && log.service === 'tasks').length.toString());
         }
 
         async function syncAllGoogleServices() {
@@ -3272,20 +3070,14 @@ Google OAuth2アクセストークンを手動で入力してください：
             addGoogleLog('info', 'calendar', 'Googleカレンダー同期開始');
             
             try {
-                // ICS形式でカレンダーデータを取得（公開カレンダーの場合）
                 const icsUrl = generateICSUrl(calendarId);
-                
-                // CORS制約により、直接取得できない場合は代替手段を提供
                 const calendarData = await fetchCalendarDataAlternative(icsUrl, calendarId);
                 
                 if (calendarData.length === 0) {
                     throw new Error('カレンダーデータが取得できませんでした。手動インポートをお試しください。');
                 }
 
-                // カレンダーイベントを内部形式に変換
                 const convertedEvents = convertCalendarEventsToEvents(calendarData);
-                
-                // 既存イベントとマージ
                 const mergedEvents = mergeCalendarEvents(convertedEvents);
                 
                 events = mergedEvents;
@@ -3307,28 +3099,21 @@ Google OAuth2アクセストークンを手動で入力してください：
         }
 
         function generateICSUrl(calendarId) {
-            // Gmail形式のカレンダーIDの場合、ICS URLを生成
             if (calendarId.includes('@gmail.com') || calendarId.includes('@googlemail.com')) {
                 const encodedId = encodeURIComponent(calendarId);
                 return `https://calendar.google.com/calendar/ical/${encodedId}/public/basic.ics`;
             }
             
-            // 既にICS URLの場合はそのまま返す
             if (calendarId.includes('.ics')) {
                 return calendarId;
             }
             
-            // その他の場合はGoogle Calendar ICS形式として扱う
             return `https://calendar.google.com/calendar/ical/${calendarId}/public/basic.ics`;
         }
 
         async function fetchCalendarDataAlternative(icsUrl, calendarId) {
-            // CORS制約のため、模擬データまたは手動インポート手順を提供
-            // 実際のプロダクションでは、バックエンドプロキシまたはGoogle Calendar APIを使用
-            
             addGoogleLog('warning', 'calendar', 'CORS制約により直接取得不可。手動インポートを推奨。');
             
-            // 代替手段として、サンプルデータを提供
             const sampleEvents = [
                 {
                     id: `google_${Date.now()}_1`,
@@ -3385,7 +3170,7 @@ Google OAuth2アクセストークンを手動で入力してください：
                 return 'deadline';
             }
             
-            return 'meeting'; // デフォルト
+            return 'meeting';
         }
 
         function mergeCalendarEvents(newEvents) {
@@ -3399,10 +3184,8 @@ Google OAuth2アクセストークンを手動で入力してください：
                 );
                 
                 if (existingIndex !== -1) {
-                    // 既存イベントを更新
                     mergedEvents[existingIndex] = { ...mergedEvents[existingIndex], ...newEvent };
                 } else {
-                    // 新しいイベントを追加
                     mergedEvents.push(newEvent);
                 }
             });
@@ -3414,12 +3197,8 @@ Google OAuth2アクセストークンを手動で入力してください：
             addGoogleLog('info', 'tasks', 'Googleタスク同期開始');
             
             try {
-                // Googleタスクの取得は手動インポートまたはCSV形式で対応
                 addGoogleLog('info', 'tasks', 'Googleタスクは手動同期が必要です');
-                
-                // CSVインポート手順を表示
                 showGoogleTasksImportInstructions();
-                
                 localStorage.setItem('classy_last_task_sync', new Date().toISOString());
                 
             } catch (error) {
@@ -3458,7 +3237,6 @@ Googleタスクの同期方法：
             try {
                 const icsUrl = generateICSUrl(calendarId);
                 
-                // 接続テスト（CORS制約により実際の接続はできないが、URL形式をチェック）
                 if (icsUrl.includes('calendar.google.com') || icsUrl.includes('.ics')) {
                     addGoogleLog('success', 'calendar', 'カレンダーURL形式が正しいです');
                     showNotification('カレンダーURL形式が正しく設定されています', 'success');
@@ -3491,7 +3269,6 @@ Googleカレンダーの手動インポート方法：
 
         async function exportTasksToGoogle() {
             try {
-                // GoogleタスクへのエクスポートCSV生成
                 const tasksCsv = generateGoogleTasksCSV();
                 
                 const blob = new Blob([tasksCsv], { type: 'text/csv;charset=utf-8;' });
@@ -3553,7 +3330,6 @@ Googleカレンダーの手動インポート方法：
                         throw new Error('インポート可能なタスクが見つかりません');
                     }
                     
-                    // 重複チェック
                     if (document.getElementById('mergeDuplicateTasks')?.checked) {
                         mergeImportedTasks(importedTasks);
                     } else {
@@ -3578,7 +3354,7 @@ Googleカレンダーの手動インポート方法：
             const lines = csvText.split('\n');
             const importedTasks = [];
             
-            for (let i = 1; i < lines.length; i++) { // ヘッダーをスキップ
+            for (let i = 1; i < lines.length; i++) {
                 if (lines[i].trim() === '') continue;
                 
                 const values = parseCSVLine(lines[i]);
@@ -3616,10 +3392,8 @@ Googleカレンダーの手動インポート方法：
                 );
                 
                 if (existingIndex !== -1) {
-                    // 既存タスクを更新
                     tasks[existingIndex] = { ...tasks[existingIndex], ...importedTask };
                 } else {
-                    // 新しいタスクを追加
                     tasks.push(importedTask);
                 }
             });
@@ -3628,8 +3402,8 @@ Googleカレンダーの手動インポート方法：
         function addGoogleLog(type, service, message) {
             const log = {
                 id: Date.now(),
-                type: type,  // success, error, info, warning
-                service: service,  // calendar, tasks, all
+                type: type,
+                service: service,
                 message: message,
                 timestamp: new Date().toISOString()
             };
@@ -3673,17 +3447,11 @@ Googleカレンダーの手動インポート方法：
         }
 
         function getGoogleLogBorderClass(type) {
-            switch (type) {
-                case 'success': return 'border-green-500';
-                case 'error': return 'border-red-500';
-                case 'warning': return 'border-yellow-500';
-                case 'info': return 'border-blue-500';
-                default: return 'border-gray-500';
-            }
+            return getSyncLogBorderClass(type);
         }
 
         function getGoogleLogBadgeClass(type) {
-            return getSyncLogBadgeClass(type); // 同じスタイルを使用
+            return getSyncLogBadgeClass(type);
         }
 
         function getServiceName(service) {
@@ -3695,38 +3463,10 @@ Googleカレンダーの手動インポート方法：
             }
         }
 
-        function resetGoogleCalendarSync() {
-            localStorage.removeItem('classy_last_calendar_sync');
-            googleCalendarData = [];
-            
-            // Googleカレンダー由来のイベントを削除
-            events = events.filter(event => !event.googleId || event.source !== 'google_calendar');
-            
-            addGoogleLog('info', 'calendar', 'Googleカレンダー同期をリセットしました');
-            showNotification('Googleカレンダー同期をリセットしました', 'info');
-            
-            saveToLocalStorage();
-            renderCurrentPage();
-        }
-
-        function resetGoogleTaskSync() {
-            localStorage.removeItem('classy_last_task_sync');
-            
-            // Googleタスク由来のタスクを削除
-            tasks = tasks.filter(task => !task.googleId || task.source !== 'google_tasks');
-            
-            addGoogleLog('info', 'tasks', 'Googleタスク同期をリセットしました');
-            showNotification('Googleタスク同期をリセットしました', 'info');
-            
-            saveToLocalStorage();
-            renderCurrentPage();
-        }
-
         function startGoogleAutoSync() {
-            const calendarInterval = 60 * 60 * 1000; // 1時間
-            const taskInterval = 30 * 60 * 1000;    // 30分
+            const calendarInterval = 60 * 60 * 1000;
+            const taskInterval = 30 * 60 * 1000;
 
-            // カレンダー自動同期
             if (document.getElementById('autoSyncCalendar')?.checked) {
                 setInterval(async () => {
                     addGoogleLog('info', 'calendar', '自動同期実行中');
@@ -3734,7 +3474,6 @@ Googleカレンダーの手動インポート方法：
                 }, calendarInterval);
             }
 
-            // タスク自動同期
             if (document.getElementById('autoSyncTasks')?.checked) {
                 setInterval(async () => {
                     addGoogleLog('info', 'tasks', '自動同期実行中');
@@ -3764,7 +3503,6 @@ Googleカレンダーの手動インポート方法：
             updateElement('authErrors', authErrors.toString());
             updateElement('lastAuthError', authErrors > 0 ? '認証エラーあり' : 'エラーなし');
             
-            // 認証ステータス更新
             const statusElement = document.getElementById('authStatus');
             const buttonElement = document.getElementById('authButton');
             
@@ -3780,7 +3518,6 @@ Googleカレンダーの手動インポート方法：
                 buttonElement.onclick = initiateGoogleAuth;
             }
 
-            // API使用量更新
             updateElement('calendarApiUsage', `${apiCallsToday.calendar} / 1,000,000`);
             updateElement('tasksApiUsage', `${apiCallsToday.tasks} / 100,000`);
             updateElement('calendarLastCall', localStorage.getItem('classy_last_calendar_api') || '未使用');
@@ -3804,7 +3541,6 @@ Googleカレンダーの手動インポート方法：
             const state = generateRandomState();
             localStorage.setItem('oauth_state', state);
 
-            // 認証方式の選択: PKCEを優先、フォールバックで通常フロー
             const authMethod = document.getElementById('authMethod')?.value || 'auto';
             
             if (authMethod === 'pkce' || authMethod === 'auto') {
@@ -3815,7 +3551,6 @@ Googleカレンダーの手動インポート方法：
         }
 
         function initiatePKCEAuth(scopes, state) {
-            // PKCE用のコードベリファイアとチャレンジを生成
             const codeVerifier = generateCodeVerifier();
             generateCodeChallenge(codeVerifier).then(codeChallenge => {
                 localStorage.setItem('code_verifier', codeVerifier);
@@ -3854,7 +3589,6 @@ Googleカレンダーの手動インポート方法：
             window.location.href = authUrl;
         }
 
-        // Google Apps Script プロキシを使用した認証（代替手段）
         async function initiateProxyAuth() {
             try {
                 addGoogleLog('info', 'auth', 'プロキシ認証を試行中');
@@ -3862,7 +3596,6 @@ Googleカレンダーの手動インポート方法：
                 const proxyUrl = 'https://script.google.com/macros/s/YOUR_GAS_ID/exec';
                 const scopes = ['https://www.googleapis.com/auth/calendar', 'https://www.googleapis.com/auth/tasks'];
                 
-                // Google Apps Scriptプロキシ経由でトークンを取得
                 const response = await fetch(proxyUrl, {
                     method: 'POST',
                     headers: {
@@ -3923,12 +3656,9 @@ Googleカレンダーの手動インポート方法：
                 }
 
                 exchangeCodeForToken(code);
-                
-                // URLからパラメータを削除
                 window.history.replaceState({}, document.title, window.location.pathname);
             }
 
-            // 保存されたトークンを復元
             loadSavedTokens();
         }
 
@@ -3936,7 +3666,6 @@ Googleカレンダーの手動インポート方法：
             try {
                 addGoogleLog('info', 'auth', 'アクセストークンを取得中');
 
-                // まずPKCEで試行
                 const codeVerifier = localStorage.getItem('code_verifier');
                 
                 if (codeVerifier) {
@@ -3949,15 +3678,12 @@ Googleカレンダーの手動インポート方法：
                     }
                 }
 
-                // PKCEが失敗した場合、implicit flowまたはpublic clientとして試行
                 await exchangeAsPublicClient(code);
 
             } catch (error) {
                 console.error('Token exchange error:', error);
                 addGoogleLog('error', 'auth', `トークン取得失敗: ${error.message}`);
                 showNotification(`認証エラー: ${error.message}`, 'error');
-                
-                // エラー時はコードベリファイアを削除
                 localStorage.removeItem('code_verifier');
             }
         }
@@ -3994,7 +3720,6 @@ Googleカレンダーの手動インポート方法：
         async function exchangeAsPublicClient(code) {
             addGoogleLog('info', 'auth', 'パブリッククライアント認証試行中');
 
-            // パブリッククライアントとしてclient_secretなしで試行
             const response = await fetch('https://oauth2.googleapis.com/token', {
                 method: 'POST',
                 headers: {
@@ -4011,7 +3736,6 @@ Googleカレンダーの手動インポート方法：
             if (!response.ok) {
                 const errorData = await response.text();
                 
-                // 特定のエラーメッセージに基づいて解決策を提示
                 if (errorData.includes('client_secret is missing')) {
                     showClientTypeError();
                     throw new Error('このOAuth2クライアントにはclient_secretが必要です。クライアントタイプの変更が必要です。');
@@ -4031,9 +3755,7 @@ Googleカレンダーの手動インポート方法：
             refreshToken = tokenData.refresh_token;
             tokenExpiresAt = new Date(Date.now() + (tokenData.expires_in * 1000));
 
-            // トークンを保存
             saveTokens();
-
             showNotification('Google認証が完了しました', 'success');
             updateOAuthStats();
         }
@@ -4078,7 +3800,6 @@ Google OAuth2クライアントの設定変更が必要です：
                     refreshToken = tokenData.refreshToken;
                     tokenExpiresAt = tokenData.expiresAt ? new Date(tokenData.expiresAt) : null;
 
-                    // トークンが期限切れの場合は更新を試行
                     if (tokenExpiresAt && new Date() >= tokenExpiresAt && refreshToken) {
                         refreshGoogleAuth();
                     }
@@ -4153,12 +3874,105 @@ Google OAuth2クライアントの設定変更が必要です：
             updateOAuthStats();
         }
 
+        function updateAuthMethodInfo() {
+            const method = document.getElementById('authMethod')?.value;
+            const infoDiv = document.getElementById('authMethodInfo');
+            
+            if (!infoDiv) return;
+
+            const infoMap = {
+                auto: {
+                    icon: 'info-circle',
+                    color: 'blue',
+                    title: '自動選択モード',
+                    description: '最適な認証方式を自動的に選択します。エラーが発生した場合は他の方式を試行します。'
+                },
+                pkce: {
+                    icon: 'shield-alt',
+                    color: 'green',
+                    title: 'PKCE認証',
+                    description: 'Proof Key for Code Exchange。最もセキュアな認証方式ですが、SPA設定が必要です。'
+                },
+                standard: {
+                    icon: 'key',
+                    color: 'yellow',
+                    title: '標準認証',
+                    description: '従来のOAuth2フロー。PKCEが使用できない場合の代替手段です。'
+                },
+                proxy: {
+                    icon: 'server',
+                    color: 'purple',
+                    title: 'プロキシ認証',
+                    description: 'Google Apps Script経由での認証。直接認証が失敗する場合の最終手段です。'
+                }
+            };
+
+            const info = infoMap[method] || infoMap.auto;
+            
+            infoDiv.className = `bg-${info.color}-50 p-3 rounded-lg`;
+            infoDiv.innerHTML = `
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-${info.icon} text-${info.color}-600"></i>
+                    <span class="text-sm font-medium text-${info.color}-800">${info.title}</span>
+                </div>
+                <p class="text-xs text-${info.color}-700 mt-1">${info.description}</p>
+            `;
+        }
+
+        function showManualTokenInput() {
+            const token = prompt(`
+Google OAuth2アクセストークンを手動で入力してください：
+
+取得方法：
+1. Google OAuth2 Playground (https://developers.google.com/oauthplayground/) にアクセス
+2. Step 1: scope設定 (calendar, tasks)
+3. Step 2: 認証コード取得
+4. Step 3: アクセストークン取得
+5. アクセストークンをコピー
+
+アクセストークン:`);
+
+            if (token && token.trim()) {
+                accessToken = token.trim();
+                tokenExpiresAt = new Date(Date.now() + 3600 * 1000);
+                
+                saveTokens();
+                addGoogleLog('success', 'auth', '手動トークン入力完了');
+                showNotification('手動でアクセストークンを設定しました', 'success');
+                updateOAuthStats();
+            }
+        }
+
+        async function testWithoutAuth() {
+            try {
+                addGoogleLog('info', 'auth', '認証なしテスト実行');
+                
+                const sampleTasks = [
+                    { id: 'test1', title: 'サンプルタスク1', completed: false },
+                    { id: 'test2', title: 'サンプルタスク2', completed: true }
+                ];
+                
+                const sampleEvents = [
+                    { id: 'event1', summary: 'サンプル会議', start: { date: getDateString(new Date()) } }
+                ];
+
+                addGoogleLog('success', 'auth', 'サンプルデータでのテスト完了');
+                showNotification('認証なしでのテストが完了しました。サンプルデータを使用します。', 'info');
+                
+                console.log('Sample tasks:', sampleTasks);
+                console.log('Sample events:', sampleEvents);
+                
+            } catch (error) {
+                addGoogleLog('error', 'auth', `認証なしテスト失敗: ${error.message}`);
+                showNotification(`テストエラー: ${error.message}`, 'error');
+            }
+        }
+
         async function makeGoogleAPICall(url, options = {}) {
             if (!accessToken) {
                 throw new Error('認証が必要です');
             }
 
-            // トークンの有効性をチェック
             if (tokenExpiresAt && new Date() >= tokenExpiresAt) {
                 await refreshGoogleAuth();
                 if (!accessToken) {
@@ -4177,7 +3991,6 @@ Google OAuth2クライアントの設定変更が必要です：
                 headers: headers
             });
 
-            // API使用量を記録
             const apiType = url.includes('calendar') ? 'calendar' : 'tasks';
             apiCallsToday[apiType]++;
             localStorage.setItem(`classy_last_${apiType}_api`, new Date().toISOString());
@@ -4189,62 +4002,14 @@ Google OAuth2クライアントの設定変更が必要です：
             return response.json();
         }
 
-        // Google Tasks API
-        async function testTasksAPI() {
-            try {
-                addGoogleLog('info', 'tasks', 'Tasks API接続テスト開始');
-                
-                const tasklists = await makeGoogleAPICall('https://tasks.googleapis.com/tasks/v1/users/@me/lists');
-                
-                addGoogleLog('success', 'tasks', `${tasklists.items?.length || 0}個のタスクリストを取得`);
-                showNotification(`Tasks API接続成功！${tasklists.items?.length || 0}個のタスクリストが見つかりました`, 'success');
-                
-                console.log('Task lists:', tasklists);
-                
-            } catch (error) {
-                console.error('Tasks API test error:', error);
-                addGoogleLog('error', 'tasks', `Tasks API接続失敗: ${error.message}`);
-                showNotification(`Tasks API接続エラー: ${error.message}`, 'error');
-            }
-        }
-
-        async function createTestTask() {
-            try {
-                addGoogleLog('info', 'tasks', 'テストタスク作成中');
-                
-                const taskData = {
-                    title: 'CLASSY業務管理システム テストタスク',
-                    notes: `作成日時: ${new Date().toLocaleString('ja-JP')}`,
-                    due: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
-                };
-
-                const newTask = await makeGoogleAPICall('https://tasks.googleapis.com/tasks/v1/lists/@default/tasks', {
-                    method: 'POST',
-                    body: JSON.stringify(taskData)
-                });
-                
-                addGoogleLog('success', 'tasks', 'テストタスク作成完了');
-                showNotification('テストタスクを作成しました', 'success');
-                
-                console.log('Created task:', newTask);
-                
-            } catch (error) {
-                console.error('Create task error:', error);
-                addGoogleLog('error', 'tasks', `タスク作成失敗: ${error.message}`);
-                showNotification(`タスク作成エラー: ${error.message}`, 'error');
-            }
-        }
-
         async function syncGoogleTasksAPI() {
             try {
                 addGoogleLog('info', 'tasks', 'Googleタスク同期開始（API）');
                 
-                // タスクリスト取得
                 const tasklists = await makeGoogleAPICall('https://tasks.googleapis.com/tasks/v1/users/@me/lists');
                 
                 let allTasks = [];
                 
-                // 各タスクリストからタスクを取得
                 for (const tasklist of tasklists.items || []) {
                     const tasks = await makeGoogleAPICall(`https://tasks.googleapis.com/tasks/v1/lists/${tasklist.id}/tasks`);
                     if (tasks.items) {
@@ -4256,15 +4021,12 @@ Google OAuth2クライアントの設定変更が必要です：
                     }
                 }
 
-                // 内部形式に変換
                 const convertedTasks = convertGoogleTasksToLocalTasks(allTasks);
                 
-                // 双方向同期の場合
                 if (document.getElementById('bidirectionalTasks')?.checked) {
                     await syncLocalTasksToGoogle(convertedTasks);
                 }
 
-                // ローカルタスクを更新
                 mergeGoogleTasks(convertedTasks);
                 
                 addGoogleLog('success', 'tasks', `${convertedTasks.length}件のタスクを同期`);
@@ -4287,7 +4049,7 @@ Google OAuth2クライアントの設定変更が必要です：
                 description: gtask.notes || '',
                 dueDate: gtask.due ? gtask.due.split('T')[0] : getDateString(new Date()),
                 completed: gtask.status === 'completed',
-                priority: 'medium', // Googleタスクには優先度がないのでデフォルト
+                priority: 'medium',
                 googleId: gtask.id,
                 googleTasklistId: gtask.tasklistId,
                 googleTasklistTitle: gtask.tasklistTitle,
@@ -4298,15 +4060,11 @@ Google OAuth2クライアントの設定変更が必要です：
         }
 
         function mergeGoogleTasks(googleTasks) {
-            // 既存のGoogleタスクを削除
             tasks = tasks.filter(task => !task.googleId || task.source !== 'google_tasks_api');
-            
-            // 新しいGoogleタスクを追加
             tasks = tasks.concat(googleTasks);
         }
 
         async function syncLocalTasksToGoogle(googleTasks) {
-            // ローカルでのみ存在するタスクをGoogleに送信
             const localOnlyTasks = tasks.filter(task => 
                 !task.googleId && !task.source?.includes('google')
             );
@@ -4325,7 +4083,6 @@ Google OAuth2クライアントの設定変更が必要です：
                         body: JSON.stringify(googleTaskData)
                     });
 
-                    // ローカルタスクにGoogleIDを設定
                     localTask.googleId = createdTask.id;
                     localTask.source = 'synced_to_google';
 
@@ -4333,59 +4090,6 @@ Google OAuth2クライアントの設定変更が必要です：
                     console.error('Sync local task to Google error:', error);
                     addGoogleLog('warning', 'tasks', `タスク "${localTask.title}" のGoogle同期に失敗`);
                 }
-            }
-        }
-
-        // Google Calendar API
-        async function testCalendarAPI() {
-            try {
-                addGoogleLog('info', 'calendar', 'Calendar API接続テスト開始');
-                
-                const calendars = await makeGoogleAPICall('https://www.googleapis.com/calendar/v3/users/me/calendarList');
-                
-                addGoogleLog('success', 'calendar', `${calendars.items?.length || 0}個のカレンダーを取得`);
-                showNotification(`Calendar API接続成功！${calendars.items?.length || 0}個のカレンダーが見つかりました`, 'success');
-                
-                console.log('Calendars:', calendars);
-                
-            } catch (error) {
-                console.error('Calendar API test error:', error);
-                addGoogleLog('error', 'calendar', `Calendar API接続失敗: ${error.message}`);
-                showNotification(`Calendar API接続エラー: ${error.message}`, 'error');
-            }
-        }
-
-        async function createTestEvent() {
-            try {
-                addGoogleLog('info', 'calendar', 'テストイベント作成中');
-                
-                const eventData = {
-                    summary: 'CLASSY業務管理システム テストイベント',
-                    description: `作成日時: ${new Date().toLocaleString('ja-JP')}`,
-                    start: {
-                        dateTime: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
-                        timeZone: 'Asia/Tokyo'
-                    },
-                    end: {
-                        dateTime: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(),
-                        timeZone: 'Asia/Tokyo'
-                    }
-                };
-
-                const newEvent = await makeGoogleAPICall('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
-                    method: 'POST',
-                    body: JSON.stringify(eventData)
-                });
-                
-                addGoogleLog('success', 'calendar', 'テストイベント作成完了');
-                showNotification('テストイベントを作成しました', 'success');
-                
-                console.log('Created event:', newEvent);
-                
-            } catch (error) {
-                console.error('Create event error:', error);
-                addGoogleLog('error', 'calendar', `イベント作成失敗: ${error.message}`);
-                showNotification(`イベント作成エラー: ${error.message}`, 'error');
             }
         }
 
@@ -4401,15 +4105,12 @@ Google OAuth2クライアントの設定変更が必要です：
                     `https://www.googleapis.com/calendar/v3/calendars/primary/events?timeMin=${timeMin}&timeMax=${timeMax}&singleEvents=true&orderBy=startTime`
                 );
 
-                // 内部形式に変換
                 const convertedEvents = convertGoogleEventsToLocalEvents(events.items || []);
                 
-                // 双方向同期の場合
                 if (document.getElementById('bidirectionalCalendar')?.checked) {
                     await syncLocalEventsToGoogle(convertedEvents);
                 }
 
-                // ローカルイベントを更新
                 mergeGoogleEvents(convertedEvents);
                 
                 addGoogleLog('success', 'calendar', `${convertedEvents.length}件のイベントを同期`);
@@ -4446,15 +4147,11 @@ Google OAuth2クライアントの設定変更が必要です：
         }
 
         function mergeGoogleEvents(googleEvents) {
-            // 既存のGoogleイベントを削除
             events = events.filter(event => !event.googleId || event.source !== 'google_calendar_api');
-            
-            // 新しいGoogleイベントを追加
             events = events.concat(googleEvents);
         }
 
         async function syncLocalEventsToGoogle(googleEvents) {
-            // ローカルでのみ存在するイベントをGoogleに送信
             const localOnlyEvents = events.filter(event => 
                 !event.googleId && !event.source?.includes('google')
             );
@@ -4480,7 +4177,6 @@ Google OAuth2クライアントの設定変更が必要です：
                         body: JSON.stringify(googleEventData)
                     });
 
-                    // ローカルイベントにGoogleIDを設定
                     localEvent.googleId = createdEvent.id;
                     localEvent.source = 'synced_to_google';
 
@@ -4489,139 +4185,6 @@ Google OAuth2クライアントの設定変更が必要です：
                     addGoogleLog('warning', 'calendar', `イベント "${localEvent.title}" のGoogle同期に失敗`);
                 }
             }
-        }
-
-        function updateRecordsStats() {
-            const today = getDateString(new Date());
-            const completedTasks = tasks.filter(t => t.completed).length;
-            const upcomingEvents = events.filter(e => e.date > today).length;
-            const dataSize = Math.round((JSON.stringify({tasks, events, storeData, activityLogs}).length) / 1024);
-            
-            updateElement('totalTasksCount', tasks.length.toString());
-            updateElement('completedTasksCount', `完了: ${completedTasks}件`);
-            updateElement('totalEventsCount', events.length.toString());
-            updateElement('upcomingEventsCount', `今後: ${upcomingEvents}件`);
-            updateElement('dataSize', `${dataSize}KB`);
-            updateElement('lastBackup', localStorage.getItem('classy_last_backup') || '未実行');
-        }
-
-        function renderActivityLogs() {
-            const container = document.getElementById('activityLogsList');
-
-            if (activityLogs.length === 0) {
-                container.innerHTML = '<div class="text-center text-gray-500 py-4">まだ活動ログがありません</div>';
-                return;
-            }
-
-            container.innerHTML = activityLogs.slice(0, 20).map(log => 
-                `<div class="bg-white p-3 rounded border-l-4 ${getLogBorderClass(log.type)}">
-                    <div class="flex items-center justify-between">
-                        <div class="flex-1">
-                            <div class="text-sm font-medium text-gray-900">${getLogIcon(log.type)} ${escapeHtml(log.details)}</div>
-                            <div class="text-xs text-gray-500 mt-1">${formatDateTime(log.timestamp)}</div>
-                        </div>
-                        <span class="px-2 py-1 text-xs rounded ${getLogBadgeClass(log.action)}">${getLogActionText(log.action)}</span>
-                    </div>
-                </div>`
-            ).join('');
-        }
-
-        function performFullBackup() {
-            const data = {
-                tasks: tasks,
-                events: events,
-                storeData: storeData,
-                activityLogs: activityLogs,
-                exportDate: new Date().toISOString(),
-                version: '1.0.0'
-            };
-
-            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `classy_backup_${new Date().toISOString().split('T')[0]}.json`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-
-            localStorage.setItem('classy_last_backup', new Date().toLocaleString('ja-JP'));
-            addActivityLog('backup', 'export', '完全バックアップ実行');
-            showNotification('バックアップを作成しました', 'success');
-            updateRecordsStats();
-        }
-
-        function exportToCSV() {
-            const tasksCsv = [
-                ['ID', 'タイトル', '説明', '優先度', '期限', '完了状態', '作成日'],
-                ...tasks.map(task => [
-                    task.id,
-                    task.title,
-                    task.description,
-                    task.priority,
-                    task.dueDate,
-                    task.completed ? '完了' : '未完了',
-                    formatDate(task.createdAt)
-                ])
-            ].map(row => row.map(cell => `"${(cell || '').toString().replace(/"/g, '""')}"`).join(',')).join('\n');
-
-            const csvContent = `タスク一覧\n${tasksCsv}`;
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `classy_data_${new Date().toISOString().split('T')[0]}.csv`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-
-            addActivityLog('backup', 'export', 'CSVエクスポート実行');
-            showNotification('CSVファイルをエクスポートしました', 'success');
-        }
-
-        function resetAllData() {
-            if (confirm('すべてのデータをリセットしますか？この操作は取り消せません。')) {
-                localStorage.clear();
-                tasks = [];
-                events = [];
-                storeData = [];
-                activityLogs = [];
-                
-                initializeStoreData();
-                addActivityLog('system', 'reset', 'データ完全リセット実行');
-                saveToLocalStorage();
-                renderCurrentPage();
-                
-                showNotification('すべてのデータをリセットしました', 'info');
-            }
-        }
-
-        function handleFileImport(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const data = JSON.parse(e.target.result);
-                    
-                    if (data.tasks) tasks = data.tasks;
-                    if (data.events) events = data.events;
-                    if (data.storeData) storeData = data.storeData;
-                    if (data.activityLogs) activityLogs = data.activityLogs;
-                    
-                    addActivityLog('backup', 'import', `ファイル復元: ${file.name}`);
-                    showNotification('データを復元しました', 'success');
-                    
-                    saveToLocalStorage();
-                    renderCurrentPage();
-                } catch (parseError) {
-                    showNotification('ファイルの形式が正しくありません', 'error');
-                }
-            };
-            reader.readAsText(file);
         }
 
         // モーダル管理
@@ -4657,7 +4220,6 @@ Google OAuth2クライアントの設定変更が必要です：
             let testResults = [];
             
             try {
-                // データ保存テスト
                 const testData = { test: 'data' };
                 localStorage.setItem('test_key', JSON.stringify(testData));
                 const retrieved = JSON.parse(localStorage.getItem('test_key'));
@@ -4672,7 +4234,6 @@ Google OAuth2クライアントの設定変更が必要です：
             }
 
             try {
-                // データ表示テスト
                 if (storeData.length > 0) {
                     testResults.push('✅ データ表示: OK');
                 } else {
@@ -4683,7 +4244,6 @@ Google OAuth2クライアントの設定変更が必要です：
             }
 
             try {
-                // 計算機能テスト
                 const monthProgress = calculateMonthProgress();
                 if (monthProgress.progressPercentage >= 0) {
                     testResults.push('✅ 計算機能: OK');
@@ -4695,7 +4255,6 @@ Google OAuth2クライアントの設定変更が必要です：
             }
 
             try {
-                // UI表示テスト
                 const currentPageElement = document.getElementById('currentPageTitle');
                 if (currentPageElement && currentPageElement.textContent) {
                     testResults.push('✅ UI表示: OK');
@@ -4706,7 +4265,6 @@ Google OAuth2クライアントの設定変更が必要です：
                 testResults.push('❌ UI表示: エラー');
             }
 
-            // テスト結果表示
             addActivityLog('system', 'reset', 'システム動作テスト実行');
             showNotification('動作テスト完了: ' + testResults.join(', '), testResults.some(r => r.includes('❌')) ? 'warning' : 'success');
         }
@@ -4715,14 +4273,12 @@ Google OAuth2クライアントの設定変更が必要です：
         document.addEventListener('DOMContentLoaded', function() {
             initializeSystem();
             
-            // モバイル対応
             window.addEventListener('resize', function() {
                 if (window.innerWidth >= 1024) {
                     document.getElementById('sidebar').classList.remove('active');
                 }
             });
 
-            // 自動同期チェックボックスのイベントリスナー
             document.addEventListener('change', function(e) {
                 if (e.target.id === 'autoSync') {
                     toggleAutoSync();
@@ -4731,7 +4287,6 @@ Google OAuth2クライアントの設定変更が必要です：
                 }
             });
 
-            // キーボードショートカット
             document.addEventListener('keydown', function(e) {
                 if (e.ctrlKey || e.metaKey) {
                     switch(e.key) {
@@ -4763,7 +4318,6 @@ Google OAuth2クライアントの設定変更が必要です：
                 }
                 
                 if (e.key === 'Escape') {
-                    // すべてのモーダルを閉じる
                     document.querySelectorAll('.modal').forEach(modal => {
                         modal.classList.add('hidden');
                     });
@@ -4771,7 +4325,6 @@ Google OAuth2クライアントの設定変更が必要です：
             });
         });
 
-        // クリックイベントでモーダル外をクリックしたら閉じる
         document.addEventListener('click', function(e) {
             if (e.target.classList.contains('modal')) {
                 e.target.classList.add('hidden');
@@ -4813,16 +4366,10 @@ Google OAuth2クライアントの設定変更が必要です：
         window.importCalendarManually = importCalendarManually;
         window.exportTasksToGoogle = exportTasksToGoogle;
         window.importTasksFromGoogle = importTasksFromGoogle;
-        window.resetGoogleCalendarSync = resetGoogleCalendarSync;
-        window.resetGoogleTaskSync = resetGoogleTaskSync;
         window.initiateGoogleAuth = initiateGoogleAuth;
         window.refreshGoogleAuth = refreshGoogleAuth;
         window.revokeGoogleAuth = revokeGoogleAuth;
-        window.testTasksAPI = testTasksAPI;
-        window.createTestTask = createTestTask;
         window.syncGoogleTasksAPI = syncGoogleTasksAPI;
-        window.testCalendarAPI = testCalendarAPI;
-        window.createTestEvent = createTestEvent;
         window.syncGoogleCalendarAPI = syncGoogleCalendarAPI;
         window.updateAuthMethodInfo = updateAuthMethodInfo;
         window.initiateProxyAuth = initiateProxyAuth;
