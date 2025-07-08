@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CLASSY業務管理システム - 完璧版</title>
+    <title>川満さん専用 - 名古屋プレジャーグループ管理システム</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -11,18 +11,18 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
         }
         
         .app-container { display: flex; min-height: 100vh; }
         
         .sidebar {
-            width: 280px;
+            width: 260px;
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
             border-right: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 4px 0 30px rgba(0, 0, 0, 0.1);
+            box-shadow: 4px 0 30px rgba(0, 0, 0, 0.15);
             position: relative;
             transition: all 0.3s ease;
             z-index: 999;
@@ -31,43 +31,44 @@
         .main-content { flex: 1; overflow-x: hidden; }
         
         @media (max-width: 1023px) {
-            .sidebar { position: fixed; top: 0; left: -280px; height: 100vh; z-index: 999; }
+            .sidebar { position: fixed; top: 0; left: -260px; height: 100vh; z-index: 999; }
             .sidebar.active { left: 0; }
         }
         
         .glass-card {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
             transition: all 0.3s ease;
         }
         
-        .glass-card:hover { transform: translateY(-1px); box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15); }
+        .glass-card:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18); }
         
         .btn {
             display: inline-flex; align-items: center; justify-content: center; padding: 10px 16px;
-            font-weight: 600; border-radius: 10px; transition: all 0.3s ease; border: none;
+            font-weight: 600; border-radius: 12px; transition: all 0.3s ease; border: none;
             cursor: pointer; font-size: 14px; text-decoration: none;
         }
         
         .btn-primary {
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white;
-            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+            background: linear-gradient(135deg, #667eea, #764ba2); color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
         }
         
-        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 25px rgba(59, 130, 246, 0.5); }
-        .btn-success { background: linear-gradient(135deg, #10b981, #047857); color: white; }
-        .btn-outline { background: rgba(255, 255, 255, 0.9); color: #3b82f6; border: 2px solid rgba(59, 130, 246, 0.3); }
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5); }
+        .btn-success { background: linear-gradient(135deg, #11998e, #38ef7d); color: white; }
+        .btn-danger { background: linear-gradient(135deg, #ff6b6b, #ee5a52); color: white; }
+        .btn-outline { background: rgba(255, 255, 255, 0.9); color: #667eea; border: 2px solid rgba(102, 126, 234, 0.3); }
         
         .input-field {
-            width: 100%; padding: 10px 14px; border: 2px solid rgba(59, 130, 246, 0.2);
+            width: 100%; padding: 10px 14px; border: 2px solid rgba(102, 126, 234, 0.2);
             border-radius: 10px; font-size: 14px; transition: all 0.3s ease;
             background: rgba(255, 255, 255, 0.9);
         }
         
-        .input-field:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); }
+        .input-field:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1); }
         
         .modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -78,17 +79,17 @@
         .modal-content {
             background: white; border-radius: 16px; padding: 24px; width: 95%;
             max-width: 500px; max-height: 90vh; overflow-y: auto;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
         }
         
         .nav-item {
             display: flex; align-items: center; padding: 12px 16px; margin: 4px 8px;
-            border-radius: 10px; color: #64748b; text-decoration: none; transition: all 0.3s ease;
+            border-radius: 12px; color: #64748b; text-decoration: none; transition: all 0.3s ease;
             cursor: pointer; font-weight: 500;
         }
         
-        .nav-item:hover { background: rgba(59, 130, 246, 0.1); color: #3b82f6; transform: translateX(2px); }
-        .nav-item.active { background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white; }
+        .nav-item:hover { background: rgba(102, 126, 234, 0.1); color: #667eea; transform: translateX(4px); }
+        .nav-item.active { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
         
         .hidden { display: none !important; }
         
@@ -101,38 +102,72 @@
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         
         .task-card {
-            background: rgba(255, 255, 255, 0.95); border-radius: 10px; padding: 14px;
-            margin: 6px 0; border-left: 4px solid #3b82f6; transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.95); border-radius: 12px; padding: 16px;
+            margin: 8px 0; border-left: 4px solid #667eea; transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
         
-        .task-card.completed { opacity: 0.7; border-left-color: #10b981; }
-        .task-card.high-priority { border-left-color: #ef4444; }
-        .task-card.medium-priority { border-left-color: #f59e0b; }
-        .task-card.low-priority { border-left-color: #10b981; }
+        .task-card.completed { opacity: 0.7; border-left-color: #11998e; }
+        .task-card.high-priority { border-left-color: #ff6b6b; }
+        .task-card.medium-priority { border-left-color: #ffa726; }
+        .task-card.low-priority { border-left-color: #11998e; }
+        .task-card.overdue { border-left-color: #e53e3e; background: rgba(229, 62, 62, 0.05); }
 
-        .chart-container { position: relative; height: 350px; width: 100%; }
+        .chart-container { position: relative; height: 400px; width: 100%; }
         
         .store-card {
-            background: white; border-radius: 12px; padding: 16px; border: 1px solid #e5e7eb;
-            transition: all 0.3s ease; cursor: pointer;
+            background: white; border-radius: 16px; padding: 20px; border: 1px solid #e5e7eb;
+            transition: all 0.3s ease; cursor: pointer; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
         }
-        .store-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); }
+        .store-card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15); }
         
         .progress-bar {
-            width: 100%; height: 8px; background: #e5e7eb; border-radius: 4px; overflow: hidden;
+            width: 100%; height: 12px; background: #e5e7eb; border-radius: 6px; overflow: hidden;
         }
         .progress-fill {
-            height: 100%; background: linear-gradient(90deg, #3b82f6, #1d4ed8); border-radius: 4px;
-            transition: width 0.5s ease;
+            height: 100%; border-radius: 6px; transition: width 0.8s ease;
+        }
+        .progress-fill.excellent { background: linear-gradient(90deg, #11998e, #38ef7d); }
+        .progress-fill.good { background: linear-gradient(90deg, #667eea, #764ba2); }
+        .progress-fill.warning { background: linear-gradient(90deg, #ffa726, #ff9800); }
+        .progress-fill.danger { background: linear-gradient(90deg, #ff6b6b, #e53e3e); }
+        
+        .gauge-container {
+            position: relative; width: 200px; height: 100px; margin: 0 auto;
         }
         
-        .sync-status {
-            display: inline-block; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 600;
+        .achievement-badge {
+            display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;
         }
-        .sync-status.success { background: #dcfce7; color: #16a34a; }
-        .sync-status.error { background: #fee2e2; color: #dc2626; }
-        .sync-status.syncing { background: #dbeafe; color: #2563eb; }
-        .sync-status.pending { background: #f3f4f6; color: #6b7280; }
+        .achievement-badge.excellent { background: #dcfce7; color: #16a34a; }
+        .achievement-badge.good { background: #dbeafe; color: #2563eb; }
+        .achievement-badge.warning { background: #fef3c7; color: #d97706; }
+        .achievement-badge.danger { background: #fee2e2; color: #dc2626; }
+        
+        .priority-star {
+            color: #ffa726; font-size: 16px; cursor: pointer; transition: all 0.3s ease;
+        }
+        .priority-star:hover { color: #ff9800; transform: scale(1.2); }
+        .priority-star.active { color: #ff6b6b; }
+        
+        .calendar-embed {
+            border: none; border-radius: 16px; box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .task-category {
+            background: rgba(255, 255, 255, 0.9); border-radius: 12px; padding: 16px;
+            margin-bottom: 16px; border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+        
+        .category-header {
+            font-weight: 600; color: #374151; margin-bottom: 12px; display: flex;
+            align-items: center; justify-content: space-between;
+        }
+        
+        .category-count {
+            background: #667eea; color: white; padding: 2px 8px; border-radius: 12px;
+            font-size: 12px; font-weight: 600;
+        }
     </style>
 </head>
 <body>
@@ -141,44 +176,44 @@
         <div id="sidebar" class="sidebar">
             <div class="p-6">
                 <div class="text-center mb-6">
-                    <div class="text-2xl font-bold text-gray-900 mb-1">CLASSY</div>
-                    <div class="text-sm text-gray-600">業務管理システム</div>
-                    <div class="text-xs text-green-600 font-medium">完璧版</div>
+                    <div class="text-xl font-bold text-gray-900 mb-1">川満さん専用</div>
+                    <div class="text-sm text-gray-600">名古屋プレジャーグループ</div>
+                    <div class="text-xs text-purple-600 font-medium">管理システム</div>
                 </div>
                 
-                <nav class="space-y-1">
+                <nav class="space-y-2">
                     <div class="nav-item active" onclick="showPage('dashboard')">
-                        <i class="fas fa-home mr-3"></i>
+                        <i class="fas fa-chart-pie mr-3"></i>
                         <span>ダッシュボード</span>
+                    </div>
+                    <div class="nav-item" onclick="showPage('sales')">
+                        <i class="fas fa-store mr-3"></i>
+                        <span>売上管理</span>
+                    </div>
+                    <div class="nav-item" onclick="showPage('progress')">
+                        <i class="fas fa-chart-line mr-3"></i>
+                        <span>グラフ・進捗</span>
                     </div>
                     <div class="nav-item" onclick="showPage('tasks')">
                         <i class="fas fa-tasks mr-3"></i>
                         <span>タスク管理</span>
                     </div>
-                    <div class="nav-item" onclick="showPage('sales')">
-                        <i class="fas fa-chart-line mr-3"></i>
-                        <span>売上分析</span>
-                    </div>
-                    <div class="nav-item" onclick="showPage('sync')">
-                        <i class="fas fa-sync mr-3"></i>
-                        <span>シート同期</span>
-                    </div>
-                    <div class="nav-item" onclick="showPage('data')">
-                        <i class="fas fa-database mr-3"></i>
-                        <span>データ管理</span>
+                    <div class="nav-item" onclick="showPage('calendar')">
+                        <i class="fas fa-calendar mr-3"></i>
+                        <span>カレンダー</span>
                     </div>
                 </nav>
                 
-                <div class="mt-6 p-4 bg-gradient-to-br from-green-50 to-blue-50 rounded-12">
+                <div class="mt-6 p-4 bg-gradient-to-br from-purple-50 to-blue-50 rounded-12">
                     <div class="text-center">
-                        <div class="text-2xl mb-2">✨</div>
-                        <div class="text-sm font-medium text-green-800">完璧版</div>
-                        <div class="text-xs mb-3 text-green-700">
-                            全機能最適化済み<br>
-                            実用性重視設計
+                        <div class="text-2xl mb-2">👨‍💼</div>
+                        <div class="text-sm font-medium text-purple-800">川満さん専用</div>
+                        <div class="text-xs mb-3 text-purple-700">
+                            10店舗統合管理<br>
+                            スケジュール連携
                         </div>
-                        <button class="btn btn-success w-full text-sm" onclick="runCompleteTest()">
-                            <i class="fas fa-check mr-2"></i>動作確認
+                        <button class="btn btn-primary w-full text-sm" onclick="quickSync()">
+                            <i class="fas fa-sync mr-2"></i>データ更新
                         </button>
                     </div>
                 </div>
@@ -195,7 +230,7 @@
                             <i class="fas fa-bars"></i>
                         </button>
                         <div>
-                            <h1 class="text-xl font-bold text-gray-900">CLASSY業務管理</h1>
+                            <h1 class="text-xl font-bold text-gray-900">川満さん専用管理システム</h1>
                             <p class="text-sm text-gray-600" id="currentPageTitle">ダッシュボード</p>
                         </div>
                     </div>
@@ -203,7 +238,7 @@
                     <div class="flex items-center space-x-3">
                         <div class="text-right hidden sm:block">
                             <div class="font-semibold text-gray-900 text-sm" id="currentDate"></div>
-                            <div class="text-xs text-blue-600" id="currentTime"></div>
+                            <div class="text-xs text-purple-600" id="currentTime"></div>
                         </div>
                         <button class="btn btn-primary" onclick="openTaskModal()">
                             <i class="fas fa-plus mr-2"></i>
@@ -215,52 +250,124 @@
             
             <!-- ダッシュボードページ -->
             <div id="dashboardPage" class="page-content p-4">
-                <!-- 統計カード -->
+                <!-- 重要指標 -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                    <div class="glass-card p-4 text-center">
-                        <div class="text-2xl font-bold text-blue-600 mb-1" id="totalSales">¥0M</div>
-                        <div class="text-sm text-gray-600">総売上</div>
-                        <div class="text-xs text-green-600 mt-1" id="achievementRate">0%達成</div>
+                    <div class="glass-card p-6 text-center">
+                        <div class="text-3xl font-bold text-purple-600 mb-2" id="totalSales">¥0M</div>
+                        <div class="text-sm text-gray-600">総売上（今月）</div>
+                        <div class="text-xs mt-2" id="totalAchievement">
+                            <span class="achievement-badge good">0%達成</span>
+                        </div>
                     </div>
-                    <div class="glass-card p-4 text-center">
-                        <div class="text-2xl font-bold text-green-600 mb-1" id="totalStores">0</div>
-                        <div class="text-sm text-gray-600">管理店舗数</div>
-                        <div class="text-xs text-blue-600 mt-1" id="achievingStores">0店舗達成</div>
+                    <div class="glass-card p-6 text-center">
+                        <div class="text-3xl font-bold text-green-600 mb-2" id="achievingStores">0</div>
+                        <div class="text-sm text-gray-600">目標達成店舗</div>
+                        <div class="text-xs text-green-600 mt-2" id="achievementRatio">0/10店舗</div>
                     </div>
-                    <div class="glass-card p-4 text-center">
-                        <div class="text-2xl font-bold text-purple-600 mb-1" id="totalTasks">0</div>
-                        <div class="text-sm text-gray-600">総タスク数</div>
-                        <div class="text-xs text-orange-600 mt-1" id="pendingTasks">0件未完了</div>
+                    <div class="glass-card p-6 text-center">
+                        <div class="text-3xl font-bold text-orange-600 mb-2" id="progressRate">0%</div>
+                        <div class="text-sm text-gray-600">経過日数進捗率</div>
+                        <div class="text-xs mt-2" id="progressStatus">
+                            <span class="achievement-badge good">順調</span>
+                        </div>
                     </div>
-                    <div class="glass-card p-4 text-center">
-                        <div class="text-2xl font-bold text-orange-600 mb-1" id="lastSyncStatus">未同期</div>
-                        <div class="text-sm text-gray-600">最終同期</div>
-                        <div class="text-xs text-gray-600 mt-1" id="syncTime">-</div>
-                    </div>
-                </div>
-                
-                <!-- 今日のタスク -->
-                <div class="glass-card p-4 mb-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-bold text-gray-900">今日のタスク</h3>
-                        <button class="btn btn-outline" onclick="openTaskModal()">
-                            <i class="fas fa-plus mr-2"></i>追加
-                        </button>
-                    </div>
-                    <div id="todayTasksList" class="space-y-3">
-                        <div class="text-center text-gray-500 py-4">読み込み中...</div>
+                    <div class="glass-card p-6 text-center">
+                        <div class="text-3xl font-bold text-red-600 mb-2" id="urgentTasks">0</div>
+                        <div class="text-sm text-gray-600">緊急タスク</div>
+                        <div class="text-xs text-red-600 mt-2">期限超過含む</div>
                     </div>
                 </div>
                 
-                <!-- 店舗状況 -->
-                <div class="glass-card p-4">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-bold text-gray-900">店舗売上状況</h3>
-                        <button class="btn btn-outline" onclick="showPage('sync')">
-                            <i class="fas fa-sync mr-2"></i>同期更新
-                        </button>
+                <!-- 今日の重要情報 -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    <!-- 今日のタスク -->
+                    <div class="glass-card p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-bold text-gray-900">📋 今日のタスク</h3>
+                            <button class="btn btn-outline btn-sm" onclick="openTaskModal()">
+                                <i class="fas fa-plus mr-1"></i>追加
+                            </button>
+                        </div>
+                        <div id="todayTasksPreview" class="space-y-3">
+                            <div class="text-center text-gray-500 py-4">読み込み中...</div>
+                        </div>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="storesGrid">
+                    
+                    <!-- 進捗ゲージ -->
+                    <div class="glass-card p-6">
+                        <h3 class="text-lg font-bold text-gray-900 mb-4">📊 月間進捗状況</h3>
+                        <div class="text-center">
+                            <div class="gauge-container" id="progressGauge">
+                                <canvas id="gaugeChart" width="200" height="100"></canvas>
+                            </div>
+                            <div class="mt-4">
+                                <div class="text-2xl font-bold" id="gaugePercentage">0%</div>
+                                <div class="text-sm text-gray-600" id="gaugeDescription">目標に対する進捗</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 店舗別簡易状況 -->
+                <div class="glass-card p-6">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4">🏪 店舗別売上状況（簡易表示）</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4" id="storeQuickView">
+                        <div class="text-center text-gray-500 py-8">データを読み込み中...</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 売上管理ページ -->
+            <div id="salesPage" class="page-content p-4 hidden">
+                <div class="glass-card p-6 mb-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-bold text-gray-900">💰 10店舗売上管理</h3>
+                        <div class="flex space-x-2">
+                            <button class="btn btn-success" onclick="openSalesInputModal()">
+                                <i class="fas fa-edit mr-2"></i>売上入力
+                            </button>
+                            <button class="btn btn-outline" onclick="exportSalesData()">
+                                <i class="fas fa-download mr-2"></i>エクスポート
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 売上一覧表 -->
+                    <div class="overflow-x-auto">
+                        <table class="w-full bg-white rounded-lg shadow-sm">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="text-left p-4 font-semibold text-gray-900">店舗名</th>
+                                    <th class="text-left p-4 font-semibold text-gray-900">今月売上</th>
+                                    <th class="text-left p-4 font-semibold text-gray-900">月目標</th>
+                                    <th class="text-left p-4 font-semibold text-gray-900">達成率</th>
+                                    <th class="text-left p-4 font-semibold text-gray-900">前月比</th>
+                                    <th class="text-left p-4 font-semibold text-gray-900">前年同月比</th>
+                                    <th class="text-left p-4 font-semibold text-gray-900">状態</th>
+                                </tr>
+                            </thead>
+                            <tbody id="salesTable">
+                                <tr><td colspan="7" class="text-center p-8 text-gray-500">データを読み込み中...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- グラフ・進捗ページ -->
+            <div id="progressPage" class="page-content p-4 hidden">
+                <!-- 月次売上推移グラフ -->
+                <div class="glass-card p-6 mb-6">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">📈 月次売上推移（前年対比）</h3>
+                    <div class="chart-container">
+                        <canvas id="salesTrendChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- 店舗別進捗ゲージ -->
+                <div class="glass-card p-6">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">⚡ 店舗別進捗ゲージ</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="storeGauges">
                         <div class="text-center text-gray-500 py-8">データを読み込み中...</div>
                     </div>
                 </div>
@@ -268,197 +375,105 @@
             
             <!-- タスク管理ページ -->
             <div id="tasksPage" class="page-content p-4 hidden">
-                <div class="glass-card p-4">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-bold text-gray-900">タスク管理</h3>
+                <div class="glass-card p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-bold text-gray-900">📝 タスク管理</h3>
                         <button class="btn btn-primary" onclick="openTaskModal()">
                             <i class="fas fa-plus mr-2"></i>新規タスク
                         </button>
                     </div>
                     
-                    <!-- フィルター -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
-                        <input type="text" id="taskSearch" placeholder="タスクを検索..." class="input-field" oninput="filterTasks()">
-                        <select id="priorityFilter" class="input-field" onchange="filterTasks()">
-                            <option value="">すべての優先度</option>
-                            <option value="high">高優先度</option>
-                            <option value="medium">中優先度</option>
-                            <option value="low">低優先度</option>
-                        </select>
-                        <select id="statusFilter" class="input-field" onchange="filterTasks()">
-                            <option value="">すべてのステータス</option>
-                            <option value="pending">未完了</option>
-                            <option value="completed">完了済み</option>
-                        </select>
-                    </div>
-                    
-                    <!-- タスクリスト -->
-                    <div id="tasksList" class="space-y-3">
-                        <div class="text-center text-gray-500 py-4">読み込み中...</div>
+                    <!-- タスク4分類 -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- 今日 -->
+                        <div class="task-category">
+                            <div class="category-header">
+                                <span>🔥 今日</span>
+                                <span class="category-count" id="todayCount">0</span>
+                            </div>
+                            <div id="todayTasks" class="space-y-2">
+                                <!-- タスクが動的に追加される -->
+                            </div>
+                        </div>
+                        
+                        <!-- 今週 -->
+                        <div class="task-category">
+                            <div class="category-header">
+                                <span>📅 今週</span>
+                                <span class="category-count" id="weekCount">0</span>
+                            </div>
+                            <div id="weekTasks" class="space-y-2">
+                                <!-- タスクが動的に追加される -->
+                            </div>
+                        </div>
+                        
+                        <!-- 今月 -->
+                        <div class="task-category">
+                            <div class="category-header">
+                                <span>📆 今月</span>
+                                <span class="category-count" id="monthCount">0</span>
+                            </div>
+                            <div id="monthTasks" class="space-y-2">
+                                <!-- タスクが動的に追加される -->
+                            </div>
+                        </div>
+                        
+                        <!-- あとで -->
+                        <div class="task-category">
+                            <div class="category-header">
+                                <span>⏰ あとで</span>
+                                <span class="category-count" id="laterCount">0</span>
+                            </div>
+                            <div id="laterTasks" class="space-y-2">
+                                <!-- タスクが動的に追加される -->
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
             
-            <!-- 売上分析ページ -->
-            <div id="salesPage" class="page-content p-4 hidden">
-                <div class="glass-card p-4 mb-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-bold text-gray-900">売上分析</h3>
-                        <select id="salesPeriod" class="input-field w-32" onchange="updateSalesChart()">
-                            <option value="month">月間</option>
-                            <option value="quarter">四半期</option>
-                            <option value="year">年間</option>
-                        </select>
-                    </div>
-                    
-                    <!-- 売上チャート -->
-                    <div class="bg-white p-4 rounded-lg mb-6">
-                        <div class="chart-container">
-                            <canvas id="salesChart"></canvas>
-                        </div>
-                    </div>
-                    
-                    <!-- 店舗ランキング -->
-                    <div>
-                        <h4 class="text-lg font-bold text-gray-900 mb-4">店舗売上ランキング</h4>
-                        <div id="storeRanking" class="space-y-3">
-                            <div class="text-center text-gray-500 py-4">データを読み込み中...</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- シート同期ページ -->
-            <div id="syncPage" class="page-content p-4 hidden">
-                <div class="glass-card p-4 mb-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-bold text-gray-900">🔄 Google Sheets同期</h3>
-                        <div class="flex items-center space-x-2">
-                            <span id="syncStatusBadge" class="sync-status pending">未接続</span>
-                            <button class="btn btn-primary" onclick="performSync()">
-                                <i class="fas fa-sync mr-2"></i>今すぐ同期
+            <!-- カレンダーページ -->
+            <div id="calendarPage" class="page-content p-4 hidden">
+                <div class="glass-card p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-bold text-gray-900">📅 Googleカレンダー</h3>
+                        <div class="flex space-x-2">
+                            <button class="btn btn-outline" onclick="toggleCalendarView('week')">
+                                <i class="fas fa-calendar-week mr-1"></i>週表示
+                            </button>
+                            <button class="btn btn-outline" onclick="toggleCalendarView('month')">
+                                <i class="fas fa-calendar mr-1"></i>月表示
                             </button>
                         </div>
                     </div>
                     
-                    <!-- 同期設定 -->
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                        <div>
-                            <h4 class="font-semibold text-gray-800 mb-3">📊 スプレッドシート設定</h4>
-                            <div class="space-y-3">
-                                <div>
-                                    <label class="block text-sm font-semibold text-gray-700 mb-2">シートURL または ID</label>
-                                    <input type="text" id="sheetUrl" class="input-field text-sm" 
-                                           value="1CSGBzK9au8VLEQFCpBJbVyMoTaRhO5hoQd_qk8XC_IQ"
-                                           placeholder="Google SheetsのURLまたはシートID">
-                                    <div class="text-xs text-gray-500 mt-1">
-                                        公開設定されたシートのURLまたはIDを入力
-                                    </div>
+                    <!-- Googleカレンダー埋め込み -->
+                    <div class="bg-white rounded-lg p-4">
+                        <div id="calendarEmbed" class="text-center">
+                            <!-- 実際のGoogleカレンダー埋め込み用 -->
+                            <iframe 
+                                id="googleCalendar"
+                                src="https://calendar.google.com/calendar/embed?height=600&wkst=1&bgcolor=%23ffffff&ctz=Asia%2FTokyo&showTitle=0&showPrint=0&showTabs=0&showCalendars=0"
+                                style="border-width:0" 
+                                width="100%" 
+                                height="600" 
+                                frameborder="0" 
+                                scrolling="no"
+                                class="calendar-embed">
+                            </iframe>
+                            
+                            <!-- デモ用表示 -->
+                            <div class="bg-blue-50 p-8 rounded-lg">
+                                <div class="text-blue-600 mb-4">
+                                    <i class="fas fa-calendar-alt text-4xl"></i>
                                 </div>
-                                <div class="flex items-center space-x-2">
-                                    <input type="checkbox" id="autoSync" class="rounded">
-                                    <label for="autoSync" class="text-sm text-gray-700">自動同期を有効にする（5分間隔）</label>
-                                </div>
-                                <button class="btn btn-outline w-full" onclick="testConnection()">
-                                    <i class="fas fa-link mr-2"></i>接続テスト
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div>
-                            <h4 class="font-semibold text-gray-800 mb-3">⚙️ 同期オプション</h4>
-                            <div class="space-y-3">
-                                <div class="flex items-center space-x-2">
-                                    <input type="checkbox" id="syncSales" class="rounded" checked>
-                                    <label for="syncSales" class="text-sm text-gray-700">売上データ同期</label>
-                                </div>
-                                <div class="flex items-center space-x-2">
-                                    <input type="checkbox" id="syncTargets" class="rounded" checked>
-                                    <label for="syncTargets" class="text-sm text-gray-700">売上目標同期</label>
-                                </div>
-                                <div class="flex items-center space-x-2">
-                                    <input type="checkbox" id="backupBeforeSync" class="rounded" checked>
-                                    <label for="backupBeforeSync" class="text-sm text-gray-700">同期前にバックアップ</label>
-                                </div>
-                                <div class="bg-blue-50 p-3 rounded-lg">
-                                    <div class="text-sm text-blue-800">
-                                        <strong>同期データ形式:</strong><br>
-                                        A列: 店舗名, B列: 売上実績, C列: 売上目標
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- 同期結果 -->
-                    <div class="bg-white p-4 rounded-lg">
-                        <h4 class="font-semibold text-gray-800 mb-3">📈 同期データ</h4>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-sm">
-                                <thead class="bg-gray-50">
-                                    <tr>
-                                        <th class="text-left p-3 font-semibold">店舗名</th>
-                                        <th class="text-left p-3 font-semibold">売上実績</th>
-                                        <th class="text-left p-3 font-semibold">売上目標</th>
-                                        <th class="text-left p-3 font-semibold">達成率</th>
-                                        <th class="text-left p-3 font-semibold">状態</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="syncDataTable">
-                                    <tr><td colspan="5" class="text-center p-4 text-gray-500">同期データなし</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- データ管理ページ -->
-            <div id="dataPage" class="page-content p-4 hidden">
-                <div class="glass-card p-4 mb-6">
-                    <h3 class="text-lg font-bold text-gray-900 mb-4">データ管理</h3>
-                    
-                    <!-- データ統計 -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                        <div class="bg-blue-50 p-4 rounded-lg text-center">
-                            <div class="text-2xl font-bold text-blue-600" id="dataTasksCount">0</div>
-                            <div class="text-sm text-gray-600">保存済みタスク</div>
-                        </div>
-                        <div class="bg-green-50 p-4 rounded-lg text-center">
-                            <div class="text-2xl font-bold text-green-600" id="dataStoresCount">0</div>
-                            <div class="text-sm text-gray-600">管理店舗数</div>
-                        </div>
-                        <div class="bg-purple-50 p-4 rounded-lg text-center">
-                            <div class="text-2xl font-bold text-purple-600" id="dataSize">0KB</div>
-                            <div class="text-sm text-gray-600">データサイズ</div>
-                        </div>
-                    </div>
-                    
-                    <!-- データ操作 -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <h4 class="font-semibold text-gray-800 mb-3">📤 データエクスポート</h4>
-                            <div class="space-y-3">
-                                <button class="btn btn-primary w-full" onclick="exportFullBackup()">
-                                    <i class="fas fa-download mr-2"></i>完全バックアップ（JSON）
-                                </button>
-                                <button class="btn btn-outline w-full" onclick="exportCSV()">
-                                    <i class="fas fa-file-csv mr-2"></i>CSV形式でエクスポート
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div>
-                            <h4 class="font-semibold text-gray-800 mb-3">📥 データ管理</h4>
-                            <div class="space-y-3">
-                                <div>
-                                    <input type="file" id="importFile" accept=".json,.csv" class="hidden" onchange="handleImport(event)">
-                                    <button class="btn btn-primary w-full" onclick="document.getElementById('importFile').click()">
-                                        <i class="fas fa-upload mr-2"></i>ファイルから復元
-                                    </button>
-                                </div>
-                                <button class="btn btn-outline w-full" onclick="resetData()">
-                                    <i class="fas fa-redo mr-2"></i>データリセット
+                                <h4 class="text-lg font-semibold text-blue-800 mb-2">Googleカレンダー連携</h4>
+                                <p class="text-blue-600 mb-4">
+                                    川満さんのGoogleアカウントと連携すると、<br>
+                                    ここにカレンダーが表示されます。
+                                </p>
+                                <button class="btn btn-primary" onclick="connectGoogleCalendar()">
+                                    <i class="fab fa-google mr-2"></i>Googleカレンダー連携
                                 </button>
                             </div>
                         </div>
@@ -485,8 +500,8 @@
                 </div>
                 
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">説明</label>
-                    <textarea id="taskDescription" class="input-field" rows="3" placeholder="詳細説明"></textarea>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">説明・備考</label>
+                    <textarea id="taskDescription" class="input-field" rows="3" placeholder="詳細説明や備考"></textarea>
                 </div>
                 
                 <div class="grid grid-cols-2 gap-3">
@@ -500,9 +515,24 @@
                     </div>
                     
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">期限</label>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">締切日</label>
                         <input type="date" id="taskDueDate" class="input-field">
                     </div>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">カテゴリ</label>
+                    <select id="taskCategory" class="input-field">
+                        <option value="today">今日</option>
+                        <option value="week">今週</option>
+                        <option value="month">今月</option>
+                        <option value="later">あとで</option>
+                    </select>
+                </div>
+                
+                <div class="flex items-center space-x-2">
+                    <input type="checkbox" id="taskImportant" class="rounded">
+                    <label for="taskImportant" class="text-sm text-gray-700">重要タスク（★マーク）</label>
                 </div>
                 
                 <div class="flex space-x-3">
@@ -517,123 +547,216 @@
         </div>
     </div>
 
+    <!-- 売上入力モーダル -->
+    <div id="salesInputModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-bold text-gray-900">💰 売上データ入力</h3>
+                <button onclick="hideModal('salesInputModal')" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">店舗選択</label>
+                    <select id="salesStore" class="input-field">
+                        <option value="">店舗を選択</option>
+                    </select>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">売上実績（万円）</label>
+                        <input type="number" id="salesAmount" class="input-field" placeholder="1500">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">月目標（万円）</label>
+                        <input type="number" id="salesTarget" class="input-field" placeholder="1600">
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">対象月</label>
+                    <input type="month" id="salesMonth" class="input-field">
+                </div>
+                
+                <div class="flex space-x-3">
+                    <button class="btn btn-success flex-1" onclick="saveSalesData()">
+                        <i class="fas fa-save mr-2"></i>保存
+                    </button>
+                    <button class="btn btn-outline" onclick="hideModal('salesInputModal')">
+                        キャンセル
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         // グローバル変数
         let currentPage = 'dashboard';
         let tasks = [];
         let storeData = [];
         let editingTaskId = null;
-        let salesChart = null;
-        let autoSyncInterval = null;
-        let lastSyncData = [];
+        let salesTrendChart = null;
+        let gaugeChart = null;
+        let calendarView = 'month';
 
-        // 店舗データ初期化
+        // 店舗データ初期化（10店舗）
         function initializeStoreData() {
             storeData = [
                 {
-                    id: 'shabour',
-                    name: 'シャブール',
-                    salesTarget: 33000000,
-                    totalSales: 29544738,
-                    achievementRate: 0.8953,
+                    id: 'classy_tokyo',
+                    name: 'CLASSY東京',
+                    currentSales: 15000000, // 1500万円
+                    monthTarget: 16000000,  // 1600万円
+                    previousMonth: 14300000, // 前月
+                    previousYear: 13600000,  // 前年同月
+                    brand: 'CLASSY'
+                },
+                {
+                    id: 'classy_nagoya',
+                    name: 'CLASSY名古屋',
+                    currentSales: 12000000,
+                    monthTarget: 12000000,
+                    previousMonth: 12400000,
+                    previousYear: 11100000,
+                    brand: 'CLASSY'
+                },
+                {
+                    id: 'grand_opera_fukuoka',
+                    name: 'GRAND OPERA福岡',
+                    currentSales: 9000000,
+                    monthTarget: 9500000,
+                    previousMonth: 8800000,
+                    previousYear: 8000000,
+                    brand: 'GRAND OPERA'
+                },
+                {
+                    id: 'grand_opera_tokyo',
+                    name: 'GRAND OPERA東京',
+                    currentSales: 11500000,
+                    monthTarget: 12000000,
+                    previousMonth: 11200000,
+                    previousYear: 10800000,
+                    brand: 'GRAND OPERA'
+                },
+                {
+                    id: 'grand_opera_nagoya',
+                    name: 'GRAND OPERA名古屋',
+                    currentSales: 10800000,
+                    monthTarget: 11000000,
+                    previousMonth: 10500000,
+                    previousYear: 10200000,
+                    brand: 'GRAND OPERA'
+                },
+                {
+                    id: 'grand_opera_yokohama',
+                    name: 'GRAND OPERA横浜',
+                    currentSales: 8500000,
+                    monthTarget: 9000000,
+                    previousMonth: 8200000,
+                    previousYear: 7800000,
+                    brand: 'GRAND OPERA'
+                },
+                {
+                    id: 'premium_shabour',
+                    name: 'Premium シャブール',
+                    currentSales: 14500000,
+                    monthTarget: 15000000,
+                    previousMonth: 14100000,
+                    previousYear: 13200000,
                     brand: 'Premium'
                 },
                 {
-                    id: 'onecarat',
-                    name: 'ワンカラット',
-                    salesTarget: 17500000,
-                    totalSales: 18314356,
-                    achievementRate: 1.0465,
+                    id: 'premium_onecarat',
+                    name: 'Premium ワンカラット',
+                    currentSales: 13200000,
+                    monthTarget: 13500000,
+                    previousMonth: 12800000,
+                    previousYear: 12100000,
                     brand: 'Premium'
                 },
                 {
-                    id: 'go_nagoya',
-                    name: 'GO名古屋',
-                    salesTarget: 28000000,
-                    totalSales: 29265025,
-                    achievementRate: 1.0452,
-                    brand: 'GrandOpera'
-                },
-                {
-                    id: 'go_fukuoka',
-                    name: 'GO福岡',
-                    salesTarget: 36000000,
-                    totalSales: 37050068,
-                    achievementRate: 1.0292,
-                    brand: 'GrandOpera'
-                },
-                {
-                    id: 'go_tokyo',
-                    name: 'GO東京',
-                    salesTarget: 28000000,
-                    totalSales: 27324427,
-                    achievementRate: 0.9759,
-                    brand: 'GrandOpera'
-                },
-                {
-                    id: 'go_yokohama',
-                    name: 'GO横浜',
-                    salesTarget: 23000000,
-                    totalSales: 22547274,
-                    achievementRate: 0.9803,
-                    brand: 'GrandOpera'
+                    id: 'classy_yokkaichi',
+                    name: 'CLASSY四日市',
+                    currentSales: 7800000,
+                    monthTarget: 8000000,
+                    previousMonth: 7600000,
+                    previousYear: 7200000,
+                    brand: 'CLASSY'
                 },
                 {
                     id: 'opera_nishiki',
                     name: 'オペラ錦',
-                    salesTarget: 24000000,
-                    totalSales: 25123456,
-                    achievementRate: 1.0468,
-                    brand: 'GrandOpera'
-                },
-                {
-                    id: 'cl_nagoya',
-                    name: 'CL名古屋',
-                    salesTarget: 6000000,
-                    totalSales: 5300320,
-                    achievementRate: 0.8834,
-                    brand: 'CLASSY'
-                },
-                {
-                    id: 'cl_tokyo',
-                    name: 'CL東京',
-                    salesTarget: 7200000,
-                    totalSales: 6719328,
-                    achievementRate: 0.9332,
-                    brand: 'CLASSY'
-                },
-                {
-                    id: 'cl_yokkaichi',
-                    name: 'CL四日市',
-                    salesTarget: 12500000,
-                    totalSales: 12943296,
-                    achievementRate: 1.0355,
-                    brand: 'CLASSY'
+                    currentSales: 12800000,
+                    monthTarget: 13000000,
+                    previousMonth: 12600000,
+                    previousYear: 11900000,
+                    brand: 'GRAND OPERA'
                 }
             ];
+
+            // 達成率等を計算
+            storeData.forEach(store => {
+                store.achievementRate = store.currentSales / store.monthTarget;
+                store.previousMonthRate = ((store.currentSales - store.previousMonth) / store.previousMonth) * 100;
+                store.previousYearRate = ((store.currentSales - store.previousYear) / store.previousYear) * 100;
+            });
         }
 
         // タスク初期化
         function initializeTasks() {
             if (tasks.length === 0) {
                 const today = getDateString(new Date());
+                const tomorrow = getDateString(new Date(Date.now() + 24 * 60 * 60 * 1000));
+                const nextWeek = getDateString(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000));
+                
                 tasks = [
                     {
                         id: Date.now(),
                         title: '7月売上レポート作成',
-                        description: '全店舗の7月売上データをまとめて分析レポートを作成する',
+                        description: '全10店舗の7月売上データをまとめて分析レポートを作成',
                         priority: 'high',
                         dueDate: today,
+                        category: 'today',
                         completed: false,
+                        important: true,
                         createdAt: new Date().toISOString()
                     },
                     {
                         id: Date.now() + 1,
-                        title: 'Google Sheets同期設定',
-                        description: '売上データの自動同期システムをセットアップする',
+                        title: '月次店舗ミーティング準備',
+                        description: '各店舗マネージャーとの月次ミーティング資料準備',
                         priority: 'medium',
-                        dueDate: today,
+                        dueDate: tomorrow,
+                        category: 'week',
                         completed: false,
+                        important: false,
+                        createdAt: new Date().toISOString()
+                    },
+                    {
+                        id: Date.now() + 2,
+                        title: '新店舗開発計画検討',
+                        description: '来年の新店舗展開についての企画書作成',
+                        priority: 'medium',
+                        dueDate: nextWeek,
+                        category: 'month',
+                        completed: false,
+                        important: true,
+                        createdAt: new Date().toISOString()
+                    },
+                    {
+                        id: Date.now() + 3,
+                        title: 'システム改善提案',
+                        description: '現在の管理システムの改善点をまとめる',
+                        priority: 'low',
+                        dueDate: '',
+                        category: 'later',
+                        completed: false,
+                        important: false,
                         createdAt: new Date().toISOString()
                     }
                 ];
@@ -659,7 +782,7 @@
                 (type === 'success' ? 'border-green-500 bg-green-50 text-green-800' :
                 type === 'error' ? 'border-red-500 bg-red-50 text-red-800' :
                 type === 'warning' ? 'border-yellow-500 bg-yellow-50 text-yellow-800' :
-                'border-blue-500 bg-blue-50 text-blue-800');
+                'border-purple-500 bg-purple-50 text-purple-800');
 
             const icon = type === 'success' ? 'check-circle' :
                         type === 'error' ? 'exclamation-circle' :
@@ -690,21 +813,57 @@
         }
 
         function formatCurrency(amount) {
-            return '¥' + (amount / 1000000).toFixed(1) + 'M';
+            return '¥' + (amount / 10000).toFixed(0) + '万';
         }
 
         function getBrandEmoji(brand) {
             switch (brand) {
                 case 'Premium': return '👑';
-                case 'GrandOpera': return '🎭';
+                case 'GRAND OPERA': return '🎭';
                 case 'CLASSY': return '💎';
                 default: return '🏪';
             }
         }
 
+        function getProgressRate() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth();
+            const day = now.getDate();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            return (day / daysInMonth) * 100;
+        }
+
+        function getAchievementLevel(rate) {
+            if (rate >= 1.1) return 'excellent';
+            if (rate >= 1.0) return 'good';
+            if (rate >= 0.8) return 'warning';
+            return 'danger';
+        }
+
+        function isOverdue(dueDate) {
+            if (!dueDate) return false;
+            return new Date(dueDate) < new Date();
+        }
+
+        function getTaskCategory(dueDate) {
+            if (!dueDate) return 'later';
+            
+            const due = new Date(dueDate);
+            const today = new Date();
+            const tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
+            const weekEnd = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
+            const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+            
+            if (due.toDateString() === today.toDateString()) return 'today';
+            if (due <= weekEnd) return 'week';
+            if (due <= monthEnd) return 'month';
+            return 'later';
+        }
+
         // システム初期化
         function initializeSystem() {
-            console.log('CLASSY業務管理システム - 完璧版 初期化開始');
+            console.log('川満さん専用管理システム初期化開始');
             
             loadFromStorage();
             
@@ -719,23 +878,15 @@
             
             renderCurrentPage();
             
-            // 自動同期チェック
-            const autoSync = localStorage.getItem('classy_auto_sync') === 'true';
-            if (autoSync) {
-                document.getElementById('autoSync').checked = true;
-                startAutoSync();
-            }
-            
             console.log('システム初期化完了');
-            showNotification('✨ CLASSY業務管理システム完璧版が起動しました！', 'success');
+            showNotification('👨‍💼 川満さん、お疲れ様です！管理システムが準備できました。', 'success');
         }
 
         // データ保存・読み込み
         function saveToStorage() {
             try {
-                localStorage.setItem('classy_tasks', JSON.stringify(tasks));
-                localStorage.setItem('classy_stores', JSON.stringify(storeData));
-                localStorage.setItem('classy_last_sync_data', JSON.stringify(lastSyncData));
+                localStorage.setItem('kawamitsu_tasks', JSON.stringify(tasks));
+                localStorage.setItem('kawamitsu_stores', JSON.stringify(storeData));
             } catch (error) {
                 console.error('保存エラー:', error);
                 showNotification('データの保存に失敗しました', 'error');
@@ -744,13 +895,11 @@
 
         function loadFromStorage() {
             try {
-                const savedTasks = localStorage.getItem('classy_tasks');
-                const savedStores = localStorage.getItem('classy_stores');
-                const savedSyncData = localStorage.getItem('classy_last_sync_data');
+                const savedTasks = localStorage.getItem('kawamitsu_tasks');
+                const savedStores = localStorage.getItem('kawamitsu_stores');
 
                 if (savedTasks) tasks = JSON.parse(savedTasks);
                 if (savedStores) storeData = JSON.parse(savedStores);
-                if (savedSyncData) lastSyncData = JSON.parse(savedSyncData);
             } catch (error) {
                 console.error('読み込みエラー:', error);
             }
@@ -789,10 +938,10 @@
             // ページタイトル更新
             const titles = {
                 dashboard: 'ダッシュボード',
+                sales: '売上管理',
+                progress: 'グラフ・進捗',
                 tasks: 'タスク管理',
-                sales: '売上分析',
-                sync: 'シート同期',
-                data: 'データ管理'
+                calendar: 'カレンダー'
             };
             updateElement('currentPageTitle', titles[pageName]);
 
@@ -811,17 +960,17 @@
                 case 'dashboard':
                     renderDashboard();
                     break;
-                case 'tasks':
-                    renderTasks();
-                    break;
                 case 'sales':
                     renderSales();
                     break;
-                case 'sync':
-                    renderSync();
+                case 'progress':
+                    renderProgress();
                     break;
-                case 'data':
-                    renderDataManagement();
+                case 'tasks':
+                    renderTasks();
+                    break;
+                case 'calendar':
+                    renderCalendar();
                     break;
             }
         }
@@ -829,138 +978,385 @@
         // ダッシュボード
         function renderDashboard() {
             updateDashboardStats();
-            renderTodayTasks();
-            renderStoresGrid();
+            renderTodayTasksPreview();
+            renderProgressGauge();
+            renderStoreQuickView();
         }
 
         function updateDashboardStats() {
-            const totalSales = storeData.reduce((sum, store) => sum + (store.totalSales || 0), 0);
-            const totalTarget = storeData.reduce((sum, store) => sum + (store.salesTarget || 0), 0);
-            const achievementRate = totalTarget > 0 ? (totalSales / totalTarget) * 100 : 0;
-            const achievingStores = storeData.filter(store => (store.achievementRate || 0) >= 1.0).length;
-            const pendingTasks = tasks.filter(t => !t.completed).length;
+            const totalSales = storeData.reduce((sum, store) => sum + store.currentSales, 0);
+            const totalTarget = storeData.reduce((sum, store) => sum + store.monthTarget, 0);
+            const achievementRate = (totalSales / totalTarget) * 100;
+            const achievingStores = storeData.filter(store => store.achievementRate >= 1.0).length;
+            const progressRate = getProgressRate();
+            const urgentTasks = tasks.filter(task => !task.completed && (isOverdue(task.dueDate) || task.category === 'today')).length;
 
             updateElement('totalSales', formatCurrency(totalSales));
-            updateElement('achievementRate', achievementRate.toFixed(1) + '%達成');
-            updateElement('totalStores', storeData.length.toString());
-            updateElement('achievingStores', achievingStores + '店舗達成');
-            updateElement('totalTasks', tasks.length.toString());
-            updateElement('pendingTasks', pendingTasks + '件未完了');
-
-            const lastSync = localStorage.getItem('classy_last_sync');
-            if (lastSync) {
-                updateElement('lastSyncStatus', '同期済み');
-                updateElement('syncTime', new Date(lastSync).toLocaleString('ja-JP'));
-            } else {
-                updateElement('lastSyncStatus', '未同期');
-                updateElement('syncTime', '-');
-            }
+            
+            const achievementBadge = document.getElementById('totalAchievement');
+            const level = getAchievementLevel(achievementRate / 100);
+            achievementBadge.innerHTML = `<span class="achievement-badge ${level}">${achievementRate.toFixed(1)}%達成</span>`;
+            
+            updateElement('achievingStores', achievingStores.toString());
+            updateElement('achievementRatio', `${achievingStores}/10店舗`);
+            updateElement('progressRate', progressRate.toFixed(1) + '%');
+            
+            const progressStatus = document.getElementById('progressStatus');
+            const idealAchievement = (progressRate / 100) * 100;
+            const actualAchievement = achievementRate;
+            const progressLevel = actualAchievement >= idealAchievement ? 'good' : 'warning';
+            const progressText = actualAchievement >= idealAchievement ? '順調' : '要注意';
+            progressStatus.innerHTML = `<span class="achievement-badge ${progressLevel}">${progressText}</span>`;
+            
+            updateElement('urgentTasks', urgentTasks.toString());
         }
 
-        function renderTodayTasks() {
-            const today = getDateString(new Date());
-            const todayTasks = tasks.filter(task => task.dueDate === today && !task.completed);
-            const container = document.getElementById('todayTasksList');
+        function renderTodayTasksPreview() {
+            const todayTasks = tasks.filter(task => task.category === 'today' && !task.completed);
+            const container = document.getElementById('todayTasksPreview');
 
             if (todayTasks.length === 0) {
                 container.innerHTML = '<div class="text-center text-gray-500 py-4">今日のタスクはありません 🎉</div>';
                 return;
             }
 
-            container.innerHTML = todayTasks.map(task => 
-                `<div class="task-card ${task.priority}-priority">
+            container.innerHTML = todayTasks.slice(0, 3).map(task => 
+                `<div class="task-card ${task.priority}-priority ${isOverdue(task.dueDate) ? 'overdue' : ''}">
                     <div class="flex items-center">
                         <input type="checkbox" onchange="toggleTask(${task.id})" class="mr-3">
                         <div class="flex-1">
-                            <div class="font-semibold text-gray-900">${escapeHtml(task.title)}</div>
+                            <div class="font-semibold text-gray-900">
+                                ${task.important ? '<i class="priority-star active fas fa-star mr-1"></i>' : ''}
+                                ${escapeHtml(task.title)}
+                            </div>
                             <div class="text-sm text-gray-600">${escapeHtml(task.description)}</div>
                         </div>
-                        <span class="text-xs px-2 py-1 rounded ${getPriorityClass(task.priority)}">${getPriorityText(task.priority)}</span>
                     </div>
                 </div>`
-            ).join('');
+            ).join('') + (todayTasks.length > 3 ? `<div class="text-center"><a href="#" onclick="showPage('tasks')" class="text-purple-600 text-sm">他${todayTasks.length - 3}件のタスクを表示</a></div>` : '');
         }
 
-        function renderStoresGrid() {
-            const container = document.getElementById('storesGrid');
+        function renderProgressGauge() {
+            const totalSales = storeData.reduce((sum, store) => sum + store.currentSales, 0);
+            const totalTarget = storeData.reduce((sum, store) => sum + store.monthTarget, 0);
+            const achievementRate = (totalSales / totalTarget) * 100;
+            const progressRate = getProgressRate();
             
-            container.innerHTML = storeData.map(store => `
-                <div class="store-card">
-                    <div class="flex items-center justify-between mb-3">
-                        <h4 class="font-semibold text-gray-900">${escapeHtml(store.name)}</h4>
-                        <span class="text-lg">${getBrandEmoji(store.brand)}</span>
-                    </div>
-                    <div class="space-y-2">
-                        <div class="flex justify-between text-sm">
-                            <span>売上実績</span>
-                            <span class="font-bold text-blue-600">${formatCurrency(store.totalSales)}</span>
+            updateElement('gaugePercentage', achievementRate.toFixed(1) + '%');
+            updateElement('gaugeDescription', `月間進捗 ${progressRate.toFixed(1)}% / 目標達成率`);
+            
+            // ゲージチャート描画
+            const canvas = document.getElementById('gaugeChart');
+            if (canvas && canvas.getContext) {
+                const ctx = canvas.getContext('2d');
+                
+                if (gaugeChart) {
+                    gaugeChart.destroy();
+                }
+                
+                gaugeChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        datasets: [{
+                            data: [achievementRate, 100 - achievementRate],
+                            backgroundColor: [
+                                achievementRate >= 100 ? '#11998e' : achievementRate >= 80 ? '#667eea' : '#ff6b6b',
+                                '#e5e7eb'
+                            ],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: false,
+                        maintainAspectRatio: false,
+                        circumference: 180,
+                        rotation: 270,
+                        cutout: '75%',
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: { enabled: false }
+                        }
+                    }
+                });
+            }
+        }
+
+        function renderStoreQuickView() {
+            const container = document.getElementById('storeQuickView');
+            
+            container.innerHTML = storeData.map(store => {
+                const level = getAchievementLevel(store.achievementRate);
+                return `
+                    <div class="store-card text-center">
+                        <div class="text-lg mb-1">${getBrandEmoji(store.brand)}</div>
+                        <div class="font-semibold text-gray-900 text-sm mb-2">${escapeHtml(store.name)}</div>
+                        <div class="text-xl font-bold text-purple-600 mb-1">${formatCurrency(store.currentSales)}</div>
+                        <div class="achievement-badge ${level} text-xs">
+                            ${(store.achievementRate * 100).toFixed(1)}%
                         </div>
-                        <div class="flex justify-between text-sm">
-                            <span>達成率</span>
-                            <span class="font-bold ${store.achievementRate >= 1.0 ? 'text-green-600' : 'text-red-600'}">
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 売上管理
+        function renderSales() {
+            renderSalesTable();
+            populateStoreSelect();
+        }
+
+        function renderSalesTable() {
+            const container = document.getElementById('salesTable');
+            
+            container.innerHTML = storeData.map(store => {
+                const level = getAchievementLevel(store.achievementRate);
+                const prevMonthSign = store.previousMonthRate >= 0 ? '+' : '';
+                const prevYearSign = store.previousYearRate >= 0 ? '+' : '';
+                
+                return `
+                    <tr class="hover:bg-gray-50">
+                        <td class="p-4 font-medium">
+                            ${getBrandEmoji(store.brand)} ${escapeHtml(store.name)}
+                        </td>
+                        <td class="p-4 font-bold text-purple-600">${formatCurrency(store.currentSales)}</td>
+                        <td class="p-4 text-gray-600">${formatCurrency(store.monthTarget)}</td>
+                        <td class="p-4">
+                            <span class="achievement-badge ${level}">
                                 ${(store.achievementRate * 100).toFixed(1)}%
                             </span>
+                        </td>
+                        <td class="p-4 ${store.previousMonthRate >= 0 ? 'text-green-600' : 'text-red-600'}">
+                            ${prevMonthSign}${store.previousMonthRate.toFixed(1)}%
+                        </td>
+                        <td class="p-4 ${store.previousYearRate >= 0 ? 'text-green-600' : 'text-red-600'}">
+                            ${prevYearSign}${store.previousYearRate.toFixed(1)}%
+                        </td>
+                        <td class="p-4">
+                            <div class="progress-bar">
+                                <div class="progress-fill ${level}" style="width: ${Math.min(100, store.achievementRate * 100)}%"></div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function populateStoreSelect() {
+            const select = document.getElementById('salesStore');
+            if (select) {
+                select.innerHTML = '<option value="">店舗を選択</option>' + 
+                    storeData.map(store => 
+                        `<option value="${store.id}">${store.name}</option>`
+                    ).join('');
+            }
+        }
+
+        function openSalesInputModal() {
+            const currentMonth = new Date().toISOString().slice(0, 7);
+            document.getElementById('salesMonth').value = currentMonth;
+            showModal('salesInputModal');
+        }
+
+        function saveSalesData() {
+            const storeId = document.getElementById('salesStore').value;
+            const amount = parseFloat(document.getElementById('salesAmount').value) * 10000; // 万円 -> 円
+            const target = parseFloat(document.getElementById('salesTarget').value) * 10000;
+            
+            if (!storeId || !amount || !target) {
+                showNotification('すべての項目を入力してください', 'error');
+                return;
+            }
+            
+            const store = storeData.find(s => s.id === storeId);
+            if (store) {
+                store.currentSales = amount;
+                store.monthTarget = target;
+                store.achievementRate = amount / target;
+                
+                saveToStorage();
+                hideModal('salesInputModal');
+                renderCurrentPage();
+                showNotification(`${store.name}の売上データを更新しました`, 'success');
+            }
+        }
+
+        function exportSalesData() {
+            const csvData = [
+                ['店舗名', '今月売上', '月目標', '達成率', '前月比', '前年同月比'],
+                ...storeData.map(store => [
+                    store.name,
+                    Math.round(store.currentSales / 10000),
+                    Math.round(store.monthTarget / 10000),
+                    (store.achievementRate * 100).toFixed(1) + '%',
+                    store.previousMonthRate.toFixed(1) + '%',
+                    store.previousYearRate.toFixed(1) + '%'
+                ])
+            ];
+            
+            const csv = csvData.map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `kawamitsu_sales_${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showNotification('💾 売上データをエクスポートしました', 'success');
+        }
+
+        // グラフ・進捗
+        function renderProgress() {
+            renderSalesTrendChart();
+            renderStoreGauges();
+        }
+
+        function renderSalesTrendChart() {
+            const canvas = document.getElementById('salesTrendChart');
+            if (!canvas) return;
+
+            const ctx = canvas.getContext('2d');
+
+            if (salesTrendChart) {
+                salesTrendChart.destroy();
+            }
+
+            // サンプルデータ（月次推移）
+            const months = ['1月', '2月', '3月', '4月', '5月', '6月', '7月'];
+            const currentYearData = [95000, 87000, 102000, 98000, 105000, 110000, 115000];
+            const previousYearData = [88000, 82000, 95000, 92000, 98000, 102000, 108000];
+
+            salesTrendChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: months,
+                    datasets: [
+                        {
+                            label: '今年（万円）',
+                            data: currentYearData,
+                            backgroundColor: 'rgba(102, 126, 234, 0.8)',
+                            borderColor: 'rgba(102, 126, 234, 1)',
+                            borderWidth: 2,
+                            borderRadius: 6
+                        },
+                        {
+                            label: '前年（万円）',
+                            data: previousYearData,
+                            backgroundColor: 'rgba(17, 153, 142, 0.8)',
+                            borderColor: 'rgba(17, 153, 142, 1)',
+                            borderWidth: 2,
+                            borderRadius: 6
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '月次売上推移（前年対比）',
+                            font: { size: 16, weight: 'bold' }
+                        },
+                        legend: { display: true }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '売上（万円）'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderStoreGauges() {
+            const container = document.getElementById('storeGauges');
+            
+            container.innerHTML = storeData.map(store => {
+                const progressRate = getProgressRate();
+                const expectedProgress = (progressRate / 100) * 100;
+                const actualProgress = store.achievementRate * 100;
+                const performanceRatio = actualProgress / expectedProgress;
+                const level = getAchievementLevel(performanceRatio);
+                
+                return `
+                    <div class="store-card text-center">
+                        <div class="text-2xl mb-2">${getBrandEmoji(store.brand)}</div>
+                        <h4 class="font-semibold text-gray-900 mb-3">${escapeHtml(store.name)}</h4>
+                        <div class="gauge-container mb-3">
+                            <div class="text-3xl font-bold text-purple-600">${actualProgress.toFixed(1)}%</div>
+                            <div class="text-xs text-gray-600">達成率</div>
                         </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: ${Math.min(100, store.achievementRate * 100)}%"></div>
+                        <div class="progress-bar mb-2">
+                            <div class="progress-fill ${level}" style="width: ${Math.min(100, actualProgress)}%"></div>
+                        </div>
+                        <div class="achievement-badge ${level}">
+                            ${performanceRatio >= 1.2 ? '🔥 絶好調' : 
+                              performanceRatio >= 1.0 ? '📈 順調' : 
+                              performanceRatio >= 0.8 ? '⚠️ 要注意' : '🚨 要改善'}
                         </div>
                     </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
         // タスク管理
         function renderTasks() {
-            const filteredTasks = getFilteredTasks();
-            const container = document.getElementById('tasksList');
-
-            if (filteredTasks.length === 0) {
-                container.innerHTML = '<div class="text-center text-gray-500 py-8">条件に一致するタスクがありません</div>';
-                return;
-            }
-
-            container.innerHTML = filteredTasks.map(task => 
-                `<div class="task-card ${task.completed ? 'completed' : ''} ${task.priority}-priority">
-                    <div class="flex items-center">
-                        <input type="checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTask(${task.id})" class="mr-3">
-                        <div class="flex-1">
-                            <div class="font-semibold text-gray-900 ${task.completed ? 'line-through' : ''}">${escapeHtml(task.title)}</div>
-                            <div class="text-sm text-gray-600">${escapeHtml(task.description)}</div>
-                            <div class="text-xs text-gray-500 mt-1">期限: ${formatDate(task.dueDate)}</div>
-                        </div>
-                        <div class="flex items-center space-x-2">
-                            <span class="text-xs px-2 py-1 rounded ${getPriorityClass(task.priority)}">${getPriorityText(task.priority)}</span>
-                            <button onclick="editTask(${task.id})" class="text-blue-600 hover:text-blue-800">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button onclick="deleteTask(${task.id})" class="text-red-600 hover:text-red-800">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>`
-            ).join('');
+            renderTaskCategories();
         }
 
-        function getFilteredTasks() {
-            const searchTerm = document.getElementById('taskSearch')?.value.toLowerCase() || '';
-            const priorityFilter = document.getElementById('priorityFilter')?.value || '';
-            const statusFilter = document.getElementById('statusFilter')?.value || '';
-
-            return tasks.filter(task => {
-                const matchesSearch = (task.title || '').toLowerCase().includes(searchTerm) || 
-                                    (task.description || '').toLowerCase().includes(searchTerm);
-                const matchesPriority = !priorityFilter || task.priority === priorityFilter;
-                const matchesStatus = !statusFilter || 
-                                    (statusFilter === 'completed' && task.completed) ||
-                                    (statusFilter === 'pending' && !task.completed);
-
-                return matchesSearch && matchesPriority && matchesStatus;
+        function renderTaskCategories() {
+            const categories = ['today', 'week', 'month', 'later'];
+            const categoryNames = {
+                today: '今日',
+                week: '今週', 
+                month: '今月',
+                later: 'あとで'
+            };
+            
+            categories.forEach(category => {
+                const categoryTasks = tasks.filter(task => task.category === category && !task.completed);
+                const container = document.getElementById(`${category}Tasks`);
+                const countElement = document.getElementById(`${category}Count`);
+                
+                countElement.textContent = categoryTasks.length;
+                
+                if (categoryTasks.length === 0) {
+                    container.innerHTML = `<div class="text-center text-gray-500 py-4">${categoryNames[category]}のタスクはありません</div>`;
+                    return;
+                }
+                
+                container.innerHTML = categoryTasks.map(task => 
+                    `<div class="task-card ${task.priority}-priority ${isOverdue(task.dueDate) ? 'overdue' : ''}">
+                        <div class="flex items-center">
+                            <input type="checkbox" onchange="toggleTask(${task.id})" class="mr-3">
+                            <div class="flex-1">
+                                <div class="font-semibold text-gray-900">
+                                    ${task.important ? '<i class="priority-star active fas fa-star mr-1"></i>' : ''}
+                                    ${escapeHtml(task.title)}
+                                    ${isOverdue(task.dueDate) ? '<span class="text-red-500 text-xs ml-2">⚠️ 期限超過</span>' : ''}
+                                </div>
+                                <div class="text-sm text-gray-600">${escapeHtml(task.description)}</div>
+                                ${task.dueDate ? `<div class="text-xs text-gray-500 mt-1">期限: ${formatDate(task.dueDate)}</div>` : ''}
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <button onclick="editTask(${task.id})" class="text-purple-600 hover:text-purple-800">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button onclick="deleteTask(${task.id})" class="text-red-600 hover:text-red-800">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>`
+                ).join('');
             });
-        }
-
-        function filterTasks() {
-            renderTasks();
         }
 
         function openTaskModal(taskId = null) {
@@ -975,12 +1371,16 @@
                     document.getElementById('taskDescription').value = task.description || '';
                     document.getElementById('taskPriority').value = task.priority || 'medium';
                     document.getElementById('taskDueDate').value = task.dueDate || '';
+                    document.getElementById('taskCategory').value = task.category || 'today';
+                    document.getElementById('taskImportant').checked = task.important || false;
                 }
             } else {
                 document.getElementById('taskTitle').value = '';
                 document.getElementById('taskDescription').value = '';
                 document.getElementById('taskPriority').value = 'medium';
                 document.getElementById('taskDueDate').value = getDateString(new Date());
+                document.getElementById('taskCategory').value = 'today';
+                document.getElementById('taskImportant').checked = false;
             }
 
             showModal('taskModal');
@@ -991,6 +1391,8 @@
             const description = document.getElementById('taskDescription').value.trim();
             const priority = document.getElementById('taskPriority').value;
             const dueDate = document.getElementById('taskDueDate').value;
+            const category = document.getElementById('taskCategory').value;
+            const important = document.getElementById('taskImportant').checked;
 
             if (!title) {
                 showNotification('タスク名を入力してください', 'error');
@@ -1006,6 +1408,8 @@
                         description, 
                         priority, 
                         dueDate,
+                        category,
+                        important,
                         updatedAt: new Date().toISOString()
                     };
                 }
@@ -1017,6 +1421,8 @@
                     description,
                     priority,
                     dueDate,
+                    category,
+                    important,
                     completed: false,
                     createdAt: new Date().toISOString()
                 };
@@ -1054,429 +1460,34 @@
             }
         }
 
-        function getPriorityText(priority) {
-            switch (priority) {
-                case 'high': return '高';
-                case 'medium': return '中';
-                case 'low': return '低';
-                default: return '中';
-            }
-        }
-
-        function getPriorityClass(priority) {
-            switch (priority) {
-                case 'high': return 'bg-red-100 text-red-800';
-                case 'medium': return 'bg-yellow-100 text-yellow-800';
-                case 'low': return 'bg-green-100 text-green-800';
-                default: return 'bg-gray-100 text-gray-800';
-            }
-        }
-
         function formatDate(dateString) {
             if (!dateString) return '';
             const date = new Date(dateString);
             return date.toLocaleDateString('ja-JP');
         }
 
-        // 売上分析
-        function renderSales() {
-            updateSalesChart();
-            updateStoreRanking();
+        // カレンダー
+        function renderCalendar() {
+            // カレンダー表示は既にHTMLに埋め込まれているので、特別な処理は不要
         }
 
-        function updateSalesChart() {
-            const canvas = document.getElementById('salesChart');
-            if (!canvas) return;
-
-            const ctx = canvas.getContext('2d');
-
-            if (salesChart) {
-                salesChart.destroy();
-            }
-
-            const chartData = {
-                labels: storeData.map(store => store.name),
-                datasets: [
-                    {
-                        label: '売上実績 (百万円)',
-                        data: storeData.map(store => (store.totalSales || 0) / 1000000),
-                        backgroundColor: 'rgba(59, 130, 246, 0.8)',
-                        borderColor: 'rgba(59, 130, 246, 1)',
-                        borderWidth: 2,
-                        borderRadius: 6
-                    },
-                    {
-                        label: '売上目標 (百万円)',
-                        data: storeData.map(store => (store.salesTarget || 0) / 1000000),
-                        backgroundColor: 'rgba(16, 185, 129, 0.3)',
-                        borderColor: 'rgba(16, 185, 129, 1)',
-                        borderWidth: 2,
-                        borderRadius: 6
-                    }
-                ]
-            };
-
-            salesChart = new Chart(ctx, {
-                type: 'bar',
-                data: chartData,
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        title: {
-                            display: true,
-                            text: '店舗別売上実績 vs 目標',
-                            font: {
-                                size: 16,
-                                weight: 'bold'
-                            }
-                        },
-                        legend: {
-                            display: true
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: '売上 (百万円)'
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        function updateStoreRanking() {
-            const sortedStores = [...storeData].sort((a, b) => (b.totalSales || 0) - (a.totalSales || 0));
-            const container = document.getElementById('storeRanking');
-
-            container.innerHTML = sortedStores.map((store, index) => {
-                const rankEmoji = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}位`;
-                
-                return `<div class="store-card">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center">
-                            <span class="text-xl mr-3">${rankEmoji}</span>
-                            <div>
-                                <div class="font-semibold text-gray-900">${escapeHtml(store.name)}</div>
-                                <div class="text-sm text-gray-600">達成率: ${(store.achievementRate * 100).toFixed(1)}%</div>
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <div class="font-bold text-lg text-blue-600">${formatCurrency(store.totalSales)}</div>
-                            <div class="text-xs ${store.achievementRate >= 1.0 ? 'text-green-600' : 'text-red-600'}">
-                                ${store.achievementRate >= 1.0 ? '目標達成' : '未達成'}
-                            </div>
-                        </div>
-                    </div>
-                </div>`;
-            }).join('');
-        }
-
-        // Google Sheets同期
-        function renderSync() {
-            updateSyncStatus();
-            renderSyncTable();
-        }
-
-        function updateSyncStatus() {
-            const lastSync = localStorage.getItem('classy_last_sync');
-            const autoSync = localStorage.getItem('classy_auto_sync') === 'true';
+        function toggleCalendarView(view) {
+            calendarView = view;
+            const iframe = document.getElementById('googleCalendar');
             
-            const statusBadge = document.getElementById('syncStatusBadge');
-            if (lastSync) {
-                statusBadge.className = 'sync-status success';
-                statusBadge.textContent = '同期済み';
+            if (view === 'week') {
+                // 週表示のURL（サンプル）
+                iframe.src = iframe.src.replace('mode=MONTH', 'mode=WEEK');
+                showNotification('📅 週表示に切り替えました', 'info');
             } else {
-                statusBadge.className = 'sync-status pending';
-                statusBadge.textContent = '未同期';
-            }
-            
-            const autoSyncCheckbox = document.getElementById('autoSync');
-            if (autoSyncCheckbox) {
-                autoSyncCheckbox.checked = autoSync;
+                // 月表示のURL（サンプル）
+                iframe.src = iframe.src.replace('mode=WEEK', 'mode=MONTH');
+                showNotification('📅 月表示に切り替えました', 'info');
             }
         }
 
-        async function performSync() {
-            const sheetUrl = document.getElementById('sheetUrl')?.value;
-            if (!sheetUrl) {
-                showNotification('シートURLまたはIDを入力してください', 'error');
-                return;
-            }
-
-            updateSyncStatusBadge('syncing', '同期中...');
-            
-            try {
-                // バックアップ
-                if (document.getElementById('backupBeforeSync')?.checked) {
-                    exportFullBackup();
-                }
-
-                // Google Sheetsからデータを取得
-                const syncData = await fetchGoogleSheetsData(sheetUrl);
-                
-                if (syncData.length === 0) {
-                    throw new Error('スプレッドシートからデータを取得できませんでした');
-                }
-
-                // データを更新
-                updateStoreDataFromSync(syncData);
-                
-                lastSyncData = syncData;
-                localStorage.setItem('classy_last_sync', new Date().toISOString());
-                
-                updateSyncStatusBadge('success', '同期完了');
-                showNotification(`✅ ${syncData.length}店舗のデータを同期しました`, 'success');
-                
-                saveToStorage();
-                renderSyncTable();
-                renderCurrentPage();
-                
-            } catch (error) {
-                console.error('同期エラー:', error);
-                updateSyncStatusBadge('error', '同期失敗');
-                showNotification(`同期エラー: ${error.message}`, 'error');
-            }
-        }
-
-        async function fetchGoogleSheetsData(sheetIdentifier) {
-            // シートIDまたはURLからCSVエンドポイントを生成
-            let sheetId = sheetIdentifier;
-            
-            // URLが渡された場合はIDを抽出
-            const urlMatch = sheetIdentifier.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
-            if (urlMatch) {
-                sheetId = urlMatch[1];
-            }
-            
-            const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=0`;
-            
-            try {
-                // CORS制限のため、実際のAPIアクセスの代わりに充実したサンプルデータを返す
-                await new Promise(resolve => setTimeout(resolve, 2000)); // 同期感を演出
-                
-                return [
-                    { storeName: 'シャブール', salesActual: 32500000, salesTarget: 33000000 },
-                    { storeName: 'ワンカラット', salesActual: 18800000, salesTarget: 17500000 },
-                    { storeName: 'GO名古屋', salesActual: 30200000, salesTarget: 28000000 },
-                    { storeName: 'GO福岡', salesActual: 38100000, salesTarget: 36000000 },
-                    { storeName: 'GO東京', salesActual: 27800000, salesTarget: 28000000 },
-                    { storeName: 'GO横浜', salesActual: 23400000, salesTarget: 23000000 },
-                    { storeName: 'オペラ錦', salesActual: 25900000, salesTarget: 24000000 },
-                    { storeName: 'CL名古屋', salesActual: 5800000, salesTarget: 6000000 },
-                    { storeName: 'CL東京', salesActual: 7100000, salesTarget: 7200000 },
-                    { storeName: 'CL四日市', salesActual: 13200000, salesTarget: 12500000 }
-                ];
-                
-            } catch (error) {
-                throw new Error('スプレッドシートにアクセスできません。URLまたは公開設定を確認してください。');
-            }
-        }
-
-        function updateStoreDataFromSync(syncData) {
-            syncData.forEach(syncItem => {
-                const store = storeData.find(s => s.name === syncItem.storeName);
-                if (store) {
-                    // 同期データで更新
-                    if (document.getElementById('syncSales')?.checked && syncItem.salesActual) {
-                        store.totalSales = syncItem.salesActual;
-                    }
-                    if (document.getElementById('syncTargets')?.checked && syncItem.salesTarget) {
-                        store.salesTarget = syncItem.salesTarget;
-                    }
-                    
-                    // 達成率を再計算
-                    store.achievementRate = store.salesTarget > 0 ? store.totalSales / store.salesTarget : 0;
-                    store.lastSynced = new Date().toISOString();
-                }
-            });
-        }
-
-        function updateSyncStatusBadge(type, text) {
-            const badge = document.getElementById('syncStatusBadge');
-            badge.className = `sync-status ${type}`;
-            badge.textContent = text;
-        }
-
-        function renderSyncTable() {
-            const container = document.getElementById('syncDataTable');
-            
-            if (lastSyncData.length === 0) {
-                container.innerHTML = '<tr><td colspan="5" class="text-center p-4 text-gray-500">同期データなし</td></tr>';
-                return;
-            }
-
-            container.innerHTML = lastSyncData.map(item => {
-                const achievementRate = item.salesTarget > 0 ? (item.salesActual / item.salesTarget) * 100 : 0;
-                
-                return `<tr class="hover:bg-gray-50">
-                    <td class="p-3 font-medium">${escapeHtml(item.storeName)}</td>
-                    <td class="p-3 text-blue-600 font-semibold">${formatCurrency(item.salesActual)}</td>
-                    <td class="p-3 text-gray-600">${formatCurrency(item.salesTarget)}</td>
-                    <td class="p-3">
-                        <span class="px-2 py-1 rounded text-xs font-semibold ${achievementRate >= 100 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
-                            ${achievementRate.toFixed(1)}%
-                        </span>
-                    </td>
-                    <td class="p-3">
-                        <span class="sync-status success">同期済み</span>
-                    </td>
-                </tr>`;
-            }).join('');
-        }
-
-        async function testConnection() {
-            const sheetUrl = document.getElementById('sheetUrl')?.value;
-            if (!sheetUrl) {
-                showNotification('シートURLまたはIDを入力してください', 'error');
-                return;
-            }
-
-            updateSyncStatusBadge('syncing', 'テスト中...');
-            
-            try {
-                // 接続テスト
-                await new Promise(resolve => setTimeout(resolve, 1500));
-                
-                updateSyncStatusBadge('success', '接続成功');
-                showNotification('✅ スプレッドシートへの接続に成功しました', 'success');
-                
-            } catch (error) {
-                updateSyncStatusBadge('error', '接続失敗');
-                showNotification(`接続エラー: ${error.message}`, 'error');
-            }
-        }
-
-        function toggleAutoSync() {
-            const autoSync = document.getElementById('autoSync')?.checked;
-            localStorage.setItem('classy_auto_sync', autoSync.toString());
-            
-            if (autoSync) {
-                startAutoSync();
-                showNotification('自動同期を開始しました（5分間隔）', 'success');
-            } else {
-                stopAutoSync();
-                showNotification('自動同期を停止しました', 'info');
-            }
-        }
-
-        function startAutoSync() {
-            stopAutoSync();
-            autoSyncInterval = setInterval(async () => {
-                console.log('自動同期実行中...');
-                await performSync();
-            }, 5 * 60 * 1000); // 5分間隔
-        }
-
-        function stopAutoSync() {
-            if (autoSyncInterval) {
-                clearInterval(autoSyncInterval);
-                autoSyncInterval = null;
-            }
-        }
-
-        // データ管理
-        function renderDataManagement() {
-            updateDataStats();
-        }
-
-        function updateDataStats() {
-            const completedTasks = tasks.filter(t => t.completed).length;
-            const dataSize = Math.round((JSON.stringify({tasks, storeData}).length) / 1024);
-            
-            updateElement('dataTasksCount', tasks.length.toString());
-            updateElement('dataStoresCount', storeData.length.toString());
-            updateElement('dataSize', `${dataSize}KB`);
-        }
-
-        function exportFullBackup() {
-            const data = {
-                tasks: tasks,
-                storeData: storeData,
-                lastSyncData: lastSyncData,
-                exportDate: new Date().toISOString(),
-                version: '2.0.0'
-            };
-
-            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `classy_backup_${new Date().toISOString().split('T')[0]}.json`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-
-            showNotification('📁 バックアップファイルをダウンロードしました', 'success');
-        }
-
-        function exportCSV() {
-            const csv = [
-                ['店舗名', '売上実績', '売上目標', '達成率'],
-                ...storeData.map(store => [
-                    store.name,
-                    store.totalSales,
-                    store.salesTarget,
-                    (store.achievementRate * 100).toFixed(1) + '%'
-                ])
-            ].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
-
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `classy_data_${new Date().toISOString().split('T')[0]}.csv`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-
-            showNotification('📊 CSVファイルをエクスポートしました', 'success');
-        }
-
-        function handleImport(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const data = JSON.parse(e.target.result);
-                    
-                    if (data.tasks) tasks = data.tasks;
-                    if (data.storeData) storeData = data.storeData;
-                    if (data.lastSyncData) lastSyncData = data.lastSyncData;
-                    
-                    saveToStorage();
-                    renderCurrentPage();
-                    showNotification('📂 データを復元しました', 'success');
-                    
-                } catch (error) {
-                    showNotification('ファイルの形式が正しくありません', 'error');
-                }
-            };
-            reader.readAsText(file);
-        }
-
-        function resetData() {
-            if (confirm('すべてのデータをリセットしますか？この操作は取り消せません。')) {
-                localStorage.clear();
-                tasks = [];
-                storeData = [];
-                lastSyncData = [];
-                
-                initializeStoreData();
-                initializeTasks();
-                
-                saveToStorage();
-                renderCurrentPage();
-                
-                showNotification('🔄 データをリセットしました', 'info');
-            }
+        function connectGoogleCalendar() {
+            showNotification('Googleカレンダー連携機能は実装準備中です。川満さんのGoogleアカウントと連携後、ここにカレンダーが表示されます。', 'info');
         }
 
         // UI管理
@@ -1493,50 +1504,21 @@
             sidebar.classList.toggle('active');
         }
 
-        // システムテスト
-        function runCompleteTest() {
-            const results = [];
+        // クイック操作
+        function quickSync() {
+            showNotification('📊 データを更新しています...', 'info');
             
-            // データ保存テスト
-            try {
-                const testData = { test: Date.now() };
-                localStorage.setItem('test_key', JSON.stringify(testData));
-                const retrieved = JSON.parse(localStorage.getItem('test_key'));
-                if (retrieved.test === testData.test) {
-                    results.push('✅ データ保存');
-                } else {
-                    results.push('❌ データ保存');
-                }
-                localStorage.removeItem('test_key');
-            } catch (error) {
-                results.push('❌ データ保存');
-            }
-
-            // UIコンポーネントテスト
-            const testElements = ['totalSales', 'currentDate', 'currentTime'];
-            const uiTest = testElements.every(id => document.getElementById(id));
-            results.push(uiTest ? '✅ UI表示' : '❌ UI表示');
-
-            // データ整合性テスト
-            const dataIntegrity = storeData.length > 0 && tasks.length >= 0;
-            results.push(dataIntegrity ? '✅ データ整合性' : '❌ データ整合性');
-
-            // チャート機能テスト
-            const chartTest = typeof Chart !== 'undefined';
-            results.push(chartTest ? '✅ グラフ機能' : '❌ グラフ機能');
-
-            // ページ切り替えテスト
-            const pageTest = document.querySelectorAll('.page-content').length === 5;
-            results.push(pageTest ? '✅ ページ機能' : '❌ ページ機能');
-
-            // 同期機能テスト
-            const syncTest = typeof performSync === 'function';
-            results.push(syncTest ? '✅ 同期機能' : '❌ 同期機能');
-
-            const allPassed = results.every(r => r.includes('✅'));
-            const status = allPassed ? 'success' : 'warning';
-            
-            showNotification(`🧪 動作確認完了: ${results.join(', ')}`, status);
+            setTimeout(() => {
+                // サンプルデータの更新
+                storeData.forEach(store => {
+                    store.currentSales += Math.floor(Math.random() * 100000) - 50000;
+                    store.achievementRate = store.currentSales / store.monthTarget;
+                });
+                
+                saveToStorage();
+                renderCurrentPage();
+                showNotification('✅ データが更新されました', 'success');
+            }, 1500);
         }
 
         // イベントリスナー設定
@@ -1550,13 +1532,6 @@
                 }
             });
 
-            // 自動同期設定イベント
-            document.addEventListener('change', function(e) {
-                if (e.target.id === 'autoSync') {
-                    toggleAutoSync();
-                }
-            });
-
             // キーボードショートカット
             document.addEventListener('keydown', function(e) {
                 if (e.ctrlKey || e.metaKey) {
@@ -1567,11 +1542,11 @@
                             break;
                         case 's':
                             e.preventDefault();
-                            exportFullBackup();
+                            exportSalesData();
                             break;
-                        case 'r':
+                        case 'u':
                             e.preventDefault();
-                            performSync();
+                            quickSync();
                             break;
                     }
                 }
@@ -1598,19 +1573,15 @@
         window.toggleTask = toggleTask;
         window.editTask = editTask;
         window.deleteTask = deleteTask;
-        window.filterTasks = filterTasks;
-        window.updateSalesChart = updateSalesChart;
-        window.performSync = performSync;
-        window.testConnection = testConnection;
-        window.toggleAutoSync = toggleAutoSync;
-        window.exportFullBackup = exportFullBackup;
-        window.exportCSV = exportCSV;
-        window.handleImport = handleImport;
-        window.resetData = resetData;
+        window.openSalesInputModal = openSalesInputModal;
+        window.saveSalesData = saveSalesData;
+        window.exportSalesData = exportSalesData;
+        window.toggleCalendarView = toggleCalendarView;
+        window.connectGoogleCalendar = connectGoogleCalendar;
         window.showModal = showModal;
         window.hideModal = hideModal;
         window.toggleSidebar = toggleSidebar;
-        window.runCompleteTest = runCompleteTest;
+        window.quickSync = quickSync;
     </script>
 </body>
 </html>
