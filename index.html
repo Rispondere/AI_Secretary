@@ -182,6 +182,30 @@
             border-color: #667eea;
             background-color: #f8faff;
         }
+
+        .sync-method {
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .sync-method:hover { border-color: #667eea; background-color: #f8faff; }
+        .sync-method.active { border-color: #667eea; background-color: #e0e7ff; }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            transition: width 0.3s ease;
+        }
     </style>
 </head>
 <body>
@@ -194,7 +218,7 @@
                     <div class="text-sm text-gray-600">名古屋プレジャーグループ</div>
                     <div class="text-xs text-purple-600 font-medium">統合管理システム</div>
                     <div id="syncStatus" class="sync-status connected">
-                        <i class="fas fa-database mr-1"></i>直接連携
+                        <i class="fas fa-database mr-1"></i>準備完了
                     </div>
                 </div>
                 
@@ -224,14 +248,14 @@
                 <div class="google-integration">
                     <div class="text-center">
                         <div class="text-2xl mb-2">📊</div>
-                        <div class="text-sm font-medium">直接連携機能</div>
+                        <div class="text-sm font-medium">スプレッドシート同期</div>
                         <div class="text-xs mb-3 opacity-90">
-                            📈 スプレッドシート直接読み込み<br>
+                            📈 複数方法で確実同期<br>
                             📝 CSV同期機能<br>
-                            💾 確実なデータ連携
+                            💾 自動フォールバック
                         </div>
-                        <button class="btn btn-outline w-full text-sm text-white border-white hover:bg-white hover:text-blue-600" onclick="loadFromGoogleSheets()">
-                            <i class="fas fa-download mr-2"></i>データ読み込み
+                        <button class="btn btn-outline w-full text-sm text-white border-white hover:bg-white hover:text-blue-600" onclick="startSyncProcess()">
+                            <i class="fas fa-sync mr-2"></i>同期開始
                         </button>
                     </div>
                 </div>
@@ -240,10 +264,13 @@
                     <div class="text-center">
                         <div class="text-sm font-medium text-purple-800">データ状況</div>
                         <div class="text-xs mb-2 text-purple-700" id="lastSyncTime">
-                            最終更新: 読み込み中...
+                            最終更新: 未実行
                         </div>
                         <div class="text-xs text-purple-600" id="totalStores">
                             総店舗数: 0店舗
+                        </div>
+                        <div class="text-xs text-gray-500 mt-1" id="syncMethod">
+                            同期方法: 未設定
                         </div>
                     </div>
                 </div>
@@ -274,9 +301,9 @@
                             <i class="fas fa-plus mr-2"></i>
                             <span class="hidden sm:inline">クイック入力</span>
                         </button>
-                        <button class="btn btn-google" onclick="openSyncModal()">
+                        <button class="btn btn-google" onclick="startSyncProcess()">
                             <i class="fas fa-sync mr-2"></i>
-                            <span class="hidden sm:inline">同期設定</span>
+                            <span class="hidden sm:inline">同期実行</span>
                         </button>
                     </div>
                 </div>
@@ -287,8 +314,8 @@
                 <div class="flex justify-between items-center mb-6">
                     <h2 class="text-2xl font-bold text-gray-900">📊 リアルタイムダッシュボード</h2>
                     <div class="flex space-x-2">
-                        <button class="btn btn-google" onclick="loadFromGoogleSheets()">
-                            <i class="fas fa-download mr-2"></i>最新データ取得
+                        <button class="btn btn-google" onclick="startSyncProcess()">
+                            <i class="fas fa-sync mr-2"></i>スプレッドシート同期
                         </button>
                         <button class="btn btn-danger" onclick="downloadReport()">
                             <i class="fas fa-file-pdf mr-2"></i>PDFレポート
@@ -296,20 +323,29 @@
                     </div>
                 </div>
 
-                <!-- 接続状況 -->
+                <!-- 同期状況 -->
                 <div class="glass-card p-4 mb-6">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center">
-                            <i class="fas fa-database text-green-500 mr-3"></i>
+                            <i id="connectionIcon" class="fas fa-database text-gray-400 mr-3"></i>
                             <div>
                                 <div class="font-semibold text-gray-900">スプレッドシート連携状況</div>
-                                <div class="text-sm text-gray-600" id="connectionInfo">データ読み込み準備完了</div>
+                                <div class="text-sm text-gray-600" id="connectionInfo">同期準備完了 - 「同期実行」でデータを取得してください</div>
                             </div>
                         </div>
                         <div class="text-right">
-                            <div class="text-sm font-semibold text-gray-900" id="dataCounter">読み込みデータ: 10店舗</div>
+                            <div class="text-sm font-semibold text-gray-900" id="dataCounter">読み込みデータ: 0店舗</div>
                             <div class="text-xs text-gray-500" id="lastUpdate">最終更新: --</div>
+                            <div class="text-xs text-purple-600" id="lastSyncMethod"></div>
                         </div>
+                    </div>
+                    
+                    <!-- 進行状況バー -->
+                    <div id="progressContainer" class="mt-3 hidden">
+                        <div class="progress-bar">
+                            <div id="progressFill" class="progress-fill" style="width: 0%"></div>
+                        </div>
+                        <div class="text-xs text-gray-600 mt-1" id="progressText">同期準備中...</div>
                     </div>
                 </div>
 
@@ -343,7 +379,9 @@
                 <div class="glass-card p-6 mb-6">
                     <h3 class="text-xl font-bold text-gray-900 mb-4">🏪 ブランド別実績</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" id="brandSummary">
-                        <!-- ブランド別データが動的に生成される -->
+                        <div class="text-center text-gray-500 py-8 col-span-full">
+                            データを同期すると、ここにブランド別の実績が表示されます
+                        </div>
                     </div>
                 </div>
 
@@ -377,7 +415,7 @@
                             <tbody id="storeTable">
                                 <tr>
                                     <td colspan="8" class="text-center p-8 text-gray-500">
-                                        <div class="pulse">「最新データ取得」ボタンでスプレッドシートからデータを読み込んでください</div>
+                                        <div class="pulse">「同期実行」ボタンでスプレッドシートからデータを読み込んでください</div>
                                     </td>
                                 </tr>
                             </tbody>
@@ -391,45 +429,76 @@
                 <div class="glass-card p-6">
                     <div class="flex items-center justify-between mb-6">
                         <h3 class="text-xl font-bold text-gray-900">🔄 スプレッドシート同期</h3>
-                        <div class="flex space-x-2">
-                            <button class="btn btn-google" onclick="loadFromGoogleSheets()">
-                                <i class="fas fa-download mr-2"></i>データ読み込み
-                            </button>
-                            <button class="btn btn-success" onclick="openCSVModal()">
-                                <i class="fas fa-file-csv mr-2"></i>CSV同期
-                            </button>
-                        </div>
+                        <button class="btn btn-google" onclick="startSyncProcess()">
+                            <i class="fas fa-sync mr-2"></i>同期開始
+                        </button>
                     </div>
                     
                     <!-- 同期方法選択 -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
-                            <h4 class="font-bold text-blue-800 mb-3">
-                                <i class="fas fa-download mr-2"></i>直接読み込み（推奨）
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                        <div class="sync-method" onclick="selectSyncMethod('api')" id="apiMethod">
+                            <h4 class="font-bold text-gray-800 mb-3">
+                                <i class="fas fa-cloud mr-2 text-blue-500"></i>Google Sheets API（推奨）
                             </h4>
-                            <ul class="space-y-2 text-sm text-blue-700 mb-4">
-                                <li>✅ スプレッドシートから直接データ取得</li>
-                                <li>✅ 設定不要で即座利用可能</li>
-                                <li>✅ リアルタイム反映</li>
-                                <li>✅ エラーが起きにくい</li>
+                            <ul class="space-y-2 text-sm text-gray-700 mb-4">
+                                <li>✅ 最も確実な同期方法</li>
+                                <li>✅ リアルタイム更新</li>
+                                <li>✅ 大容量データ対応</li>
+                                <li>⚠️ APIキー設定が必要</li>
                             </ul>
-                            <button class="btn btn-google w-full" onclick="loadFromGoogleSheets()">
-                                <i class="fas fa-download mr-2"></i>今すぐ読み込み
-                            </button>
+                            <div class="text-xs text-gray-500">
+                                現在の状態: <span id="apiStatus">未設定</span>
+                            </div>
                         </div>
                         
-                        <div class="bg-green-50 border border-green-200 rounded-lg p-6">
-                            <h4 class="font-bold text-green-800 mb-3">
-                                <i class="fas fa-file-csv mr-2"></i>CSV同期
+                        <div class="sync-method" onclick="selectSyncMethod('proxy')" id="proxyMethod">
+                            <h4 class="font-bold text-gray-800 mb-3">
+                                <i class="fas fa-download mr-2 text-green-500"></i>直接読み込み
                             </h4>
-                            <ul class="space-y-2 text-sm text-green-700 mb-4">
-                                <li>✅ CSVファイルで手動同期</li>
+                            <ul class="space-y-2 text-sm text-gray-700 mb-4">
+                                <li>✅ 設定不要で即座利用</li>
+                                <li>✅ 公開スプレッドシート対応</li>
+                                <li>✅ 複数プロキシで安定性向上</li>
+                                <li>⚠️ ネットワーク環境に依存</li>
+                            </ul>
+                            <div class="text-xs text-gray-500">
+                                現在の状態: <span id="proxyStatus">準備完了</span>
+                            </div>
+                        </div>
+                        
+                        <div class="sync-method" onclick="selectSyncMethod('csv')" id="csvMethod">
+                            <h4 class="font-bold text-gray-800 mb-3">
+                                <i class="fas fa-file-csv mr-2 text-orange-500"></i>CSV手動同期
+                            </h4>
+                            <ul class="space-y-2 text-sm text-gray-700 mb-4">
+                                <li>✅ 100%確実な同期</li>
                                 <li>✅ オフラインでも利用可能</li>
                                 <li>✅ データ確認しながら同期</li>
-                                <li>✅ バックアップとしても活用</li>
+                                <li>⚠️ 手動でCSVダウンロード必要</li>
                             </ul>
-                            <button class="btn btn-success w-full" onclick="openCSVModal()">
-                                <i class="fas fa-file-csv mr-2"></i>CSV同期を開始
+                            <div class="text-xs text-gray-500">
+                                現在の状態: <span id="csvStatus">いつでも利用可能</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- API設定セクション -->
+                    <div id="apiSettings" class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6 hidden">
+                        <h4 class="text-lg font-semibold text-blue-800 mb-4">Google Sheets API 設定</h4>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="input-label">APIキー</label>
+                                <input type="text" id="apiKey" class="input-field" placeholder="AIzaSyC...">
+                                <div class="text-xs text-blue-600 mt-1">
+                                    Google Cloud Consoleで取得したAPIキーを入力してください
+                                </div>
+                            </div>
+                            <div>
+                                <label class="input-label">スプレッドシートID</label>
+                                <input type="text" id="spreadsheetId" class="input-field" value="1CSGBzK9au8VLEQFCpBJbVyMoTaRhO5hoQd_qk8XC_IQ">
+                            </div>
+                            <button class="btn btn-google" onclick="testApiConnection()">
+                                <i class="fas fa-plug mr-2"></i>接続テスト
                             </button>
                         </div>
                     </div>
@@ -439,7 +508,7 @@
                         <h4 class="text-lg font-semibold text-gray-800 mb-4">📊 現在のデータ状況</h4>
                         <div id="syncStatusInfo" class="space-y-4">
                             <div class="text-center text-gray-500 py-8">
-                                データを読み込むと、ここに詳細情報が表示されます
+                                同期方法を選択して「同期開始」ボタンを押してください
                             </div>
                         </div>
                     </div>
@@ -451,8 +520,8 @@
                 <div class="glass-card p-6">
                     <div class="flex items-center justify-between mb-6">
                         <h3 class="text-xl font-bold text-gray-900">✏️ 手動データ入力・更新</h3>
-                        <button class="btn btn-google" onclick="loadFromGoogleSheets()">
-                            <i class="fas fa-download mr-2"></i>最新データで更新
+                        <button class="btn btn-google" onclick="startSyncProcess()">
+                            <i class="fas fa-sync mr-2"></i>最新データで更新
                         </button>
                     </div>
 
@@ -597,7 +666,7 @@
                         <div class="text-center text-yellow-700">
                             <i class="fas fa-chart-bar text-2xl mb-2"></i>
                             <p>詳細分析機能</p>
-                            <p class="text-sm mt-2">データを読み込み後、分析結果を表示します</p>
+                            <p class="text-sm mt-2">データを同期後、分析結果を表示します</p>
                         </div>
                     </div>
                 </div>
@@ -691,77 +760,44 @@
         </div>
     </div>
 
-    <!-- 同期設定モーダル -->
-    <div id="syncSettingsModal" class="modal hidden">
-        <div class="modal-content">
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-bold text-gray-900">⚙️ 同期設定</h3>
-                <button onclick="closeModal('syncSettingsModal')" class="text-gray-500 hover:text-gray-700">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            
-            <div class="space-y-4">
-                <div class="bg-green-50 border border-green-200 rounded-lg p-4">
-                    <h4 class="font-semibold text-green-800 mb-2">✅ 現在の設定</h4>
-                    <div class="text-sm text-green-700 space-y-1">
-                        <div>📊 スプレッドシートID: 1CSGBzK9au8VLEQFCpBJbVyMoTaRhO5hoQd_qk8XC_IQ</div>
-                        <div>🔗 連携方法: 直接読み込み</div>
-                        <div>⚡ 設定不要: 即座に利用可能</div>
-                    </div>
-                </div>
-
-                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                    <h4 class="font-semibold text-blue-800 mb-2">📋 利用方法</h4>
-                    <div class="text-sm text-blue-700 space-y-2">
-                        <div>1. 「最新データ取得」でスプレッドシートから読み込み</div>
-                        <div>2. 手動入力でデータを追加・更新</div>
-                        <div>3. CSV同期で一括データ管理</div>
-                        <div>4. PDFレポートで結果を出力</div>
-                    </div>
-                </div>
-
-                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                    <h4 class="font-semibold text-yellow-800 mb-2">💡 Tips</h4>
-                    <div class="text-sm text-yellow-700 space-y-1">
-                        <div>• スプレッドシートを直接編集後、「最新データ取得」で反映</div>
-                        <div>• CSV同期でオフライン作業も可能</div>
-                        <div>• 手動入力でリアルタイム更新</div>
-                    </div>
-                </div>
-
-                <div class="flex space-x-3">
-                    <button class="btn btn-google flex-1" onclick="loadFromGoogleSheets()">
-                        <i class="fas fa-download mr-2"></i>データ読み込みテスト
-                    </button>
-                    <button class="btn btn-outline" onclick="closeModal('syncSettingsModal')">
-                        閉じる
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <script>
         // グローバル変数
         let currentPage = 'dashboard';
         let storeData = [];
         let sortBy = 'sales';
+        let selectedSyncMethod = 'proxy';
+        let apiKey = '';
+        let isConnected = false;
 
-        // スプレッドシートURL（直接CSV取得用）
+        // スプレッドシート設定
         const SPREADSHEET_ID = '1CSGBzK9au8VLEQFCpBJbVyMoTaRhO5hoQd_qk8XC_IQ';
-        const CSV_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/export?format=csv&gid=0`;
+        const SHEET_RANGE = 'Sheet1!A:Z';
+
+        // 複数のプロキシサービス（フォールバック用）
+        const PROXY_SERVICES = [
+            'https://api.allorigins.win/get?url=',
+            'https://cors-anywhere.herokuapp.com/',
+            'https://api.codetabs.com/v1/proxy?quest='
+        ];
 
         // システム初期化
         function initSystem() {
-            console.log('川満さん専用システム（直接連携版）初期化開始');
+            console.log('川満さん専用システム（改良版同期機能）初期化開始');
             
             updateDateTime();
             setInterval(updateDateTime, 60000);
             
+            // 保存されたAPIキーがあれば復元
+            const savedApiKey = localStorage.getItem('gsheets_api_key');
+            if (savedApiKey) {
+                apiKey = savedApiKey;
+                document.getElementById('apiKey').value = savedApiKey;
+                updateApiStatus('保存済みAPIキー利用可能');
+            }
+            
             renderCurrentPage();
             
-            showNotification('👨‍💼 川満さん、システムが準備できました！「最新データ取得」でスプレッドシートからデータを読み込めます。', 'success');
+            showNotification('👨‍💼 川満さん、改良版システムが準備できました！複数の同期方法でより確実にデータを取得できます。', 'success');
         }
 
         // 時刻更新
@@ -786,11 +822,6 @@
                 });
             }
             
-            const lastSyncElement = document.getElementById('lastSyncTime');
-            if (lastSyncElement) {
-                lastSyncElement.textContent = `最終更新: ${now.toLocaleTimeString('ja-JP')}`;
-            }
-            
             // デフォルト日付設定
             const dateInput = document.getElementById('updateDate');
             if (dateInput && !dateInput.value) {
@@ -798,45 +829,204 @@
             }
         }
 
-        // Googleスプレッドシートからデータを直接読み込み
-        async function loadFromGoogleSheets() {
-            showNotification('📊 スプレッドシートからデータを読み込み中...', 'info');
-            updateConnectionStatus('syncing', 'スプレッドシートにアクセス中...');
+        // 同期プロセス開始
+        async function startSyncProcess() {
+            showNotification('🔄 同期プロセスを開始します...', 'info');
+            updateConnectionStatus('syncing', '同期中...');
+            showProgress(0, '同期方法を決定中...');
             
             try {
-                // CORS対応のプロキシ経由でデータを取得
-                const proxyUrl = 'https://api.allorigins.win/get?url=' + encodeURIComponent(CSV_URL);
-                const response = await fetch(proxyUrl);
+                let success = false;
                 
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
+                // 選択された同期方法に応じて処理
+                switch (selectedSyncMethod) {
+                    case 'api':
+                        success = await syncWithAPI();
+                        break;
+                    case 'proxy':
+                        success = await syncWithProxy();
+                        break;
+                    case 'csv':
+                        showModal('csvModal');
+                        hideProgress();
+                        return;
                 }
                 
-                const data = await response.json();
-                const csvText = data.contents;
-                
-                // CSVデータを解析
-                const parsedData = parseCSVData(csvText);
-                
-                if (parsedData.length > 0) {
-                    storeData = parsedData;
+                if (success) {
+                    updateConnectionStatus('success', `同期完了 (${storeData.length}店舗) - ${getSyncMethodName()}`);
+                    updateLastSyncInfo();
                     updateDashboard();
-                    updateSyncInfo();
-                    
-                    updateConnectionStatus('success', `データ読み込み完了 (${parsedData.length}店舗)`);
-                    showNotification(`✅ ${parsedData.length}店舗のデータを正常に読み込みました`, 'success');
+                    showNotification(`✅ ${getSyncMethodName()}で${storeData.length}店舗のデータを正常に同期しました`, 'success');
                 } else {
-                    throw new Error('データが見つかりませんでした');
+                    // 自動フォールバック
+                    await tryFallbackMethods();
                 }
                 
             } catch (error) {
-                console.error('データ読み込みエラー:', error);
-                updateConnectionStatus('error', `読み込み失敗: ${error.message}`);
-                showNotification('❌ データ読み込みに失敗しました。手動でCSV同期をお試しください。', 'error');
-                
-                // フォールバック: デモデータを表示
-                loadDemoData();
+                console.error('同期エラー:', error);
+                updateConnectionStatus('error', `同期失敗: ${error.message}`);
+                showNotification('❌ 同期に失敗しました。CSV同期をお試しください。', 'error');
+            } finally {
+                hideProgress();
             }
+        }
+
+        // Google Sheets API同期
+        async function syncWithAPI() {
+            if (!apiKey) {
+                throw new Error('APIキーが設定されていません');
+            }
+            
+            showProgress(20, 'Google Sheets APIに接続中...');
+            
+            const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${SHEET_RANGE}?key=${apiKey}`;
+            
+            try {
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    if (response.status === 403) {
+                        throw new Error('APIキーが無効または権限がありません');
+                    }
+                    throw new Error(`API応答エラー: ${response.status}`);
+                }
+                
+                showProgress(60, 'データを解析中...');
+                
+                const data = await response.json();
+                const parsedData = parseAPIData(data);
+                
+                showProgress(90, 'データを処理中...');
+                
+                if (parsedData.length > 0) {
+                    storeData = parsedData;
+                    return true;
+                } else {
+                    throw new Error('有効なデータが見つかりませんでした');
+                }
+                
+            } catch (error) {
+                console.error('API同期エラー:', error);
+                throw error;
+            }
+        }
+
+        // プロキシ経由同期（複数サービス試行）
+        async function syncWithProxy() {
+            const csvUrl = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/export?format=csv&gid=0`;
+            
+            for (let i = 0; i < PROXY_SERVICES.length; i++) {
+                const proxyService = PROXY_SERVICES[i];
+                
+                try {
+                    showProgress(20 + (i * 20), `プロキシサービス ${i + 1} で接続中...`);
+                    
+                    let url, fetchOptions = {};
+                    
+                    if (proxyService.includes('allorigins')) {
+                        url = proxyService + encodeURIComponent(csvUrl);
+                    } else if (proxyService.includes('cors-anywhere')) {
+                        url = proxyService + csvUrl;
+                        fetchOptions.headers = { 'X-Requested-With': 'XMLHttpRequest' };
+                    } else {
+                        url = proxyService + encodeURIComponent(csvUrl);
+                    }
+                    
+                    const response = await fetch(url, fetchOptions);
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+                    
+                    showProgress(60 + (i * 10), 'データを取得中...');
+                    
+                    let csvText;
+                    if (proxyService.includes('allorigins')) {
+                        const data = await response.json();
+                        csvText = data.contents;
+                    } else {
+                        csvText = await response.text();
+                    }
+                    
+                    showProgress(80 + (i * 5), 'データを解析中...');
+                    
+                    const parsedData = parseCSVData(csvText);
+                    
+                    if (parsedData.length > 0) {
+                        storeData = parsedData;
+                        document.getElementById('syncMethod').textContent = `同期方法: プロキシ ${i + 1}`;
+                        return true;
+                    }
+                    
+                } catch (error) {
+                    console.warn(`プロキシサービス ${i + 1} 失敗:`, error);
+                    
+                    if (i === PROXY_SERVICES.length - 1) {
+                        throw new Error('すべてのプロキシサービスで失敗しました');
+                    }
+                }
+            }
+            
+            return false;
+        }
+
+        // フォールバック処理
+        async function tryFallbackMethods() {
+            showNotification('🔄 代替方法を試行中...', 'info');
+            
+            // 他の同期方法を順次試行
+            const fallbackMethods = ['proxy', 'api'].filter(method => method !== selectedSyncMethod);
+            
+            for (const method of fallbackMethods) {
+                try {
+                    selectedSyncMethod = method;
+                    
+                    let success = false;
+                    if (method === 'api' && apiKey) {
+                        success = await syncWithAPI();
+                    } else if (method === 'proxy') {
+                        success = await syncWithProxy();
+                    }
+                    
+                    if (success) {
+                        updateConnectionStatus('success', `フォールバック成功 (${storeData.length}店舗) - ${getSyncMethodName()}`);
+                        updateLastSyncInfo();
+                        updateDashboard();
+                        showNotification(`✅ ${getSyncMethodName()}（代替方法）で同期成功`, 'success');
+                        return;
+                    }
+                    
+                } catch (error) {
+                    console.warn(`フォールバック ${method} 失敗:`, error);
+                }
+            }
+            
+            // 全て失敗した場合はデモデータを表示
+            loadDemoData();
+            showNotification('⚠️ 自動同期に失敗しました。CSV手動同期をお試しください。', 'warning');
+        }
+
+        // APIデータの解析
+        function parseAPIData(data) {
+            if (!data.values || data.values.length < 2) {
+                return [];
+            }
+            
+            const headers = data.values[0];
+            const rows = data.values.slice(1);
+            
+            const parsedData = [];
+            for (const row of rows) {
+                if (row.length > 0 && row[0]) { // 店舗名があるもののみ
+                    const record = {};
+                    headers.forEach((header, index) => {
+                        record[header] = row[index] || '';
+                    });
+                    parsedData.push(record);
+                }
+            }
+            
+            return parsedData;
         }
 
         // CSVデータの解析
@@ -850,13 +1040,12 @@
             const data = [];
             for (let i = 1; i < lines.length; i++) {
                 const values = parseCSVLine(lines[i]);
-                if (values.length >= headers.length && values[0]) { // 店舗名があるもののみ
+                if (values.length >= headers.length && values[0]) {
                     const record = {};
                     headers.forEach((header, index) => {
                         record[header] = values[index] || '';
                     });
                     
-                    // データが有効な場合のみ追加
                     if (record['店舗名'] && record['店舗名'].trim()) {
                         data.push(record);
                     }
@@ -866,7 +1055,7 @@
             return data;
         }
 
-        // CSV行の解析（カンマ区切りとクォート対応）
+        // CSV行の解析
         function parseCSVLine(line) {
             const values = [];
             let current = '';
@@ -879,7 +1068,7 @@
                 if (char === '"') {
                     if (inQuotes && nextChar === '"') {
                         current += '"';
-                        i++; // Skip next quote
+                        i++;
                     } else {
                         inQuotes = !inQuotes;
                     }
@@ -893,6 +1082,102 @@
             
             values.push(current.trim());
             return values;
+        }
+
+        // 同期方法選択
+        function selectSyncMethod(method) {
+            selectedSyncMethod = method;
+            
+            // UI更新
+            document.querySelectorAll('.sync-method').forEach(el => {
+                el.classList.remove('active');
+            });
+            document.getElementById(`${method}Method`).classList.add('active');
+            
+            // API設定表示切り替え
+            const apiSettings = document.getElementById('apiSettings');
+            if (method === 'api') {
+                apiSettings.classList.remove('hidden');
+            } else {
+                apiSettings.classList.add('hidden');
+            }
+            
+            showNotification(`📋 同期方法を「${getSyncMethodName()}」に設定しました`, 'info');
+        }
+
+        // API接続テスト
+        async function testApiConnection() {
+            const inputApiKey = document.getElementById('apiKey').value.trim();
+            
+            if (!inputApiKey) {
+                showNotification('APIキーを入力してください', 'error');
+                return;
+            }
+            
+            try {
+                apiKey = inputApiKey;
+                localStorage.setItem('gsheets_api_key', apiKey);
+                
+                const testUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}?key=${apiKey}`;
+                const response = await fetch(testUrl);
+                
+                if (response.ok) {
+                    updateApiStatus('接続成功');
+                    showNotification('✅ API接続テスト成功', 'success');
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+            } catch (error) {
+                updateApiStatus('接続失敗');
+                showNotification('❌ API接続テスト失敗: ' + error.message, 'error');
+            }
+        }
+
+        // デモデータの読み込み（フォールバック）
+        function loadDemoData() {
+            storeData = [
+                {
+                    '店舗名': 'シャブール',
+                    '売上実績': '4,279,028',
+                    '売上目標': '35,000,000',
+                    '写メ日記投稿数': '904',
+                    '口コミ総数': '42',
+                    'アクセス数': '250,951',
+                    'ブランド': 'Shaboole'
+                },
+                {
+                    '店舗名': 'ワンカラット',
+                    '売上実績': '2,304,312',
+                    '売上目標': '19,000,000',
+                    '写メ日記投稿数': '977',
+                    '口コミ総数': '14',
+                    'アクセス数': '160,404',
+                    'ブランド': 'OneCart'
+                },
+                {
+                    '店舗名': 'GO名古屋',
+                    '売上実績': '3,567,890',
+                    '売上目標': '25,000,000',
+                    '写メ日記投稿数': '1,245',
+                    '口コミ総数': '67',
+                    'アクセス数': '189,234',
+                    'ブランド': 'GrandOpera'
+                },
+                {
+                    '店舗名': 'CL名古屋',
+                    '売上実績': '2,890,456',
+                    '売上目標': '22,000,000',
+                    '写メ日記投稿数': '834',
+                    '口コミ総数': '29',
+                    'アクセス数': '145,678',
+                    'ブランド': 'CLASSY'
+                }
+            ];
+            
+            updateDashboard();
+            updateConnectionStatus('warning', 'デモデータを表示中');
+            document.getElementById('syncMethod').textContent = '同期方法: デモデータ';
         }
 
         // ダッシュボード更新
@@ -911,7 +1196,7 @@
                 totalSales += sales;
                 totalTarget += target;
                 
-                if (sales >= target * 0.8) { // 80%以上を達成とする
+                if (sales >= target * 0.8) {
                     achievingStores++;
                 }
             });
@@ -933,7 +1218,6 @@
             // データカウンター更新
             document.getElementById('totalStores').textContent = `総店舗数: ${storeData.length}店舗`;
             document.getElementById('dataCounter').textContent = `読み込みデータ: ${storeData.length}店舗`;
-            document.getElementById('lastUpdate').textContent = `最終更新: ${new Date().toLocaleTimeString('ja-JP')}`;
         }
 
         // ブランド別サマリー更新
@@ -1035,65 +1319,68 @@
             }).join('');
         }
 
-        // 同期情報更新
-        function updateSyncInfo() {
-            const container = document.getElementById('syncStatusInfo');
-            if (!container) return;
+        // 進行状況表示
+        function showProgress(percent, text) {
+            const container = document.getElementById('progressContainer');
+            const fill = document.getElementById('progressFill');
+            const textElement = document.getElementById('progressText');
             
-            const now = new Date();
-            const totalStores = storeData.length;
-            const totalSales = storeData.reduce((sum, store) => sum + parseFloat(store['売上実績']?.replace(/,/g, '') || 0), 0);
-            
-            container.innerHTML = `
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="bg-blue-50 rounded-lg p-4">
-                        <div class="text-2xl font-bold text-blue-600">${totalStores}</div>
-                        <div class="text-sm text-blue-800">読み込み店舗数</div>
-                    </div>
-                    <div class="bg-green-50 rounded-lg p-4">
-                        <div class="text-2xl font-bold text-green-600">¥${(totalSales / 1000000).toFixed(1)}M</div>
-                        <div class="text-sm text-green-800">総売上実績</div>
-                    </div>
-                    <div class="bg-purple-50 rounded-lg p-4">
-                        <div class="text-2xl font-bold text-purple-600">${now.toLocaleTimeString('ja-JP')}</div>
-                        <div class="text-sm text-purple-800">最終同期時刻</div>
-                    </div>
-                </div>
-                
-                <div class="mt-4 text-sm text-gray-600">
-                    <div>✅ スプレッドシートから正常に読み込み完了</div>
-                    <div>📊 データは自動で解析され、ダッシュボードに反映されています</div>
-                    <div>🔄 手動で再読み込みする場合は「データ読み込み」ボタンをご利用ください</div>
-                </div>
-            `;
+            container.classList.remove('hidden');
+            fill.style.width = `${percent}%`;
+            textElement.textContent = text;
         }
 
-        // デモデータの読み込み（フォールバック）
-        function loadDemoData() {
-            storeData = [
-                {
-                    '店舗名': 'シャブール',
-                    '売上実績': '4,279,028',
-                    '売上目標': '35,000,000',
-                    '写メ日記投稿数': '904',
-                    '口コミ総数': '42',
-                    'アクセス数': '250,951',
-                    'ブランド': 'Shaboole'
-                },
-                {
-                    '店舗名': 'ワンカラット',
-                    '売上実績': '2,304,312',
-                    '売上目標': '19,000,000',
-                    '写メ日記投稿数': '977',
-                    '口コミ総数': '14',
-                    'アクセス数': '160,404',
-                    'ブランド': 'OneCart'
-                }
-                // 必要に応じて他の店舗データも追加
-            ];
+        function hideProgress() {
+            const container = document.getElementById('progressContainer');
+            container.classList.add('hidden');
+        }
+
+        // 状態更新関数
+        function updateConnectionStatus(status, message) {
+            const statusElement = document.getElementById('connectionInfo');
+            const iconElement = document.getElementById('connectionIcon');
             
-            updateDashboard();
-            showNotification('💡 デモデータを表示中です。実際のデータを読み込むには「最新データ取得」をお試しください。', 'warning');
+            if (statusElement) {
+                statusElement.textContent = message;
+                statusElement.className = `text-sm ${
+                    status === 'success' ? 'text-green-600' : 
+                    status === 'error' ? 'text-red-600' : 
+                    status === 'syncing' ? 'text-yellow-600' : 
+                    'text-gray-600'
+                }`;
+            }
+            
+            if (iconElement) {
+                iconElement.className = `fas mr-3 ${
+                    status === 'success' ? 'fa-check-circle text-green-500' :
+                    status === 'error' ? 'fa-exclamation-circle text-red-500' :
+                    status === 'syncing' ? 'fa-sync-alt fa-spin text-yellow-500' :
+                    'fa-database text-gray-400'
+                }`;
+            }
+        }
+
+        function updateLastSyncInfo() {
+            const now = new Date();
+            document.getElementById('lastSyncTime').textContent = `最終更新: ${now.toLocaleTimeString('ja-JP')}`;
+            document.getElementById('lastUpdate').textContent = `最終更新: ${now.toLocaleTimeString('ja-JP')}`;
+            document.getElementById('lastSyncMethod').textContent = getSyncMethodName();
+        }
+
+        function updateApiStatus(status) {
+            const element = document.getElementById('apiStatus');
+            if (element) {
+                element.textContent = status;
+            }
+        }
+
+        function getSyncMethodName() {
+            switch (selectedSyncMethod) {
+                case 'api': return 'Google Sheets API';
+                case 'proxy': return '直接読み込み';
+                case 'csv': return 'CSV同期';
+                default: return '不明';
+            }
         }
 
         // ユーティリティ関数
@@ -1114,19 +1401,6 @@
                 case 'CLASSY': return '💫';
                 case 'GrandOpera': return '🎭';
                 default: return '🏪';
-            }
-        }
-
-        function updateConnectionStatus(status, message) {
-            const statusElement = document.getElementById('connectionInfo');
-            if (statusElement) {
-                statusElement.textContent = message;
-                statusElement.className = `text-sm ${
-                    status === 'success' ? 'text-green-600' : 
-                    status === 'error' ? 'text-red-600' : 
-                    status === 'syncing' ? 'text-yellow-600' : 
-                    'text-gray-600'
-                }`;
             }
         }
 
@@ -1156,7 +1430,6 @@
                 return;
             }
 
-            // ローカルデータに追加
             addToLocalData(formData);
             showNotification('✅ データを保存しました', 'success');
             clearForm();
@@ -1192,7 +1465,6 @@
         }
 
         function addToLocalData(data) {
-            // ローカルストレージに保存
             const savedData = JSON.parse(localStorage.getItem('manualInputs') || '[]');
             savedData.push({
                 ...data,
@@ -1231,14 +1503,6 @@
                             <div class="col-span-2"><strong>備考:</strong> ${data.memo || 'なし'}</div>
                         </div>
                     </div>
-                    
-                    <div class="bg-blue-50 rounded-lg p-4">
-                        <h4 class="font-semibold text-blue-800 mb-2">保存内容</h4>
-                        <div class="text-sm text-blue-700">
-                            • ローカルストレージに保存されます<br>
-                            • 保存日時: ${new Date().toLocaleString('ja-JP')}
-                        </div>
-                    </div>
                 `;
             }
 
@@ -1251,10 +1515,6 @@
         }
 
         // CSV機能
-        function openCSVModal() {
-            showModal('csvModal');
-        }
-
         function handleCSVUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -1274,6 +1534,8 @@
                 if (parsedData.length > 0) {
                     storeData = parsedData;
                     updateDashboard();
+                    updateConnectionStatus('success', `CSV同期完了 (${parsedData.length}店舗)`);
+                    updateLastSyncInfo();
                     
                     const resultElement = document.getElementById('csvResult');
                     const contentElement = document.getElementById('csvResultContent');
@@ -1290,6 +1552,8 @@
                     
                     resultElement.classList.remove('hidden');
                     showNotification(`✅ CSVから${parsedData.length}店舗のデータを読み込みました`, 'success');
+                    
+                    document.getElementById('syncMethod').textContent = '同期方法: CSV手動同期';
                 } else {
                     throw new Error('有効なデータが見つかりませんでした');
                 }
@@ -1306,7 +1570,6 @@
                 return;
             }
             
-            // CSVデータを生成
             const headers = ['店舗名', '売上実績', '売上目標', '写メ日記投稿数', '口コミ総数', 'アクセス数', 'ブランド'];
             const csvContent = [
                 headers.join(','),
@@ -1315,7 +1578,6 @@
                 )
             ].join('\n');
             
-            // ダウンロード
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -1331,13 +1593,11 @@
 
         // ページ管理
         function showPage(pageName) {
-            // ナビゲーション更新
             document.querySelectorAll('.nav-item').forEach(item => {
                 item.classList.remove('active');
             });
             event.target.closest('.nav-item').classList.add('active');
 
-            // ページ表示切り替え
             document.querySelectorAll('.page-content').forEach(page => {
                 page.classList.add('hidden');
             });
@@ -1347,7 +1607,6 @@
                 targetPage.classList.remove('hidden');
             }
 
-            // ページタイトル更新
             const titles = {
                 dashboard: 'ダッシュボード',
                 sync: 'スプレッドシート同期',
@@ -1364,7 +1623,6 @@
             currentPage = pageName;
             renderCurrentPage();
 
-            // モバイルでサイドバーを閉じる
             if (window.innerWidth < 1024) {
                 const sidebar = document.getElementById('sidebar');
                 if (sidebar) {
@@ -1385,6 +1643,46 @@
                     break;
                 default:
                     break;
+            }
+        }
+
+        function updateSyncInfo() {
+            const container = document.getElementById('syncStatusInfo');
+            if (!container) return;
+            
+            if (storeData.length > 0) {
+                const now = new Date();
+                const totalStores = storeData.length;
+                const totalSales = storeData.reduce((sum, store) => sum + parseFloat(store['売上実績']?.replace(/,/g, '') || 0), 0);
+                
+                container.innerHTML = `
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-blue-50 rounded-lg p-4">
+                            <div class="text-2xl font-bold text-blue-600">${totalStores}</div>
+                            <div class="text-sm text-blue-800">読み込み店舗数</div>
+                        </div>
+                        <div class="bg-green-50 rounded-lg p-4">
+                            <div class="text-2xl font-bold text-green-600">¥${(totalSales / 1000000).toFixed(1)}M</div>
+                            <div class="text-sm text-green-800">総売上実績</div>
+                        </div>
+                        <div class="bg-purple-50 rounded-lg p-4">
+                            <div class="text-2xl font-bold text-purple-600">${getSyncMethodName()}</div>
+                            <div class="text-sm text-purple-800">同期方法</div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 text-sm text-gray-600">
+                        <div>✅ データ同期が正常に完了しています</div>
+                        <div>📊 ダッシュボードに最新データが反映されています</div>
+                        <div>🔄 再同期する場合は「同期開始」ボタンをご利用ください</div>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `
+                    <div class="text-center text-gray-500 py-8">
+                        同期方法を選択して「同期開始」ボタンを押してください
+                    </div>
+                `;
             }
         }
 
@@ -1444,10 +1742,6 @@
             showPage('manual');
         }
 
-        function openSyncModal() {
-            showModal('syncSettingsModal');
-        }
-
         function downloadReport() {
             showNotification('📄 PDFレポートを準備中...', 'info');
             setTimeout(() => {
@@ -1457,7 +1751,9 @@
 
         // グローバル関数の設定
         window.showPage = showPage;
-        window.loadFromGoogleSheets = loadFromGoogleSheets;
+        window.startSyncProcess = startSyncProcess;
+        window.selectSyncMethod = selectSyncMethod;
+        window.testApiConnection = testApiConnection;
         window.submitData = submitData;
         window.clearForm = clearForm;
         window.previewData = previewData;
@@ -1466,10 +1762,8 @@
         window.closeModal = closeModal;
         window.toggleSidebar = toggleSidebar;
         window.quickAdd = quickAdd;
-        window.openSyncModal = openSyncModal;
         window.downloadReport = downloadReport;
         window.sortStores = sortStores;
-        window.openCSVModal = openCSVModal;
         window.handleCSVUpload = handleCSVUpload;
         window.downloadCSV = downloadCSV;
 
@@ -1477,7 +1771,9 @@
         document.addEventListener('DOMContentLoaded', function() {
             initSystem();
             
-            // リサイズイベント
+            // デフォルトの同期方法を設定
+            selectSyncMethod('proxy');
+            
             window.addEventListener('resize', function() {
                 if (window.innerWidth >= 1024) {
                     const sidebar = document.getElementById('sidebar');
@@ -1487,7 +1783,6 @@
                 }
             });
 
-            // キーボードショートカット
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape') {
                     document.querySelectorAll('.modal').forEach(modal => {
@@ -1499,13 +1794,12 @@
                     switch(e.key) {
                         case 'r':
                             e.preventDefault();
-                            loadFromGoogleSheets();
+                            startSyncProcess();
                             break;
                     }
                 }
             });
 
-            // モーダル外クリックで閉じる
             document.addEventListener('click', function(e) {
                 if (e.target.classList.contains('modal')) {
                     e.target.classList.add('hidden');
