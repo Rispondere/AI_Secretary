@@ -206,6 +206,113 @@
             background: linear-gradient(135deg, #667eea, #764ba2);
             transition: width 0.3s ease;
         }
+
+        /* Analytics specific styles */
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .ranking-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            margin-bottom: 8px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            transition: all 0.3s ease;
+        }
+
+        .ranking-item:hover {
+            transform: translateX(4px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .ranking-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 12px;
+        }
+
+        .ranking-number.gold { background: linear-gradient(135deg, #ffd700, #ffa500); color: white; }
+        .ranking-number.silver { background: linear-gradient(135deg, #c0c0c0, #a0a0a0); color: white; }
+        .ranking-number.bronze { background: linear-gradient(135deg, #cd7f32, #b8860b); color: white; }
+        .ranking-number.default { background: #f3f4f6; color: #374151; }
+
+        .improvement-card {
+            border-left: 4px solid;
+            padding: 16px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .improvement-card:hover {
+            transform: translateX(4px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .improvement-card.urgent { border-color: #ef4444; background: #fef2f2; }
+        .improvement-card.warning { border-color: #f59e0b; background: #fffbeb; }
+        .improvement-card.success { border-color: #10b981; background: #f0fdf4; }
+        .improvement-card.info { border-color: #3b82f6; background: #eff6ff; }
+
+        .metric-card {
+            text-align: center;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .metric-label {
+            color: #6b7280;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .trend-up { color: #10b981; }
+        .trend-down { color: #ef4444; }
+        .trend-stable { color: #6b7280; }
+
+        @media (max-width: 768px) {
+            .analytics-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .chart-container {
+                height: 250px;
+                padding: 15px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -663,14 +770,128 @@
 
             <!-- 詳細分析ページ -->
             <div id="analyticsPage" class="page-content p-4 hidden">
-                <div class="glass-card p-6">
-                    <h3 class="text-xl font-bold text-gray-900 mb-4">📈 詳細分析</h3>
-                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                        <div class="text-center text-yellow-700">
-                            <i class="fas fa-chart-bar text-2xl mb-2"></i>
-                            <p>詳細分析機能</p>
-                            <p class="text-sm mt-2">データを同期後、分析結果を表示します</p>
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-900">📈 詳細分析</h2>
+                    <div class="flex space-x-2">
+                        <button class="btn btn-google" onclick="updateAnalytics()">
+                            <i class="fas fa-sync mr-2"></i>分析更新
+                        </button>
+                        <button class="btn btn-danger" onclick="exportAnalysisReport()">
+                            <i class="fas fa-file-export mr-2"></i>レポート出力
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 全体パフォーマンス分析 -->
+                <div class="glass-card p-6 mb-6">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">📊 全体パフォーマンス分析</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div class="metric-card">
+                            <div class="metric-value trend-up" id="avgAchievementRate">85.2%</div>
+                            <div class="metric-label">平均達成率</div>
+                            <div class="text-xs mt-2">
+                                <i class="fas fa-arrow-up text-green-500"></i> 先月比 +3.2%
+                            </div>
                         </div>
+                        <div class="metric-card">
+                            <div class="metric-value trend-up" id="topPerformanceStore">シャブール</div>
+                            <div class="metric-label">最高売上店舗</div>
+                            <div class="text-xs mt-2">
+                                ¥4.3M達成
+                            </div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value trend-stable" id="avgPhotoCount">451</div>
+                            <div class="metric-label">平均写メ日記投稿</div>
+                            <div class="text-xs mt-2">
+                                月間平均投稿数
+                            </div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value trend-down" id="improvementNeeded">3店舗</div>
+                            <div class="metric-label">改善要店舗数</div>
+                            <div class="text-xs mt-2">
+                                達成率60%未満
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ビジュアル分析チャート -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    <!-- 店舗別売上達成率 -->
+                    <div class="glass-card p-6">
+                        <h4 class="text-lg font-bold text-gray-900 mb-4">📊 店舗別売上達成率</h4>
+                        <div class="chart-container">
+                            <canvas id="achievementChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- ブランド別売上分布 -->
+                    <div class="glass-card p-6">
+                        <h4 class="text-lg font-bold text-gray-900 mb-4">🍕 ブランド別売上分布</h4>
+                        <div class="chart-container">
+                            <canvas id="brandDistributionChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- 写メ日記投稿分析 -->
+                    <div class="glass-card p-6">
+                        <h4 class="text-lg font-bold text-gray-900 mb-4">📸 写メ日記投稿分析（TOP8）</h4>
+                        <div class="chart-container">
+                            <canvas id="photoAnalysisChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- 口コミ・アクセス分析 -->
+                    <div class="glass-card p-6">
+                        <h4 class="text-lg font-bold text-gray-900 mb-4">💬 口コミ・アクセス相関分析</h4>
+                        <div class="chart-container">
+                            <canvas id="engagementChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ランキングシステム -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    <!-- 売上ランキング -->
+                    <div class="glass-card p-6">
+                        <h4 class="text-lg font-bold text-gray-900 mb-4">🏆 売上ランキング</h4>
+                        <div id="salesRanking">
+                            <!-- ランキングデータが挿入される -->
+                        </div>
+                    </div>
+
+                    <!-- 達成率ランキング -->
+                    <div class="glass-card p-6">
+                        <h4 class="text-lg font-bold text-gray-900 mb-4">🎯 達成率ランキング</h4>
+                        <div id="achievementRanking">
+                            <!-- ランキングデータが挿入される -->
+                        </div>
+                    </div>
+
+                    <!-- 写メ日記ランキング -->
+                    <div class="glass-card p-6">
+                        <h4 class="text-lg font-bold text-gray-900 mb-4">📸 写メ日記ランキング</h4>
+                        <div id="photoRanking">
+                            <!-- ランキングデータが挿入される -->
+                        </div>
+                    </div>
+
+                    <!-- 口コミランキング -->
+                    <div class="glass-card p-6">
+                        <h4 class="text-lg font-bold text-gray-900 mb-4">💬 口コミランキング</h4>
+                        <div id="reviewRanking">
+                            <!-- ランキングデータが挿入される -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI改善提案エンジン -->
+                <div class="glass-card p-6">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">🤖 AI改善提案エンジン</h3>
+                    <div id="improvementSuggestions" class="space-y-4">
+                        <!-- AI提案が挿入される -->
                     </div>
                 </div>
             </div>
@@ -771,6 +992,7 @@
         let selectedSyncMethod = 'proxy';
         let apiKey = '';
         let isConnected = false;
+        let analyticsCharts = {};
 
         // スプレッドシート設定
         const SPREADSHEET_ID = '1CSGBzK9au8VLEQFCpBJbVyMoTaRhO5hoQd_qk8XC_IQ';
@@ -785,7 +1007,7 @@
 
         // システム初期化
         function initSystem() {
-            console.log('川満さん専用システム（改良版同期機能）初期化開始');
+            console.log('川満さん専用システム（詳細分析機能対応）初期化開始');
             
             updateDateTime();
             setInterval(updateDateTime, 60000);
@@ -863,6 +1085,7 @@
                     updateConnectionStatus('success', `同期完了 (${storeData.length}店舗) - ${getSyncMethodName()}`);
                     updateLastSyncInfo();
                     updateDashboard();
+                    updateAnalytics(); // 分析も更新
                     showNotification(`✅ ${getSyncMethodName()}で${storeData.length}店舗のデータを正常に同期しました`, 'success');
                 } else {
                     // 自動フォールバック
@@ -999,6 +1222,7 @@
                         updateConnectionStatus('success', `フォールバック成功 (${storeData.length}店舗) - ${getSyncMethodName()}`);
                         updateLastSyncInfo();
                         updateDashboard();
+                        updateAnalytics();
                         showNotification(`✅ ${getSyncMethodName()}（代替方法）で同期成功`, 'success');
                         return;
                     }
@@ -1357,6 +1581,7 @@
             ];
             
             updateDashboard();
+            updateAnalytics();
             updateConnectionStatus('warning', 'スプレッドシートの実データを表示中（2025/07/07時点）');
             document.getElementById('syncMethod').textContent = '同期方法: 実データ表示';
             showNotification('📊 スプレッドシートの実データ（11店舗）を表示しています', 'success');
@@ -1505,6 +1730,649 @@
                     </tr>
                 `;
             }).join('');
+        }
+
+        // 分析更新
+        function updateAnalytics() {
+            if (storeData.length === 0) return;
+            
+            updateAnalyticsMetrics();
+            createAnalyticsCharts();
+            createRankings();
+            generateImprovementSuggestions();
+        }
+
+        // 分析メトリクス更新
+        function updateAnalyticsMetrics() {
+            // 平均達成率計算
+            let totalAchievement = 0;
+            let maxSales = 0;
+            let topStore = '';
+            let totalPhotos = 0;
+            let improvementCount = 0;
+            
+            storeData.forEach(store => {
+                const sales = parseFloat(store['売上実績']?.replace(/,/g, '') || 0);
+                const target = parseFloat(store['売上目標']?.replace(/,/g, '') || 0);
+                const achievement = target > 0 ? (sales / target * 100) : 0;
+                const photos = parseInt(store['写メ日記投稿数'] || 0);
+                
+                totalAchievement += achievement;
+                totalPhotos += photos;
+                
+                if (sales > maxSales) {
+                    maxSales = sales;
+                    topStore = store['店舗名'];
+                }
+                
+                if (achievement < 60) {
+                    improvementCount++;
+                }
+            });
+            
+            const avgAchievement = totalAchievement / storeData.length;
+            const avgPhotos = Math.round(totalPhotos / storeData.length);
+            
+            // UI更新
+            document.getElementById('avgAchievementRate').textContent = `${avgAchievement.toFixed(1)}%`;
+            document.getElementById('topPerformanceStore').textContent = topStore;
+            document.getElementById('avgPhotoCount').textContent = avgPhotos.toString();
+            document.getElementById('improvementNeeded').textContent = `${improvementCount}店舗`;
+        }
+
+        // 分析チャート作成
+        function createAnalyticsCharts() {
+            createAchievementChart();
+            createBrandDistributionChart();
+            createPhotoAnalysisChart();
+            createEngagementChart();
+        }
+
+        // 店舗別売上達成率チャート
+        function createAchievementChart() {
+            const ctx = document.getElementById('achievementChart');
+            if (!ctx) return;
+            
+            if (analyticsCharts.achievement) {
+                analyticsCharts.achievement.destroy();
+            }
+            
+            const sortedStores = [...storeData].sort((a, b) => {
+                const aAchievement = (parseFloat(a['売上実績']?.replace(/,/g, '') || 0) / parseFloat(a['売上目標']?.replace(/,/g, '') || 1)) * 100;
+                const bAchievement = (parseFloat(b['売上実績']?.replace(/,/g, '') || 0) / parseFloat(b['売上目標']?.replace(/,/g, '') || 1)) * 100;
+                return bAchievement - aAchievement;
+            });
+            
+            const labels = sortedStores.map(store => store['店舗名']);
+            const achievements = sortedStores.map(store => {
+                const sales = parseFloat(store['売上実績']?.replace(/,/g, '') || 0);
+                const target = parseFloat(store['売上目標']?.replace(/,/g, '') || 0);
+                return target > 0 ? (sales / target * 100) : 0;
+            });
+            
+            const backgroundColors = achievements.map(achievement => {
+                if (achievement >= 100) return '#10b981';
+                if (achievement >= 80) return '#3b82f6';
+                if (achievement >= 60) return '#f59e0b';
+                return '#ef4444';
+            });
+            
+            analyticsCharts.achievement = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '達成率 (%)',
+                        data: achievements,
+                        backgroundColor: backgroundColors,
+                        borderColor: backgroundColors,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: Math.max(120, Math.max(...achievements) + 10),
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                maxRotation: 45
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // ブランド別売上分布チャート
+        function createBrandDistributionChart() {
+            const ctx = document.getElementById('brandDistributionChart');
+            if (!ctx) return;
+            
+            if (analyticsCharts.brandDistribution) {
+                analyticsCharts.brandDistribution.destroy();
+            }
+            
+            const brands = {};
+            storeData.forEach(store => {
+                const brand = store['ブランド'] || 'その他';
+                const sales = parseFloat(store['売上実績']?.replace(/,/g, '') || 0);
+                
+                if (!brands[brand]) {
+                    brands[brand] = 0;
+                }
+                brands[brand] += sales;
+            });
+            
+            const labels = Object.keys(brands);
+            const data = Object.values(brands).map(sales => sales / 1000000); // 百万円単位
+            const colors = ['#8b5cf6', '#ef4444', '#3b82f6', '#10b981', '#f59e0b'];
+            
+            analyticsCharts.brandDistribution = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: colors.slice(0, labels.length),
+                        borderColor: '#fff',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.label}: ¥${context.parsed.toFixed(1)}M`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 写メ日記投稿分析チャート
+        function createPhotoAnalysisChart() {
+            const ctx = document.getElementById('photoAnalysisChart');
+            if (!ctx) return;
+            
+            if (analyticsCharts.photoAnalysis) {
+                analyticsCharts.photoAnalysis.destroy();
+            }
+            
+            // 投稿数上位8店舗
+            const sortedStores = [...storeData]
+                .sort((a, b) => parseInt(b['写メ日記投稿数'] || 0) - parseInt(a['写メ日記投稿数'] || 0))
+                .slice(0, 8);
+            
+            const labels = sortedStores.map(store => store['店舗名']);
+            const actual = sortedStores.map(store => parseInt(store['写メ日記投稿数'] || 0));
+            const target = sortedStores.map(store => parseInt(store['写メ日記月間目標'] || 0));
+            
+            analyticsCharts.photoAnalysis = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '実績',
+                        data: actual,
+                        backgroundColor: '#3b82f6',
+                        borderColor: '#3b82f6',
+                        borderWidth: 1
+                    }, {
+                        label: '目標',
+                        data: target,
+                        backgroundColor: '#e5e7eb',
+                        borderColor: '#9ca3af',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        },
+                        x: {
+                            ticks: {
+                                maxRotation: 45
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 口コミ・アクセス相関分析チャート
+        function createEngagementChart() {
+            const ctx = document.getElementById('engagementChart');
+            if (!ctx) return;
+            
+            if (analyticsCharts.engagement) {
+                analyticsCharts.engagement.destroy();
+            }
+            
+            const data = storeData.map(store => ({
+                x: parseInt(store['アクセス数'] || 0),
+                y: parseInt(store['口コミ総数'] || 0),
+                label: store['店舗名'],
+                brand: store['ブランド']
+            }));
+            
+            const colors = {
+                'Shaboole': '#8b5cf6',
+                'OneCart': '#ef4444',
+                'CLASSY': '#3b82f6',
+                'GrandOpera': '#10b981'
+            };
+            
+            analyticsCharts.engagement = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'アクセス数 vs 口コミ数',
+                        data: data,
+                        backgroundColor: data.map(point => colors[point.brand] || '#6b7280'),
+                        borderColor: data.map(point => colors[point.brand] || '#6b7280'),
+                        pointRadius: 8,
+                        pointHoverRadius: 10
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                title: function(context) {
+                                    return context[0].raw.label;
+                                },
+                                label: function(context) {
+                                    return [
+                                        `アクセス数: ${context.raw.x.toLocaleString()}`,
+                                        `口コミ数: ${context.raw.y}件`,
+                                        `ブランド: ${context.raw.brand}`
+                                    ];
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'アクセス数'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toLocaleString();
+                                }
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: '口コミ数'
+                            },
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // ランキング作成
+        function createRankings() {
+            createSalesRanking();
+            createAchievementRanking();
+            createPhotoRanking();
+            createReviewRanking();
+        }
+
+        // 売上ランキング
+        function createSalesRanking() {
+            const container = document.getElementById('salesRanking');
+            if (!container) return;
+            
+            const sortedStores = [...storeData].sort((a, b) => {
+                return parseFloat(b['売上実績']?.replace(/,/g, '') || 0) - parseFloat(a['売上実績']?.replace(/,/g, '') || 0);
+            });
+            
+            container.innerHTML = sortedStores.slice(0, 10).map((store, index) => {
+                const sales = parseFloat(store['売上実績']?.replace(/,/g, '') || 0);
+                const rankClass = index === 0 ? 'gold' : index === 1 ? 'silver' : index === 2 ? 'bronze' : 'default';
+                const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '';
+                
+                return `
+                    <div class="ranking-item">
+                        <div class="ranking-number ${rankClass}">${index + 1}</div>
+                        <div class="flex-1">
+                            <div class="font-semibold text-gray-900">
+                                ${getBrandEmoji(store['ブランド'])} ${store['店舗名']} ${medal}
+                            </div>
+                            <div class="text-sm text-gray-600">¥${sales.toLocaleString()}</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-lg font-bold text-purple-600">¥${(sales / 1000000).toFixed(1)}M</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 達成率ランキング
+        function createAchievementRanking() {
+            const container = document.getElementById('achievementRanking');
+            if (!container) return;
+            
+            const sortedStores = [...storeData].sort((a, b) => {
+                const aAchievement = (parseFloat(a['売上実績']?.replace(/,/g, '') || 0) / parseFloat(a['売上目標']?.replace(/,/g, '') || 1)) * 100;
+                const bAchievement = (parseFloat(b['売上実績']?.replace(/,/g, '') || 0) / parseFloat(b['売上目標']?.replace(/,/g, '') || 1)) * 100;
+                return bAchievement - aAchievement;
+            });
+            
+            container.innerHTML = sortedStores.slice(0, 10).map((store, index) => {
+                const sales = parseFloat(store['売上実績']?.replace(/,/g, '') || 0);
+                const target = parseFloat(store['売上目標']?.replace(/,/g, '') || 0);
+                const achievement = target > 0 ? (sales / target * 100) : 0;
+                const rankClass = index === 0 ? 'gold' : index === 1 ? 'silver' : index === 2 ? 'bronze' : 'default';
+                const achievementClass = achievement >= 100 ? 'text-green-600' : achievement >= 80 ? 'text-blue-600' : 'text-orange-600';
+                
+                return `
+                    <div class="ranking-item">
+                        <div class="ranking-number ${rankClass}">${index + 1}</div>
+                        <div class="flex-1">
+                            <div class="font-semibold text-gray-900">
+                                ${getBrandEmoji(store['ブランド'])} ${store['店舗名']}
+                            </div>
+                            <div class="text-sm text-gray-600">目標: ¥${(target / 1000000).toFixed(1)}M</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-lg font-bold ${achievementClass}">${achievement.toFixed(1)}%</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 写メ日記ランキング
+        function createPhotoRanking() {
+            const container = document.getElementById('photoRanking');
+            if (!container) return;
+            
+            const sortedStores = [...storeData].sort((a, b) => {
+                return parseInt(b['写メ日記投稿数'] || 0) - parseInt(a['写メ日記投稿数'] || 0);
+            });
+            
+            container.innerHTML = sortedStores.slice(0, 10).map((store, index) => {
+                const photos = parseInt(store['写メ日記投稿数'] || 0);
+                const target = parseInt(store['写メ日記月間目標'] || 0);
+                const achievement = target > 0 ? (photos / target * 100) : 0;
+                const rankClass = index === 0 ? 'gold' : index === 1 ? 'silver' : index === 2 ? 'bronze' : 'default';
+                
+                return `
+                    <div class="ranking-item">
+                        <div class="ranking-number ${rankClass}">${index + 1}</div>
+                        <div class="flex-1">
+                            <div class="font-semibold text-gray-900">
+                                ${getBrandEmoji(store['ブランド'])} ${store['店舗名']}
+                            </div>
+                            <div class="text-sm text-gray-600">達成率: ${achievement.toFixed(1)}%</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-lg font-bold text-blue-600">${photos}件</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 口コミランキング
+        function createReviewRanking() {
+            const container = document.getElementById('reviewRanking');
+            if (!container) return;
+            
+            const sortedStores = [...storeData].sort((a, b) => {
+                return parseInt(b['口コミ総数'] || 0) - parseInt(a['口コミ総数'] || 0);
+            });
+            
+            container.innerHTML = sortedStores.slice(0, 10).map((store, index) => {
+                const reviews = parseInt(store['口コミ総数'] || 0);
+                const target = parseInt(store['口コミ月間目標'] || 0);
+                const achievement = target > 0 ? (reviews / target * 100) : 0;
+                const rankClass = index === 0 ? 'gold' : index === 1 ? 'silver' : index === 2 ? 'bronze' : 'default';
+                
+                return `
+                    <div class="ranking-item">
+                        <div class="ranking-number ${rankClass}">${index + 1}</div>
+                        <div class="flex-1">
+                            <div class="font-semibold text-gray-900">
+                                ${getBrandEmoji(store['ブランド'])} ${store['店舗名']}
+                            </div>
+                            <div class="text-sm text-gray-600">達成率: ${achievement.toFixed(1)}%</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-lg font-bold text-green-600">${reviews}件</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // AI改善提案エンジン
+        function generateImprovementSuggestions() {
+            const container = document.getElementById('improvementSuggestions');
+            if (!container) return;
+            
+            const suggestions = [];
+            
+            // 売上改善急務店舗
+            const urgentStores = storeData.filter(store => {
+                const sales = parseFloat(store['売上実績']?.replace(/,/g, '') || 0);
+                const target = parseFloat(store['売上目標']?.replace(/,/g, '') || 0);
+                const achievement = target > 0 ? (sales / target * 100) : 0;
+                return achievement < 60;
+            });
+            
+            if (urgentStores.length > 0) {
+                suggestions.push({
+                    type: 'urgent',
+                    title: '🚨 売上改善急務店舗',
+                    content: `${urgentStores.map(s => s['店舗名']).join('、')}は達成率60%未満です。緊急の売上対策が必要です。`,
+                    action: '営業戦略見直し・キャンペーン実施・スタッフ研修を検討してください。'
+                });
+            }
+            
+            // 写メ日記強化店舗
+            const lowPhotoStores = storeData.filter(store => {
+                const photos = parseInt(store['写メ日記投稿数'] || 0);
+                const target = parseInt(store['写メ日記月間目標'] || 0);
+                const achievement = target > 0 ? (photos / target * 100) : 0;
+                return achievement < 50;
+            });
+            
+            if (lowPhotoStores.length > 0) {
+                suggestions.push({
+                    type: 'warning',
+                    title: '📸 写メ日記強化推奨',
+                    content: `${lowPhotoStores.map(s => s['店舗名']).join('、')}は写メ日記投稿が目標の50%未満です。`,
+                    action: '投稿インセンティブ制度の導入・投稿時間の見直し・コンテンツ企画を実施してください。'
+                });
+            }
+            
+            // 口コミ促進店舗
+            const lowReviewStores = storeData.filter(store => {
+                const reviews = parseInt(store['口コミ総数'] || 0);
+                return reviews < 15;
+            });
+            
+            if (lowReviewStores.length > 0) {
+                suggestions.push({
+                    type: 'warning',
+                    title: '💬 口コミ促進キャンペーン',
+                    content: `${lowReviewStores.map(s => s['店舗名']).join('、')}は口コミ数が15件未満です。`,
+                    action: '口コミ投稿キャンペーン・お客様へのフォロー強化・満足度向上施策を実施してください。'
+                });
+            }
+            
+            // 成功事例横展開
+            const successStores = storeData.filter(store => {
+                const sales = parseFloat(store['売上実績']?.replace(/,/g, '') || 0);
+                const target = parseFloat(store['売上目標']?.replace(/,/g, '') || 0);
+                const achievement = target > 0 ? (sales / target * 100) : 0;
+                return achievement >= 120;
+            });
+            
+            if (successStores.length > 0) {
+                suggestions.push({
+                    type: 'success',
+                    title: '🏆 成功事例横展開',
+                    content: `${successStores.map(s => s['店舗名']).join('、')}は達成率120%以上の優秀店舗です。`,
+                    action: 'これらの店舗のベストプラクティスを他店舗に横展開し、成功ノウハウを共有してください。'
+                });
+            }
+            
+            // コンバージョン改善
+            const conversionStores = storeData.filter(store => {
+                const access = parseInt(store['アクセス数'] || 0);
+                const sales = parseFloat(store['売上実績']?.replace(/,/g, '') || 0);
+                return access > 150000 && sales < 2000000; // アクセス多いが売上低い
+            });
+            
+            if (conversionStores.length > 0) {
+                suggestions.push({
+                    type: 'info',
+                    title: '🎯 コンバージョン改善',
+                    content: `${conversionStores.map(s => s['店舗名']).join('、')}はアクセス数は多いものの売上が低い状況です。`,
+                    action: 'サービス内容の見直し・料金体系の最適化・接客品質向上を検討してください。'
+                });
+            }
+            
+            // 提案表示
+            container.innerHTML = suggestions.map(suggestion => `
+                <div class="improvement-card ${suggestion.type}">
+                    <h4 class="font-bold text-gray-800 mb-2">${suggestion.title}</h4>
+                    <p class="text-sm text-gray-700 mb-3">${suggestion.content}</p>
+                    <div class="text-sm font-medium text-gray-800">
+                        💡 改善アクション: ${suggestion.action}
+                    </div>
+                </div>
+            `).join('');
+            
+            if (suggestions.length === 0) {
+                container.innerHTML = `
+                    <div class="improvement-card success">
+                        <h4 class="font-bold text-gray-800 mb-2">🎉 優秀な運営状況</h4>
+                        <p class="text-sm text-gray-700">現在、すべての店舗が良好な運営状況です。この状態を維持し、さらなる向上を目指しましょう。</p>
+                    </div>
+                `;
+            }
+        }
+
+        // 分析レポート出力
+        function exportAnalysisReport() {
+            if (storeData.length === 0) {
+                showNotification('出力するデータがありません', 'warning');
+                return;
+            }
+            
+            // 分析データの計算
+            let totalSales = 0;
+            let totalTarget = 0;
+            let totalPhotos = 0;
+            let totalReviews = 0;
+            let improvementCount = 0;
+            
+            storeData.forEach(store => {
+                const sales = parseFloat(store['売上実績']?.replace(/,/g, '') || 0);
+                const target = parseFloat(store['売上目標']?.replace(/,/g, '') || 0);
+                const achievement = target > 0 ? (sales / target * 100) : 0;
+                
+                totalSales += sales;
+                totalTarget += target;
+                totalPhotos += parseInt(store['写メ日記投稿数'] || 0);
+                totalReviews += parseInt(store['口コミ総数'] || 0);
+                
+                if (achievement < 60) improvementCount++;
+            });
+            
+            const avgAchievement = (totalSales / totalTarget * 100).toFixed(1);
+            const avgPhotos = Math.round(totalPhotos / storeData.length);
+            const avgReviews = Math.round(totalReviews / storeData.length);
+            
+            // レポート内容
+            const reportContent = `
+名古屋プレジャーグループ 詳細分析レポート
+生成日時: ${new Date().toLocaleString('ja-JP')}
+
+【全体パフォーマンス概要】
+・総店舗数: ${storeData.length}店舗
+・総売上実績: ¥${(totalSales / 1000000).toFixed(1)}M
+・総売上目標: ¥${(totalTarget / 1000000).toFixed(1)}M
+・平均達成率: ${avgAchievement}%
+・改善要店舗: ${improvementCount}店舗
+
+【KPI実績】
+・総写メ日記投稿: ${totalPhotos.toLocaleString()}件 (平均: ${avgPhotos}件/店舗)
+・総口コミ数: ${totalReviews}件 (平均: ${avgReviews}件/店舗)
+
+【店舗別詳細】
+${storeData.map((store, index) => {
+    const sales = parseFloat(store['売上実績']?.replace(/,/g, '') || 0);
+    const target = parseFloat(store['売上目標']?.replace(/,/g, '') || 0);
+    const achievement = target > 0 ? (sales / target * 100) : 0;
+    
+    return `${index + 1}. ${store['店舗名']} (${store['ブランド']})
+   売上実績: ¥${sales.toLocaleString()} / 目標: ¥${target.toLocaleString()} (達成率: ${achievement.toFixed(1)}%)
+   写メ日記: ${store['写メ日記投稿数']}件 / 口コミ: ${store['口コミ総数']}件 / アクセス: ${parseInt(store['アクセス数'] || 0).toLocaleString()}`;
+}).join('\n')}
+
+【改善提案】
+1. 達成率60%未満の店舗は緊急対策が必要
+2. 写メ日記投稿の強化でエンゲージメント向上
+3. 口コミ促進キャンペーンで顧客満足度向上
+4. 成功店舗のノウハウ横展開
+
+このレポートは川満さん専用システムにより自動生成されました。
+            `.trim();
+            
+            // テキストファイルとしてダウンロード
+            const blob = new Blob([reportContent], { type: 'text/plain;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `nagoya_pleasure_analytics_${new Date().toISOString().split('T')[0]}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showNotification('📊 分析レポートをダウンロードしました', 'success');
         }
 
         // 進行状況表示
@@ -1722,6 +2590,7 @@
                 if (parsedData.length > 0) {
                     storeData = parsedData;
                     updateDashboard();
+                    updateAnalytics(); // 分析も更新
                     updateConnectionStatus('success', `CSV同期完了 (${parsedData.length}店舗)`);
                     updateLastSyncInfo();
                     
@@ -1828,6 +2697,11 @@
                     break;
                 case 'sync':
                     updateSyncInfo();
+                    break;
+                case 'analytics':
+                    if (storeData.length > 0) {
+                        updateAnalytics();
+                    }
                     break;
                 default:
                     break;
@@ -1954,6 +2828,8 @@
         window.sortStores = sortStores;
         window.handleCSVUpload = handleCSVUpload;
         window.downloadCSV = downloadCSV;
+        window.updateAnalytics = updateAnalytics;
+        window.exportAnalysisReport = exportAnalysisReport;
 
         // ページ読み込み完了時の初期化
         document.addEventListener('DOMContentLoaded', function() {
