@@ -1247,7 +1247,7 @@
             showNotification('⚠️ 自動同期に失敗しました。CSV手動同期をお試しください。', 'warning');
         }
 
-        // APIデータの解析
+        // APIデータの解析（写メ日記対応強化）
         function parseAPIData(data) {
             if (!data.values || data.values.length < 2) {
                 return [];
@@ -1264,12 +1264,21 @@
                     const record = {};
                     headers.forEach((header, index) => {
                         let value = row[index] || '';
-                        // 数値フィールドのカンマ除去
-                        if (header.includes('投稿数') || header.includes('目標') || header.includes('売上') || header.includes('アクセス')) {
-                            value = value.toString().replace(/,/g, '');
+                        
+                        // 写メ日記関連フィールドの特別処理
+                        if (header.includes('写メ') || header.includes('日記') || header.includes('投稿') || 
+                            header.includes('目標') || header.includes('売上') || header.includes('アクセス') ||
+                            header.includes('口コミ') || header.includes('キテネ') || header.includes('出勤')) {
+                            // 数値フィールドのカンマと空白を除去
+                            value = value.toString().replace(/[,\s]/g, '');
                         }
+                        
                         record[header] = value;
                     });
+                    
+                    // 写メ日記データのデバッグ出力
+                    console.log(`${record['店舗名']} - 写メ日記投稿数: "${record['写メ日記投稿数']}", 目標: "${record['写メ日記月間目標']}"`);
+                    
                     parsedData.push(record);
                 }
             }
@@ -1278,7 +1287,7 @@
             return parsedData;
         }
 
-        // CSVデータの解析
+        // CSVデータの解析（写メ日記対応強化）
         function parseCSVData(csvText) {
             const lines = csvText.split('\n').filter(line => line.trim());
             if (lines.length < 2) return [];
@@ -1295,24 +1304,28 @@
                         let value = values[index] || '';
                         // クォートを除去
                         value = value.replace(/^"|"$/g, '').trim();
+                        
+                        // 数値フィールドの正規化（写メ日記含む）
+                        if (header.includes('写メ') || header.includes('日記') || header.includes('投稿') || 
+                            header.includes('目標') || header.includes('売上') || header.includes('実績') ||
+                            header.includes('アクセス') || header.includes('口コミ') || header.includes('キテネ') ||
+                            header.includes('出勤') || header.includes('人数')) {
+                            value = value.replace(/[,\s]/g, '');
+                        }
+                        
                         record[header] = value;
                     });
                     
                     // 店舗名が有効な場合のみ追加
                     if (record['店舗名'] && record['店舗名'].trim()) {
-                        // 写メ日記データの正規化
-                        if (record['写メ日記投稿数']) {
-                            record['写メ日記投稿数'] = record['写メ日記投稿数'].replace(/,/g, '');
-                        }
-                        if (record['写メ日記月間目標']) {
-                            record['写メ日記月間目標'] = record['写メ日記月間目標'].replace(/,/g, '');
-                        }
+                        // 写メ日記データのデバッグ出力
+                        console.log(`CSV ${record['店舗名']} - 写メ日記投稿数: "${record['写メ日記投稿数']}", 目標: "${record['写メ日記月間目標']}"`);
                         data.push(record);
                     }
                 }
             }
             
-            console.log('パースされたデータ:', data);
+            console.log('パースされたCSVデータ:', data);
             return data;
         }
 
@@ -1758,7 +1771,21 @@
             }).join('');
         }
 
-        // 店舗別テーブル更新
+        // 数値変換のヘルパー関数
+        function parseNumber(value) {
+            if (value === null || value === undefined || value === '') {
+                return 0;
+            }
+            
+            // 文字列として処理し、カンマと空白を除去
+            const cleanValue = value.toString().replace(/[,\s]/g, '');
+            const num = parseInt(cleanValue) || 0;
+            
+            console.log(`数値変換: "${value}" -> "${cleanValue}" -> ${num}`);
+            return num;
+        }
+
+        // 店舗別テーブル更新（写メ日記処理強化）
         function updateStoreTable() {
             const tableBody = document.getElementById('storeTable');
             
@@ -1774,9 +1801,21 @@
                 return 0;
             });
             
-            // 写メ日記の平均計算
-            const totalPhotos = sortedData.reduce((sum, store) => sum + parseInt(store['写メ日記投稿数']?.replace(/,/g, '') || 0), 0);
-            const avgPhotos = sortedData.length > 0 ? (totalPhotos / sortedData.length) : 0;
+            // 写メ日記の平均計算（強化版）
+            let totalPhotos = 0;
+            let validStoreCount = 0;
+            
+            sortedData.forEach(store => {
+                const photos = parseNumber(store['写メ日記投稿数']);
+                console.log(`${store['店舗名']} - 写メ日記数値変換: ${photos}`);
+                if (photos >= 0) {
+                    totalPhotos += photos;
+                    validStoreCount++;
+                }
+            });
+            
+            const avgPhotos = validStoreCount > 0 ? (totalPhotos / validStoreCount) : 0;
+            console.log(`写メ日記平均計算: 総投稿数=${totalPhotos}, 有効店舗数=${validStoreCount}, 平均=${avgPhotos}`);
             
             tableBody.innerHTML = sortedData.map((store, index) => {
                 const sales = parseFloat(store['売上実績']?.replace(/,/g, '') || 0);
@@ -1784,16 +1823,19 @@
                 const achievement = target > 0 ? (sales / target * 100) : 0;
                 const achievementClass = achievement >= 100 ? 'excellent' : achievement >= 80 ? 'good' : achievement >= 60 ? 'warning' : 'danger';
                 
-                const photoCount = parseInt(store['写メ日記投稿数']?.replace(/,/g, '') || 0);
-                const photoTarget = parseInt(store['写メ日記月間目標']?.replace(/,/g, '') || 0);
+                // 写メ日記データの確実な数値変換
+                const photoCount = parseNumber(store['写メ日記投稿数']);
+                const photoTarget = parseNumber(store['写メ日記月間目標']);
                 const photoAchievement = photoTarget > 0 ? (photoCount / photoTarget * 100) : 0;
                 
-                const reviewCount = parseInt(store['口コミ総数']?.replace(/,/g, '') || 0);
-                const kiteneCount = parseInt(store['キテネ送信数']?.replace(/,/g, '') || 0);
-                const accessCount = parseInt(store['アクセス数']?.replace(/,/g, '') || 0);
-                const workingStaff = parseInt(store['出勤人数']?.replace(/,/g, '') || 0);
+                const reviewCount = parseNumber(store['口コミ総数']);
+                const kiteneCount = parseNumber(store['キテネ送信数']);
+                const accessCount = parseNumber(store['アクセス数']);
+                const workingStaff = parseNumber(store['出勤人数']);
                 const kpi = store['重点KPI'] || '-';
                 const brand = store['ブランド'] || 'その他';
+                
+                console.log(`テーブル行作成 - ${store['店舗名']}: 写メ日記=${photoCount}, 目標=${photoTarget}, 達成率=${photoAchievement.toFixed(1)}%`);
                 
                 return `
                     <tr class="hover:bg-gray-50 ${index < 3 ? 'bg-blue-50' : ''}">
@@ -1810,9 +1852,7 @@
                         </td>
                         <td class="p-3 text-right">
                             <div class="font-semibold">${photoCount.toLocaleString()}件</div>
-                            <div class="text-xs text-gray-500">
-                                目標: ${photoTarget.toLocaleString()}件 (${photoAchievement.toFixed(1)}%)
-                            </div>
+                            ${photoTarget > 0 ? `<div class="text-xs text-gray-500">目標: ${photoTarget.toLocaleString()}件 (${photoAchievement.toFixed(1)}%)</div>` : ''}
                             <div class="text-xs ${photoCount >= avgPhotos ? 'text-green-600' : 'text-orange-600'}">
                                 平均${photoCount >= avgPhotos ? '以上' : '以下'} (全店平均: ${avgPhotos.toFixed(1)}件)
                             </div>
@@ -2296,7 +2336,7 @@
             }).join('');
         }
 
-        // AI改善提案エンジン
+        // AI改善提案エンジン（写メ日記処理強化）
         function generateImprovementSuggestions() {
             const container = document.getElementById('improvementSuggestions');
             if (!container) return;
@@ -2320,11 +2360,12 @@
                 });
             }
             
-            // 写メ日記強化店舗
+            // 写メ日記強化店舗（強化版）
             const lowPhotoStores = storeData.filter(store => {
-                const photos = parseInt(store['写メ日記投稿数'] || 0);
-                const target = parseInt(store['写メ日記月間目標'] || 0);
+                const photos = parseNumber(store['写メ日記投稿数']);
+                const target = parseNumber(store['写メ日記月間目標']);
                 const achievement = target > 0 ? (photos / target * 100) : 0;
+                console.log(`${store['店舗名']} - 写メ日記改善提案チェック: 投稿数=${photos}, 目標=${target}, 達成率=${achievement.toFixed(1)}%`);
                 return achievement < 50;
             });
             
@@ -2339,7 +2380,7 @@
             
             // 口コミ促進店舗
             const lowReviewStores = storeData.filter(store => {
-                const reviews = parseInt(store['口コミ総数'] || 0);
+                const reviews = parseNumber(store['口コミ総数']);
                 return reviews < 15;
             });
             
@@ -2371,7 +2412,7 @@
             
             // コンバージョン改善
             const conversionStores = storeData.filter(store => {
-                const access = parseInt(store['アクセス数'] || 0);
+                const access = parseNumber(store['アクセス数']);
                 const sales = parseFloat(store['売上実績']?.replace(/,/g, '') || 0);
                 return access > 150000 && sales < 2000000; // アクセス多いが売上低い
             });
@@ -2382,6 +2423,23 @@
                     title: '🎯 コンバージョン改善',
                     content: `${conversionStores.map(s => s['店舗名']).join('、')}はアクセス数は多いものの売上が低い状況です。`,
                     action: 'サービス内容の見直し・料金体系の最適化・接客品質向上を検討してください。'
+                });
+            }
+            
+            // 写メ日記優秀店舗の特別提案
+            const excellentPhotoStores = storeData.filter(store => {
+                const photos = parseNumber(store['写メ日記投稿数']);
+                const target = parseNumber(store['写メ日記月間目標']);
+                const achievement = target > 0 ? (photos / target * 100) : 0;
+                return achievement >= 150; // 目標の150%以上
+            });
+            
+            if (excellentPhotoStores.length > 0) {
+                suggestions.push({
+                    type: 'success',
+                    title: '📸 写メ日記優秀店舗',
+                    content: `${excellentPhotoStores.map(s => s['店舗名']).join('、')}は写メ日記投稿が目標の150%以上と非常に優秀です。`,
+                    action: 'これらの店舗の写メ日記運用ノウハウを他店舗に共有し、投稿品質向上の指導役として活用してください。'
                 });
             }
             
