@@ -1082,10 +1082,20 @@
                 }
                 
                 if (success) {
+                    console.log('同期成功 - 取得データ:', storeData);
                     updateConnectionStatus('success', `同期完了 (${storeData.length}店舗) - ${getSyncMethodName()}`);
                     updateLastSyncInfo();
                     updateDashboard();
                     updateAnalytics(); // 分析も更新
+                    
+                    // 写メ日記データのデバッグ情報
+                    const photoSummary = storeData.map(store => ({
+                        name: store['店舗名'],
+                        photos: store['写メ日記投稿数'],
+                        target: store['写メ日記月間目標']
+                    }));
+                    console.log('写メ日記データ詳細:', photoSummary);
+                    
                     showNotification(`✅ ${getSyncMethodName()}で${storeData.length}店舗のデータを正常に同期しました`, 'success');
                 } else {
                     // 自動フォールバック
@@ -1246,17 +1256,25 @@
             const headers = data.values[0];
             const rows = data.values.slice(1);
             
+            console.log('APIヘッダー:', headers);
+            
             const parsedData = [];
             for (const row of rows) {
-                if (row.length > 0 && row[0]) { // 店舗名があるもののみ
+                if (row.length > 0 && row[0] && row[0].trim()) { // 店舗名があるもののみ
                     const record = {};
                     headers.forEach((header, index) => {
-                        record[header] = row[index] || '';
+                        let value = row[index] || '';
+                        // 数値フィールドのカンマ除去
+                        if (header.includes('投稿数') || header.includes('目標') || header.includes('売上') || header.includes('アクセス')) {
+                            value = value.toString().replace(/,/g, '');
+                        }
+                        record[header] = value;
                     });
                     parsedData.push(record);
                 }
             }
             
+            console.log('パースされたAPIデータ:', parsedData);
             return parsedData;
         }
 
@@ -1271,18 +1289,30 @@
             const data = [];
             for (let i = 1; i < lines.length; i++) {
                 const values = parseCSVLine(lines[i]);
-                if (values.length >= headers.length && values[0]) {
+                if (values.length > 0 && values[0] && values[0].trim()) {
                     const record = {};
                     headers.forEach((header, index) => {
-                        record[header] = values[index] || '';
+                        let value = values[index] || '';
+                        // クォートを除去
+                        value = value.replace(/^"|"$/g, '').trim();
+                        record[header] = value;
                     });
                     
+                    // 店舗名が有効な場合のみ追加
                     if (record['店舗名'] && record['店舗名'].trim()) {
+                        // 写メ日記データの正規化
+                        if (record['写メ日記投稿数']) {
+                            record['写メ日記投稿数'] = record['写メ日記投稿数'].replace(/,/g, '');
+                        }
+                        if (record['写メ日記月間目標']) {
+                            record['写メ日記月間目標'] = record['写メ日記月間目標'].replace(/,/g, '');
+                        }
                         data.push(record);
                     }
                 }
             }
             
+            console.log('パースされたデータ:', data);
             return data;
         }
 
@@ -1591,17 +1621,25 @@
         function updateDashboard() {
             if (storeData.length === 0) return;
             
+            console.log('ダッシュボード更新開始 - データ数:', storeData.length);
+            
             // 全体サマリー計算
             let totalSales = 0;
             let totalTarget = 0;
+            let totalPhotos = 0;
+            let totalPhotoTarget = 0;
             let achievingStores = 0;
             
             storeData.forEach(store => {
                 const sales = parseFloat(store['売上実績']?.replace(/,/g, '') || 0);
                 const target = parseFloat(store['売上目標']?.replace(/,/g, '') || 0);
+                const photos = parseInt(store['写メ日記投稿数']?.replace(/,/g, '') || 0);
+                const photoTarget = parseInt(store['写メ日記月間目標']?.replace(/,/g, '') || 0);
                 
                 totalSales += sales;
                 totalTarget += target;
+                totalPhotos += photos;
+                totalPhotoTarget += photoTarget;
                 
                 if (sales >= target * 0.8) {
                     achievingStores++;
@@ -1609,6 +1647,15 @@
             });
             
             const avgAchievement = totalTarget > 0 ? (totalSales / totalTarget * 100) : 0;
+            const avgPhotos = storeData.length > 0 ? Math.round(totalPhotos / storeData.length) : 0;
+            const avgPhotoTarget = storeData.length > 0 ? Math.round(totalPhotoTarget / storeData.length) : 0;
+            
+            console.log('写メ日記集計:', {
+                totalPhotos,
+                avgPhotos,
+                totalPhotoTarget,
+                avgPhotoTarget
+            });
             
             // サマリー表示
             document.getElementById('totalSales').textContent = `¥${(totalSales / 1000000).toFixed(1)}M`;
@@ -1625,6 +1672,33 @@
             // データカウンター更新
             document.getElementById('totalStores').textContent = `総店舗数: ${storeData.length}店舗`;
             document.getElementById('dataCounter').textContent = `読み込みデータ: ${storeData.length}店舗`;
+            
+            // 写メ日記平均情報をサマリーに追加
+            updatePhotoSummary(avgPhotos, totalPhotos);
+        }
+
+        // 写メ日記サマリー更新
+        function updatePhotoSummary(avgPhotos, totalPhotos) {
+            // 既存のサマリーカードに写メ日記情報を追加表示
+            const summaryContainer = document.querySelector('.glass-card .grid');
+            if (summaryContainer) {
+                // 既に追加済みの場合は削除
+                const existingPhotoSummary = summaryContainer.querySelector('#photoSummaryCard');
+                if (existingPhotoSummary) {
+                    existingPhotoSummary.remove();
+                }
+                
+                // 新しい写メ日記サマリーカードを追加
+                const photoSummaryCard = document.createElement('div');
+                photoSummaryCard.id = 'photoSummaryCard';
+                photoSummaryCard.className = 'bg-pink-50 rounded-lg p-4';
+                photoSummaryCard.innerHTML = `
+                    <div class="text-2xl font-bold text-pink-600">${avgPhotos}件</div>
+                    <div class="text-sm text-pink-800">平均写メ日記投稿</div>
+                    <div class="text-xs text-pink-600 mt-1">総投稿数: ${totalPhotos.toLocaleString()}件</div>
+                `;
+                summaryContainer.appendChild(photoSummaryCard);
+            }
         }
 
         // ブランド別サマリー更新
@@ -1635,19 +1709,22 @@
                 const brand = store['ブランド'] || 'その他';
                 const sales = parseFloat(store['売上実績']?.replace(/,/g, '') || 0);
                 const target = parseFloat(store['売上目標']?.replace(/,/g, '') || 0);
+                const photos = parseInt(store['写メ日記投稿数']?.replace(/,/g, '') || 0);
                 
                 if (!brands[brand]) {
-                    brands[brand] = { sales: 0, target: 0, count: 0 };
+                    brands[brand] = { sales: 0, target: 0, count: 0, photos: 0 };
                 }
                 
                 brands[brand].sales += sales;
                 brands[brand].target += target;
+                brands[brand].photos += photos;
                 brands[brand].count += 1;
             });
             
             const brandContainer = document.getElementById('brandSummary');
             brandContainer.innerHTML = Object.entries(brands).map(([brand, data]) => {
                 const achievement = data.target > 0 ? (data.sales / data.target * 100) : 0;
+                const avgPhotos = data.count > 0 ? Math.round(data.photos / data.count) : 0;
                 const brandClass = getBrandClass(brand);
                 
                 return `
@@ -1666,6 +1743,14 @@
                                 <span class="font-semibold ${achievement >= 80 ? 'text-green-600' : 'text-red-600'}">
                                     ${achievement.toFixed(1)}%
                                 </span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-600">平均写メ日記</span>
+                                <span class="font-semibold text-blue-600">${avgPhotos}件</span>
+                            </div>
+                            <div class="flex justify-between text-xs text-gray-500">
+                                <span>総投稿数</span>
+                                <span>${data.photos.toLocaleString()}件</span>
                             </div>
                         </div>
                     </div>
@@ -1689,17 +1774,24 @@
                 return 0;
             });
             
+            // 写メ日記の平均計算
+            const totalPhotos = sortedData.reduce((sum, store) => sum + parseInt(store['写メ日記投稿数']?.replace(/,/g, '') || 0), 0);
+            const avgPhotos = sortedData.length > 0 ? (totalPhotos / sortedData.length) : 0;
+            
             tableBody.innerHTML = sortedData.map((store, index) => {
                 const sales = parseFloat(store['売上実績']?.replace(/,/g, '') || 0);
                 const target = parseFloat(store['売上目標']?.replace(/,/g, '') || 0);
                 const achievement = target > 0 ? (sales / target * 100) : 0;
                 const achievementClass = achievement >= 100 ? 'excellent' : achievement >= 80 ? 'good' : achievement >= 60 ? 'warning' : 'danger';
                 
-                const photoCount = parseInt(store['写メ日記投稿数'] || 0);
-                const reviewCount = parseInt(store['口コミ総数'] || 0);
-                const kiteneCount = parseInt(store['キテネ送信数'] || 0);
-                const accessCount = parseInt(store['アクセス数'] || 0);
-                const workingStaff = parseInt(store['出勤人数'] || 0);
+                const photoCount = parseInt(store['写メ日記投稿数']?.replace(/,/g, '') || 0);
+                const photoTarget = parseInt(store['写メ日記月間目標']?.replace(/,/g, '') || 0);
+                const photoAchievement = photoTarget > 0 ? (photoCount / photoTarget * 100) : 0;
+                
+                const reviewCount = parseInt(store['口コミ総数']?.replace(/,/g, '') || 0);
+                const kiteneCount = parseInt(store['キテネ送信数']?.replace(/,/g, '') || 0);
+                const accessCount = parseInt(store['アクセス数']?.replace(/,/g, '') || 0);
+                const workingStaff = parseInt(store['出勤人数']?.replace(/,/g, '') || 0);
                 const kpi = store['重点KPI'] || '-';
                 const brand = store['ブランド'] || 'その他';
                 
@@ -1716,7 +1808,15 @@
                                 ${achievement.toFixed(1)}%
                             </span>
                         </td>
-                        <td class="p-3 text-right">${photoCount.toLocaleString()}件</td>
+                        <td class="p-3 text-right">
+                            <div class="font-semibold">${photoCount.toLocaleString()}件</div>
+                            <div class="text-xs text-gray-500">
+                                目標: ${photoTarget.toLocaleString()}件 (${photoAchievement.toFixed(1)}%)
+                            </div>
+                            <div class="text-xs ${photoCount >= avgPhotos ? 'text-green-600' : 'text-orange-600'}">
+                                平均${photoCount >= avgPhotos ? '以上' : '以下'} (全店平均: ${avgPhotos.toFixed(1)}件)
+                            </div>
+                        </td>
                         <td class="p-3 text-right">${reviewCount.toLocaleString()}件</td>
                         <td class="p-3 text-right">${kiteneCount.toLocaleString()}件</td>
                         <td class="p-3 text-right">${accessCount.toLocaleString()}</td>
@@ -1749,16 +1849,22 @@
             let maxSales = 0;
             let topStore = '';
             let totalPhotos = 0;
+            let validPhotoStores = 0;
             let improvementCount = 0;
             
             storeData.forEach(store => {
                 const sales = parseFloat(store['売上実績']?.replace(/,/g, '') || 0);
                 const target = parseFloat(store['売上目標']?.replace(/,/g, '') || 0);
                 const achievement = target > 0 ? (sales / target * 100) : 0;
-                const photos = parseInt(store['写メ日記投稿数'] || 0);
+                const photos = parseInt(store['写メ日記投稿数']?.replace(/,/g, '') || 0);
                 
                 totalAchievement += achievement;
-                totalPhotos += photos;
+                
+                // 写メ日記の集計（0以上のもののみ）
+                if (photos >= 0) {
+                    totalPhotos += photos;
+                    validPhotoStores++;
+                }
                 
                 if (sales > maxSales) {
                     maxSales = sales;
@@ -1771,12 +1877,18 @@
             });
             
             const avgAchievement = totalAchievement / storeData.length;
-            const avgPhotos = Math.round(totalPhotos / storeData.length);
+            const avgPhotos = validPhotoStores > 0 ? Math.round(totalPhotos / validPhotoStores) : 0;
+            
+            console.log('分析メトリクス - 写メ日記:', {
+                totalPhotos,
+                validPhotoStores,
+                avgPhotos
+            });
             
             // UI更新
             document.getElementById('avgAchievementRate').textContent = `${avgAchievement.toFixed(1)}%`;
             document.getElementById('topPerformanceStore').textContent = topStore;
-            document.getElementById('avgPhotoCount').textContent = avgPhotos.toString();
+            document.getElementById('avgPhotoCount').textContent = `${avgPhotos}`;
             document.getElementById('improvementNeeded').textContent = `${improvementCount}店舗`;
         }
 
