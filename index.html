@@ -252,6 +252,34 @@
             50% { opacity: 0.5; }
         }
 
+        .performance-integration {
+            background: linear-gradient(135deg, #ff8a00, #e52e71);
+            color: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin: 16px 0;
+        }
+
+        .performance-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin: 16px 0;
+        }
+
+        .performance-stat-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .performance-stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
         @media (max-width: 768px) {
             .chart-container {
                 height: 250px;
@@ -313,6 +341,21 @@
                         <button class="btn btn-outline w-full text-sm text-white border-white hover:bg-white hover:text-blue-600" onclick="startSyncProcess()">
                             <i class="fas fa-sync mr-2"></i>同期開始
                         </button>
+                    </div>
+                </div>
+
+                <div class="performance-integration">
+                    <div class="text-center">
+                        <div class="text-2xl mb-2">🌟</div>
+                        <div class="text-sm font-medium">パフォーマンスヘブン</div>
+                        <div class="text-xs mb-3 opacity-90">
+                            🎯 キャスト分析統合<br>
+                            📊 パフォーマンス評価<br>
+                            💎 最適化提案
+                        </div>
+                        <div class="text-xs text-white mt-1" id="performanceStatus">
+                            統合データ: 3店舗対応
+                        </div>
                     </div>
                 </div>
 
@@ -380,24 +423,27 @@
                         <button class="btn btn-google" onclick="startSyncProcess()">
                             <i class="fas fa-sync mr-2"></i>スプレッドシート同期
                         </button>
+                        <button class="btn btn-orange" onclick="showPerformanceIntegration()">
+                            <i class="fas fa-star mr-2"></i>パフォーマンス統合
+                        </button>
                         <button class="btn btn-danger" onclick="downloadReport()">
                             <i class="fas fa-file-pdf mr-2"></i>完全PDFレポート
                         </button>
                     </div>
                 </div>
 
-                <!-- 同期状況 -->
+                <!-- 統合状況 -->
                 <div class="glass-card p-4 mb-6">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center">
                             <i id="connectionIcon" class="fas fa-check-circle text-green-500 mr-3"></i>
                             <div>
-                                <div class="font-semibold text-gray-900">スプレッドシート連携状況</div>
-                                <div class="text-sm text-green-600" id="connectionInfo">実データ読み込み完了 - 11店舗データ表示中</div>
+                                <div class="font-semibold text-gray-900">システム統合状況</div>
+                                <div class="text-sm text-green-600" id="connectionInfo">実データ+パフォーマンスヘブン統合完了 - 11店舗データ表示中</div>
                             </div>
                         </div>
                         <div class="text-right">
-                            <div class="text-sm font-semibold text-gray-900" id="dataCounter">読み込みデータ: 11店舗</div>
+                            <div class="text-sm font-semibold text-gray-900" id="dataCounter">統合データ: 11店舗</div>
                             <div class="text-xs text-gray-500" id="lastUpdate">最終更新: システム起動時</div>
                         </div>
                     </div>
@@ -408,6 +454,19 @@
                             <div id="progressFill" class="progress-fill" style="width: 0%"></div>
                         </div>
                         <div class="text-xs text-gray-600 mt-1" id="progressText">同期準備中...</div>
+                    </div>
+                </div>
+
+                <!-- パフォーマンスヘブン統合サマリー -->
+                <div class="glass-card p-6 mb-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-bold text-gray-900">🌟 パフォーマンスヘブン統合データ</h3>
+                        <button class="btn btn-orange" onclick="showPage('performance')">
+                            <i class="fas fa-star mr-2"></i>詳細分析
+                        </button>
+                    </div>
+                    <div id="performanceIntegratedSummary" class="performance-stats">
+                        <!-- パフォーマンスヘブン統合データが表示される -->
                     </div>
                 </div>
 
@@ -452,13 +511,16 @@
                 <!-- 店舗別詳細テーブル -->
                 <div class="glass-card p-6 mb-6">
                     <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-xl font-bold text-gray-900">📋 店舗別詳細実績</h3>
+                        <h3 class="text-xl font-bold text-gray-900">📋 店舗別詳細実績（パフォーマンスヘブン統合）</h3>
                         <div class="flex space-x-2">
                             <button class="btn btn-outline btn-sm" onclick="sortStores('sales')">
                                 <i class="fas fa-sort-amount-down mr-1"></i>売上順
                             </button>
                             <button class="btn btn-outline btn-sm" onclick="sortStores('achievement')">
                                 <i class="fas fa-percentage mr-1"></i>達成率順
+                            </button>
+                            <button class="btn btn-outline btn-sm" onclick="sortStores('performance')">
+                                <i class="fas fa-star mr-1"></i>パフォーマンス順
                             </button>
                         </div>
                     </div>
@@ -472,10 +534,8 @@
                                     <th class="text-center p-3 font-semibold text-gray-900">達成率</th>
                                     <th class="text-right p-3 font-semibold text-gray-900">写メ日記</th>
                                     <th class="text-right p-3 font-semibold text-gray-900">口コミ数</th>
-                                    <th class="text-right p-3 font-semibold text-gray-900">キテネ送信</th>
                                     <th class="text-right p-3 font-semibold text-gray-900">アクセス数</th>
-                                    <th class="text-right p-3 font-semibold text-gray-900">出勤人数</th>
-                                    <th class="text-center p-3 font-semibold text-gray-900">重点KPI</th>
+                                    <th class="text-center p-3 font-semibold text-gray-900">パフォーマンス</th>
                                     <th class="text-center p-3 font-semibold text-gray-900">ブランド</th>
                                 </tr>
                             </thead>
@@ -579,14 +639,33 @@
             <!-- パフォーマンスヘブンページ -->
             <div id="performancePage" class="page-content p-4 hidden">
                 <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-2xl font-bold text-gray-900">🌟 パフォーマンスヘブン連携</h2>
+                    <h2 class="text-2xl font-bold text-gray-900">🌟 パフォーマンスヘブン統合分析</h2>
                     <div class="flex space-x-2">
                         <button class="btn btn-orange" onclick="uploadPerformancePDF()">
                             <i class="fas fa-upload mr-2"></i>PDFアップロード
                         </button>
+                        <button class="btn btn-google" onclick="showPerformanceIntegration()">
+                            <i class="fas fa-sync mr-2"></i>統合分析更新
+                        </button>
                         <button class="btn btn-danger" onclick="downloadPerformanceReport()">
                             <i class="fas fa-file-pdf mr-2"></i>レポート出力
                         </button>
+                    </div>
+                </div>
+
+                <!-- パフォーマンスヘブン統合概要 -->
+                <div class="glass-card p-6 mb-6">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">🔗 パフォーマンスヘブン統合概要</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="performanceOverview">
+                        <!-- パフォーマンス概要が表示される -->
+                    </div>
+                </div>
+
+                <!-- 店舗別パフォーマンス詳細 -->
+                <div class="glass-card p-6 mb-6">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">📊 店舗別パフォーマンス詳細</h3>
+                    <div id="performanceStoreDetails" class="space-y-6">
+                        <!-- 店舗別詳細が表示される -->
                     </div>
                 </div>
 
@@ -614,70 +693,18 @@
                     </div>
                 </div>
 
-                <!-- パフォーマンス統合分析 -->
-                <div class="glass-card p-6 mb-6">
-                    <h3 class="text-xl font-bold text-gray-900 mb-4">🔗 統合分析ダッシュボード</h3>
-                    <div id="performanceIntegration" class="space-y-6">
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            <div class="bg-white rounded-lg p-6 border border-gray-200">
-                                <h4 class="text-lg font-bold text-gray-900 mb-4">📊 パフォーマンス概要</h4>
-                                <div class="space-y-3">
-                                    <div class="flex justify-between">
-                                        <span class="text-gray-600">総店舗数</span>
-                                        <span class="font-semibold">11店舗</span>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <span class="text-gray-600">アップロード済みPDF</span>
-                                        <span class="font-semibold" id="uploadedPDFCount">0ファイル</span>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <span class="text-gray-600">最高売上店舗</span>
-                                        <span class="font-semibold">GO名古屋</span>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <span class="text-gray-600">平均写メ日記投稿</span>
-                                        <span class="font-semibold">471件</span>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="bg-white rounded-lg p-6 border border-gray-200">
-                                <h4 class="text-lg font-bold text-gray-900 mb-4">🎯 パフォーマンス指標</h4>
-                                <div class="space-y-3">
-                                    <div class="flex justify-between items-center">
-                                        <span class="text-gray-600">総売上達成率</span>
-                                        <span class="font-semibold text-blue-600">11.9%</span>
-                                    </div>
-                                    <div class="flex justify-between items-center">
-                                        <span class="text-gray-600">写メ日記投稿率</span>
-                                        <span class="font-semibold text-green-600">89.3%</span>
-                                    </div>
-                                    <div class="flex justify-between items-center">
-                                        <span class="text-gray-600">口コミ平均</span>
-                                        <span class="font-semibold text-purple-600">17.7件</span>
-                                    </div>
-                                    <div class="flex justify-between items-center">
-                                        <span class="text-gray-600">改善要店舗</span>
-                                        <span class="font-semibold text-orange-600">10店舗</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- パフォーマンスチャート -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                     <div class="glass-card p-6">
-                        <h4 class="text-lg font-bold text-gray-900 mb-4">📈 店舗別売上パフォーマンス</h4>
+                        <h4 class="text-lg font-bold text-gray-900 mb-4">📈 店舗別パフォーマンススコア</h4>
                         <div class="chart-container">
-                            <canvas id="performanceSalesChart"></canvas>
+                            <canvas id="performanceScoreChart"></canvas>
                         </div>
                     </div>
                     <div class="glass-card p-6">
-                        <h4 class="text-lg font-bold text-gray-900 mb-4">🎭 ブランド別パフォーマンス分布</h4>
+                        <h4 class="text-lg font-bold text-gray-900 mb-4">🎭 キャスト満足度分布</h4>
                         <div class="chart-container">
-                            <canvas id="performanceBrandChart"></canvas>
+                            <canvas id="satisfactionChart"></canvas>
                         </div>
                     </div>
                 </div>
@@ -827,10 +854,13 @@
             <!-- 詳細分析ページ -->
             <div id="analyticsPage" class="page-content p-4 hidden">
                 <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-2xl font-bold text-gray-900">📈 詳細分析</h2>
+                    <h2 class="text-2xl font-bold text-gray-900">📈 詳細分析（パフォーマンス統合）</h2>
                     <div class="flex space-x-2">
                         <button class="btn btn-google" onclick="updateAnalytics()">
                             <i class="fas fa-sync mr-2"></i>分析更新
+                        </button>
+                        <button class="btn btn-orange" onclick="showPerformanceIntegration()">
+                            <i class="fas fa-star mr-2"></i>パフォーマンス統合
                         </button>
                         <button class="btn btn-danger" onclick="exportAnalysisReport()">
                             <i class="fas fa-file-export mr-2"></i>レポート出力
@@ -838,9 +868,9 @@
                     </div>
                 </div>
 
-                <!-- 全体パフォーマンス分析 -->
+                <!-- 統合パフォーマンス分析 -->
                 <div class="glass-card p-6 mb-6">
-                    <h3 class="text-xl font-bold text-gray-900 mb-4">📊 全体パフォーマンス分析</h3>
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">📊 統合パフォーマンス分析</h3>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div class="text-center p-4 bg-white rounded-lg border">
                             <div class="text-2xl font-bold text-blue-600" id="avgAchievementRate">11.9%</div>
@@ -864,10 +894,10 @@
                             </div>
                         </div>
                         <div class="text-center p-4 bg-white rounded-lg border">
-                            <div class="text-2xl font-bold text-orange-600" id="improvementNeeded">10店舗</div>
-                            <div class="text-sm text-orange-800">改善要店舗数</div>
+                            <div class="text-2xl font-bold text-orange-600" id="performanceIntegratedStores">3店舗</div>
+                            <div class="text-sm text-orange-800">パフォーマンス統合済</div>
                             <div class="text-xs mt-2">
-                                達成率20%未満
+                                CLASSYブランド対応
                             </div>
                         </div>
                     </div>
@@ -883,11 +913,11 @@
                         </div>
                     </div>
 
-                    <!-- ブランド別売上分布 -->
+                    <!-- パフォーマンス統合分析 -->
                     <div class="glass-card p-6">
-                        <h4 class="text-lg font-bold text-gray-900 mb-4">🍕 ブランド別売上分布</h4>
+                        <h4 class="text-lg font-bold text-gray-900 mb-4">🌟 パフォーマンス統合分析</h4>
                         <div class="chart-container">
-                            <canvas id="brandDistributionChart"></canvas>
+                            <canvas id="performanceIntegrationChart"></canvas>
                         </div>
                     </div>
 
@@ -918,11 +948,11 @@
                         </div>
                     </div>
 
-                    <!-- 達成率ランキング -->
+                    <!-- パフォーマンス統合ランキング -->
                     <div class="glass-card p-6">
-                        <h4 class="text-lg font-bold text-gray-900 mb-4">🎯 達成率ランキング</h4>
-                        <div id="achievementRanking">
-                            <!-- ランキングデータが挿入される -->
+                        <h4 class="text-lg font-bold text-gray-900 mb-4">🌟 パフォーマンス統合ランキング</h4>
+                        <div id="performanceRanking">
+                            <!-- パフォーマンスランキングが挿入される -->
                         </div>
                     </div>
 
@@ -945,7 +975,7 @@
 
                 <!-- AI改善提案エンジン -->
                 <div class="glass-card p-6">
-                    <h3 class="text-xl font-bold text-gray-900 mb-4">🤖 AI改善提案エンジン</h3>
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">🤖 AI改善提案エンジン（パフォーマンス統合）</h3>
                     <div id="improvementSuggestions" class="space-y-4">
                         <!-- AI提案が挿入される -->
                     </div>
@@ -1061,6 +1091,61 @@
             'https://api.codetabs.com/v1/proxy?quest='
         ];
 
+        // パフォーマンスヘブン統合データ
+        const PERFORMANCE_HEAVEN_DATA = {
+            'CL名古屋': {
+                店舗名: 'CL名古屋',
+                パフォーマンス更新日: '2025/06/30',
+                インフルエンサー平均: 27,
+                勤務時間平均: 47,
+                売上平均: '286,911円',
+                在籍日数平均: '334日',
+                総キャスト数: 29,
+                アクティブキャスト: 18,
+                店舗満足度: { excellent: 3, good: 5, normal: 3, poor: 0, very_poor: 18 },
+                パフォーマンススコア: 72,
+                topPerformers: [
+                    { name: 'かのん', level: 70, sales: 638000, reservations: 26 },
+                    { name: 'あい', level: 69, sales: 1300000, reservations: 28 },
+                    { name: 'るな', level: 65, sales: 426000, reservations: 12 }
+                ]
+            },
+            'CL東京': {
+                店舗名: 'CL東京',
+                パフォーマンス更新日: '2025/06/30',
+                インフルエンサー平均: 27,
+                勤務時間平均: 57,
+                売上平均: '386,187円',
+                在籍日数平均: '181日',
+                総キャスト数: 27,
+                アクティブキャスト: 15,
+                店舗満足度: { excellent: 3, good: 4, normal: 1, poor: 1, very_poor: 15 },
+                パフォーマンススコア: 78,
+                topPerformers: [
+                    { name: 'ひびき', level: 91, sales: 1628000, reservations: 55 },
+                    { name: 'えみり', level: 88, sales: 2908000, reservations: 59 },
+                    { name: 'ねね', level: 71, sales: 905000, reservations: 33 }
+                ]
+            },
+            'CL四日市': {
+                店舗名: 'CL四日市',
+                パフォーマンス更新日: '2025/06/30',
+                インフルエンサー平均: 36,
+                勤務時間平均: 74,
+                売上平均: '381,652円',
+                在籍日数平均: '455日',
+                総キャスト数: 42,
+                アクティブキャスト: 23,
+                店舗満足度: { excellent: 5, good: 8, normal: 0, poor: 9, very_poor: 14 },
+                パフォーマンススコア: 85,
+                topPerformers: [
+                    { name: 'はるか', level: 81, sales: 1015000, reservations: 23 },
+                    { name: 'もも', level: 78, sales: 603000, reservations: 15 },
+                    { name: 'りあ', level: 75, sales: 1910000, reservations: 47 }
+                ]
+            }
+        };
+
         // 実データ（スプレッドシートの最新データ）
         const REAL_STORE_DATA = [
             {
@@ -1082,7 +1167,8 @@
                 'ブランド': 'Shaboole',
                 '重点KPI': '写メ日記強化',
                 '改善点': 'アクセス数向上',
-                '備考': '高級店舗'
+                '備考': '高級店舗',
+                'パフォーマンスヘブン': null
             },
             {
                 '店舗名': 'ワンカラット',
@@ -1103,7 +1189,8 @@
                 'ブランド': 'OneCart',
                 '重点KPI': '口コミ増加',
                 '改善点': '売上安定',
-                '備考': '目標達成店舗'
+                '備考': '目標達成店舗',
+                'パフォーマンスヘブン': null
             },
             {
                 '店舗名': 'GO名古屋',
@@ -1124,7 +1211,8 @@
                 'ブランド': 'GrandOpera',
                 '重点KPI': '日記投稿強化',
                 '改善点': '継続投稿',
-                '備考': '中部エリア主力'
+                '備考': '中部エリア主力',
+                'パフォーマンスヘブン': null
             },
             {
                 '店舗名': 'GO福岡',
@@ -1145,7 +1233,8 @@
                 'ブランド': 'GrandOpera',
                 '重点KPI': '口コミ維持',
                 '改善点': 'キテネ強化',
-                '備考': '九州エリア最高'
+                '備考': '九州エリア最高',
+                'パフォーマンスヘブン': null
             },
             {
                 '店舗名': 'GO東京',
@@ -1166,7 +1255,8 @@
                 'ブランド': 'GrandOpera',
                 '重点KPI': '全KPI改善',
                 '改善点': '日記投稿増',
-                '備考': '首都圏戦略店'
+                '備考': '首都圏戦略店',
+                'パフォーマンスヘブン': null
             },
             {
                 '店舗名': 'GO横浜',
@@ -1187,7 +1277,8 @@
                 'ブランド': 'GrandOpera',
                 '重点KPI': 'アクセス向上',
                 '改善点': '売上達成',
-                '備考': '神奈川主力'
+                '備考': '神奈川主力',
+                'パフォーマンスヘブン': null
             },
             {
                 '店舗名': 'オペラ錦',
@@ -1208,7 +1299,8 @@
                 'ブランド': 'GrandOpera',
                 '重点KPI': 'KPI維持',
                 '改善点': '安定運営',
-                '備考': '名古屋中心部'
+                '備考': '名古屋中心部',
+                'パフォーマンスヘブン': null
             },
             {
                 '店舗名': 'CL名古屋',
@@ -1229,7 +1321,8 @@
                 'ブランド': 'CLASSY',
                 '重点KPI': '全体底上げ',
                 '改善点': '売上向上',
-                '備考': '中部CLASSY'
+                '備考': '中部CLASSY',
+                'パフォーマンスヘブン': PERFORMANCE_HEAVEN_DATA['CL名古屋']
             },
             {
                 '店舗名': 'CL東京',
@@ -1250,7 +1343,8 @@
                 'ブランド': 'CLASSY',
                 '重点KPI': '日記強化',
                 '改善点': '口コミ維持',
-                '備考': '首都圏CLASSY'
+                '備考': '首都圏CLASSY',
+                'パフォーマンスヘブン': PERFORMANCE_HEAVEN_DATA['CL東京']
             },
             {
                 '店舗名': 'CL四日市',
@@ -1271,7 +1365,8 @@
                 'ブランド': 'CLASSY',
                 '重点KPI': 'KPI優秀',
                 '改善点': '運営継続',
-                '備考': '東海地区トップ'
+                '備考': '東海地区トップ',
+                'パフォーマンスヘブン': PERFORMANCE_HEAVEN_DATA['CL四日市']
             }
         ];
 
@@ -1303,25 +1398,247 @@
                 }
             }
             
-            // 実データを読み込み
+            // 実データを読み込み（パフォーマンスヘブン統合）
             loadRealData();
             updateDashboard();
             updateSyncInfo();
+            updatePerformanceIntegration();
             
-            showNotification('👨‍💼 川満さん、システムが準備完了しました！スプレッドシートの実データ（11店舗）を表示中です。', 'success');
+            showNotification('👨‍💼 川満さん、パフォーマンスヘブン統合システムが準備完了しました！', 'success');
         }
 
         // 実データ読み込み
         function loadRealData() {
             storeData = [...REAL_STORE_DATA];
-            console.log('✅ 実データを読み込みました:', storeData.length, '店舗');
+            console.log('✅ 実データを読み込みました（パフォーマンスヘブン統合）:', storeData.length, '店舗');
             
-            updateConnectionStatus('success', '実データ読み込み完了 (' + storeData.length + '店舗)');
-            document.getElementById('syncMethod').textContent = '同期方法: 実データ読み込み済み';
-            document.getElementById('totalStores').textContent = '総店舗数: ' + storeData.length + '店舗（実データ）';
+            // パフォーマンスヘブンデータ統合数をカウント
+            const performanceIntegratedCount = storeData.filter(store => store.パフォーマンスヘブン).length;
+            
+            updateConnectionStatus('success', `実データ+パフォーマンス統合完了 (${storeData.length}店舗, 統合${performanceIntegratedCount}店舗)`);
+            document.getElementById('syncMethod').textContent = '同期方法: 実データ+パフォーマンス統合済み';
+            document.getElementById('totalStores').textContent = `総店舗数: ${storeData.length}店舗（統合データ）`;
             
             // ローカルストレージに保存
             localStorage.setItem('store_data', JSON.stringify(storeData));
+        }
+
+        // パフォーマンス統合表示
+        function showPerformanceIntegration() {
+            updatePerformanceIntegration();
+            showNotification('🌟 パフォーマンスヘブン統合分析を更新しました', 'success');
+        }
+
+        // パフォーマンス統合データ更新
+        function updatePerformanceIntegration() {
+            // ダッシュボードのパフォーマンス統合サマリー更新
+            const container = document.getElementById('performanceIntegratedSummary');
+            if (container) {
+                const performanceStores = Object.values(PERFORMANCE_HEAVEN_DATA);
+                
+                if (performanceStores.length > 0) {
+                    const avgScore = performanceStores.reduce((sum, store) => sum + store.パフォーマンススコア, 0) / performanceStores.length;
+                    const totalCasts = performanceStores.reduce((sum, store) => sum + store.総キャスト数, 0);
+                    const totalActive = performanceStores.reduce((sum, store) => sum + store.アクティブキャスト, 0);
+                    
+                    container.innerHTML = `
+                        <div class="performance-stat-card">
+                            <div class="text-2xl font-bold text-orange-600">${performanceStores.length}</div>
+                            <div class="text-sm text-gray-800">統合店舗数</div>
+                            <div class="text-xs text-gray-600 mt-1">CLASSYブランド</div>
+                        </div>
+                        <div class="performance-stat-card">
+                            <div class="text-2xl font-bold text-purple-600">${avgScore.toFixed(1)}</div>
+                            <div class="text-sm text-gray-800">平均パフォーマンススコア</div>
+                            <div class="text-xs text-gray-600 mt-1">満点100点中</div>
+                        </div>
+                        <div class="performance-stat-card">
+                            <div class="text-2xl font-bold text-blue-600">${totalCasts}</div>
+                            <div class="text-sm text-gray-800">総キャスト数</div>
+                            <div class="text-xs text-gray-600 mt-1">在籍合計</div>
+                        </div>
+                        <div class="performance-stat-card">
+                            <div class="text-2xl font-bold text-green-600">${((totalActive / totalCasts) * 100).toFixed(1)}%</div>
+                            <div class="text-sm text-gray-800">アクティブ率</div>
+                            <div class="text-xs text-gray-600 mt-1">${totalActive}名/${totalCasts}名</div>
+                        </div>
+                    `;
+                } else {
+                    container.innerHTML = '<div class="performance-stat-card col-span-full text-center">パフォーマンスヘブンデータを読み込み中...</div>';
+                }
+            }
+            
+            // パフォーマンスページの詳細更新
+            updatePerformancePageDetails();
+        }
+
+        // パフォーマンスページ詳細更新
+        function updatePerformancePageDetails() {
+            // パフォーマンス概要
+            const overviewContainer = document.getElementById('performanceOverview');
+            if (overviewContainer) {
+                const performanceStores = Object.values(PERFORMANCE_HEAVEN_DATA);
+                const avgScore = performanceStores.reduce((sum, store) => sum + store.パフォーマンススコア, 0) / performanceStores.length;
+                const totalCasts = performanceStores.reduce((sum, store) => sum + store.総キャスト数, 0);
+                const totalActive = performanceStores.reduce((sum, store) => sum + store.アクティブキャスト, 0);
+                
+                overviewContainer.innerHTML = `
+                    <div class="bg-white rounded-lg p-6 border border-gray-200">
+                        <h4 class="text-lg font-bold text-gray-900 mb-4">📊 統合概要</h4>
+                        <div class="space-y-3">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">統合店舗数</span>
+                                <span class="font-semibold">${performanceStores.length}店舗</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">平均パフォーマンススコア</span>
+                                <span class="font-semibold text-orange-600">${avgScore.toFixed(1)}点</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">総キャスト数</span>
+                                <span class="font-semibold">${totalCasts}名</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">アクティブ率</span>
+                                <span class="font-semibold text-green-600">${((totalActive / totalCasts) * 100).toFixed(1)}%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg p-6 border border-gray-200">
+                        <h4 class="text-lg font-bold text-gray-900 mb-4">🎯 パフォーマンス指標</h4>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">最高スコア店舗</span>
+                                <span class="font-semibold text-purple-600">CL四日市 (85点)</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">平均勤務時間</span>
+                                <span class="font-semibold text-blue-600">59.3時間</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">平均在籍日数</span>
+                                <span class="font-semibold text-green-600">323日</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">統合完了率</span>
+                                <span class="font-semibold text-orange-600">100%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg p-6 border border-gray-200">
+                        <h4 class="text-lg font-bold text-gray-900 mb-4">💎 トップパフォーマー</h4>
+                        <div class="space-y-2">
+                            <div class="text-sm">
+                                <div class="font-semibold">えみり (CL東京)</div>
+                                <div class="text-gray-600">売上: ¥2,908,000 / Lv.88</div>
+                            </div>
+                            <div class="text-sm">
+                                <div class="font-semibold">りあ (CL四日市)</div>
+                                <div class="text-gray-600">売上: ¥1,910,000 / Lv.75</div>
+                            </div>
+                            <div class="text-sm">
+                                <div class="font-semibold">ひびき (CL東京)</div>
+                                <div class="text-gray-600">売上: ¥1,628,000 / Lv.91</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // 店舗別パフォーマンス詳細
+            const detailsContainer = document.getElementById('performanceStoreDetails');
+            if (detailsContainer) {
+                const html = Object.entries(PERFORMANCE_HEAVEN_DATA).map(([storeName, data]) => {
+                    const satisfactionTotal = Object.values(data.店舗満足度).reduce((a, b) => a + b, 0);
+                    const satisfactionScore = (
+                        (data.店舗満足度.excellent * 5 + 
+                         data.店舗満足度.good * 4 + 
+                         data.店舗満足度.normal * 3 + 
+                         data.店舗満足度.poor * 2 + 
+                         data.店舗満足度.very_poor * 1) / satisfactionTotal
+                    ).toFixed(1);
+                    
+                    return `
+                        <div class="bg-white rounded-lg border border-gray-200 p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <h4 class="text-lg font-bold text-gray-900">💫 ${storeName}</h4>
+                                <span class="bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm font-semibold">
+                                    スコア: ${data.パフォーマンススコア}点
+                                </span>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div class="space-y-3">
+                                    <h5 class="font-semibold text-gray-800">基本指標</h5>
+                                    <div class="text-sm space-y-2">
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-600">総キャスト数</span>
+                                            <span class="font-semibold">${data.総キャスト数}名</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-600">アクティブキャスト</span>
+                                            <span class="font-semibold">${data.アクティブキャスト}名</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-600">平均勤務時間</span>
+                                            <span class="font-semibold">${data.勤務時間平均}時間</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-600">平均在籍日数</span>
+                                            <span class="font-semibold">${data.在籍日数平均}日</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="space-y-3">
+                                    <h5 class="font-semibold text-gray-800">満足度分布</h5>
+                                    <div class="text-sm space-y-2">
+                                        <div class="flex justify-between">
+                                            <span class="text-green-600">優秀</span>
+                                            <span class="font-semibold">${data.店舗満足度.excellent}名</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-blue-600">良好</span>
+                                            <span class="font-semibold">${data.店舗満足度.good}名</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-yellow-600">普通</span>
+                                            <span class="font-semibold">${data.店舗満足度.normal}名</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-orange-600">要改善</span>
+                                            <span class="font-semibold">${data.店舗満足度.poor}名</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-red-600">緊急改善</span>
+                                            <span class="font-semibold">${data.店舗満足度.very_poor}名</span>
+                                        </div>
+                                        <div class="flex justify-between pt-2 border-t">
+                                            <span class="text-gray-800 font-semibold">満足度スコア</span>
+                                            <span class="font-bold text-purple-600">${satisfactionScore}/5.0</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="space-y-3">
+                                    <h5 class="font-semibold text-gray-800">トップパフォーマー</h5>
+                                    <div class="text-sm space-y-3">
+                                        ${data.topPerformers.map((performer, index) => `
+                                            <div class="border-l-4 ${index === 0 ? 'border-gold' : index === 1 ? 'border-silver' : 'border-bronze'} pl-3">
+                                                <div class="font-semibold">${index + 1}. ${performer.name}</div>
+                                                <div class="text-gray-600">Lv.${performer.level} | ¥${performer.sales.toLocaleString()}</div>
+                                                <div class="text-gray-500">予約: ${performer.reservations}件</div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                detailsContainer.innerHTML = html;
+            }
+            
+            // パフォーマンスチャート作成
+            createPerformanceCharts();
         }
 
         // 時刻更新
@@ -1383,6 +1700,7 @@
                     updateDashboard();
                     updateAnalytics();
                     updateSyncInfo();
+                    updatePerformanceIntegration();
                     
                     // データをローカルストレージに保存
                     localStorage.setItem('store_data', JSON.stringify(storeData));
@@ -1402,6 +1720,7 @@
                 loadRealData();
                 updateDashboard();
                 updateAnalytics();
+                updatePerformanceIntegration();
             } finally {
                 hideProgress();
             }
@@ -1435,7 +1754,7 @@
                 showProgress(90, 'データを処理中...');
                 
                 if (parsedData.length > 0) {
-                    storeData = parsedData;
+                    storeData = integratePerfomanceData(parsedData);
                     return true;
                 } else {
                     throw new Error('有効なデータが見つかりませんでした');
@@ -1489,8 +1808,8 @@
                     const parsedData = parseCSVData(csvText);
                     
                     if (parsedData.length > 0) {
-                        storeData = parsedData;
-                        document.getElementById('syncMethod').textContent = '同期方法: プロキシ ' + (i + 1);
+                        storeData = integratePerfomanceData(parsedData);
+                        document.getElementById('syncMethod').textContent = '同期方法: プロキシ ' + (i + 1) + ' + パフォーマンス統合';
                         return true;
                     }
                     
@@ -1504,6 +1823,23 @@
             }
             
             return false;
+        }
+
+        // パフォーマンスデータ統合
+        function integratePerfomanceData(baseData) {
+            return baseData.map(store => {
+                const storeName = store['店舗名'];
+                if (PERFORMANCE_HEAVEN_DATA[storeName]) {
+                    return {
+                        ...store,
+                        'パフォーマンスヘブン': PERFORMANCE_HEAVEN_DATA[storeName]
+                    };
+                }
+                return {
+                    ...store,
+                    'パフォーマンスヘブン': null
+                };
+            });
         }
 
         // フォールバック処理
@@ -1530,6 +1866,7 @@
                         updateDashboard();
                         updateAnalytics();
                         updateSyncInfo();
+                        updatePerformanceIntegration();
                         showNotification('✅ ' + getSyncMethodName() + '（代替方法）で同期成功', 'success');
                         return;
                     }
@@ -1544,7 +1881,8 @@
             updateDashboard();
             updateAnalytics();
             updateSyncInfo();
-            showNotification('⚠️ 自動同期に失敗しました。実データを表示中です。', 'warning');
+            updatePerformanceIntegration();
+            showNotification('⚠️ 自動同期に失敗しました。統合実データを表示中です。', 'warning');
         }
 
         // APIデータの解析
@@ -1839,7 +2177,7 @@
         function updateDashboard() {
             if (storeData.length === 0) return;
             
-            console.log('📊 ダッシュボード更新開始 - データ数:', storeData.length);
+            console.log('📊 ダッシュボード更新開始（パフォーマンス統合） - データ数:', storeData.length);
             
             // 全体サマリー計算
             let totalSales = 0;
@@ -1874,11 +2212,12 @@
             // ブランド別サマリー
             updateBrandSummary();
             
-            // 店舗別テーブル
+            // 店舗別テーブル（パフォーマンス統合）
             updateStoreTable();
             
             // データカウンター更新
-            document.getElementById('dataCounter').textContent = '読み込みデータ: ' + storeData.length + '店舗';
+            const performanceIntegratedCount = storeData.filter(store => store.パフォーマンスヘブン).length;
+            document.getElementById('dataCounter').textContent = `統合データ: ${storeData.length}店舗 (パフォーマンス統合: ${performanceIntegratedCount}店舗)`;
         }
 
         // ブランド別サマリー更新
@@ -1890,15 +2229,17 @@
                 const sales = parseFloat(store['売上実績'] ? store['売上実績'].replace(/,/g, '') : '0');
                 const target = parseFloat(store['売上目標'] ? store['売上目標'].replace(/,/g, '') : '0');
                 const photos = parseInt(store['写メ日記投稿数'] ? store['写メ日記投稿数'].replace(/,/g, '') : '0');
+                const hasPerformance = store.パフォーマンスヘブン ? 1 : 0;
                 
                 if (!brands[brand]) {
-                    brands[brand] = { sales: 0, target: 0, count: 0, photos: 0 };
+                    brands[brand] = { sales: 0, target: 0, count: 0, photos: 0, performanceIntegrated: 0 };
                 }
                 
                 brands[brand].sales += sales;
                 brands[brand].target += target;
                 brands[brand].photos += photos;
                 brands[brand].count += 1;
+                brands[brand].performanceIntegrated += hasPerformance;
             });
             
             const brandContainer = document.getElementById('brandSummary');
@@ -1908,6 +2249,7 @@
                 const achievement = data.target > 0 ? (data.sales / data.target * 100) : 0;
                 const avgPhotos = data.count > 0 ? Math.round(data.photos / data.count) : 0;
                 const brandClass = getBrandClass(brand);
+                const integrationRate = (data.performanceIntegrated / data.count * 100).toFixed(0);
                 
                 return '<div class="bg-white rounded-lg border border-gray-200 p-4">' +
                     '<div class="flex items-center justify-between mb-3">' +
@@ -1929,16 +2271,18 @@
                             '<span class="text-gray-600">平均写メ日記</span>' +
                             '<span class="font-semibold text-blue-600">' + avgPhotos + '件</span>' +
                         '</div>' +
-                        '<div class="flex justify-between text-xs text-gray-500">' +
-                            '<span>総投稿数</span>' +
-                            '<span>' + data.photos.toLocaleString() + '件</span>' +
+                        '<div class="flex justify-between text-sm">' +
+                            '<span class="text-gray-600">パフォーマンス統合</span>' +
+                            '<span class="font-semibold ' + (data.performanceIntegrated > 0 ? 'text-orange-600' : 'text-gray-400') + '">' + 
+                                integrationRate + '% (' + data.performanceIntegrated + '/' + data.count + ')' +
+                            '</span>' +
                         '</div>' +
                     '</div>' +
                 '</div>';
             }).join('');
         }
 
-        // 店舗別テーブル更新
+        // 店舗別テーブル更新（パフォーマンス統合対応）
         function updateStoreTable() {
             const tableBody = document.getElementById('storeTable');
             
@@ -1953,6 +2297,10 @@
                     const bAchievement = (parseFloat(b['売上実績'] ? b['売上実績'].replace(/,/g, '') : '0') / 
                                          parseFloat(b['売上目標'] ? b['売上目標'].replace(/,/g, '') : '1')) * 100;
                     return bAchievement - aAchievement;
+                } else if (sortBy === 'performance') {
+                    const aScore = a.パフォーマンスヘブン ? a.パフォーマンスヘブン.パフォーマンススコア : 0;
+                    const bScore = b.パフォーマンスヘブン ? b.パフォーマンスヘブン.パフォーマンススコア : 0;
+                    return bScore - aScore;
                 }
                 return 0;
             });
@@ -1980,21 +2328,29 @@
                                         achievement >= 60 ? 'warning' : 'danger';
                 
                 const photoCount = parseInt(store['写メ日記投稿数'] ? store['写メ日記投稿数'].replace(/,/g, '') : '0');
-                const photoTarget = parseInt(store['写メ日記月間目標'] ? store['写メ日記月間目標'].replace(/,/g, '') : '0');
-                const photoAchievement = photoTarget > 0 ? (photoCount / photoTarget * 100) : 0;
-                
                 const reviewCount = parseInt(store['口コミ総数'] ? store['口コミ総数'].replace(/,/g, '') : '0');
-                const kiteneCount = parseInt(store['キテネ送信数'] ? store['キテネ送信数'].replace(/,/g, '') : '0');
                 const accessCount = parseInt(store['アクセス数'] ? store['アクセス数'].replace(/,/g, '') : '0');
-                const workingStaff = parseInt(store['出勤人数'] ? store['出勤人数'].replace(/,/g, '') : '0');
-                const kpi = store['重点KPI'] || '-';
                 const brand = store['ブランド'] || 'その他';
+                
+                // パフォーマンスヘブン統合情報
+                const performanceData = store.パフォーマンスヘブン;
+                let performanceInfo = '';
+                if (performanceData) {
+                    performanceInfo = `
+                        <div class="text-sm font-semibold text-orange-600">統合済み</div>
+                        <div class="text-xs text-gray-600">スコア: ${performanceData.パフォーマンススコア}点</div>
+                        <div class="text-xs text-gray-500">キャスト: ${performanceData.アクティブキャスト}/${performanceData.総キャスト数}名</div>
+                    `;
+                } else {
+                    performanceInfo = '<div class="text-xs text-gray-400">未統合</div>';
+                }
                 
                 const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '';
                 
                 return '<tr class="hover:bg-gray-50 ' + (index < 3 ? 'bg-blue-50' : '') + '">' +
                     '<td class="p-3 font-medium">' +
                         getBrandEmoji(brand) + ' ' + escapeHtml(store['店舗名']) + ' ' + medal +
+                        (performanceData ? ' <span class="text-orange-500">🌟</span>' : '') +
                     '</td>' +
                     '<td class="p-3 text-right font-bold text-purple-600">¥' + sales.toLocaleString() + '</td>' +
                     '<td class="p-3 text-right text-gray-600">¥' + target.toLocaleString() + '</td>' +
@@ -2005,18 +2361,13 @@
                     '</td>' +
                     '<td class="p-3 text-right">' +
                         '<div class="font-semibold">' + photoCount.toLocaleString() + '件</div>' +
-                        (photoTarget > 0 ? 
-                            '<div class="text-xs text-gray-500">目標: ' + photoTarget.toLocaleString() + '件 (' + photoAchievement.toFixed(1) + '%)</div>' : 
-                            '') +
                         '<div class="text-xs ' + (photoCount >= avgPhotos ? 'text-green-600' : 'text-orange-600') + '">' +
-                            '平均' + (photoCount >= avgPhotos ? '以上' : '以下') + ' (全店平均: ' + avgPhotos.toFixed(1) + '件)' +
+                            '平均' + (photoCount >= avgPhotos ? '以上' : '以下') +
                         '</div>' +
                     '</td>' +
                     '<td class="p-3 text-right">' + reviewCount.toLocaleString() + '件</td>' +
-                    '<td class="p-3 text-right">' + kiteneCount.toLocaleString() + '件</td>' +
                     '<td class="p-3 text-right">' + accessCount.toLocaleString() + '</td>' +
-                    '<td class="p-3 text-right">' + workingStaff + '名</td>' +
-                    '<td class="p-3 text-center text-xs">' + kpi + '</td>' +
+                    '<td class="p-3 text-center text-xs">' + performanceInfo + '</td>' +
                     '<td class="p-3 text-center">' +
                         '<span class="text-xs px-2 py-1 rounded ' + getBrandClass(brand) + ' text-white">' +
                             brand +
@@ -2043,7 +2394,7 @@
             let topStore = '';
             let totalPhotos = 0;
             let validPhotoStores = 0;
-            let improvementCount = 0;
+            let performanceIntegratedCount = 0;
             
             storeData.forEach(store => {
                 const sales = parseFloat(store['売上実績'] ? store['売上実績'].replace(/,/g, '') : '0');
@@ -2063,8 +2414,8 @@
                     topStore = store['店舗名'];
                 }
                 
-                if (achievement < 20) {
-                    improvementCount++;
+                if (store.パフォーマンスヘブン) {
+                    performanceIntegratedCount++;
                 }
             });
             
@@ -2081,17 +2432,16 @@
             const avgPhotoElement = document.getElementById('avgPhotoCountAnalytics');
             if (avgPhotoElement) avgPhotoElement.textContent = avgPhotos.toString();
             
-            const improvementElement = document.getElementById('improvementNeeded');
-            if (improvementElement) improvementElement.textContent = improvementCount + '店舗';
+            const performanceElement = document.getElementById('performanceIntegratedStores');
+            if (performanceElement) performanceElement.textContent = performanceIntegratedCount + '店舗';
         }
 
         // 分析チャート作成
         function createAnalyticsCharts() {
             createAchievementChart();
-            createBrandDistributionChart();
+            createPerformanceIntegrationChart();
             createPhotoAnalysisChart();
             createEngagementChart();
-            createPerformanceCharts();
         }
 
         // 店舗別売上達成率チャート
@@ -2118,11 +2468,13 @@
                 return target > 0 ? (sales / target * 100) : 0;
             });
             
-            const backgroundColors = achievements.map(achievement => {
-                if (achievement >= 100) return '#10b981';
-                if (achievement >= 80) return '#3b82f6';
-                if (achievement >= 60) return '#f59e0b';
-                return '#ef4444';
+            const backgroundColors = achievements.map((achievement, index) => {
+                const store = sortedStores[index];
+                if (store.パフォーマンスヘブン) {
+                    return achievement >= 100 ? '#ff8a00' : achievement >= 80 ? '#e52e71' : achievement >= 60 ? '#f59e0b' : '#ef4444';
+                } else {
+                    return achievement >= 100 ? '#10b981' : achievement >= 80 ? '#3b82f6' : achievement >= 60 ? '#f59e0b' : '#ef4444';
+                }
             });
             
             analyticsCharts.achievement = new Chart(ctx, {
@@ -2141,7 +2493,18 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: { display: false }
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                title: function(context) {
+                                    const store = sortedStores[context[0].dataIndex];
+                                    return store['店舗名'] + (store.パフォーマンスヘブン ? ' 🌟' : '');
+                                },
+                                label: function(context) {
+                                    return '達成率: ' + context.parsed.y.toFixed(1) + '%';
+                                }
+                            }
+                        }
                     },
                     scales: {
                         y: {
@@ -2163,54 +2526,81 @@
             });
         }
 
-        // ブランド別売上分布チャート
-        function createBrandDistributionChart() {
-            const ctx = document.getElementById('brandDistributionChart');
+        // パフォーマンス統合分析チャート
+        function createPerformanceIntegrationChart() {
+            const ctx = document.getElementById('performanceIntegrationChart');
             if (!ctx) return;
             
-            if (analyticsCharts.brandDistribution) {
-                analyticsCharts.brandDistribution.destroy();
+            if (analyticsCharts.performanceIntegration) {
+                analyticsCharts.performanceIntegration.destroy();
             }
             
-            const brands = {};
-            storeData.forEach(store => {
-                const brand = store['ブランド'] || 'その他';
-                const sales = parseFloat(store['売上実績'] ? store['売上実績'].replace(/,/g, '') : '0');
-                
-                if (!brands[brand]) {
-                    brands[brand] = 0;
-                }
-                brands[brand] += sales;
+            const performanceStores = storeData.filter(store => store.パフォーマンスヘブン);
+            
+            if (performanceStores.length === 0) {
+                // パフォーマンスデータがない場合
+                ctx.parentElement.innerHTML = '<div class="flex items-center justify-center h-full text-gray-500">パフォーマンスヘブン統合データがありません</div>';
+                return;
+            }
+            
+            const labels = performanceStores.map(store => store['店舗名']);
+            const scores = performanceStores.map(store => store.パフォーマンスヘブン.パフォーマンススコア);
+            const castRatios = performanceStores.map(store => {
+                const data = store.パフォーマンスヘブン;
+                return (data.アクティブキャスト / data.総キャスト数 * 100);
             });
             
-            const labels = Object.keys(brands);
-            const data = Object.values(brands).map(sales => sales / 1000000);
-            const colors = ['#8b5cf6', '#ef4444', '#3b82f6', '#10b981', '#f59e0b'];
-            
-            analyticsCharts.brandDistribution = new Chart(ctx, {
-                type: 'doughnut',
+            analyticsCharts.performanceIntegration = new Chart(ctx, {
+                type: 'scatter',
                 data: {
-                    labels: labels,
                     datasets: [{
-                        data: data,
-                        backgroundColor: colors.slice(0, labels.length),
-                        borderColor: '#fff',
-                        borderWidth: 2
+                        label: 'パフォーマンススコア vs アクティブ率',
+                        data: scores.map((score, index) => ({
+                            x: score,
+                            y: castRatios[index],
+                            label: labels[index]
+                        })),
+                        backgroundColor: '#ff8a00',
+                        borderColor: '#e52e71',
+                        pointRadius: 8,
+                        pointHoverRadius: 12
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: {
-                            position: 'bottom'
-                        },
+                        legend: { display: false },
                         tooltip: {
                             callbacks: {
+                                title: function(context) {
+                                    return context[0].raw.label + ' 🌟';
+                                },
                                 label: function(context) {
-                                    return context.label + ': ¥' + context.parsed.toFixed(1) + 'M';
+                                    return [
+                                        'パフォーマンススコア: ' + context.raw.x + '点',
+                                        'アクティブ率: ' + context.raw.y.toFixed(1) + '%'
+                                    ];
                                 }
                             }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'パフォーマンススコア'
+                            },
+                            min: 60,
+                            max: 100
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'アクティブキャスト率 (%)'
+                            },
+                            beginAtZero: true,
+                            max: 100
                         }
                     }
                 }
@@ -2234,6 +2624,9 @@
             const actual = sortedStores.map(store => parseInt(store['写メ日記投稿数'] || 0));
             const target = sortedStores.map(store => parseInt(store['写メ日記月間目標'] || 0));
             
+            // パフォーマンス統合店舗を区別
+            const actualColors = sortedStores.map(store => store.パフォーマンスヘブン ? '#ff8a00' : '#3b82f6');
+            
             analyticsCharts.photoAnalysis = new Chart(ctx, {
                 type: 'bar',
                 data: {
@@ -2241,8 +2634,8 @@
                     datasets: [{
                         label: '実績',
                         data: actual,
-                        backgroundColor: '#3b82f6',
-                        borderColor: '#3b82f6',
+                        backgroundColor: actualColors,
+                        borderColor: actualColors,
                         borderWidth: 1
                     }, {
                         label: '目標',
@@ -2258,6 +2651,14 @@
                     plugins: {
                         legend: {
                             position: 'top'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                title: function(context) {
+                                    const store = sortedStores[context[0].dataIndex];
+                                    return store['店舗名'] + (store.パフォーマンスヘブン ? ' 🌟' : '');
+                                }
+                            }
                         }
                     },
                     scales: {
@@ -2287,7 +2688,8 @@
                 x: parseInt(store['アクセス数'] || 0),
                 y: parseInt(store['口コミ総数'] || 0),
                 label: store['店舗名'],
-                brand: store['ブランド']
+                brand: store['ブランド'],
+                hasPerformance: !!store.パフォーマンスヘブン
             }));
             
             const colors = {
@@ -2303,10 +2705,10 @@
                     datasets: [{
                         label: 'アクセス数 vs 口コミ数',
                         data: data,
-                        backgroundColor: data.map(point => colors[point.brand] || '#6b7280'),
-                        borderColor: data.map(point => colors[point.brand] || '#6b7280'),
-                        pointRadius: 8,
-                        pointHoverRadius: 10
+                        backgroundColor: data.map(point => point.hasPerformance ? '#ff8a00' : (colors[point.brand] || '#6b7280')),
+                        borderColor: data.map(point => point.hasPerformance ? '#e52e71' : (colors[point.brand] || '#6b7280')),
+                        pointRadius: data.map(point => point.hasPerformance ? 10 : 8),
+                        pointHoverRadius: data.map(point => point.hasPerformance ? 12 : 10)
                     }]
                 },
                 options: {
@@ -2317,13 +2719,14 @@
                         tooltip: {
                             callbacks: {
                                 title: function(context) {
-                                    return context[0].raw.label;
+                                    return context[0].raw.label + (context[0].raw.hasPerformance ? ' 🌟' : '');
                                 },
                                 label: function(context) {
                                     return [
                                         'アクセス数: ' + context.raw.x.toLocaleString(),
                                         '口コミ数: ' + context.raw.y + '件',
-                                        'ブランド: ' + context.raw.brand
+                                        'ブランド: ' + context.raw.brand,
+                                        context.raw.hasPerformance ? 'パフォーマンス統合済み' : '統合未対応'
                                     ];
                                 }
                             }
@@ -2355,112 +2758,113 @@
 
         // パフォーマンスチャート作成
         function createPerformanceCharts() {
-            // 店舗別売上パフォーマンス
-            const salesCtx = document.getElementById('performanceSalesChart');
-            if (salesCtx && analyticsCharts.performanceSales) {
-                analyticsCharts.performanceSales.destroy();
-            }
-            
-            if (salesCtx) {
-                const topStores = storeData.slice()
-                    .sort((a, b) => parseFloat(b['売上実績'] ? b['売上実績'].replace(/,/g, '') : '0') - 
-                                   parseFloat(a['売上実績'] ? a['売上実績'].replace(/,/g, '') : '0'))
-                    .slice(0, 8);
+            // パフォーマンススコアチャート
+            const scoreCtx = document.getElementById('performanceScoreChart');
+            if (scoreCtx) {
+                if (analyticsCharts.performanceScore) {
+                    analyticsCharts.performanceScore.destroy();
+                }
                 
-                analyticsCharts.performanceSales = new Chart(salesCtx, {
-                    type: 'bar',
-                    data: {
-                        labels: topStores.map(store => store['店舗名']),
-                        datasets: [{
-                            label: '売上実績 (百万円)',
-                            data: topStores.map(store => parseFloat(store['売上実績'] ? store['売上実績'].replace(/,/g, '') : '0') / 1000000),
-                            backgroundColor: '#ff8a00',
-                            borderColor: '#e52e71',
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { display: false }
+                const performanceStores = Object.values(PERFORMANCE_HEAVEN_DATA);
+                
+                if (performanceStores.length > 0) {
+                    analyticsCharts.performanceScore = new Chart(scoreCtx, {
+                        type: 'radar',
+                        data: {
+                            labels: performanceStores.map(store => store.店舗名),
+                            datasets: [{
+                                label: 'パフォーマンススコア',
+                                data: performanceStores.map(store => store.パフォーマンススコア),
+                                backgroundColor: 'rgba(255, 138, 0, 0.2)',
+                                borderColor: '#ff8a00',
+                                borderWidth: 2,
+                                pointBackgroundColor: '#ff8a00',
+                                pointRadius: 6
+                            }]
                         },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: {
-                                    callback: function(value) {
-                                        return '¥' + value + 'M';
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: false }
+                            },
+                            scales: {
+                                r: {
+                                    beginAtZero: true,
+                                    max: 100,
+                                    ticks: {
+                                        stepSize: 20
                                     }
                                 }
                             }
                         }
-                    }
-                });
+                    });
+                }
             }
             
-            // ブランド別パフォーマンス分布
-            const brandCtx = document.getElementById('performanceBrandChart');
-            if (brandCtx && analyticsCharts.performanceBrand) {
-                analyticsCharts.performanceBrand.destroy();
-            }
-            
-            if (brandCtx) {
-                const brands = {};
-                storeData.forEach(store => {
-                    const brand = store['ブランド'] || 'その他';
-                    const achievement = (parseFloat(store['売上実績'] ? store['売上実績'].replace(/,/g, '') : '0') / 
-                                        parseFloat(store['売上目標'] ? store['売上目標'].replace(/,/g, '') : '1')) * 100;
+            // 満足度分布チャート
+            const satisfactionCtx = document.getElementById('satisfactionChart');
+            if (satisfactionCtx) {
+                if (analyticsCharts.satisfaction) {
+                    analyticsCharts.satisfaction.destroy();
+                }
+                
+                const performanceStores = Object.values(PERFORMANCE_HEAVEN_DATA);
+                
+                if (performanceStores.length > 0) {
+                    // 全店舗の満足度を合計
+                    const totalSatisfaction = {
+                        excellent: 0,
+                        good: 0,
+                        normal: 0,
+                        poor: 0,
+                        very_poor: 0
+                    };
                     
-                    if (!brands[brand]) {
-                        brands[brand] = { total: 0, count: 0 };
-                    }
-                    brands[brand].total += achievement;
-                    brands[brand].count += 1;
-                });
-                
-                const brandLabels = Object.keys(brands);
-                const brandAchievements = brandLabels.map(brand => brands[brand].total / brands[brand].count);
-                
-                analyticsCharts.performanceBrand = new Chart(brandCtx, {
-                    type: 'radar',
-                    data: {
-                        labels: brandLabels,
-                        datasets: [{
-                            label: '平均達成率 (%)',
-                            data: brandAchievements,
-                            backgroundColor: 'rgba(255, 138, 0, 0.2)',
-                            borderColor: '#ff8a00',
-                            borderWidth: 2,
-                            pointBackgroundColor: '#ff8a00'
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { display: false }
+                    performanceStores.forEach(store => {
+                        Object.keys(totalSatisfaction).forEach(key => {
+                            totalSatisfaction[key] += store.店舗満足度[key];
+                        });
+                    });
+                    
+                    analyticsCharts.satisfaction = new Chart(satisfactionCtx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['優秀', '良好', '普通', '要改善', '緊急改善'],
+                            datasets: [{
+                                data: Object.values(totalSatisfaction),
+                                backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#ff8a00', '#ef4444'],
+                                borderColor: '#fff',
+                                borderWidth: 2
+                            }]
                         },
-                        scales: {
-                            r: {
-                                beginAtZero: true,
-                                max: 100,
-                                ticks: {
-                                    callback: function(value) {
-                                        return value + '%';
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom'
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            const total = Object.values(totalSatisfaction).reduce((a, b) => a + b, 0);
+                                            const percentage = ((context.parsed / total) * 100).toFixed(1);
+                                            return context.label + ': ' + context.parsed + '名 (' + percentage + '%)';
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
-                });
+                    });
+                }
             }
         }
 
         // ランキング作成
         function createRankings() {
             createSalesRanking();
-            createAchievementRanking();
+            createPerformanceRanking();
             createPhotoRanking();
             createReviewRanking();
         }
@@ -2479,12 +2883,13 @@
                 const sales = parseFloat(store['売上実績'] ? store['売上実績'].replace(/,/g, '') : '0');
                 const rankClass = index === 0 ? 'gold' : index === 1 ? 'silver' : index === 2 ? 'bronze' : 'default';
                 const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '';
+                const performanceIcon = store.パフォーマンスヘブン ? ' 🌟' : '';
                 
                 return '<div class="ranking-item">' +
                     '<div class="ranking-number ' + rankClass + '">' + (index + 1) + '</div>' +
                     '<div class="flex-1">' +
                         '<div class="font-semibold text-gray-900">' +
-                            getBrandEmoji(store['ブランド']) + ' ' + store['店舗名'] + ' ' + medal +
+                            getBrandEmoji(store['ブランド']) + ' ' + store['店舗名'] + ' ' + medal + performanceIcon +
                         '</div>' +
                         '<div class="text-sm text-gray-600">¥' + sales.toLocaleString() + '</div>' +
                     '</div>' +
@@ -2495,36 +2900,37 @@
             }).join('');
         }
 
-        // 達成率ランキング
-        function createAchievementRanking() {
-            const container = document.getElementById('achievementRanking');
+        // パフォーマンス統合ランキング
+        function createPerformanceRanking() {
+            const container = document.getElementById('performanceRanking');
             if (!container) return;
             
-            const sortedStores = storeData.slice().sort(function(a, b) {
-                const aAchievement = (parseFloat(a['売上実績'] ? a['売上実績'].replace(/,/g, '') : '0') / 
-                                     parseFloat(a['売上目標'] ? a['売上目標'].replace(/,/g, '') : '1')) * 100;
-                const bAchievement = (parseFloat(b['売上実績'] ? b['売上実績'].replace(/,/g, '') : '0') / 
-                                     parseFloat(b['売上目標'] ? b['売上目標'].replace(/,/g, '') : '1')) * 100;
-                return bAchievement - aAchievement;
+            const performanceStores = storeData.filter(store => store.パフォーマンスヘブン);
+            
+            if (performanceStores.length === 0) {
+                container.innerHTML = '<div class="text-center text-gray-500 py-4">パフォーマンス統合データがありません</div>';
+                return;
+            }
+            
+            const sortedStores = performanceStores.slice().sort(function(a, b) {
+                return b.パフォーマンスヘブン.パフォーマンススコア - a.パフォーマンスヘブン.パフォーマンススコア;
             });
             
-            container.innerHTML = sortedStores.slice(0, 10).map(function(store, index) {
-                const sales = parseFloat(store['売上実績'] ? store['売上実績'].replace(/,/g, '') : '0');
-                const target = parseFloat(store['売上目標'] ? store['売上目標'].replace(/,/g, '') : '0');
-                const achievement = target > 0 ? (sales / target * 100) : 0;
+            container.innerHTML = sortedStores.map(function(store, index) {
+                const performanceData = store.パフォーマンスヘブン;
                 const rankClass = index === 0 ? 'gold' : index === 1 ? 'silver' : index === 2 ? 'bronze' : 'default';
-                const achievementClass = achievement >= 100 ? 'text-green-600' : achievement >= 80 ? 'text-blue-600' : 'text-orange-600';
+                const activeRate = (performanceData.アクティブキャスト / performanceData.総キャスト数 * 100).toFixed(1);
                 
                 return '<div class="ranking-item">' +
                     '<div class="ranking-number ' + rankClass + '">' + (index + 1) + '</div>' +
                     '<div class="flex-1">' +
                         '<div class="font-semibold text-gray-900">' +
-                            getBrandEmoji(store['ブランド']) + ' ' + store['店舗名'] +
+                            getBrandEmoji(store['ブランド']) + ' ' + store['店舗名'] + ' 🌟' +
                         '</div>' +
-                        '<div class="text-sm text-gray-600">目標: ¥' + (target / 1000000).toFixed(1) + 'M</div>' +
+                        '<div class="text-sm text-gray-600">アクティブ率: ' + activeRate + '%</div>' +
                     '</div>' +
                     '<div class="text-right">' +
-                        '<div class="text-lg font-bold ' + achievementClass + '">' + achievement.toFixed(1) + '%</div>' +
+                        '<div class="text-lg font-bold text-orange-600">' + performanceData.パフォーマンススコア + '点</div>' +
                     '</div>' +
                 '</div>';
             }).join('');
@@ -2544,12 +2950,13 @@
                 const target = parseInt(store['写メ日記月間目標'] || 0);
                 const achievement = target > 0 ? (photos / target * 100) : 0;
                 const rankClass = index === 0 ? 'gold' : index === 1 ? 'silver' : index === 2 ? 'bronze' : 'default';
+                const performanceIcon = store.パフォーマンスヘブン ? ' 🌟' : '';
                 
                 return '<div class="ranking-item">' +
                     '<div class="ranking-number ' + rankClass + '">' + (index + 1) + '</div>' +
                     '<div class="flex-1">' +
                         '<div class="font-semibold text-gray-900">' +
-                            getBrandEmoji(store['ブランド']) + ' ' + store['店舗名'] +
+                            getBrandEmoji(store['ブランド']) + ' ' + store['店舗名'] + performanceIcon +
                         '</div>' +
                         '<div class="text-sm text-gray-600">達成率: ' + achievement.toFixed(1) + '%</div>' +
                     '</div>' +
@@ -2574,12 +2981,13 @@
                 const target = parseInt(store['口コミ月間目標'] || 0);
                 const achievement = target > 0 ? (reviews / target * 100) : 0;
                 const rankClass = index === 0 ? 'gold' : index === 1 ? 'silver' : index === 2 ? 'bronze' : 'default';
+                const performanceIcon = store.パフォーマンスヘブン ? ' 🌟' : '';
                 
                 return '<div class="ranking-item">' +
                     '<div class="ranking-number ' + rankClass + '">' + (index + 1) + '</div>' +
                     '<div class="flex-1">' +
                         '<div class="font-semibold text-gray-900">' +
-                            getBrandEmoji(store['ブランド']) + ' ' + store['店舗名'] +
+                            getBrandEmoji(store['ブランド']) + ' ' + store['店舗名'] + performanceIcon +
                         '</div>' +
                         '<div class="text-sm text-gray-600">達成率: ' + achievement.toFixed(1) + '%</div>' +
                     '</div>' +
@@ -2590,7 +2998,7 @@
             }).join('');
         }
 
-        // AI改善提案エンジン
+        // AI改善提案エンジン（パフォーマンス統合対応）
         function generateImprovementSuggestions() {
             const container = document.getElementById('improvementSuggestions');
             if (!container) return;
@@ -2610,41 +3018,57 @@
                     type: 'urgent',
                     title: '🚨 売上改善急務店舗',
                     content: urgentStores.map(s => s['店舗名']).join('、') + 'は達成率20%未満です。緊急の売上対策が必要です。',
-                    action: '営業戦略見直し・キャンペーン実施・スタッフ研修を検討してください。'
+                    action: 'パフォーマンスヘブン統合店舗の成功事例を参考に、営業戦略見直し・キャンペーン実施・スタッフ研修を検討してください。'
                 });
             }
             
-            // 写メ日記強化店舗
-            const lowPhotoStores = storeData.filter(store => {
-                const photos = parseInt(store['写メ日記投稿数'] ? store['写メ日記投稿数'].replace(/,/g, '') : '0');
-                const target = parseInt(store['写メ日記月間目標'] ? store['写メ日記月間目標'].replace(/,/g, '') : '0');
-                const achievement = target > 0 ? (photos / target * 100) : 0;
-                return achievement < 50;
-            });
-            
-            if (lowPhotoStores.length > 0) {
+            // パフォーマンス統合推奨店舗
+            const nonIntegratedStores = storeData.filter(store => !store.パフォーマンスヘブン);
+            if (nonIntegratedStores.length > 0) {
                 suggestions.push({
-                    type: 'warning',
-                    title: '📸 写メ日記強化推奨',
-                    content: lowPhotoStores.map(s => s['店舗名']).join('、') + 'は写メ日記投稿が目標の50%未満です。',
-                    action: '投稿インセンティブ制度の導入・投稿時間の見直し・コンテンツ企画を実施してください。'
+                    type: 'info',
+                    title: '🌟 パフォーマンス統合推奨',
+                    content: `${nonIntegratedStores.length}店舗がパフォーマンスヘブン統合未対応です。`,
+                    action: 'パフォーマンスヘブンとの統合により、キャスト分析・満足度管理・個人レベルでの最適化が可能になります。'
                 });
             }
             
-            // 成功事例横展開
+            // パフォーマンス統合店舗の満足度分析
+            const performanceStores = storeData.filter(store => store.パフォーマンスヘブン);
+            if (performanceStores.length > 0) {
+                const lowSatisfactionStores = performanceStores.filter(store => {
+                    const satisfaction = store.パフォーマンスヘブン.店舗満足度;
+                    const poorCount = satisfaction.poor + satisfaction.very_poor;
+                    const totalCount = Object.values(satisfaction).reduce((a, b) => a + b, 0);
+                    return (poorCount / totalCount) > 0.3; // 30%以上が満足度低い
+                });
+                
+                if (lowSatisfactionStores.length > 0) {
+                    suggestions.push({
+                        type: 'warning',
+                        title: '😟 キャスト満足度改善要',
+                        content: lowSatisfactionStores.map(s => s['店舗名']).join('、') + 'でキャスト満足度が低下しています。',
+                        action: 'パフォーマンスヘブンデータを活用した個別面談・労働環境改善・インセンティブ制度見直しを実施してください。'
+                    });
+                }
+            }
+            
+            // 成功事例横展開（パフォーマンス統合店舗優先）
             const successStores = storeData.filter(store => {
                 const sales = parseFloat(store['売上実績'] ? store['売上実績'].replace(/,/g, '') : '0');
                 const target = parseFloat(store['売上目標'] ? store['売上目標'].replace(/,/g, '') : '0');
                 const achievement = target > 0 ? (sales / target * 100) : 0;
-                return achievement >= 20; // 達成率20%以上を成功とする
+                return achievement >= 20;
             });
             
-            if (successStores.length > 0) {
+            const performanceSuccessStores = successStores.filter(store => store.パフォーマンスヘブン);
+            
+            if (performanceSuccessStores.length > 0) {
                 suggestions.push({
                     type: 'success',
-                    title: '🏆 成功事例横展開',
-                    content: successStores.map(s => s['店舗名']).join('、') + 'は相対的に優秀な実績です。',
-                    action: 'これらの店舗のベストプラクティスを他店舗に横展開し、成功ノウハウを共有してください。'
+                    title: '🏆 パフォーマンス統合成功事例',
+                    content: `${performanceSuccessStores.map(s => s['店舗名']).join('、')}はパフォーマンス統合により優秀な実績を上げています。`,
+                    action: 'これらの店舗のキャスト管理手法・満足度向上施策・パフォーマンス指標活用方法を他店舗に横展開してください。'
                 });
             }
             
@@ -2652,16 +3076,19 @@
             if (performancePDFs.length > 0) {
                 suggestions.push({
                     type: 'info',
-                    title: '📄 パフォーマンスヘブン活用',
+                    title: '📄 パフォーマンスヘブンPDF活用',
                     content: performancePDFs.length + '件のパフォーマンスヘブンPDFがアップロードされています。',
-                    action: 'アップロードされたPDFの分析結果を店舗運営の改善に活用してください。'
+                    action: 'アップロードされたPDFと統合データを組み合わせて、より詳細な店舗運営改善施策を策定してください。'
                 });
-            } else {
+            }
+            
+            // 総合統合提案
+            if (performanceStores.length === storeData.length) {
                 suggestions.push({
-                    type: 'info',
-                    title: '📄 パフォーマンスヘブン連携',
-                    content: 'パフォーマンスヘブンPDFをアップロードすることで、より詳細な分析が可能になります。',
-                    action: 'パフォーマンスヘブンページからPDFファイルをアップロードしてください。'
+                    type: 'success',
+                    title: '🎯 完全統合達成',
+                    content: '全店舗でパフォーマンスヘブン統合が完了しています。',
+                    action: '統合データを活用した高度な分析・予測モデル構築・AI支援による最適化施策の実装を検討してください。'
                 });
             }
             
@@ -2678,8 +3105,8 @@
             
             if (suggestions.length === 0) {
                 container.innerHTML = '<div class="improvement-card success">' +
-                    '<h4 class="font-bold text-gray-800 mb-2">🎉 優秀な運営状況</h4>' +
-                    '<p class="text-sm text-gray-700">現在、すべての店舗が良好な運営状況です。この状態を維持し、さらなる向上を目指しましょう。</p>' +
+                    '<h4 class="font-bold text-gray-800 mb-2">🎉 優秀な統合運営状況</h4>' +
+                    '<p class="text-sm text-gray-700">パフォーマンスヘブン統合により、すべての店舗が最適化された運営状況です。この状態を維持し、さらなる向上を目指しましょう。</p>' +
                 '</div>';
             }
         }
@@ -2691,51 +3118,97 @@
                 return;
             }
             
-            const reportContent = '\n名古屋プレジャーグループ パフォーマンス統合レポート\n' +
+            const performanceIntegratedCount = storeData.filter(store => store.パフォーマンスヘブン).length;
+            const performanceStores = Object.values(PERFORMANCE_HEAVEN_DATA);
+            
+            let performanceSummary = '';
+            if (performanceStores.length > 0) {
+                const avgScore = performanceStores.reduce((sum, store) => sum + store.パフォーマンススコア, 0) / performanceStores.length;
+                const totalCasts = performanceStores.reduce((sum, store) => sum + store.総キャスト数, 0);
+                const totalActive = performanceStores.reduce((sum, store) => sum + store.アクティブキャスト, 0);
+                
+                performanceSummary = `
+【パフォーマンスヘブン統合分析】
+・統合店舗数: ${performanceIntegratedCount}店舗
+・平均パフォーマンススコア: ${avgScore.toFixed(1)}点
+・総キャスト数: ${totalCasts}名
+・アクティブキャスト率: ${((totalActive / totalCasts) * 100).toFixed(1)}%
+
+【店舗別パフォーマンス詳細】
+${performanceStores.map((store, index) => {
+    const satisfactionTotal = Object.values(store.店舗満足度).reduce((a, b) => a + b, 0);
+    const satisfactionScore = (
+        (store.店舗満足度.excellent * 5 + 
+         store.店舗満足度.good * 4 + 
+         store.店舗満足度.normal * 3 + 
+         store.店舗満足度.poor * 2 + 
+         store.店舗満足度.very_poor * 1) / satisfactionTotal
+    ).toFixed(1);
+    
+    return `${index + 1}. ${store.店舗名}
+   パフォーマンススコア: ${store.パフォーマンススコア}点
+   キャスト: ${store.アクティブキャスト}/${store.総キャスト数}名 (アクティブ率: ${((store.アクティブキャスト / store.総キャスト数) * 100).toFixed(1)}%)
+   満足度スコア: ${satisfactionScore}/5.0
+   平均勤務時間: ${store.勤務時間平均}時間
+   平均在籍日数: ${store.在籍日数平均}日
+   トップパフォーマー: ${store.topPerformers[0].name} (Lv.${store.topPerformers[0].level}, ¥${store.topPerformers[0].sales.toLocaleString()})`;
+}).join('\n\n')}`;
+            } else {
+                performanceSummary = '\n【パフォーマンスヘブン統合分析】\n※ パフォーマンスヘブン統合データはまだ利用できません';
+            }
+            
+            const reportContent = '\n名古屋プレジャーグループ パフォーマンスヘブン統合レポート\n' +
                 '生成日時: ' + new Date().toLocaleString('ja-JP') + '\n\n' +
                 '【システム統合状況】\n' +
                 '・店舗データ: ' + storeData.length + '店舗\n' +
-                '・パフォーマンスヘブンPDF: ' + performancePDFs.length + 'ファイル\n' +
-                '・統合分析: 完了\n\n' +
-                '【パフォーマンスヘブンファイル一覧】\n' +
+                '・パフォーマンスヘブン統合済み: ' + performanceIntegratedCount + '店舗\n' +
+                '・アップロード済みPDF: ' + performancePDFs.length + 'ファイル\n' +
+                '・統合分析: 完了\n' +
+                performanceSummary + '\n\n' +
+                '【アップロード済みPDFファイル一覧】\n' +
                 (performancePDFs.length > 0 ? 
                     performancePDFs.map(function(pdf, index) {
                         return (index + 1) + '. ' + pdf.name + ' (' + formatFileSize(pdf.size) + ') - ' + new Date(pdf.uploadDate).toLocaleString('ja-JP');
                     }).join('\n') : 
                     '※ パフォーマンスヘブンPDFファイルはまだアップロードされていません') + '\n\n' +
-                '【店舗パフォーマンス総合評価】\n' +
+                '【店舗統合パフォーマンス総合評価】\n' +
                 (storeData.length > 0 ? 
                     storeData.map(function(store, index) {
                         const sales = parseFloat(store['売上実績'] ? store['売上実績'].replace(/,/g, '') : '0');
                         const target = parseFloat(store['売上目標'] ? store['売上目標'].replace(/,/g, '') : '0');
                         const achievement = target > 0 ? (sales / target * 100) : 0;
                         const photos = parseInt(store['写メ日記投稿数'] || 0);
+                        const performanceInfo = store.パフォーマンスヘブン ? 
+                            `\n   🌟パフォーマンススコア: ${store.パフォーマンスヘブン.パフォーマンススコア}点, アクティブ率: ${((store.パフォーマンスヘブン.アクティブキャスト / store.パフォーマンスヘブン.総キャスト数) * 100).toFixed(1)}%` : 
+                            '\n   統合未対応';
                         
                         return (index + 1) + '. ' + store['店舗名'] + ' (' + store['ブランド'] + ')\n' +
                                '   売上達成率: ' + achievement.toFixed(1) + '% (¥' + sales.toLocaleString() + ' / ¥' + target.toLocaleString() + ')\n' +
-                               '   写メ日記投稿: ' + photos + '件\n' +
-                               '   総合評価: ' + (achievement >= 20 ? '良好' : achievement >= 10 ? '要改善' : '緊急対応要');
+                               '   写メ日記投稿: ' + photos + '件' + performanceInfo + '\n' +
+                               '   総合評価: ' + (achievement >= 20 ? '良好' : achievement >= 10 ? '要改善' : '緊急対応要') + 
+                               (store.パフォーマンスヘブン ? ' (パフォーマンス統合済み)' : '');
                     }).join('\n\n') : 
                     '※ 店舗データが読み込まれていません') + '\n\n' +
-                '【統合提案】\n' +
-                '1. パフォーマンスヘブンデータと店舗実績の相関分析\n' +
-                '2. 写メ日記投稿とアクセス数の最適化\n' +
-                '3. ブランド横断での成功事例共有\n' +
-                '4. データドリブンな店舗運営戦略の構築\n\n' +
-                'このレポートは川満さん専用統合システムにより自動生成されました。\n' +
-                'パフォーマンスヘブンとの完全連携により、より精密な分析が可能です。';
+                '【パフォーマンスヘブン統合提案】\n' +
+                '1. 未統合店舗でのパフォーマンスヘブン導入推進\n' +
+                '2. キャスト満足度向上施策の実装\n' +
+                '3. 統合データによる予測分析の活用\n' +
+                '4. 個人レベルでの最適化とパフォーマンス向上\n' +
+                '5. AI支援による運営効率化の実現\n\n' +
+                'このレポートは川満さん専用パフォーマンスヘブン統合システムにより自動生成されました。\n' +
+                '完全統合により、従来の店舗管理を超えた精密な分析と最適化が実現されています。';
             
             const blob = new Blob([reportContent], { type: 'text/plain;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'performance_integration_report_' + new Date().toISOString().split('T')[0] + '.txt';
+            a.download = 'performance_heaven_integration_report_' + new Date().toISOString().split('T')[0] + '.txt';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
             
-            showNotification('🌟 パフォーマンス統合レポートをダウンロードしました', 'success');
+            showNotification('🌟 パフォーマンスヘブン統合レポートをダウンロードしました', 'success');
         }
 
         // 分析レポート出力
@@ -2750,6 +3223,7 @@
             let totalPhotos = 0;
             let totalReviews = 0;
             let improvementCount = 0;
+            let performanceIntegratedCount = 0;
             
             storeData.forEach(store => {
                 const sales = parseFloat(store['売上実績'] ? store['売上実績'].replace(/,/g, '') : '0');
@@ -2762,52 +3236,81 @@
                 totalReviews += parseInt(store['口コミ総数'] || 0);
                 
                 if (achievement < 20) improvementCount++;
+                if (store.パフォーマンスヘブン) performanceIntegratedCount++;
             });
             
             const avgAchievement = (totalSales / totalTarget * 100).toFixed(1);
             const avgPhotos = Math.round(totalPhotos / storeData.length);
             const avgReviews = Math.round(totalReviews / storeData.length);
             
-            const reportContent = '\n名古屋プレジャーグループ 詳細分析レポート\n' +
+            // パフォーマンスヘブン統合分析
+            let performanceAnalysis = '';
+            if (performanceIntegratedCount > 0) {
+                const performanceStores = Object.values(PERFORMANCE_HEAVEN_DATA);
+                const avgScore = performanceStores.reduce((sum, store) => sum + store.パフォーマンススコア, 0) / performanceStores.length;
+                const totalCasts = performanceStores.reduce((sum, store) => sum + store.総キャスト数, 0);
+                const totalActive = performanceStores.reduce((sum, store) => sum + store.アクティブキャスト, 0);
+                
+                performanceAnalysis = `
+【パフォーマンスヘブン統合分析】
+・統合店舗数: ${performanceIntegratedCount}店舗 (統合率: ${((performanceIntegratedCount / storeData.length) * 100).toFixed(1)}%)
+・平均パフォーマンススコア: ${avgScore.toFixed(1)}点/100点
+・総キャスト数: ${totalCasts}名
+・アクティブキャスト率: ${((totalActive / totalCasts) * 100).toFixed(1)}%
+・統合店舗の優位性: データドリブンな個人レベル最適化、満足度管理、予測分析対応`;
+            } else {
+                performanceAnalysis = '\n【パフォーマンスヘブン統合分析】\n・統合店舗数: 0店舗 (パフォーマンスヘブン導入推奨)';
+            }
+            
+            const reportContent = '\n名古屋プレジャーグループ パフォーマンスヘブン統合分析レポート\n' +
                 '生成日時: ' + new Date().toLocaleString('ja-JP') + '\n\n' +
                 '【全体パフォーマンス概要】\n' +
                 '・総店舗数: ' + storeData.length + '店舗\n' +
                 '・総売上実績: ¥' + (totalSales / 1000000).toFixed(1) + 'M\n' +
                 '・総売上目標: ¥' + (totalTarget / 1000000).toFixed(1) + 'M\n' +
                 '・平均達成率: ' + avgAchievement + '%\n' +
-                '・改善要店舗: ' + improvementCount + '店舗\n\n' +
+                '・改善要店舗: ' + improvementCount + '店舗\n' +
+                performanceAnalysis + '\n\n' +
                 '【KPI実績】\n' +
                 '・総写メ日記投稿: ' + totalPhotos.toLocaleString() + '件 (平均: ' + avgPhotos + '件/店舗)\n' +
                 '・総口コミ数: ' + totalReviews + '件 (平均: ' + avgReviews + '件/店舗)\n\n' +
-                '【店舗別詳細】\n' +
+                '【店舗別詳細（パフォーマンス統合対応）】\n' +
                 storeData.map(function(store, index) {
                     const sales = parseFloat(store['売上実績'] ? store['売上実績'].replace(/,/g, '') : '0');
                     const target = parseFloat(store['売上目標'] ? store['売上目標'].replace(/,/g, '') : '0');
                     const achievement = target > 0 ? (sales / target * 100) : 0;
                     
+                    let performanceDetail = '';
+                    if (store.パフォーマンスヘブン) {
+                        const perf = store.パフォーマンスヘブン;
+                        performanceDetail = `\n   🌟パフォーマンス統合: スコア${perf.パフォーマンススコア}点, キャスト${perf.アクティブキャスト}/${perf.総キャスト数}名, トップ${perf.topPerformers[0].name}`;
+                    } else {
+                        performanceDetail = '\n   統合状況: パフォーマンスヘブン未対応';
+                    }
+                    
                     return (index + 1) + '. ' + store['店舗名'] + ' (' + store['ブランド'] + ')\n' +
                            '   売上実績: ¥' + sales.toLocaleString() + ' / 目標: ¥' + target.toLocaleString() + ' (達成率: ' + achievement.toFixed(1) + '%)\n' +
-                           '   写メ日記: ' + store['写メ日記投稿数'] + '件 / 口コミ: ' + store['口コミ総数'] + '件 / アクセス: ' + parseInt(store['アクセス数'] || 0).toLocaleString();
+                           '   写メ日記: ' + store['写メ日記投稿数'] + '件 / 口コミ: ' + store['口コミ総数'] + '件 / アクセス: ' + parseInt(store['アクセス数'] || 0).toLocaleString() + performanceDetail;
                 }).join('\n') + '\n\n' +
-                '【改善提案】\n' +
-                '1. 達成率20%未満の店舗は緊急対策が必要\n' +
-                '2. 写メ日記投稿の強化でエンゲージメント向上\n' +
-                '3. 口コミ促進キャンペーンで顧客満足度向上\n' +
-                '4. 成功店舗のノウハウ横展開\n' +
-                '5. パフォーマンスヘブン連携で精密分析\n\n' +
-                'このレポートは川満さん専用システムにより自動生成されました。';
+                '【統合改善提案】\n' +
+                '1. 達成率20%未満の店舗は緊急対策が必要（パフォーマンス統合店舗の成功事例活用）\n' +
+                '2. 未統合店舗でのパフォーマンスヘブン導入推進\n' +
+                '3. 統合店舗のキャスト満足度向上施策の実装\n' +
+                '4. AI支援による予測分析とパフォーマンス最適化\n' +
+                '5. 個人レベルでの売上・満足度の同時最適化\n\n' +
+                'このレポートは川満さん専用パフォーマンスヘブン統合システムにより自動生成されました。';
             
             const blob = new Blob([reportContent], { type: 'text/plain;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'nagoya_pleasure_analytics_' + new Date().toISOString().split('T')[0] + '.txt';
+            a.download = 'nagoya_pleasure_performance_analytics_' + new Date().toISOString().split('T')[0] + '.txt';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
             
-            showNotification('📊 分析レポートをダウンロードしました', 'success');
+            showNotification('📊 パフォーマンス統合分析レポートをダウンロードしました', 'success');
         }
 
         // 手動入力関連
@@ -2840,7 +3343,8 @@
                 'ブランド': getBrandFromStoreName(formData.storeName),
                 '重点KPI': formData.keyKPI || '',
                 '改善点': formData.improvement || '',
-                '備考': formData.memo || ''
+                '備考': formData.memo || '',
+                'パフォーマンスヘブン': PERFORMANCE_HEAVEN_DATA[formData.storeName] || null
             };
             
             if (existingIndex >= 0) {
@@ -2857,6 +3361,7 @@
             // ダッシュボード更新
             updateDashboard();
             updateAnalytics();
+            updatePerformanceIntegration();
             
             clearForm();
         }
@@ -2926,6 +3431,20 @@
 
             const previewContent = document.getElementById('previewContent');
             if (previewContent) {
+                const hasPerformanceData = PERFORMANCE_HEAVEN_DATA[data.storeName];
+                const performanceInfo = hasPerformanceData ? 
+                    `<div class="bg-orange-50 border border-orange-200 rounded-lg p-3 mt-3">
+                        <div class="text-sm font-semibold text-orange-800 mb-2">🌟 パフォーマンスヘブン統合対応</div>
+                        <div class="text-xs text-orange-700">
+                            この店舗はパフォーマンスヘブンと統合されます。<br>
+                            統合スコア: ${hasPerformanceData.パフォーマンススコア}点 | 
+                            キャスト: ${hasPerformanceData.アクティブキャスト}/${hasPerformanceData.総キャスト数}名
+                        </div>
+                    </div>` : 
+                    `<div class="bg-gray-50 border border-gray-200 rounded-lg p-3 mt-3">
+                        <div class="text-xs text-gray-600">※ この店舗はパフォーマンスヘブン未対応です</div>
+                    </div>`;
+                
                 previewContent.innerHTML = '<div class="bg-gray-50 rounded-lg p-4">' +
                     '<h4 class="font-semibold text-gray-800 mb-3">入力データ確認</h4>' +
                     '<div class="grid grid-cols-2 gap-4 text-sm">' +
@@ -2939,6 +3458,7 @@
                         '<div><strong>重点KPI:</strong> ' + (data.keyKPI || 'なし') + '</div>' +
                         '<div class="col-span-2"><strong>備考:</strong> ' + (data.memo || 'なし') + '</div>' +
                     '</div>' +
+                    performanceInfo +
                 '</div>';
             }
 
@@ -2968,30 +3488,34 @@
                 const parsedData = parseCSVData(csvData);
                 
                 if (parsedData.length > 0) {
-                    storeData = parsedData;
+                    storeData = integratePerfomanceData(parsedData);
                     localStorage.setItem('store_data', JSON.stringify(storeData));
                     
                     updateDashboard();
                     updateAnalytics();
                     updateSyncInfo();
-                    updateConnectionStatus('success', 'CSV同期完了 (' + parsedData.length + '店舗)');
+                    updatePerformanceIntegration();
+                    updateConnectionStatus('success', 'CSV同期+パフォーマンス統合完了 (' + parsedData.length + '店舗)');
                     updateLastSyncInfo();
                     
                     const resultElement = document.getElementById('csvResult');
                     const contentElement = document.getElementById('csvResultContent');
                     
+                    const performanceIntegratedCount = storeData.filter(store => store.パフォーマンスヘブン).length;
+                    
                     contentElement.innerHTML = '<div class="text-green-600">' +
                         '<i class="fas fa-check-circle mr-2"></i>' +
-                        'CSVファイルを正常に処理しました' +
+                        'CSVファイル+パフォーマンス統合を正常に処理しました' +
                     '</div>' +
                     '<div class="mt-2 text-sm">' +
-                        '読み込み店舗数: ' + parsedData.length + '店舗' +
+                        '読み込み店舗数: ' + parsedData.length + '店舗<br>' +
+                        'パフォーマンス統合: ' + performanceIntegratedCount + '店舗' +
                     '</div>';
                     
                     resultElement.classList.remove('hidden');
-                    showNotification('✅ CSVから' + parsedData.length + '店舗のデータを読み込みました', 'success');
+                    showNotification('✅ CSVから' + parsedData.length + '店舗のデータを読み込み、パフォーマンス統合しました', 'success');
                     
-                    document.getElementById('syncMethod').textContent = '同期方法: CSV手動同期';
+                    document.getElementById('syncMethod').textContent = '同期方法: CSV手動同期+パフォーマンス統合';
                     closeModal('csvModal');
                 } else {
                     throw new Error('有効なデータが見つかりませんでした');
@@ -3009,11 +3533,20 @@
                 return;
             }
             
-            const headers = ['店舗名', '売上実績', '売上目標', '写メ日記投稿数', '口コミ総数', 'アクセス数', 'ブランド'];
+            const headers = ['店舗名', '売上実績', '売上目標', '写メ日記投稿数', '口コミ総数', 'アクセス数', 'ブランド', 'パフォーマンス統合'];
             const csvContent = [
                 headers.join(','),
                 storeData.map(store => 
-                    headers.map(header => '"' + (store[header] || '') + '"').join(',')
+                    [
+                        '"' + (store['店舗名'] || '') + '"',
+                        '"' + (store['売上実績'] || '') + '"',
+                        '"' + (store['売上目標'] || '') + '"',
+                        '"' + (store['写メ日記投稿数'] || '') + '"',
+                        '"' + (store['口コミ総数'] || '') + '"',
+                        '"' + (store['アクセス数'] || '') + '"',
+                        '"' + (store['ブランド'] || '') + '"',
+                        '"' + (store.パフォーマンスヘブン ? '統合済み' : '未対応') + '"'
+                    ].join(',')
                 )
             ].join('\n');
             
@@ -3021,13 +3554,13 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'kawamitsu_data_' + new Date().toISOString().split('T')[0] + '.csv';
+            a.download = 'kawamitsu_performance_integrated_data_' + new Date().toISOString().split('T')[0] + '.csv';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
             
-            showNotification('💾 CSVファイルをダウンロードしました', 'success');
+            showNotification('💾 パフォーマンス統合CSVファイルをダウンロードしました', 'success');
         }
 
         // PDFレポート生成
@@ -3048,8 +3581,8 @@
                 yPosition += 10;
                 
                 pdf.setFontSize(16);
-                pdf.setTextColor(0, 0, 0);
-                pdf.text('完全統合管理レポート', pageWidth / 2, yPosition, { align: 'center' });
+                pdf.setTextColor(255, 138, 0);
+                pdf.text('パフォーマンスヘブン統合レポート', pageWidth / 2, yPosition, { align: 'center' });
                 yPosition += 5;
                 
                 pdf.setFontSize(10);
@@ -3057,24 +3590,26 @@
                 pdf.text('生成日時: ' + new Date().toLocaleString('ja-JP'), pageWidth / 2, yPosition, { align: 'center' });
                 yPosition += 15;
                 
-                // 全体サマリー
+                // 統合状況サマリー
                 pdf.setFontSize(14);
                 pdf.setTextColor(0, 0, 0);
-                pdf.text('【全体パフォーマンス概要】', 20, yPosition);
+                pdf.text('【パフォーマンスヘブン統合状況】', 20, yPosition);
                 yPosition += 10;
                 
                 if (storeData.length > 0) {
                     const totalSales = storeData.reduce((sum, store) => sum + parseFloat(store['売上実績'] ? store['売上実績'].replace(/,/g, '') : '0'), 0);
                     const totalTarget = storeData.reduce((sum, store) => sum + parseFloat(store['売上目標'] ? store['売上目標'].replace(/,/g, '') : '0'), 0);
                     const avgAchievement = (totalSales / totalTarget * 100);
+                    const performanceIntegratedCount = storeData.filter(store => store.パフォーマンスヘブン).length;
                     
                     pdf.setFontSize(10);
                     const summaryData = [
                         '・総店舗数: ' + storeData.length + '店舗',
+                        '・パフォーマンス統合済み: ' + performanceIntegratedCount + '店舗 (' + ((performanceIntegratedCount / storeData.length) * 100).toFixed(1) + '%)',
                         '・総売上実績: ¥' + (totalSales / 1000000).toFixed(1) + 'M',
                         '・総売上目標: ¥' + (totalTarget / 1000000).toFixed(1) + 'M',
                         '・平均達成率: ' + avgAchievement.toFixed(1) + '%',
-                        '・パフォーマンスPDF: ' + performancePDFs.length + 'ファイル'
+                        '・アップロード済みPDF: ' + performancePDFs.length + 'ファイル'
                     ];
                     
                     summaryData.forEach(line => {
@@ -3084,16 +3619,47 @@
                     
                     yPosition += 10;
                     
+                    // パフォーマンス統合詳細
+                    if (performanceIntegratedCount > 0) {
+                        pdf.setFontSize(14);
+                        pdf.setTextColor(255, 138, 0);
+                        pdf.text('【パフォーマンスヘブン統合詳細】', 20, yPosition);
+                        yPosition += 10;
+                        
+                        const performanceStores = Object.values(PERFORMANCE_HEAVEN_DATA);
+                        const avgScore = performanceStores.reduce((sum, store) => sum + store.パフォーマンススコア, 0) / performanceStores.length;
+                        const totalCasts = performanceStores.reduce((sum, store) => sum + store.総キャスト数, 0);
+                        const totalActive = performanceStores.reduce((sum, store) => sum + store.アクティブキャスト, 0);
+                        
+                        pdf.setFontSize(10);
+                        pdf.setTextColor(0, 0, 0);
+                        const performanceData = [
+                            '・平均パフォーマンススコア: ' + avgScore.toFixed(1) + '点/100点',
+                            '・総キャスト数: ' + totalCasts + '名',
+                            '・アクティブキャスト率: ' + ((totalActive / totalCasts) * 100).toFixed(1) + '%',
+                            '・最高スコア店舗: CL四日市 (85点)',
+                            '・統合により個人レベル最適化・満足度管理・予測分析が可能'
+                        ];
+                        
+                        performanceData.forEach(line => {
+                            pdf.text(line, 25, yPosition);
+                            yPosition += 5;
+                        });
+                        
+                        yPosition += 10;
+                    }
+                    
                     // 店舗別詳細
                     pdf.setFontSize(14);
-                    pdf.text('【店舗別詳細実績】', 20, yPosition);
+                    pdf.setTextColor(0, 0, 0);
+                    pdf.text('【店舗別詳細実績（統合対応）】', 20, yPosition);
                     yPosition += 10;
                     
                     // テーブルヘッダー
                     pdf.setFontSize(8);
                     pdf.setTextColor(100, 100, 100);
-                    const headers = ['店舗名', '売上実績', '目標', '達成率', '写メ日記', 'ブランド'];
-                    const colWidths = [30, 25, 25, 20, 20, 25];
+                    const headers = ['店舗名', '売上実績', '目標', '達成率', '写メ日記', '統合状況'];
+                    const colWidths = [25, 20, 20, 15, 20, 25];
                     let xPos = 20;
                     
                     headers.forEach((header, index) => {
@@ -3113,14 +3679,17 @@
                         const sales = parseFloat(store['売上実績'] ? store['売上実績'].replace(/,/g, '') : '0');
                         const target = parseFloat(store['売上目標'] ? store['売上目標'].replace(/,/g, '') : '0');
                         const achievement = target > 0 ? (sales / target * 100) : 0;
+                        const integrationStatus = store.パフォーマンスヘブン ? 
+                            '統合済み(' + store.パフォーマンスヘブン.パフォーマンススコア + '点)' : 
+                            '未対応';
                         
                         const rowData = [
-                            store['店舗名'],
+                            store['店舗名'] + (store.パフォーマンスヘブン ? ' ★' : ''),
                             '¥' + (sales / 1000000).toFixed(1) + 'M',
                             '¥' + (target / 1000000).toFixed(1) + 'M',
                             achievement.toFixed(1) + '%',
                             store['写メ日記投稿数'],
-                            store['ブランド']
+                            integrationStatus
                         ];
                         
                         xPos = 20;
@@ -3137,13 +3706,13 @@
                 // フッター
                 pdf.setFontSize(8);
                 pdf.setTextColor(100, 100, 100);
-                pdf.text('川満さん専用完全統合システム - パフォーマンスヘブン連携対応', pageWidth / 2, pageHeight - 10, { align: 'center' });
+                pdf.text('川満さん専用パフォーマンスヘブン統合システム - 完全統合対応', pageWidth / 2, pageHeight - 10, { align: 'center' });
                 
                 // PDFダウンロード
-                const fileName = 'nagoya_pleasure_完全統合レポート_' + new Date().toISOString().split('T')[0] + '.pdf';
+                const fileName = 'nagoya_pleasure_performance_統合レポート_' + new Date().toISOString().split('T')[0] + '.pdf';
                 pdf.save(fileName);
                 
-                showNotification('✅ 完璧なPDFレポートをダウンロードしました！', 'success');
+                showNotification('✅ パフォーマンスヘブン統合PDFレポートをダウンロードしました！', 'success');
                 
             } catch (error) {
                 console.error('PDF生成エラー:', error);
@@ -3226,8 +3795,9 @@
                 const now = new Date();
                 const totalStores = storeData.length;
                 const totalSales = storeData.reduce((sum, store) => sum + parseFloat(store['売上実績'] ? store['売上実績'].replace(/,/g, '') : '0'), 0);
+                const performanceIntegratedCount = storeData.filter(store => store.パフォーマンスヘブン).length;
                 
-                container.innerHTML = '<div class="grid grid-cols-1 md:grid-cols-3 gap-4">' +
+                container.innerHTML = '<div class="grid grid-cols-1 md:grid-cols-4 gap-4">' +
                     '<div class="bg-blue-50 rounded-lg p-4">' +
                         '<div class="text-2xl font-bold text-blue-600">' + totalStores + '</div>' +
                         '<div class="text-sm text-blue-800">読み込み店舗数</div>' +
@@ -3236,15 +3806,19 @@
                         '<div class="text-2xl font-bold text-green-600">¥' + (totalSales / 1000000).toFixed(1) + 'M</div>' +
                         '<div class="text-sm text-green-800">総売上実績</div>' +
                     '</div>' +
+                    '<div class="bg-orange-50 rounded-lg p-4">' +
+                        '<div class="text-2xl font-bold text-orange-600">' + performanceIntegratedCount + '</div>' +
+                        '<div class="text-sm text-orange-800">パフォーマンス統合店舗</div>' +
+                    '</div>' +
                     '<div class="bg-purple-50 rounded-lg p-4">' +
                         '<div class="text-2xl font-bold text-purple-600">' + performancePDFs.length + '</div>' +
                         '<div class="text-sm text-purple-800">パフォーマンスPDF</div>' +
                     '</div>' +
                 '</div>' +
                 '<div class="mt-4 text-sm text-gray-600">' +
-                    '<div>✅ データ同期が正常に完了しています</div>' +
-                    '<div>📊 ダッシュボードに最新データが反映されています</div>' +
-                    '<div>🌟 パフォーマンスヘブン連携機能が利用可能です</div>' +
+                    '<div>✅ データ同期+パフォーマンス統合が正常に完了しています</div>' +
+                    '<div>📊 ダッシュボードに最新統合データが反映されています</div>' +
+                    '<div>🌟 パフォーマンスヘブン完全統合機能が利用可能です</div>' +
                     '<div>🔄 再同期する場合は「同期開始」ボタンをご利用ください</div>' +
                 '</div>';
             } else {
@@ -3298,7 +3872,14 @@
         function sortStores(type) {
             sortBy = type;
             updateStoreTable();
-            showNotification('📊 ' + (type === 'sales' ? '売上' : '達成率') + '順でソートしました', 'info');
+            
+            const sortNames = {
+                'sales': '売上順',
+                'achievement': '達成率順',
+                'performance': 'パフォーマンス順'
+            };
+            
+            showNotification('📊 ' + sortNames[type] + 'でソートしました', 'info');
         }
 
         // ページ管理
@@ -3326,9 +3907,9 @@
             const titles = {
                 dashboard: 'ダッシュボード',
                 sync: 'スプレッドシート同期',
-                performance: 'パフォーマンスヘブン',
+                performance: 'パフォーマンスヘブン統合',
                 manual: '手動入力',
-                analytics: '詳細分析',
+                analytics: '詳細分析（パフォーマンス統合）',
                 calendar: 'カレンダー'
             };
             
@@ -3345,9 +3926,12 @@
             } else if (pageName === 'performance') {
                 updatePerformanceFilesList();
                 updatePerformanceCount();
+                updatePerformanceIntegration();
                 setTimeout(() => createPerformanceCharts(), 100);
             } else if (pageName === 'sync') {
                 updateSyncInfo();
+            } else if (pageName === 'dashboard') {
+                updatePerformanceIntegration();
             }
 
             if (window.innerWidth < 1024) {
@@ -3439,10 +4023,11 @@
         window.downloadCSV = downloadCSV;
         window.updateAnalytics = updateAnalytics;
         window.exportAnalysisReport = exportAnalysisReport;
+        window.showPerformanceIntegration = showPerformanceIntegration;
 
         // ページ読み込み完了時の初期化
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 川満さん専用完全統合システム起動開始');
+            console.log('🚀 川満さん専用パフォーマンスヘブン統合システム起動開始');
             
             initSystem();
             
@@ -3477,6 +4062,10 @@
                         case 'p':
                             e.preventDefault();
                             downloadReport();
+                            break;
+                        case 's':
+                            e.preventDefault();
+                            showPerformanceIntegration();
                             break;
                     }
                 }
@@ -3513,7 +4102,8 @@
                 });
             }
 
-            console.log('✅ システム起動完了 - すべての機能が利用可能です！');
+            console.log('✅ パフォーマンスヘブン統合システム起動完了 - すべての機能が利用可能です！');
+            console.log('🌟 パフォーマンスヘブン統合店舗数:', Object.keys(PERFORMANCE_HEAVEN_DATA).length);
         });
 
         // エラーハンドリング
