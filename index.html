@@ -349,12 +349,15 @@
                         <div class="text-2xl mb-2">🌟</div>
                         <div class="text-sm font-medium">パフォーマンスヘブン</div>
                         <div class="text-xs mb-3 opacity-90">
-                            🎯 キャスト分析統合<br>
-                            📊 パフォーマンス評価<br>
-                            💎 最適化提案
+                            🎯 全11店舗対応<br>
+                            📊 毎月データ更新<br>
+                            💎 PDF・手動入力対応
                         </div>
-                        <div class="text-xs text-white mt-1" id="performanceStatus">
-                            統合データ: 3店舗対応
+                        <button class="btn btn-outline w-full text-sm text-white border-white hover:bg-white hover:text-orange-600" onclick="openPerformanceDataInput()">
+                            <i class="fas fa-plus mr-2"></i>データ入力
+                        </button>
+                        <div class="text-xs text-white mt-2" id="performanceStatus">
+                            統合データ: <span id="performanceIntegratedCount">3</span>/11店舗
                         </div>
                     </div>
                 </div>
@@ -671,15 +674,47 @@
 
                 <!-- パフォーマンスPDFアップロードセクション -->
                 <div class="glass-card p-6 mb-6">
-                    <h3 class="text-xl font-bold text-gray-900 mb-4">📤 パフォーマンスヘブンPDFアップロード</h3>
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">📤 パフォーマンスヘブンPDF・データ入力</h3>
                     
-                    <!-- アップロードゾーン -->
-                    <div class="performance-upload-zone" onclick="document.getElementById('performancePDFFile').click()">
-                        <i class="fas fa-cloud-upload-alt text-4xl text-orange-400 mb-4"></i>
-                        <h4 class="text-lg font-semibold text-gray-700 mb-2">パフォーマンスヘブンPDFをアップロード</h4>
-                        <p class="text-gray-600 mb-2">PDFファイルをドロップまたはクリックして選択</p>
-                        <p class="text-xs text-gray-500">対応形式: PDF (最大10MB)</p>
-                        <input type="file" id="performancePDFFile" accept=".pdf" style="display: none;" onchange="handlePerformancePDFUpload(event)" multiple>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- PDFアップロード -->
+                        <div>
+                            <h4 class="text-lg font-semibold text-gray-800 mb-3">📄 PDFファイルアップロード</h4>
+                            <div class="performance-upload-zone" onclick="document.getElementById('performancePDFFile').click()">
+                                <i class="fas fa-cloud-upload-alt text-4xl text-orange-400 mb-4"></i>
+                                <h4 class="text-lg font-semibold text-gray-700 mb-2">パフォーマンスヘブンPDFをアップロード</h4>
+                                <p class="text-gray-600 mb-2">PDFファイルをドロップまたはクリックして選択</p>
+                                <p class="text-xs text-gray-500">対応形式: PDF (最大10MB)</p>
+                                <input type="file" id="performancePDFFile" accept=".pdf" style="display: none;" onchange="handlePerformancePDFUpload(event)" multiple>
+                            </div>
+                        </div>
+
+                        <!-- データ直接入力 -->
+                        <div>
+                            <h4 class="text-lg font-semibold text-gray-800 mb-3">📝 データ直接入力</h4>
+                            <div class="bg-gradient-to-br from-orange-50 to-yellow-50 border-2 border-dashed border-orange-300 rounded-lg p-6 text-center">
+                                <i class="fas fa-keyboard text-4xl text-orange-400 mb-4"></i>
+                                <h4 class="text-lg font-semibold text-gray-700 mb-2">パフォーマンスデータを入力</h4>
+                                <p class="text-gray-600 mb-4">手動でパフォーマンスヘブンデータを入力・更新できます</p>
+                                <button class="btn btn-orange" onclick="openPerformanceDataInput()">
+                                    <i class="fas fa-plus mr-2"></i>新規データ入力
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 毎月更新のお知らせ -->
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-6">
+                        <div class="flex items-center">
+                            <i class="fas fa-calendar-alt text-blue-500 mr-3"></i>
+                            <div>
+                                <div class="font-semibold text-blue-800">毎月データ更新対応</div>
+                                <div class="text-sm text-blue-700">
+                                    PDFアップロードまたは直接入力により、全11店舗の月次パフォーマンスデータを更新できます。<br>
+                                    既存データがある場合は上書きされ、常に最新の情報が反映されます。
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- アップロード済みファイル一覧 -->
@@ -1045,6 +1080,183 @@
         </div>
     </div>
 
+    <!-- パフォーマンスデータ入力モーダル -->
+    <div id="performanceDataModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-bold text-gray-900">🌟 パフォーマンスヘブンデータ入力</h3>
+                <button onclick="closeModal('performanceDataModal')" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <form id="performanceDataForm">
+                <div class="space-y-6">
+                    <!-- 基本情報 -->
+                    <div class="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                        <h4 class="font-semibold text-orange-800 mb-3">基本情報</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">店舗選択 *</label>
+                                <select id="performanceStoreName" class="input-field" required>
+                                    <option value="">店舗を選択してください</option>
+                                    <option value="シャブール">シャブール (Shaboole)</option>
+                                    <option value="ワンカラット">ワンカラット (OneCart)</option>
+                                    <option value="GO名古屋">GO名古屋 (GrandOpera)</option>
+                                    <option value="GO福岡">GO福岡 (GrandOpera)</option>
+                                    <option value="GO東京">GO東京 (GrandOpera)</option>
+                                    <option value="GO横浜">GO横浜 (GrandOpera)</option>
+                                    <option value="オペラ錦">オペラ錦 (GrandOpera)</option>
+                                    <option value="CL名古屋">CL名古屋 (CLASSY)</option>
+                                    <option value="CL東京">CL東京 (CLASSY)</option>
+                                    <option value="CL四日市">CL四日市 (CLASSY)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">データ更新日 *</label>
+                                <input type="date" id="performanceUpdateDate" class="input-field" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- パフォーマンス指標 -->
+                    <div class="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                        <h4 class="font-semibold text-purple-800 mb-3">パフォーマンス指標</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">パフォーマンススコア (0-100) *</label>
+                                <input type="number" id="performanceScore" class="input-field" min="0" max="100" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">インフルエンサー平均</label>
+                                <input type="number" id="influencerAvg" class="input-field" min="0">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">勤務時間平均</label>
+                                <input type="number" id="workingHoursAvg" class="input-field" min="0">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">売上平均 (円)</label>
+                                <input type="number" id="salesAvg" class="input-field" min="0">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">在籍日数平均</label>
+                                <input type="number" id="tenureDaysAvg" class="input-field" min="0">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- キャスト情報 -->
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <h4 class="font-semibold text-blue-800 mb-3">キャスト情報</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">総キャスト数 *</label>
+                                <input type="number" id="totalCasts" class="input-field" min="0" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">アクティブキャスト数 *</label>
+                                <input type="number" id="activeCasts" class="input-field" min="0" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 満足度分布 -->
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                        <h4 class="font-semibold text-green-800 mb-3">キャスト満足度分布</h4>
+                        <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-green-600 mb-2">優秀</label>
+                                <input type="number" id="excellentCount" class="input-field" min="0" placeholder="0">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-blue-600 mb-2">良好</label>
+                                <input type="number" id="goodCount" class="input-field" min="0" placeholder="0">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-yellow-600 mb-2">普通</label>
+                                <input type="number" id="normalCount" class="input-field" min="0" placeholder="0">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-orange-600 mb-2">要改善</label>
+                                <input type="number" id="poorCount" class="input-field" min="0" placeholder="0">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-red-600 mb-2">緊急改善</label>
+                                <input type="number" id="veryPoorCount" class="input-field" min="0" placeholder="0">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- トップパフォーマー -->
+                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                        <h4 class="font-semibold text-yellow-800 mb-3">トップパフォーマー（上位3名）</h4>
+                        <div class="space-y-4">
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                <div class="font-semibold text-gray-700">1位</div>
+                                <input type="text" id="performer1Name" class="input-field" placeholder="キャスト名">
+                                <input type="number" id="performer1Level" class="input-field" placeholder="レベル" min="0">
+                                <input type="number" id="performer1Sales" class="input-field" placeholder="売上" min="0">
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                <div class="font-semibold text-gray-700">2位</div>
+                                <input type="text" id="performer2Name" class="input-field" placeholder="キャスト名">
+                                <input type="number" id="performer2Level" class="input-field" placeholder="レベル" min="0">
+                                <input type="number" id="performer2Sales" class="input-field" placeholder="売上" min="0">
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                <div class="font-semibold text-gray-700">3位</div>
+                                <input type="text" id="performer3Name" class="input-field" placeholder="キャスト名">
+                                <input type="number" id="performer3Level" class="input-field" placeholder="レベル" min="0">
+                                <input type="number" id="performer3Sales" class="input-field" placeholder="売上" min="0">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 送信ボタン -->
+                    <div class="flex space-x-3">
+                        <button type="button" class="btn btn-orange flex-1" onclick="savePerformanceData()">
+                            <i class="fas fa-star mr-2"></i>パフォーマンスデータを保存
+                        </button>
+                        <button type="button" class="btn btn-outline" onclick="clearPerformanceForm()">
+                            <i class="fas fa-eraser mr-2"></i>クリア
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="previewPerformanceData()">
+                            <i class="fas fa-eye mr-2"></i>プレビュー
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- パフォーマンスデータプレビューモーダル -->
+    <div id="performancePreviewModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-bold text-gray-900">🌟 パフォーマンスデータプレビュー</h3>
+                <button onclick="closeModal('performancePreviewModal')" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div id="performancePreviewContent" class="space-y-4">
+                <!-- プレビュー内容が表示される -->
+            </div>
+            
+            <div class="flex space-x-3 mt-6">
+                <button class="btn btn-orange flex-1" onclick="confirmPerformanceSave()">
+                    <i class="fas fa-check mr-2"></i>確認OK・保存実行
+                </button>
+                <button class="btn btn-outline" onclick="closeModal('performancePreviewModal')">
+                    修正する
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- プレビューモーダル -->
     <div id="previewModal" class="modal hidden">
         <div class="modal-content">
@@ -1091,8 +1303,8 @@
             'https://api.codetabs.com/v1/proxy?quest='
         ];
 
-        // パフォーマンスヘブン統合データ
-        const PERFORMANCE_HEAVEN_DATA = {
+        // パフォーマンスヘブン統合データ（全店舗対応）
+        let PERFORMANCE_HEAVEN_DATA = {
             'CL名古屋': {
                 店舗名: 'CL名古屋',
                 パフォーマンス更新日: '2025/06/30',
@@ -1144,6 +1356,25 @@
                     { name: 'りあ', level: 75, sales: 1910000, reservations: 47 }
                 ]
             }
+        };
+
+        // 全店舗のパフォーマンスデータテンプレート
+        const PERFORMANCE_DATA_TEMPLATE = {
+            店舗名: '',
+            パフォーマンス更新日: '',
+            インフルエンサー平均: 0,
+            勤務時間平均: 0,
+            売上平均: '0円',
+            在籍日数平均: '0日',
+            総キャスト数: 0,
+            アクティブキャスト: 0,
+            店舗満足度: { excellent: 0, good: 0, normal: 0, poor: 0, very_poor: 0 },
+            パフォーマンススコア: 0,
+            topPerformers: [
+                { name: '', level: 0, sales: 0, reservations: 0 },
+                { name: '', level: 0, sales: 0, reservations: 0 },
+                { name: '', level: 0, sales: 0, reservations: 0 }
+            ]
         };
 
         // 実データ（スプレッドシートの最新データ）
@@ -1398,13 +1629,18 @@
                 }
             }
             
+            // 保存されたパフォーマンスデータを復元
+            loadPerformanceData();
+            
             // 実データを読み込み（パフォーマンスヘブン統合）
             loadRealData();
             updateDashboard();
             updateSyncInfo();
             updatePerformanceIntegration();
+            updatePerformanceIntegratedCount();
             
-            showNotification('👨‍💼 川満さん、パフォーマンスヘブン統合システムが準備完了しました！', 'success');
+            const performanceStoreCount = Object.keys(PERFORMANCE_HEAVEN_DATA).length;
+            showNotification(`👨‍💼 川満さん、パフォーマンスヘブン統合システムが準備完了しました！現在${performanceStoreCount}店舗が統合対応済みです。`, 'success');
         }
 
         // 実データ読み込み
@@ -1423,9 +1659,24 @@
             localStorage.setItem('store_data', JSON.stringify(storeData));
         }
 
+        // パフォーマンス統合カウント更新
+        function updatePerformanceIntegratedCount() {
+            const performanceCount = Object.keys(PERFORMANCE_HEAVEN_DATA).length;
+            const countElement = document.getElementById('performanceIntegratedCount');
+            if (countElement) {
+                countElement.textContent = performanceCount;
+            }
+            
+            const statusElement = document.getElementById('performanceStatus');
+            if (statusElement) {
+                statusElement.innerHTML = `統合データ: <span id="performanceIntegratedCount">${performanceCount}</span>/11店舗`;
+            }
+        }
+
         // パフォーマンス統合表示
         function showPerformanceIntegration() {
             updatePerformanceIntegration();
+            updatePerformanceIntegratedCount();
             showNotification('🌟 パフォーマンスヘブン統合分析を更新しました', 'success');
         }
 
@@ -2039,7 +2290,7 @@
             }
         }
 
-        // パフォーマンスPDFアップロード処理
+        // パフォーマンスPDFアップロード処理（拡張版）
         function uploadPerformancePDF() {
             document.getElementById('performancePDFFile').click();
         }
@@ -2072,6 +2323,13 @@
                         updatePerformanceCount();
                         
                         showNotification('✅ ' + file.name + ' をアップロードしました', 'success');
+                        
+                        // PDFアップロード後にデータ入力を提案
+                        setTimeout(() => {
+                            if (confirm('📄 ' + file.name + ' のアップロードが完了しました。\n\nこのPDFに対応するパフォーマンスデータを入力しますか？')) {
+                                openPerformanceDataInput();
+                            }
+                        }, 1000);
                     };
                     reader.readAsDataURL(file);
                 } else {
@@ -2081,6 +2339,246 @@
             
             // ファイル入力をクリア
             event.target.value = '';
+        }
+
+        // パフォーマンスデータ入力モーダルを開く
+        function openPerformanceDataInput() {
+            // 現在の日付をデフォルトに設定
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('performanceUpdateDate').value = today;
+            
+            showModal('performanceDataModal');
+            showNotification('🌟 パフォーマンスヘブンデータ入力フォームを開きました', 'info');
+        }
+
+        // パフォーマンスデータ保存
+        function savePerformanceData() {
+            const formData = getPerformanceFormData();
+            
+            if (!validatePerformanceData(formData)) {
+                return;
+            }
+
+            // パフォーマンスデータオブジェクト作成
+            const performanceData = {
+                店舗名: formData.storeName,
+                パフォーマンス更新日: formData.updateDate,
+                インフルエンサー平均: parseInt(formData.influencerAvg) || 0,
+                勤務時間平均: parseInt(formData.workingHoursAvg) || 0,
+                売上平均: formData.salesAvg ? formData.salesAvg + '円' : '0円',
+                在籍日数平均: formData.tenureDaysAvg ? formData.tenureDaysAvg + '日' : '0日',
+                総キャスト数: parseInt(formData.totalCasts),
+                アクティブキャスト: parseInt(formData.activeCasts),
+                店舗満足度: {
+                    excellent: parseInt(formData.excellentCount) || 0,
+                    good: parseInt(formData.goodCount) || 0,
+                    normal: parseInt(formData.normalCount) || 0,
+                    poor: parseInt(formData.poorCount) || 0,
+                    very_poor: parseInt(formData.veryPoorCount) || 0
+                },
+                パフォーマンススコア: parseInt(formData.performanceScore),
+                topPerformers: [
+                    {
+                        name: formData.performer1Name || '',
+                        level: parseInt(formData.performer1Level) || 0,
+                        sales: parseInt(formData.performer1Sales) || 0,
+                        reservations: Math.floor((parseInt(formData.performer1Sales) || 0) / 50000) // 売上から予約数を推定
+                    },
+                    {
+                        name: formData.performer2Name || '',
+                        level: parseInt(formData.performer2Level) || 0,
+                        sales: parseInt(formData.performer2Sales) || 0,
+                        reservations: Math.floor((parseInt(formData.performer2Sales) || 0) / 50000)
+                    },
+                    {
+                        name: formData.performer3Name || '',
+                        level: parseInt(formData.performer3Level) || 0,
+                        sales: parseInt(formData.performer3Sales) || 0,
+                        reservations: Math.floor((parseInt(formData.performer3Sales) || 0) / 50000)
+                    }
+                ]
+            };
+
+            // PERFORMANCE_HEAVEN_DATAに追加または更新
+            PERFORMANCE_HEAVEN_DATA[formData.storeName] = performanceData;
+            
+            // ローカルストレージに保存
+            localStorage.setItem('performance_heaven_data', JSON.stringify(PERFORMANCE_HEAVEN_DATA));
+            
+            // storeDataの該当店舗も更新
+            const storeIndex = storeData.findIndex(store => store['店舗名'] === formData.storeName);
+            if (storeIndex >= 0) {
+                storeData[storeIndex].パフォーマンスヘブン = performanceData;
+                localStorage.setItem('store_data', JSON.stringify(storeData));
+            }
+            
+            // UIを更新
+            updateDashboard();
+            updateAnalytics();
+            updatePerformanceIntegration();
+            updatePerformanceIntegratedCount();
+            
+            closeModal('performanceDataModal');
+            clearPerformanceForm();
+            
+            showNotification('🌟 ' + formData.storeName + 'のパフォーマンスデータを保存しました！', 'success');
+        }
+
+        // パフォーマンスデータフォームデータ取得
+        function getPerformanceFormData() {
+            return {
+                storeName: document.getElementById('performanceStoreName').value,
+                updateDate: document.getElementById('performanceUpdateDate').value,
+                performanceScore: document.getElementById('performanceScore').value,
+                influencerAvg: document.getElementById('influencerAvg').value,
+                workingHoursAvg: document.getElementById('workingHoursAvg').value,
+                salesAvg: document.getElementById('salesAvg').value,
+                tenureDaysAvg: document.getElementById('tenureDaysAvg').value,
+                totalCasts: document.getElementById('totalCasts').value,
+                activeCasts: document.getElementById('activeCasts').value,
+                excellentCount: document.getElementById('excellentCount').value,
+                goodCount: document.getElementById('goodCount').value,
+                normalCount: document.getElementById('normalCount').value,
+                poorCount: document.getElementById('poorCount').value,
+                veryPoorCount: document.getElementById('veryPoorCount').value,
+                performer1Name: document.getElementById('performer1Name').value,
+                performer1Level: document.getElementById('performer1Level').value,
+                performer1Sales: document.getElementById('performer1Sales').value,
+                performer2Name: document.getElementById('performer2Name').value,
+                performer2Level: document.getElementById('performer2Level').value,
+                performer2Sales: document.getElementById('performer2Sales').value,
+                performer3Name: document.getElementById('performer3Name').value,
+                performer3Level: document.getElementById('performer3Level').value,
+                performer3Sales: document.getElementById('performer3Sales').value
+            };
+        }
+
+        // パフォーマンスデータバリデーション
+        function validatePerformanceData(data) {
+            if (!data.storeName) {
+                showNotification('店舗を選択してください', 'error');
+                return false;
+            }
+            
+            if (!data.updateDate) {
+                showNotification('データ更新日を入力してください', 'error');
+                return false;
+            }
+            
+            if (!data.performanceScore) {
+                showNotification('パフォーマンススコアを入力してください', 'error');
+                return false;
+            }
+            
+            if (!data.totalCasts) {
+                showNotification('総キャスト数を入力してください', 'error');
+                return false;
+            }
+            
+            if (!data.activeCasts) {
+                showNotification('アクティブキャスト数を入力してください', 'error');
+                return false;
+            }
+            
+            if (parseInt(data.activeCasts) > parseInt(data.totalCasts)) {
+                showNotification('アクティブキャスト数が総キャスト数を超えています', 'error');
+                return false;
+            }
+            
+            return true;
+        }
+
+        // パフォーマンスデータプレビュー
+        function previewPerformanceData() {
+            const data = getPerformanceFormData();
+            
+            if (!validatePerformanceData(data)) {
+                return;
+            }
+
+            const previewContent = document.getElementById('performancePreviewContent');
+            if (previewContent) {
+                const activeRate = ((parseInt(data.activeCasts) / parseInt(data.totalCasts)) * 100).toFixed(1);
+                const satisfactionTotal = (parseInt(data.excellentCount) || 0) + 
+                                         (parseInt(data.goodCount) || 0) + 
+                                         (parseInt(data.normalCount) || 0) + 
+                                         (parseInt(data.poorCount) || 0) + 
+                                         (parseInt(data.veryPoorCount) || 0);
+                
+                const satisfactionScore = satisfactionTotal > 0 ? (
+                    ((parseInt(data.excellentCount) || 0) * 5 + 
+                     (parseInt(data.goodCount) || 0) * 4 + 
+                     (parseInt(data.normalCount) || 0) * 3 + 
+                     (parseInt(data.poorCount) || 0) * 2 + 
+                     (parseInt(data.veryPoorCount) || 0) * 1) / satisfactionTotal
+                ).toFixed(1) : '0.0';
+                
+                previewContent.innerHTML = `
+                    <div class="bg-orange-50 rounded-lg p-4">
+                        <h4 class="font-semibold text-orange-800 mb-3">🌟 パフォーマンスデータ確認</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="space-y-3">
+                                <h5 class="font-semibold text-gray-800">基本情報</h5>
+                                <div class="text-sm space-y-2">
+                                    <div><strong>店舗名:</strong> ${data.storeName}</div>
+                                    <div><strong>更新日:</strong> ${data.updateDate}</div>
+                                    <div><strong>パフォーマンススコア:</strong> ${data.performanceScore}点</div>
+                                    <div><strong>総キャスト数:</strong> ${data.totalCasts}名</div>
+                                    <div><strong>アクティブキャスト:</strong> ${data.activeCasts}名 (${activeRate}%)</div>
+                                </div>
+                            </div>
+                            <div class="space-y-3">
+                                <h5 class="font-semibold text-gray-800">指標・満足度</h5>
+                                <div class="text-sm space-y-2">
+                                    <div><strong>インフルエンサー平均:</strong> ${data.influencerAvg || '未入力'}</div>
+                                    <div><strong>勤務時間平均:</strong> ${data.workingHoursAvg || '未入力'}時間</div>
+                                    <div><strong>売上平均:</strong> ¥${parseInt(data.salesAvg || 0).toLocaleString()}</div>
+                                    <div><strong>満足度スコア:</strong> ${satisfactionScore}/5.0 (計${satisfactionTotal}名)</div>
+                                </div>
+                            </div>
+                        </div>
+                        ${data.performer1Name ? `
+                        <div class="mt-4 pt-4 border-t border-orange-200">
+                            <h5 class="font-semibold text-gray-800 mb-2">トップパフォーマー</h5>
+                            <div class="text-sm">
+                                <div>1位: ${data.performer1Name} (Lv.${data.performer1Level}, ¥${parseInt(data.performer1Sales || 0).toLocaleString()})</div>
+                                ${data.performer2Name ? `<div>2位: ${data.performer2Name} (Lv.${data.performer2Level}, ¥${parseInt(data.performer2Sales || 0).toLocaleString()})</div>` : ''}
+                                ${data.performer3Name ? `<div>3位: ${data.performer3Name} (Lv.${data.performer3Level}, ¥${parseInt(data.performer3Sales || 0).toLocaleString()})</div>` : ''}
+                            </div>
+                        </div>
+                        ` : ''}
+                    </div>
+                `;
+            }
+
+            showModal('performancePreviewModal');
+        }
+
+        // パフォーマンスデータ確定保存
+        function confirmPerformanceSave() {
+            closeModal('performancePreviewModal');
+            savePerformanceData();
+        }
+
+        // パフォーマンスフォームクリア
+        function clearPerformanceForm() {
+            document.getElementById('performanceDataForm').reset();
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('performanceUpdateDate').value = today;
+        }
+
+        // システム初期化時にパフォーマンスデータを復元
+        function loadPerformanceData() {
+            const savedPerformanceData = localStorage.getItem('performance_heaven_data');
+            if (savedPerformanceData) {
+                try {
+                    const parsedData = JSON.parse(savedPerformanceData);
+                    PERFORMANCE_HEAVEN_DATA = { ...PERFORMANCE_HEAVEN_DATA, ...parsedData };
+                    console.log('✅ 保存されたパフォーマンスデータを復元しました:', Object.keys(PERFORMANCE_HEAVEN_DATA).length, '店舗');
+                } catch (e) {
+                    console.warn('パフォーマンスデータの復元に失敗:', e);
+                }
+            }
         }
 
         // パフォーマンスファイル一覧更新
@@ -2129,6 +2627,9 @@
             if (sidebarElement) {
                 sidebarElement.textContent = 'パフォーマンス: ' + performancePDFs.length + 'ファイル';
             }
+            
+            // パフォーマンス統合カウントも更新
+            updatePerformanceIntegratedCount();
         }
 
         // PDFダウンロード
@@ -4024,6 +4525,12 @@ ${performanceStores.map((store, index) => {
         window.updateAnalytics = updateAnalytics;
         window.exportAnalysisReport = exportAnalysisReport;
         window.showPerformanceIntegration = showPerformanceIntegration;
+        window.openPerformanceDataInput = openPerformanceDataInput;
+        window.savePerformanceData = savePerformanceData;
+        window.previewPerformanceData = previewPerformanceData;
+        window.confirmPerformanceSave = confirmPerformanceSave;
+        window.clearPerformanceForm = clearPerformanceForm;
+        window.updatePerformanceIntegratedCount = updatePerformanceIntegratedCount;
 
         // ページ読み込み完了時の初期化
         document.addEventListener('DOMContentLoaded', function() {
@@ -4103,7 +4610,9 @@ ${performanceStores.map((store, index) => {
             }
 
             console.log('✅ パフォーマンスヘブン統合システム起動完了 - すべての機能が利用可能です！');
-            console.log('🌟 パフォーマンスヘブン統合店舗数:', Object.keys(PERFORMANCE_HEAVEN_DATA).length);
+            console.log('🌟 パフォーマンスヘブン統合店舗数:', Object.keys(PERFORMANCE_HEAVEN_DATA).length, '/11店舗');
+            console.log('📄 アップロード済みPDF数:', performancePDFs.length);
+            console.log('💾 月次データ更新機能: 有効');
         });
 
         // エラーハンドリング
