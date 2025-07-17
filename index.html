@@ -332,8 +332,8 @@
                         <div class="text-2xl mb-2">🔗</div>
                         <div class="text-sm font-medium">Google Sheets API同期</div>
                         <div class="text-xs mb-3 opacity-90">
-                            📊 リアルタイム更新<br>
-                            🔒 安全な認証<br>
+                            📊 API + CSV完全対応<br>
+                            🔒 安全な認証システム<br>
                             💾 データ永続化
                         </div>
                         <button class="btn btn-outline w-full text-sm text-white border-white hover:bg-white hover:text-blue-600" onclick="startAPISync()">
@@ -376,7 +376,7 @@
                             PDF処理済み: <span id="uploadedPDFCount">0</span>ファイル
                         </div>
                         <div class="text-xs text-gray-500 mt-1" id="syncMethod">
-                            同期方法: Google Sheets API
+                            同期方法: Google Sheets API + CSV
                         </div>
                     </div>
                 </div>
@@ -574,22 +574,63 @@
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">スプレッドシートID</label>
-                                <input type="text" id="spreadsheetId" class="input-field" onchange="saveSpreadsheetId()">
+                                <input type="text" id="spreadsheetId" class="input-field" placeholder="1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms" onchange="saveSpreadsheetId()">
                                 <div class="text-xs text-blue-600 mt-1">
-                                    同期するスプレッドシートのIDを入力してください
+                                    同期するスプレッドシートのIDを入力してください（URLの一部）
                                 </div>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">シート範囲</label>
                                 <input type="text" id="sheetRange" class="input-field" value="Sheet1!A:Z" onchange="saveSheetRange()">
                                 <div class="text-xs text-blue-600 mt-1">
-                                    データを取得する範囲を指定してください
+                                    データを取得する範囲を指定してください（例: Sheet1!A:Z）
                                 </div>
                             </div>
-                            <button class="btn btn-google" onclick="testAPIConnection()">
-                                <i class="fas fa-plug mr-2"></i>接続テスト
-                            </button>
+                            <div class="flex space-x-3">
+                                <button class="btn btn-google" onclick="testAPIConnection()">
+                                    <i class="fas fa-plug mr-2"></i>接続テスト
+                                </button>
+                                <button class="btn btn-primary" onclick="showAPISetupInstructions()">
+                                    <i class="fas fa-question-circle mr-2"></i>設定方法
+                                </button>
+                                <button class="btn btn-success" onclick="tryCSVSync()">
+                                    <i class="fas fa-file-csv mr-2"></i>CSV同期
+                                </button>
+                            </div>
                         </div>
+                    </div>
+
+                    <!-- セットアップ手順 -->
+                    <div id="apiInstructions" class="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mb-6 hidden">
+                        <h4 class="text-lg font-semibold text-yellow-800 mb-4">🔧 Google Sheets API セットアップ手順</h4>
+                        <div class="space-y-3 text-sm">
+                            <div class="font-semibold text-yellow-800">1. Google Cloud Console での設定:</div>
+                            <ul class="ml-4 space-y-1 text-yellow-700">
+                                <li>• <a href="https://console.cloud.google.com/" target="_blank" class="underline">Google Cloud Console</a> にアクセス</li>
+                                <li>• 新しいプロジェクトを作成または既存のプロジェクトを選択</li>
+                                <li>• 「API とサービス」→「ライブラリ」で Google Sheets API を有効化</li>
+                                <li>• 「認証情報」→「認証情報を作成」→「APIキー」を選択</li>
+                                <li>• APIキーを制限（推奨）: Google Sheets API のみ許可</li>
+                            </ul>
+                            
+                            <div class="font-semibold text-yellow-800 mt-4">2. スプレッドシートの設定:</div>
+                            <ul class="ml-4 space-y-1 text-yellow-700">
+                                <li>• スプレッドシートの共有設定を「リンクを知っている全員」に変更</li>
+                                <li>• または、ファイル→共有→ウェブに公開を選択</li>
+                                <li>• ヘッダー行を設定: 店舗名, 更新日, 売上実績, 売上目標, 写メ日記投稿数 など</li>
+                            </ul>
+                            
+                            <div class="font-semibold text-yellow-800 mt-4">3. CORS問題の解決:</div>
+                            <ul class="ml-4 space-y-1 text-yellow-700">
+                                <li>• ブラウザから直接APIアクセスできない場合があります</li>
+                                <li>• 解決方法1: スプレッドシートを「ウェブに公開」に設定</li>
+                                <li>• 解決方法2: Google Apps Script でプロキシを作成</li>
+                                <li>• 解決方法3: Chrome拡張機能でCORSを無効化（開発時のみ）</li>
+                            </ul>
+                        </div>
+                        <button class="btn btn-outline mt-4" onclick="hideAPISetupInstructions()">
+                            <i class="fas fa-eye-slash mr-2"></i>手順を非表示
+                        </button>
                     </div>
 
                     <!-- 現在の同期状況 -->
@@ -1395,8 +1436,25 @@
 
         // API設定の読み込み
         function loadSavedAPISettings() {
-            // 簡易的にデフォルト値を設定（ブラウザストレージは使用しない）
+            // ブラウザストレージを使わない代わりに、セッション中は保持
             console.log('API設定読み込み完了');
+            
+            // デモ用にサンプル設定を表示（実際の使用時は削除）
+            setTimeout(() => {
+                const apiKeyInput = document.getElementById('apiKey');
+                const spreadsheetIdInput = document.getElementById('spreadsheetId');
+                const sheetRangeInput = document.getElementById('sheetRange');
+                
+                if (apiKeyInput && !apiKeyInput.value) {
+                    apiKeyInput.placeholder = 'AIzaSyC... (Google Cloud Console で取得)';
+                }
+                if (spreadsheetIdInput && !spreadsheetIdInput.value) {
+                    spreadsheetIdInput.placeholder = '1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms';
+                }
+                if (sheetRangeInput && !sheetRangeInput.value) {
+                    sheetRangeInput.value = 'Sheet1!A:Z';
+                }
+            }, 1000);
         }
 
         // 実データ読み込み
@@ -1618,22 +1676,43 @@
         function saveAPIKey() {
             const apiKeyInput = document.getElementById('apiKey');
             if (apiKeyInput) {
-                apiKey = apiKeyInput.value;
-                updateAPIStatus(apiKey ? 'APIキー保存済み' : '未設定');
+                apiKey = apiKeyInput.value.trim();
+                if (apiKey) {
+                    updateAPIStatus('APIキー保存済み');
+                    showNotification('✅ APIキーを保存しました', 'success', 2000);
+                    console.log('✅ APIキーが設定されました:', apiKey.substring(0, 10) + '...');
+                } else {
+                    updateAPIStatus('未設定');
+                    showNotification('⚠️ APIキーが空です', 'warning', 2000);
+                }
             }
         }
 
         function saveSpreadsheetId() {
             const spreadsheetIdInput = document.getElementById('spreadsheetId');
             if (spreadsheetIdInput) {
-                spreadsheetId = spreadsheetIdInput.value;
+                spreadsheetId = spreadsheetIdInput.value.trim();
+                if (spreadsheetId) {
+                    showNotification('✅ スプレッドシートIDを保存しました', 'success', 2000);
+                    console.log('✅ スプレッドシートIDが設定されました:', spreadsheetId);
+                } else {
+                    showNotification('⚠️ スプレッドシートIDが空です', 'warning', 2000);
+                }
             }
         }
 
         function saveSheetRange() {
             const sheetRangeInput = document.getElementById('sheetRange');
             if (sheetRangeInput) {
-                sheetRange = sheetRangeInput.value;
+                sheetRange = sheetRangeInput.value.trim();
+                if (sheetRange) {
+                    showNotification('✅ シート範囲を保存しました', 'success', 2000);
+                    console.log('✅ シート範囲が設定されました:', sheetRange);
+                } else {
+                    sheetRange = 'Sheet1!A:Z'; // デフォルト値
+                    sheetRangeInput.value = sheetRange;
+                    showNotification('⚠️ デフォルト範囲を設定しました', 'info', 2000);
+                }
             }
         }
 
@@ -1641,6 +1720,105 @@
             const statusElement = document.getElementById('apiStatusText');
             if (statusElement) {
                 statusElement.textContent = `API設定: ${status}`;
+            }
+        }
+
+        // CSV同期機能（CORS回避のための代替手段）
+        function tryCSVSync() {
+            if (!spreadsheetId) {
+                showNotification('❌ まずスプレッドシートIDを設定してください', 'error');
+                return;
+            }
+            
+            showNotification('🔄 CSV形式での同期を試行中...', 'info', 3000);
+            updateConnectionStatus('loading', 'CSV同期を実行中...');
+            
+            // Google SheetsのCSV出力URL
+            const csvUrl = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/export?format=csv&gid=0`;
+            
+            fetch(csvUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`CSV取得エラー: ${response.status} ${response.statusText}`);
+                    }
+                    return response.text();
+                })
+                .then(csvText => {
+                    console.log('✅ CSV データ取得成功');
+                    return parseCSVData(csvText);
+                })
+                .then(parsedData => {
+                    return integrateAPIData(parsedData);
+                })
+                .then((result) => {
+                    updateConnectionStatus('success', `CSV同期完了 - ${storeData.length}店舗データ更新完了`);
+                    updateDashboard();
+                    updateSyncInfo();
+                    showNotification(`✅ CSV同期が完了しました！\n\n更新: ${result.updated}店舗\n追加: ${result.added}店舗\n総計: ${storeData.length}店舗`, 'success');
+                })
+                .catch(error => {
+                    console.error('❌ CSV同期エラー:', error);
+                    updateConnectionStatus('error', 'CSV同期エラー');
+                    showNotification(`❌ CSV同期に失敗しました\n\n${error.message}\n\n対処法:\n1. スプレッドシートの共有設定を確認\n2. 「ウェブに公開」を有効化\n3. スプレッドシートIDが正しいか確認`, 'error', 10000);
+                });
+        }
+
+        // CSV データ解析
+        function parseCSVData(csvText) {
+            return new Promise((resolve, reject) => {
+                try {
+                    console.log('🔍 CSV データ解析開始');
+                    
+                    const lines = csvText.split('\n').filter(line => line.trim());
+                    if (lines.length < 2) {
+                        throw new Error('CSVデータが不足しています（ヘッダー行とデータ行が必要）');
+                    }
+                    
+                    const headers = lines[0].split(',').map(header => header.trim().replace(/"/g, ''));
+                    console.log('📋 CSVヘッダー:', headers);
+                    
+                    const parsedData = [];
+                    
+                    for (let i = 1; i < lines.length; i++) {
+                        const values = lines[i].split(',').map(value => value.trim().replace(/"/g, ''));
+                        const rowData = {};
+                        
+                        headers.forEach((header, index) => {
+                            rowData[header] = values[index] || '';
+                        });
+                        
+                        if (rowData['店舗名'] && rowData['店舗名'] !== '') {
+                            // ブランドの自動判定
+                            if (!rowData['ブランド'] || rowData['ブランド'] === '') {
+                                rowData['ブランド'] = getBrandFromStoreName(rowData['店舗名']);
+                            }
+                            
+                            parsedData.push(rowData);
+                        }
+                    }
+                    
+                    console.log(`✅ CSV データ解析完了: ${parsedData.length}店舗`);
+                    resolve(parsedData);
+                } catch (error) {
+                    console.error('❌ CSV データ解析エラー:', error);
+                    reject(error);
+                }
+            });
+        }
+
+        // セットアップ手順表示/非表示
+        function showAPISetupInstructions() {
+            const instructions = document.getElementById('apiInstructions');
+            if (instructions) {
+                instructions.classList.remove('hidden');
+                showNotification('📖 Google Sheets API設定手順を表示しました', 'info', 2000);
+            }
+        }
+
+        function hideAPISetupInstructions() {
+            const instructions = document.getElementById('apiInstructions');
+            if (instructions) {
+                instructions.classList.add('hidden');
             }
         }
 
@@ -1658,12 +1836,43 @@
             updateAPIStatus('接続テスト中...');
             updateConnectionStatus('loading', 'API接続テスト実行中...');
             
-            // モックAPI接続テスト（実際の接続は行わない）
-            setTimeout(() => {
-                updateAPIStatus('接続成功');
-                updateConnectionStatus('success', 'API接続テスト成功');
-                showNotification('✅ Google Sheets API接続テストが成功しました', 'success');
-            }, 2000);
+            // 実際のGoogle Sheets API接続テスト
+            const testUrl = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}?key=${apiKey}`;
+            
+            fetch(testUrl)
+                .then(response => {
+                    console.log('API Response Status:', response.status);
+                    if (!response.ok) {
+                        if (response.status === 403) {
+                            throw new Error('APIキーの権限が不足しているか、Sheets APIが有効化されていません');
+                        } else if (response.status === 404) {
+                            throw new Error('指定されたスプレッドシートが見つかりません');
+                        } else if (response.status === 400) {
+                            throw new Error('APIキーまたはスプレッドシートIDが無効です');
+                        } else {
+                            throw new Error(`API Error: ${response.status} ${response.statusText}`);
+                        }
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('✅ API接続テスト成功:', data);
+                    updateAPIStatus('接続成功');
+                    updateConnectionStatus('success', `API接続成功 - シート名: ${data.properties?.title || '不明'}`);
+                    showNotification(`✅ Google Sheets API接続テストが成功しました\nシート名: ${data.properties?.title || '不明'}`, 'success');
+                })
+                .catch(error => {
+                    console.error('❌ API接続テストエラー:', error);
+                    updateAPIStatus('接続エラー');
+                    updateConnectionStatus('error', 'API接続エラー');
+                    
+                    let errorMessage = error.message;
+                    if (error.message.includes('CORS')) {
+                        errorMessage = 'CORS エラー: ブラウザの制限により直接アクセスできません。Google Apps Script プロキシの使用を検討してください。';
+                    }
+                    
+                    showNotification(`❌ API接続テストに失敗しました\n\n${errorMessage}\n\n対処法:\n1. APIキーが正しいか確認\n2. Google Cloud Console で Sheets API が有効か確認\n3. スプレッドシートが公開されているか確認`, 'error', 10000);
+                });
         }
 
         function startAPISync() {
@@ -1673,32 +1882,73 @@
                 return;
             }
             
+            if (!spreadsheetId) {
+                showNotification('⚠️ スプレッドシートIDを設定してください', 'warning');
+                showPage('sync');
+                return;
+            }
+            
             updateConnectionStatus('loading', 'Google Sheets API同期を実行中...');
             showProgress(0, 'API同期を開始しています...');
             
-            // モック同期処理
-            setTimeout(() => {
-                showProgress(25, 'API応答を受信中...');
-            }, 500);
+            const syncUrl = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${sheetRange}?key=${apiKey}`;
             
-            setTimeout(() => {
-                showProgress(50, 'データを解析中...');
-            }, 1000);
-            
-            setTimeout(() => {
-                showProgress(75, 'データを統合中...');
-            }, 1500);
-            
-            setTimeout(() => {
-                showProgress(100, 'API同期完了！');
-                setTimeout(() => {
+            fetch(syncUrl)
+                .then(response => {
+                    showProgress(25, 'API応答を受信中...');
+                    console.log('Sync Response Status:', response.status);
+                    
+                    if (!response.ok) {
+                        if (response.status === 403) {
+                            throw new Error('APIキーの権限が不足しています。Google Cloud Console で Sheets API を有効化してください。');
+                        } else if (response.status === 404) {
+                            throw new Error('指定されたスプレッドシートまたは範囲が見つかりません。');
+                        } else if (response.status === 400) {
+                            throw new Error('APIキー、スプレッドシートID、または範囲が無効です。');
+                        } else {
+                            throw new Error(`API Error: ${response.status} ${response.statusText}`);
+                        }
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    showProgress(50, 'データを解析中...');
+                    console.log('✅ API同期データ取得成功:', data);
+                    return parseAPIData(data);
+                })
+                .then(parsedData => {
+                    showProgress(75, 'データを統合中...');
+                    return integrateAPIData(parsedData);
+                })
+                .then((result) => {
+                    showProgress(100, 'API同期完了！');
+                    setTimeout(() => {
+                        hideProgress();
+                        updateDashboard();
+                        updateSyncInfo();
+                        updateConnectionStatus('success', `API同期完了 - ${storeData.length}店舗データ更新完了（更新:${result.updated}、追加:${result.added}）`);
+                        showNotification(`🔗 Google Sheets API同期が完了しました！\n\n更新: ${result.updated}店舗\n追加: ${result.added}店舗\n総計: ${storeData.length}店舗`, 'success');
+                    }, 500);
+                })
+                .catch(error => {
+                    console.error('❌ API同期エラー:', error);
                     hideProgress();
-                    updateDashboard();
-                    updateSyncInfo();
-                    updateConnectionStatus('success', `API同期完了 - ${storeData.length}店舗データ更新完了`);
-                    showNotification('🔗 Google Sheets API同期が完了しました！', 'success');
-                }, 500);
-            }, 2000);
+                    updateConnectionStatus('error', 'API同期エラー');
+                    
+                    let errorMessage = error.message;
+                    let suggestions = '';
+                    
+                    if (error.message.includes('CORS')) {
+                        errorMessage = 'CORS制限によりブラウザから直接アクセスできません';
+                        suggestions = '\n\n解決方法:\n1. Google Apps Script でプロキシを作成\n2. スプレッドシートを「ウェブに公開」に設定\n3. OAuth2認証を使用';
+                    } else if (error.message.includes('403')) {
+                        suggestions = '\n\n解決方法:\n1. Google Cloud Console で Sheets API を有効化\n2. APIキーの権限を確認\n3. スプレッドシートの共有設定を確認';
+                    } else if (error.message.includes('404')) {
+                        suggestions = '\n\n解決方法:\n1. スプレッドシートIDが正しいか確認\n2. シート範囲が存在するか確認\n3. スプレッドシートがアクセス可能か確認';
+                    }
+                    
+                    showNotification(`❌ API同期に失敗しました\n\n${errorMessage}${suggestions}`, 'error', 15000);
+                });
         }
 
         // 進行状況表示
@@ -1768,6 +2018,10 @@
                             <div class="flex justify-between">
                                 <span>データ範囲:</span>
                                 <span class="text-blue-600">${sheetRange}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>同期方法:</span>
+                                <span class="text-purple-600">API + CSV対応</span>
                             </div>
                         </div>
                     </div>
@@ -2847,7 +3101,7 @@
                 const ocrStatus = window.tesseractLoaded ? 'AI OCR完全対応' : 'PDF.js + フォールバック対応';
                 showNotification(`🎉 川満さん、強化統合システムが完全に起動しました！
 
-✅ Google Sheets API: 設定可能
+✅ Google Sheets API: 完全対応 + CSV同期
 🤖 強化PDF読み取り: ${ocrStatus}
 🌟 パフォーマンス統合: ${performanceCount}店舗
 📊 リアルタイム分析: 全機能利用可能
