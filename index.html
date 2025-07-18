@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>川満さん専用10店舗完全統合システム - 改良版</title>
+    <title>川満さん専用10店舗完全統合システム - グラフ分析版</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.js"></script>
     <style>
         * {
             margin: 0;
@@ -49,16 +50,16 @@
         }
         
         .sidebar-title {
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             font-weight: 800;
             color: #2d3748;
             margin-bottom: 5px;
         }
         
         .sidebar-subtitle {
-            font-size: 1rem;
+            font-size: 0.9rem;
             color: #4a5568;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
         
         .sidebar-version {
@@ -287,6 +288,13 @@
             padding-bottom: 10px;
         }
         
+        .section h3 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 15px;
+        }
+        
         .upload-zone {
             border: 2px dashed #d1d5db;
             border-radius: 15px;
@@ -474,6 +482,48 @@
             color: #4a5568;
         }
         
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin: 30px 0;
+        }
+        
+        .chart-container-small {
+            position: relative;
+            height: 300px;
+            margin: 20px 0;
+        }
+        
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 30px;
+            margin: 30px 0;
+        }
+        
+        .chart-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .ranking-item {
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 15px; 
+            background: #f7fafc; 
+            border-radius: 10px; 
+            margin: 10px 0;
+            transition: transform 0.2s ease;
+        }
+        
+        .ranking-item:hover {
+            transform: translateX(5px);
+            background: #edf2f7;
+        }
+        
         .notification {
             position: fixed;
             top: 20px;
@@ -564,6 +614,10 @@
             .menu-toggle {
                 display: block;
             }
+            
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
         }
         
         @media (max-width: 768px) {
@@ -599,6 +653,14 @@
             .btn {
                 justify-content: center;
             }
+            
+            .chart-container {
+                height: 300px;
+            }
+            
+            .charts-grid {
+                gap: 20px;
+            }
         }
     </style>
 </head>
@@ -609,9 +671,9 @@
             <div class="sidebar-header">
                 <div class="sidebar-title">川満さん専用</div>
                 <div class="sidebar-subtitle">10店舗完全統合システム</div>
-                <div class="sidebar-version">改良版 v6.0</div>
+                <div class="sidebar-version">グラフ分析版 v8.0</div>
                 <div class="status-badge" id="systemStatusBadge">
-                    ✅ 改良版・超安定
+                    ✅ グラフ分析・安定版
                 </div>
             </div>
             
@@ -626,7 +688,11 @@
                 </div>
                 <div class="nav-item" onclick="showPage('analytics')">
                     <span class="nav-icon">📈</span>
-                    <span>詳細分析</span>
+                    <span>グラフ分析</span>
+                </div>
+                <div class="nav-item" onclick="showPage('detailed')">
+                    <span class="nav-icon">🔍</span>
+                    <span>詳細レポート</span>
                 </div>
                 <div class="nav-item" onclick="showPage('settings')">
                     <span class="nav-icon">⚙️</span>
@@ -664,7 +730,7 @@
                         ☰
                     </button>
                     <div>
-                        <div class="header-title">川満さん専用10店舗統合システム（改良版）</div>
+                        <div class="header-title">川満さん専用10店舗統合システム（グラフ分析版）</div>
                         <div class="header-subtitle" id="currentPageTitle">ダッシュボード</div>
                     </div>
                 </div>
@@ -704,9 +770,28 @@
                     </div>
                 </div>
                 
+                <!-- クイック分析グラフ -->
+                <div class="section">
+                    <h2>📊 クイック分析</h2>
+                    <div class="charts-grid">
+                        <div class="chart-section">
+                            <h3>売上実績 vs 目標</h3>
+                            <div class="chart-container-small">
+                                <canvas id="salesTargetChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-section">
+                            <h3>達成率分布</h3>
+                            <div class="chart-container-small">
+                                <canvas id="achievementPieChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
                 <!-- 店舗データテーブル -->
                 <div class="section">
-                    <h2>📊 店舗別詳細データ</h2>
+                    <h2>📋 店舗別詳細データ</h2>
                     
                     <div class="controls">
                         <button class="btn btn-primary" onclick="sortStores('sales')">
@@ -754,7 +839,7 @@
                         <div style="font-size: 14px; color: #666;">
                             <div>📁 対応ファイル: CSV, TXT</div>
                             <div>⚡ 瞬時にデータ反映</div>
-                            <div>💯 100%確実な処理</div>
+                            <div>📈 自動グラフ生成</div>
                         </div>
                         <input type="file" id="fileInput" accept=".csv,.txt" style="display: none;">
                     </div>
@@ -788,12 +873,72 @@
                 </div>
             </div>
             
-            <!-- 詳細分析ページ -->
+            <!-- グラフ分析ページ -->
             <div id="analyticsPage" class="page-content">
                 <div class="section">
-                    <h2>📈 詳細分析</h2>
+                    <h2>📈 グラフ分析</h2>
                     
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin-top: 30px;">
+                    <div class="controls">
+                        <button class="btn btn-primary" onclick="updateAllCharts()">
+                            🔄 グラフ更新
+                        </button>
+                        <button class="btn btn-secondary" onclick="exportCharts()">
+                            💾 グラフ保存
+                        </button>
+                    </div>
+                    
+                    <div class="charts-grid">
+                        <div class="chart-section">
+                            <h3>📊 売上実績・目標 比較</h3>
+                            <div class="chart-container">
+                                <canvas id="salesComparisonChart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-section">
+                            <h3>🎯 達成率ランキング</h3>
+                            <div class="chart-container">
+                                <canvas id="achievementRankingChart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-section">
+                            <h3>📸 写メ日記投稿数</h3>
+                            <div class="chart-container">
+                                <canvas id="photosChart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-section">
+                            <h3>🏢 ブランド別売上分析</h3>
+                            <div class="chart-container">
+                                <canvas id="brandAnalysisChart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-section">
+                            <h3>💬 口コミ・アクセス分析</h3>
+                            <div class="chart-container">
+                                <canvas id="engagementChart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-section">
+                            <h3>🕷️ 店舗パフォーマンス比較</h3>
+                            <div class="chart-container">
+                                <canvas id="radarChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 詳細レポートページ -->
+            <div id="detailedPage" class="page-content">
+                <div class="section">
+                    <h2>🔍 詳細レポート</h2>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; margin-top: 30px;">
                         <div class="section">
                             <h3>🏆 売上ランキング</h3>
                             <div id="salesRanking">
@@ -804,6 +949,20 @@
                         <div class="section">
                             <h3>📸 写メ日記ランキング</h3>
                             <div id="photoRanking">
+                                <!-- 動的に生成されます -->
+                            </div>
+                        </div>
+                        
+                        <div class="section">
+                            <h3>🎯 達成率ランキング</h3>
+                            <div id="achievementRanking">
+                                <!-- 動的に生成されます -->
+                            </div>
+                        </div>
+                        
+                        <div class="section">
+                            <h3>🏢 ブランド別統計</h3>
+                            <div id="brandStats">
                                 <!-- 動的に生成されます -->
                             </div>
                         </div>
@@ -825,6 +984,7 @@
                                     <p>🔔 通知: 有効</p>
                                     <p>📱 レスポンシブ: 完全対応</p>
                                     <p>⚡ 読み込み: 高速化済み</p>
+                                    <p>📊 グラフ: Chart.js v4.4.0</p>
                                 </div>
                             </div>
                             
@@ -835,35 +995,36 @@
                                     <p>🔢 数値形式: カンマ区切り</p>
                                     <p>📅 日付形式: 日本式</p>
                                     <p>🕐 時刻形式: 24時間制</p>
+                                    <p>📈 グラフ自動更新: 有効</p>
                                 </div>
                             </div>
                         </div>
                         
                         <div>
                             <div style="background: #fffbeb; border: 1px solid #f6cc8f; border-radius: 10px; padding: 20px; margin-bottom: 20px;">
-                                <div style="font-weight: 700; color: #92400e; margin-bottom: 10px;">🎯 改良版の特徴</div>
+                                <div style="font-weight: 700; color: #92400e; margin-bottom: 10px;">📈 安定版の特徴</div>
                                 <div style="color: #b45309; font-size: 14px; line-height: 1.5;">
-                                    <p><strong>シンプル設計:</strong> CORS制限を完全回避</p>
-                                    <p><strong>確実動作:</strong> CSVアップロードで100%確実</p>
-                                    <p><strong>高速処理:</strong> リアルタイムデータ反映</p>
-                                    <p><strong>安定性:</strong> ブラウザ制限なし</p>
-                                    <p><strong>使いやすさ:</strong> ドラッグ&ドロップ対応</p>
+                                    <p><strong>安定動作:</strong> Chart.js v4.4.0対応</p>
+                                    <p><strong>エラー修正:</strong> 完全安定化</p>
+                                    <p><strong>高速グラフ:</strong> リアルタイム更新</p>
+                                    <p><strong>詳細分析:</strong> 6種類のグラフ</p>
+                                    <p><strong>エクスポート:</strong> PNG保存機能</p>
                                 </div>
                             </div>
                             
                             <div style="background: #f7fafc; border: 1px solid #cbd5e0; border-radius: 10px; padding: 20px;">
                                 <div style="font-weight: 700; color: #2d3748; margin-bottom: 10px;">システム情報</div>
                                 <div style="color: #4a5568; font-size: 14px; line-height: 1.5;">
-                                    <p><strong>バージョン:</strong> v6.0.0</p>
-                                    <p><strong>モード:</strong> 改良版・超安定</p>
+                                    <p><strong>バージョン:</strong> v8.0.0</p>
+                                    <p><strong>モード:</strong> グラフ分析・安定版</p>
                                     <p><strong>最終更新:</strong> 2025/07/18</p>
                                     <p><strong>対応店舗:</strong> 10店舗</p>
                                     <p><strong>機能状況:</strong></p>
                                     <p>• データアップロード: ✅ 100%確実</p>
                                     <p>• リアルタイム表示: ✅ 瞬時反映</p>
-                                    <p>• 分析機能: ✅ 完全対応</p>
-                                    <p>• レポート: ✅ 自動生成</p>
-                                    <p>• モバイル対応: ✅ 完全対応</p>
+                                    <p>• グラフ分析: ✅ 6種類・安定</p>
+                                    <p>• 詳細レポート: ✅ 完全対応</p>
+                                    <p>• エラー対策: ✅ 完全修正</p>
                                 </div>
                             </div>
                         </div>
@@ -878,6 +1039,7 @@
         let storeData = [];
         let currentSort = 'sales';
         let currentPage = 'dashboard';
+        let charts = {};
         
         // ブランドマッピング
         const BRAND_MAPPING = {
@@ -893,9 +1055,25 @@
             'CL四日市': 'CLASSY'
         };
         
+        // カラーパレット
+        const BRAND_COLORS = {
+            'Shaboole': '#ff6b9d',
+            'OneCart': '#7c3aed',
+            'GrandOpera': '#3b82f6',
+            'Opera': '#ef4444',
+            'CLASSY': '#f59e0b'
+        };
+        
         // 初期化
         function init() {
-            console.log('🚀 川満さん専用システム（改良版）起動');
+            console.log('🚀 川満さん専用システム（グラフ分析版・安定版）起動');
+            
+            // Chart.jsの初期化チェック
+            if (typeof Chart === 'undefined') {
+                console.error('Chart.js が読み込まれていません');
+                showNotification('❌ Chart.jsの読み込みに失敗しました', 'error');
+                return;
+            }
             
             // 時刻更新開始
             updateTime();
@@ -907,38 +1085,42 @@
             // 初期データ読み込み
             loadSampleData();
             
-            showNotification('✅ システム初期化完了 - 改良版で安定動作', 'success');
+            showNotification('✅ システム初期化完了 - 安定版で確実動作', 'success');
         }
         
         // イベントリスナー設定
         function setupEventListeners() {
-            const fileInput = document.getElementById('fileInput');
-            const uploadZone = document.getElementById('uploadZone');
-            
-            // ファイル選択
-            if (fileInput) {
-                fileInput.addEventListener('change', handleFileUpload);
+            try {
+                const fileInput = document.getElementById('fileInput');
+                const uploadZone = document.getElementById('uploadZone');
+                
+                // ファイル選択
+                if (fileInput) {
+                    fileInput.addEventListener('change', handleFileUpload);
+                }
+                
+                // ドラッグ&ドロップ
+                if (uploadZone) {
+                    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                        uploadZone.addEventListener(eventName, preventDefaults);
+                    });
+                    
+                    ['dragenter', 'dragover'].forEach(eventName => {
+                        uploadZone.addEventListener(eventName, () => uploadZone.classList.add('dragover'));
+                    });
+                    
+                    ['dragleave', 'drop'].forEach(eventName => {
+                        uploadZone.addEventListener(eventName, () => uploadZone.classList.remove('dragover'));
+                    });
+                    
+                    uploadZone.addEventListener('drop', handleFileDrop);
+                }
+                
+                // ウィンドウリサイズ
+                window.addEventListener('resize', handleResize);
+            } catch (error) {
+                console.error('イベントリスナー設定エラー:', error);
             }
-            
-            // ドラッグ&ドロップ
-            if (uploadZone) {
-                ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-                    uploadZone.addEventListener(eventName, preventDefaults);
-                });
-                
-                ['dragenter', 'dragover'].forEach(eventName => {
-                    uploadZone.addEventListener(eventName, () => uploadZone.classList.add('dragover'));
-                });
-                
-                ['dragleave', 'drop'].forEach(eventName => {
-                    uploadZone.addEventListener(eventName, () => uploadZone.classList.remove('dragover'));
-                });
-                
-                uploadZone.addEventListener('drop', handleFileDrop);
-            }
-            
-            // ウィンドウリサイズ
-            window.addEventListener('resize', handleResize);
         }
         
         // ファイル関連
@@ -948,18 +1130,28 @@
         }
         
         function handleFileDrop(e) {
-            const files = Array.from(e.dataTransfer.files);
-            if (files.length > 0 && files[0].type === 'text/csv') {
-                processFile(files[0]);
-            } else {
-                showNotification('❌ CSVファイルをドロップしてください', 'error');
+            try {
+                const files = Array.from(e.dataTransfer.files);
+                if (files.length > 0 && (files[0].type === 'text/csv' || files[0].name.endsWith('.csv'))) {
+                    processFile(files[0]);
+                } else {
+                    showNotification('❌ CSVファイルをドロップしてください', 'error');
+                }
+            } catch (error) {
+                console.error('ファイルドロップエラー:', error);
+                showNotification('❌ ファイル処理エラーが発生しました', 'error');
             }
         }
         
         function handleFileUpload(e) {
-            const file = e.target.files[0];
-            if (file) {
-                processFile(file);
+            try {
+                const file = e.target.files[0];
+                if (file) {
+                    processFile(file);
+                }
+            } catch (error) {
+                console.error('ファイルアップロードエラー:', error);
+                showNotification('❌ ファイル処理エラーが発生しました', 'error');
             }
         }
         
@@ -973,7 +1165,13 @@
                 if (parsedData.length > 0) {
                     storeData = parsedData;
                     updateAllDisplays();
-                    showNotification(`✅ 成功！${parsedData.length}店舗のデータを読み込みました`, 'success');
+                    
+                    // 少し遅延してグラフを更新
+                    setTimeout(() => {
+                        updateAllCharts();
+                    }, 300);
+                    
+                    showNotification(`✅ 成功！${parsedData.length}店舗のデータを読み込み、グラフを更新しました`, 'success');
                     updateSidebarStats('real');
                     
                     // ダッシュボードに切り替え
@@ -1027,117 +1225,621 @@
         
         // サンプルデータ読み込み
         function loadSampleData() {
-            storeData = [
-                {
-                    name: 'シャブール',
-                    date: '2025/07/18',
-                    sales: 4279028,
-                    target: 35000000,
-                    photos: 904,
-                    reviews: 14,
-                    access: 77196,
-                    brand: 'Shaboole'
-                },
-                {
-                    name: 'ワンカラット',
-                    date: '2025/07/18',
-                    sales: 3850000,
-                    target: 28000000,
-                    photos: 680,
-                    reviews: 22,
-                    access: 85000,
-                    brand: 'OneCart'
-                },
-                {
-                    name: 'GO名古屋',
-                    date: '2025/07/18',
-                    sales: 4200000,
-                    target: 32000000,
-                    photos: 520,
-                    reviews: 28,
-                    access: 95000,
-                    brand: 'GrandOpera'
-                },
-                {
-                    name: 'GO福岡',
-                    date: '2025/07/18',
-                    sales: 3600000,
-                    target: 26000000,
-                    photos: 450,
-                    reviews: 24,
-                    access: 78000,
-                    brand: 'GrandOpera'
-                },
-                {
-                    name: 'GO東京',
-                    date: '2025/07/18',
-                    sales: 5200000,
-                    target: 38000000,
-                    photos: 720,
-                    reviews: 42,
-                    access: 125000,
-                    brand: 'GrandOpera'
-                },
-                {
-                    name: 'GO横浜',
-                    date: '2025/07/18',
-                    sales: 4100000,
-                    target: 30000000,
-                    photos: 580,
-                    reviews: 35,
-                    access: 98000,
-                    brand: 'GrandOpera'
-                },
-                {
-                    name: 'オペラ錦',
-                    date: '2025/07/18',
-                    sales: 3800000,
-                    target: 28000000,
-                    photos: 490,
-                    reviews: 32,
-                    access: 88000,
-                    brand: 'Opera'
-                },
-                {
-                    name: 'CL名古屋',
-                    date: '2025/07/18',
-                    sales: 1250000,
-                    target: 12000000,
-                    photos: 280,
-                    reviews: 18,
-                    access: 95000,
-                    brand: 'CLASSY'
-                },
-                {
-                    name: 'CL東京',
-                    date: '2025/07/18',
-                    sales: 1680000,
-                    target: 15000000,
-                    photos: 385,
-                    reviews: 26,
-                    access: 110000,
-                    brand: 'CLASSY'
-                },
-                {
-                    name: 'CL四日市',
-                    date: '2025/07/18',
-                    sales: 850000,
-                    target: 8500000,
-                    photos: 165,
-                    reviews: 15,
-                    access: 52000,
-                    brand: 'CLASSY'
+            try {
+                storeData = [
+                    {
+                        name: 'シャブール',
+                        date: '2025/07/18',
+                        sales: 4279028,
+                        target: 35000000,
+                        photos: 904,
+                        reviews: 14,
+                        access: 77196,
+                        brand: 'Shaboole'
+                    },
+                    {
+                        name: 'ワンカラット',
+                        date: '2025/07/18',
+                        sales: 3850000,
+                        target: 28000000,
+                        photos: 680,
+                        reviews: 22,
+                        access: 85000,
+                        brand: 'OneCart'
+                    },
+                    {
+                        name: 'GO名古屋',
+                        date: '2025/07/18',
+                        sales: 4200000,
+                        target: 32000000,
+                        photos: 520,
+                        reviews: 28,
+                        access: 95000,
+                        brand: 'GrandOpera'
+                    },
+                    {
+                        name: 'GO福岡',
+                        date: '2025/07/18',
+                        sales: 3600000,
+                        target: 26000000,
+                        photos: 450,
+                        reviews: 24,
+                        access: 78000,
+                        brand: 'GrandOpera'
+                    },
+                    {
+                        name: 'GO東京',
+                        date: '2025/07/18',
+                        sales: 5200000,
+                        target: 38000000,
+                        photos: 720,
+                        reviews: 42,
+                        access: 125000,
+                        brand: 'GrandOpera'
+                    },
+                    {
+                        name: 'GO横浜',
+                        date: '2025/07/18',
+                        sales: 4100000,
+                        target: 30000000,
+                        photos: 580,
+                        reviews: 35,
+                        access: 98000,
+                        brand: 'GrandOpera'
+                    },
+                    {
+                        name: 'オペラ錦',
+                        date: '2025/07/18',
+                        sales: 3800000,
+                        target: 28000000,
+                        photos: 490,
+                        reviews: 32,
+                        access: 88000,
+                        brand: 'Opera'
+                    },
+                    {
+                        name: 'CL名古屋',
+                        date: '2025/07/18',
+                        sales: 1250000,
+                        target: 12000000,
+                        photos: 280,
+                        reviews: 18,
+                        access: 95000,
+                        brand: 'CLASSY'
+                    },
+                    {
+                        name: 'CL東京',
+                        date: '2025/07/18',
+                        sales: 1680000,
+                        target: 15000000,
+                        photos: 385,
+                        reviews: 26,
+                        access: 110000,
+                        brand: 'CLASSY'
+                    },
+                    {
+                        name: 'CL四日市',
+                        date: '2025/07/18',
+                        sales: 850000,
+                        target: 8500000,
+                        photos: 165,
+                        reviews: 15,
+                        access: 52000,
+                        brand: 'CLASSY'
+                    }
+                ];
+                
+                updateAllDisplays();
+                updateSidebarStats('sample');
+                
+                // 少し遅延してグラフを初期化
+                setTimeout(() => {
+                    initializeCharts();
+                    showNotification('📊 サンプルデータとグラフを読み込みました', 'info');
+                }, 500);
+            } catch (error) {
+                console.error('サンプルデータ読み込みエラー:', error);
+                showNotification('❌ サンプルデータの読み込みに失敗しました', 'error');
+            }
+        }
+        
+        // グラフ初期化
+        function initializeCharts() {
+            try {
+                if (typeof Chart === 'undefined') {
+                    console.error('Chart.js が利用できません');
+                    return;
                 }
-            ];
-            
-            updateAllDisplays();
-            updateSidebarStats('sample');
-            showNotification('📊 サンプルデータを読み込みました', 'info');
+                
+                createSalesTargetChart();
+                createAchievementPieChart();
+                createSalesComparisonChart();
+                createAchievementRankingChart();
+                createPhotosChart();
+                createBrandAnalysisChart();
+                createEngagementChart();
+                createRadarChart();
+            } catch (error) {
+                console.error('グラフ初期化エラー:', error);
+                showNotification('❌ グラフの初期化に失敗しました', 'error');
+            }
+        }
+        
+        // ダッシュボード用チャート
+        function createSalesTargetChart() {
+            try {
+                const ctx = document.getElementById('salesTargetChart');
+                if (!ctx) return;
+                
+                if (charts.salesTarget) {
+                    charts.salesTarget.destroy();
+                }
+                
+                const data = storeData.slice(0, 5).map(store => ({
+                    name: store.name,
+                    sales: store.sales / 1000000,
+                    target: store.target / 1000000
+                }));
+                
+                charts.salesTarget = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.map(d => d.name),
+                        datasets: [
+                            {
+                                label: '売上実績 (百万円)',
+                                data: data.map(d => d.sales),
+                                backgroundColor: 'rgba(54, 162, 235, 0.8)',
+                                borderColor: 'rgba(54, 162, 235, 1)',
+                                borderWidth: 1
+                            },
+                            {
+                                label: '売上目標 (百万円)',
+                                data: data.map(d => d.target),
+                                backgroundColor: 'rgba(128, 90, 213, 0.3)',
+                                borderColor: 'rgba(128, 90, 213, 1)',
+                                borderWidth: 1
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top'
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('売上目標チャート作成エラー:', error);
+            }
+        }
+        
+        function createAchievementPieChart() {
+            try {
+                const ctx = document.getElementById('achievementPieChart');
+                if (!ctx) return;
+                
+                if (charts.achievementPie) {
+                    charts.achievementPie.destroy();
+                }
+                
+                const achievements = storeData.map(store => 
+                    store.target > 0 ? (store.sales / store.target * 100) : 0
+                );
+                
+                const excellent = achievements.filter(a => a >= 15).length;
+                const good = achievements.filter(a => a >= 10 && a < 15).length;
+                const average = achievements.filter(a => a >= 5 && a < 10).length;
+                const poor = achievements.filter(a => a < 5).length;
+                
+                charts.achievementPie = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['優秀 (15%+)', '良好 (10-15%)', '普通 (5-10%)', '改善要 (<5%)'],
+                        datasets: [{
+                            data: [excellent, good, average, poor],
+                            backgroundColor: [
+                                '#10b981',
+                                '#3b82f6',
+                                '#f59e0b',
+                                '#ef4444'
+                            ],
+                            borderWidth: 2,
+                            borderColor: '#fff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('達成率円グラフ作成エラー:', error);
+            }
+        }
+        
+        // 分析ページ用チャート
+        function createSalesComparisonChart() {
+            try {
+                const ctx = document.getElementById('salesComparisonChart');
+                if (!ctx) return;
+                
+                if (charts.salesComparison) {
+                    charts.salesComparison.destroy();
+                }
+                
+                const sortedData = [...storeData].sort((a, b) => b.sales - a.sales);
+                
+                charts.salesComparison = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: sortedData.map(store => store.name),
+                        datasets: [
+                            {
+                                label: '売上実績 (万円)',
+                                data: sortedData.map(store => store.sales / 10000),
+                                backgroundColor: sortedData.map(store => BRAND_COLORS[store.brand] + '80'),
+                                borderColor: sortedData.map(store => BRAND_COLORS[store.brand]),
+                                borderWidth: 2
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top'
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('売上比較チャート作成エラー:', error);
+            }
+        }
+        
+        function createAchievementRankingChart() {
+            try {
+                const ctx = document.getElementById('achievementRankingChart');
+                if (!ctx) return;
+                
+                if (charts.achievementRanking) {
+                    charts.achievementRanking.destroy();
+                }
+                
+                const data = storeData.map(store => ({
+                    name: store.name,
+                    achievement: store.target > 0 ? (store.sales / store.target * 100) : 0,
+                    brand: store.brand
+                })).sort((a, b) => b.achievement - a.achievement);
+                
+                charts.achievementRanking = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.map(d => d.name),
+                        datasets: [{
+                            label: '達成率 (%)',
+                            data: data.map(d => d.achievement),
+                            backgroundColor: data.map(d => BRAND_COLORS[d.brand] + '80'),
+                            borderColor: data.map(d => BRAND_COLORS[d.brand]),
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top'
+                            }
+                        },
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                max: Math.max(...data.map(d => d.achievement)) + 5
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('達成率ランキングチャート作成エラー:', error);
+            }
+        }
+        
+        function createPhotosChart() {
+            try {
+                const ctx = document.getElementById('photosChart');
+                if (!ctx) return;
+                
+                if (charts.photos) {
+                    charts.photos.destroy();
+                }
+                
+                const sortedData = [...storeData].sort((a, b) => b.photos - a.photos);
+                
+                charts.photos = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: sortedData.map(store => store.name),
+                        datasets: [{
+                            label: '写メ日記投稿数',
+                            data: sortedData.map(store => store.photos),
+                            backgroundColor: '#8b5cf6',
+                            borderColor: '#7c3aed',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top'
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('写メ日記チャート作成エラー:', error);
+            }
+        }
+        
+        function createBrandAnalysisChart() {
+            try {
+                const ctx = document.getElementById('brandAnalysisChart');
+                if (!ctx) return;
+                
+                if (charts.brandAnalysis) {
+                    charts.brandAnalysis.destroy();
+                }
+                
+                const brandData = {};
+                storeData.forEach(store => {
+                    if (!brandData[store.brand]) {
+                        brandData[store.brand] = { sales: 0, count: 0 };
+                    }
+                    brandData[store.brand].sales += store.sales;
+                    brandData[store.brand].count += 1;
+                });
+                
+                const brands = Object.keys(brandData);
+                const salesData = brands.map(brand => brandData[brand].sales / 1000000);
+                
+                charts.brandAnalysis = new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: brands,
+                        datasets: [{
+                            data: salesData,
+                            backgroundColor: brands.map(brand => BRAND_COLORS[brand]),
+                            borderWidth: 3,
+                            borderColor: '#fff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'right'
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('ブランド分析チャート作成エラー:', error);
+            }
+        }
+        
+        function createEngagementChart() {
+            try {
+                const ctx = document.getElementById('engagementChart');
+                if (!ctx) return;
+                
+                if (charts.engagement) {
+                    charts.engagement.destroy();
+                }
+                
+                charts.engagement = new Chart(ctx, {
+                    type: 'scatter',
+                    data: {
+                        datasets: [{
+                            label: '口コミ vs アクセス',
+                            data: storeData.map(store => ({
+                                x: store.access / 1000,
+                                y: store.reviews
+                            })),
+                            backgroundColor: storeData.map(store => BRAND_COLORS[store.brand] + '80'),
+                            borderColor: storeData.map(store => BRAND_COLORS[store.brand]),
+                            borderWidth: 2,
+                            pointRadius: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top'
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const index = context.dataIndex;
+                                        const store = storeData[index];
+                                        return `${store.name}: アクセス ${context.parsed.x}k, 口コミ ${context.parsed.y}件`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'アクセス数 (千件)'
+                                }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: '口コミ数'
+                                },
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('エンゲージメントチャート作成エラー:', error);
+            }
+        }
+        
+        function createRadarChart() {
+            try {
+                const ctx = document.getElementById('radarChart');
+                if (!ctx) return;
+                
+                if (charts.radar) {
+                    charts.radar.destroy();
+                }
+                
+                // 上位3店舗を比較
+                const topStores = [...storeData]
+                    .sort((a, b) => b.sales - a.sales)
+                    .slice(0, 3);
+                
+                const maxValues = {
+                    sales: Math.max(...storeData.map(s => s.sales)),
+                    photos: Math.max(...storeData.map(s => s.photos)),
+                    reviews: Math.max(...storeData.map(s => s.reviews)),
+                    access: Math.max(...storeData.map(s => s.access)),
+                    achievement: Math.max(...storeData.map(s => s.target > 0 ? s.sales / s.target * 100 : 0))
+                };
+                
+                const datasets = topStores.map((store, index) => {
+                    const achievement = store.target > 0 ? (store.sales / store.target * 100) : 0;
+                    return {
+                        label: store.name,
+                        data: [
+                            (store.sales / maxValues.sales) * 100,
+                            (store.photos / maxValues.photos) * 100,
+                            (store.reviews / maxValues.reviews) * 100,
+                            (store.access / maxValues.access) * 100,
+                            (achievement / maxValues.achievement) * 100
+                        ],
+                        backgroundColor: BRAND_COLORS[store.brand] + '20',
+                        borderColor: BRAND_COLORS[store.brand],
+                        borderWidth: 2,
+                        pointBackgroundColor: BRAND_COLORS[store.brand]
+                    };
+                });
+                
+                charts.radar = new Chart(ctx, {
+                    type: 'radar',
+                    data: {
+                        labels: ['売上', '写メ日記', '口コミ', 'アクセス', '達成率'],
+                        datasets: datasets
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top'
+                            }
+                        },
+                        scales: {
+                            r: {
+                                beginAtZero: true,
+                                max: 100
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('レーダーチャート作成エラー:', error);
+            }
+        }
+        
+        // グラフ更新
+        function updateAllCharts() {
+            try {
+                if (Object.keys(charts).length === 0) {
+                    initializeCharts();
+                } else {
+                    createSalesTargetChart();
+                    createAchievementPieChart();
+                    createSalesComparisonChart();
+                    createAchievementRankingChart();
+                    createPhotosChart();
+                    createBrandAnalysisChart();
+                    createEngagementChart();
+                    createRadarChart();
+                }
+                showNotification('📊 全グラフを更新しました', 'success');
+            } catch (error) {
+                console.error('グラフ更新エラー:', error);
+                showNotification('❌ グラフの更新に失敗しました', 'error');
+            }
+        }
+        
+        // グラフエクスポート
+        function exportCharts() {
+            try {
+                const chartIds = ['salesComparisonChart', 'achievementRankingChart', 'photosChart', 'brandAnalysisChart'];
+                let exportCount = 0;
+                
+                chartIds.forEach((chartId, index) => {
+                    const canvas = document.getElementById(chartId);
+                    if (canvas) {
+                        setTimeout(() => {
+                            const link = document.createElement('a');
+                            link.download = `川満さん専用_${chartId}_${new Date().toISOString().split('T')[0]}.png`;
+                            link.href = canvas.toDataURL();
+                            link.click();
+                            exportCount++;
+                            
+                            if (exportCount === chartIds.length) {
+                                showNotification(`✅ ${exportCount}個のグラフを保存しました`, 'success');
+                            }
+                        }, index * 500);
+                    }
+                });
+            } catch (error) {
+                console.error('グラフエクスポートエラー:', error);
+                showNotification('❌ グラフの保存に失敗しました', 'error');
+            }
         }
         
         // サンプルCSVダウンロード
         function downloadSample() {
-            const sampleCSV = `店舗名,B列,売上実績,売上目標,E列,写メ日記,G列,H列,I列,口コミ,K列,L列,M列,N列,O列,P列,アクセス
+            try {
+                const sampleCSV = `店舗名,B列,売上実績,売上目標,E列,写メ日記,G列,H列,I列,口コミ,K列,L列,M列,N列,O列,P列,アクセス
 シャブール,,4279028,35000000,,904,,,,14,,,,,,77196
 ワンカラット,,3850000,28000000,,680,,,,22,,,,,,85000
 GO名古屋,,4200000,32000000,,520,,,,28,,,,,,95000
@@ -1148,17 +1850,21 @@ GO横浜,,4100000,30000000,,580,,,,35,,,,,,98000
 CL名古屋,,1250000,12000000,,280,,,,18,,,,,,95000
 CL東京,,1680000,15000000,,385,,,,26,,,,,,110000
 CL四日市,,850000,8500000,,165,,,,15,,,,,,52000`;
-            
-            const blob = new Blob([sampleCSV], { type: 'text/csv' });
-            const url = URL.createObjectURL(blob);
-            
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = '川満さん専用店舗データサンプル.csv';
-            link.click();
-            
-            URL.revokeObjectURL(url);
-            showNotification('✅ サンプルCSVをダウンロードしました', 'success');
+                
+                const blob = new Blob([sampleCSV], { type: 'text/csv' });
+                const url = URL.createObjectURL(blob);
+                
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = '川満さん専用店舗データサンプル.csv';
+                link.click();
+                
+                URL.revokeObjectURL(url);
+                showNotification('✅ サンプルCSVをダウンロードしました', 'success');
+            } catch (error) {
+                console.error('CSVダウンロードエラー:', error);
+                showNotification('❌ CSVダウンロードに失敗しました', 'error');
+            }
         }
         
         // レポート生成
@@ -1170,6 +1876,7 @@ CL四日市,,850000,8500000,,165,,,,15,,,,,,52000`;
                     totalSales: storeData.reduce((sum, store) => sum + store.sales, 0),
                     totalTarget: storeData.reduce((sum, store) => sum + store.target, 0),
                     averageAchievement: calculateAverageAchievement(),
+                    brandAnalysis: getBrandAnalysis(),
                     stores: storeData.map(store => ({
                         ...store,
                         achievement: store.target > 0 ? (store.sales / store.target * 100) : 0
@@ -1182,11 +1889,11 @@ CL四日市,,850000,8500000,,165,,,,15,,,,,,52000`;
                 
                 const link = document.createElement('a');
                 link.href = url;
-                link.download = `川満さん専用レポート_${new Date().toISOString().split('T')[0]}.json`;
+                link.download = `川満さん専用詳細レポート_${new Date().toISOString().split('T')[0]}.json`;
                 link.click();
                 
                 URL.revokeObjectURL(url);
-                showNotification('✅ レポートをダウンロードしました', 'success');
+                showNotification('✅ 詳細レポートをダウンロードしました', 'success');
                 
             } catch (error) {
                 console.error('レポート生成エラー:', error);
@@ -1196,131 +1903,219 @@ CL四日市,,850000,8500000,,165,,,,15,,,,,,52000`;
         
         // 表示更新
         function updateAllDisplays() {
-            updateMetrics();
-            updateTable();
-            updateRankings();
+            try {
+                updateMetrics();
+                updateTable();
+                updateRankings();
+            } catch (error) {
+                console.error('表示更新エラー:', error);
+            }
         }
         
         function updateMetrics() {
-            const totalSales = storeData.reduce((sum, store) => sum + store.sales, 0);
-            const totalTarget = storeData.reduce((sum, store) => sum + store.target, 0);
-            const totalPhotos = storeData.reduce((sum, store) => sum + store.photos, 0);
-            const avgPhotos = storeData.length > 0 ? Math.round(totalPhotos / storeData.length) : 0;
-            const avgAchievement = calculateAverageAchievement();
-            
-            updateElement('totalSales', formatCurrency(totalSales));
-            updateElement('totalTarget', formatCurrency(totalTarget));
-            updateElement('totalAchievement', avgAchievement.toFixed(1) + '%');
-            updateElement('totalPhotos', avgPhotos.toString());
+            try {
+                const totalSales = storeData.reduce((sum, store) => sum + store.sales, 0);
+                const totalTarget = storeData.reduce((sum, store) => sum + store.target, 0);
+                const totalPhotos = storeData.reduce((sum, store) => sum + store.photos, 0);
+                const avgPhotos = storeData.length > 0 ? Math.round(totalPhotos / storeData.length) : 0;
+                const avgAchievement = calculateAverageAchievement();
+                
+                updateElement('totalSales', formatCurrency(totalSales));
+                updateElement('totalTarget', formatCurrency(totalTarget));
+                updateElement('totalAchievement', avgAchievement.toFixed(1) + '%');
+                updateElement('totalPhotos', avgPhotos.toString());
+            } catch (error) {
+                console.error('メトリクス更新エラー:', error);
+            }
         }
         
         function updateTable() {
-            const tbody = document.getElementById('storeTableBody');
-            if (!tbody) return;
-            
-            const sortedData = getSortedData();
-            
-            const html = sortedData.map(store => {
-                const achievement = store.target > 0 ? (store.sales / store.target * 100) : 0;
+            try {
+                const tbody = document.getElementById('storeTableBody');
+                if (!tbody) return;
                 
-                return `
-                    <tr>
-                        <td>
-                            <div class="store-name">${store.name}</div>
-                            <div class="store-date">${store.date}</div>
-                        </td>
-                        <td class="text-right">
-                            <div class="font-bold text-blue">${formatCurrency(store.sales)}</div>
-                        </td>
-                        <td class="text-right">
-                            <div class="text-gray">${formatCurrency(store.target)}</div>
-                        </td>
-                        <td class="text-center">
-                            ${getAchievementBadge(achievement)}
-                        </td>
-                        <td class="text-right">
-                            <div class="font-bold text-purple">${formatNumber(store.photos)}</div>
-                        </td>
-                        <td class="text-right">
-                            <div class="font-bold text-green">${formatNumber(store.reviews)}</div>
-                        </td>
-                        <td class="text-right">
-                            <div class="font-bold text-orange">${formatNumber(store.access)}</div>
-                        </td>
-                        <td class="text-center">
-                            ${getBrandBadge(store.brand)}
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-            
-            tbody.innerHTML = html;
+                const sortedData = getSortedData();
+                
+                const html = sortedData.map(store => {
+                    const achievement = store.target > 0 ? (store.sales / store.target * 100) : 0;
+                    
+                    return `
+                        <tr>
+                            <td>
+                                <div class="store-name">${store.name}</div>
+                                <div class="store-date">${store.date}</div>
+                            </td>
+                            <td class="text-right">
+                                <div class="font-bold text-blue">${formatCurrency(store.sales)}</div>
+                            </td>
+                            <td class="text-right">
+                                <div class="text-gray">${formatCurrency(store.target)}</div>
+                            </td>
+                            <td class="text-center">
+                                ${getAchievementBadge(achievement)}
+                            </td>
+                            <td class="text-right">
+                                <div class="font-bold text-purple">${formatNumber(store.photos)}</div>
+                            </td>
+                            <td class="text-right">
+                                <div class="font-bold text-green">${formatNumber(store.reviews)}</div>
+                            </td>
+                            <td class="text-right">
+                                <div class="font-bold text-orange">${formatNumber(store.access)}</div>
+                            </td>
+                            <td class="text-center">
+                                ${getBrandBadge(store.brand)}
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+                
+                tbody.innerHTML = html;
+            } catch (error) {
+                console.error('テーブル更新エラー:', error);
+            }
         }
         
         function updateRankings() {
-            updateSalesRanking();
-            updatePhotoRanking();
+            try {
+                updateSalesRanking();
+                updatePhotoRanking();
+                updateAchievementRanking();
+                updateBrandStats();
+            } catch (error) {
+                console.error('ランキング更新エラー:', error);
+            }
         }
         
         function updateSalesRanking() {
-            const container = document.getElementById('salesRanking');
-            if (!container) return;
-            
-            const sorted = [...storeData].sort((a, b) => b.sales - a.sales);
-            
-            container.innerHTML = sorted.slice(0, 5).map((store, index) => {
-                const medals = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣'];
-                return `
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #f7fafc; border-radius: 8px; margin: 5px 0;">
-                        <div style="display: flex; align-items: center;">
-                            <span style="font-size: 20px; margin-right: 10px;">${medals[index]}</span>
-                            <div>
-                                <div style="font-weight: 700; color: #2d3748;">${store.name}</div>
-                                <div style="font-size: 12px; color: #666;">${store.brand}</div>
+            try {
+                const container = document.getElementById('salesRanking');
+                if (!container) return;
+                
+                const sorted = [...storeData].sort((a, b) => b.sales - a.sales);
+                
+                container.innerHTML = sorted.slice(0, 5).map((store, index) => {
+                    const medals = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣'];
+                    return `
+                        <div class="ranking-item">
+                            <div style="display: flex; align-items: center;">
+                                <span style="font-size: 20px; margin-right: 10px;">${medals[index]}</span>
+                                <div>
+                                    <div style="font-weight: 700; color: #2d3748;">${store.name}</div>
+                                    <div style="font-size: 12px; color: #666;">${store.brand}</div>
+                                </div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-weight: 700; color: #3182ce;">${formatCurrency(store.sales)}</div>
                             </div>
                         </div>
-                        <div style="text-align: right;">
-                            <div style="font-weight: 700; color: #3182ce;">${formatCurrency(store.sales)}</div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
+                    `;
+                }).join('');
+            } catch (error) {
+                console.error('売上ランキング更新エラー:', error);
+            }
         }
         
         function updatePhotoRanking() {
-            const container = document.getElementById('photoRanking');
-            if (!container) return;
-            
-            const sorted = [...storeData].sort((a, b) => b.photos - a.photos);
-            
-            container.innerHTML = sorted.slice(0, 5).map((store, index) => {
-                const medals = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣'];
-                return `
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #f7fafc; border-radius: 8px; margin: 5px 0;">
-                        <div style="display: flex; align-items: center;">
-                            <span style="font-size: 20px; margin-right: 10px;">${medals[index]}</span>
-                            <div>
-                                <div style="font-weight: 700; color: #2d3748;">${store.name}</div>
-                                <div style="font-size: 12px; color: #666;">${store.brand}</div>
+            try {
+                const container = document.getElementById('photoRanking');
+                if (!container) return;
+                
+                const sorted = [...storeData].sort((a, b) => b.photos - a.photos);
+                
+                container.innerHTML = sorted.slice(0, 5).map((store, index) => {
+                    const medals = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣'];
+                    return `
+                        <div class="ranking-item">
+                            <div style="display: flex; align-items: center;">
+                                <span style="font-size: 20px; margin-right: 10px;">${medals[index]}</span>
+                                <div>
+                                    <div style="font-weight: 700; color: #2d3748;">${store.name}</div>
+                                    <div style="font-size: 12px; color: #666;">${store.brand}</div>
+                                </div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-weight: 700; color: #805ad5;">${formatNumber(store.photos)}件</div>
                             </div>
                         </div>
+                    `;
+                }).join('');
+            } catch (error) {
+                console.error('写メ日記ランキング更新エラー:', error);
+            }
+        }
+        
+        function updateAchievementRanking() {
+            try {
+                const container = document.getElementById('achievementRanking');
+                if (!container) return;
+                
+                const sorted = [...storeData]
+                    .map(store => ({
+                        ...store,
+                        achievement: store.target > 0 ? (store.sales / store.target * 100) : 0
+                    }))
+                    .sort((a, b) => b.achievement - a.achievement);
+                
+                container.innerHTML = sorted.slice(0, 5).map((store, index) => {
+                    const medals = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣'];
+                    return `
+                        <div class="ranking-item">
+                            <div style="display: flex; align-items: center;">
+                                <span style="font-size: 20px; margin-right: 10px;">${medals[index]}</span>
+                                <div>
+                                    <div style="font-weight: 700; color: #2d3748;">${store.name}</div>
+                                    <div style="font-size: 12px; color: #666;">${store.brand}</div>
+                                </div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-weight: 700; color: #38a169;">${store.achievement.toFixed(1)}%</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (error) {
+                console.error('達成率ランキング更新エラー:', error);
+            }
+        }
+        
+        function updateBrandStats() {
+            try {
+                const container = document.getElementById('brandStats');
+                if (!container) return;
+                
+                const brandData = getBrandAnalysis();
+                
+                container.innerHTML = Object.entries(brandData).map(([brand, data]) => `
+                    <div class="ranking-item">
+                        <div>
+                            <div style="font-weight: 700; color: #2d3748;">${brand}</div>
+                            <div style="font-size: 12px; color: #666;">${data.count}店舗</div>
+                        </div>
                         <div style="text-align: right;">
-                            <div style="font-weight: 700; color: #805ad5;">${formatNumber(store.photos)}件</div>
+                            <div style="font-weight: 700; color: #3182ce;">${formatCurrency(data.totalSales)}</div>
+                            <div style="font-size: 12px; color: #666;">平均${data.avgAchievement.toFixed(1)}%</div>
                         </div>
                     </div>
-                `;
-            }).join('');
+                `).join('');
+            } catch (error) {
+                console.error('ブランド統計更新エラー:', error);
+            }
         }
         
         function updateSidebarStats(type) {
-            updateElement('sidebarLastUpdate', new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' }));
-            
-            if (type === 'real') {
-                updateElement('sidebarDataQuality', 'リアル');
-                updateElement('sidebarStatus', 'リアルデータ');
-            } else {
-                updateElement('sidebarDataQuality', '最高');
-                updateElement('sidebarStatus', 'サンプルデータ');
+            try {
+                updateElement('sidebarLastUpdate', new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' }));
+                
+                if (type === 'real') {
+                    updateElement('sidebarDataQuality', 'リアル');
+                    updateElement('sidebarStatus', 'リアルデータ');
+                } else {
+                    updateElement('sidebarDataQuality', '最高');
+                    updateElement('sidebarStatus', 'サンプルデータ');
+                }
+            } catch (error) {
+                console.error('サイドバー統計更新エラー:', error);
             }
         }
         
@@ -1331,6 +2126,35 @@ CL四日市,,850000,8500000,,165,,,,15,,,,,,52000`;
                 return sum + (store.target > 0 ? (store.sales / store.target * 100) : 0);
             }, 0);
             return totalAchievement / storeData.length;
+        }
+        
+        function getBrandAnalysis() {
+            const brandData = {};
+            storeData.forEach(store => {
+                if (!brandData[store.brand]) {
+                    brandData[store.brand] = {
+                        count: 0,
+                        totalSales: 0,
+                        totalTarget: 0,
+                        achievements: []
+                    };
+                }
+                brandData[store.brand].count++;
+                brandData[store.brand].totalSales += store.sales;
+                brandData[store.brand].totalTarget += store.target;
+                if (store.target > 0) {
+                    brandData[store.brand].achievements.push(store.sales / store.target * 100);
+                }
+            });
+            
+            Object.keys(brandData).forEach(brand => {
+                const data = brandData[brand];
+                data.avgAchievement = data.achievements.length > 0 
+                    ? data.achievements.reduce((sum, a) => sum + a, 0) / data.achievements.length
+                    : 0;
+            });
+            
+            return brandData;
         }
         
         function getSortedData() {
@@ -1412,75 +2236,104 @@ CL四日市,,850000,8500000,,165,,,,15,,,,,,52000`;
         }
         
         function updateElement(id, content) {
-            const element = document.getElementById(id);
-            if (element) {
-                element.textContent = content;
+            try {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = content;
+                }
+            } catch (error) {
+                console.error(`要素更新エラー (${id}):`, error);
             }
         }
         
         function updateTime() {
-            const now = new Date();
-            updateElement('currentDate', now.toLocaleDateString('ja-JP'));
-            updateElement('currentTime', now.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' }));
+            try {
+                const now = new Date();
+                updateElement('currentDate', now.toLocaleDateString('ja-JP'));
+                updateElement('currentTime', now.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' }));
+            } catch (error) {
+                console.error('時刻更新エラー:', error);
+            }
         }
         
         function showPage(pageId) {
-            document.querySelectorAll('.page-content').forEach(page => {
-                page.classList.remove('active');
-            });
-            
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.classList.remove('active');
-            });
-            
-            const targetPage = document.getElementById(pageId + 'Page');
-            if (targetPage) {
-                targetPage.classList.add('active');
+            try {
+                document.querySelectorAll('.page-content').forEach(page => {
+                    page.classList.remove('active');
+                });
+                
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                
+                const targetPage = document.getElementById(pageId + 'Page');
+                if (targetPage) {
+                    targetPage.classList.add('active');
+                }
+                
+                const activeNav = document.querySelector(`[onclick="showPage('${pageId}')"]`);
+                if (activeNav) {
+                    activeNav.classList.add('active');
+                }
+                
+                const titles = {
+                    'dashboard': 'ダッシュボード',
+                    'upload': 'データアップロード',
+                    'analytics': 'グラフ分析',
+                    'detailed': '詳細レポート',
+                    'settings': '設定'
+                };
+                
+                updateElement('currentPageTitle', titles[pageId] || 'ダッシュボード');
+                currentPage = pageId;
+                
+                // グラフページに切り替えた時にグラフを更新
+                if (pageId === 'analytics' && storeData.length > 0) {
+                    setTimeout(() => {
+                        updateAllCharts();
+                    }, 200);
+                }
+            } catch (error) {
+                console.error('ページ表示エラー:', error);
             }
-            
-            const activeNav = document.querySelector(`[onclick="showPage('${pageId}')"]`);
-            if (activeNav) {
-                activeNav.classList.add('active');
-            }
-            
-            const titles = {
-                'dashboard': 'ダッシュボード',
-                'upload': 'データアップロード',
-                'analytics': '詳細分析',
-                'settings': '設定'
-            };
-            
-            updateElement('currentPageTitle', titles[pageId] || 'ダッシュボード');
-            currentPage = pageId;
         }
         
         function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const mainContent = document.getElementById('mainContent');
-            
-            if (sidebar && mainContent) {
-                sidebar.classList.toggle('active');
-                if (window.innerWidth <= 1024) {
-                    if (sidebar.classList.contains('active')) {
-                        mainContent.classList.remove('full-width');
-                    } else {
-                        mainContent.classList.add('full-width');
+            try {
+                const sidebar = document.getElementById('sidebar');
+                const mainContent = document.getElementById('mainContent');
+                
+                if (sidebar && mainContent) {
+                    sidebar.classList.toggle('active');
+                    if (window.innerWidth <= 1024) {
+                        if (sidebar.classList.contains('active')) {
+                            mainContent.classList.remove('full-width');
+                        } else {
+                            mainContent.classList.add('full-width');
+                        }
                     }
                 }
+            } catch (error) {
+                console.error('サイドバー切り替えエラー:', error);
             }
         }
         
         function sortStores(type) {
-            currentSort = type;
-            updateTable();
-            
-            const sortNames = {
-                'sales': '売上順',
-                'achievement': '達成率順',
-                'photos': '写メ日記順'
-            };
-            
-            showNotification(`📊 ${sortNames[type]}でソートしました`, 'info');
+            try {
+                currentSort = type;
+                updateTable();
+                
+                const sortNames = {
+                    'sales': '売上順',
+                    'achievement': '達成率順',
+                    'photos': '写メ日記順'
+                };
+                
+                showNotification(`📊 ${sortNames[type]}でソートしました`, 'info');
+            } catch (error) {
+                console.error('ソートエラー:', error);
+                showNotification('❌ ソート処理に失敗しました', 'error');
+            }
         }
         
         function uploadData() {
@@ -1488,22 +2341,26 @@ CL四日市,,850000,8500000,,165,,,,15,,,,,,52000`;
         }
         
         function showNotification(message, type = 'info', duration = 3000) {
-            const existingNotification = document.querySelector('.notification');
-            if (existingNotification) {
-                existingNotification.remove();
-            }
-            
-            const notification = document.createElement('div');
-            notification.className = `notification ${type}`;
-            notification.textContent = message;
-            
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                if (notification.parentNode) {
-                    notification.remove();
+            try {
+                const existingNotification = document.querySelector('.notification');
+                if (existingNotification) {
+                    existingNotification.remove();
                 }
-            }, duration);
+                
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+                notification.textContent = message;
+                
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.remove();
+                    }
+                }, duration);
+            } catch (error) {
+                console.error('通知表示エラー:', error);
+            }
         }
         
         function preventDefaults(e) {
@@ -1512,23 +2369,37 @@ CL四日市,,850000,8500000,,165,,,,15,,,,,,52000`;
         }
         
         function handleResize() {
-            const sidebar = document.getElementById('sidebar');
-            const mainContent = document.getElementById('mainContent');
-            
-            if (window.innerWidth > 1024) {
-                if (sidebar) sidebar.classList.remove('active');
-                if (mainContent) mainContent.classList.remove('full-width');
+            try {
+                const sidebar = document.getElementById('sidebar');
+                const mainContent = document.getElementById('mainContent');
+                
+                if (window.innerWidth > 1024) {
+                    if (sidebar) sidebar.classList.remove('active');
+                    if (mainContent) mainContent.classList.remove('full-width');
+                }
+                
+                // グラフのリサイズ処理
+                Object.values(charts).forEach(chart => {
+                    if (chart && chart.resize) {
+                        chart.resize();
+                    }
+                });
+            } catch (error) {
+                console.error('リサイズ処理エラー:', error);
             }
         }
         
         // 初期化実行
-        document.addEventListener('DOMContentLoaded', init);
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                init();
+            } catch (error) {
+                console.error('初期化エラー:', error);
+                showNotification('❌ システムの初期化に失敗しました', 'error');
+            }
+        });
         
         // エラーハンドリング
         window.addEventListener('error', (event) => {
             console.error('グローバルエラー:', event.error);
-            showNotification('予期しないエラーが発生しました', 'error');
-        });
-    </script>
-</body>
-</html>
+            showNotification('予期しないエラー
