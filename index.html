@@ -768,7 +768,7 @@
                     </div>
                     <div class="metric-card">
                         <div class="metric-value photos" id="totalPhotos">518</div>
-                        <div class="metric-label">平均写メ日記</div>
+                        <div class="metric-label">1日平均写メ日記</div>
                     </div>
                 </div>
                 
@@ -803,7 +803,7 @@
                             🎯 達成率順
                         </button>
                         <button class="btn btn-secondary" onclick="sortStores('photos')">
-                            📸 写メ日記順
+                            📸 1日平均写メ日記順
                         </button>
                     </div>
                     
@@ -815,9 +815,9 @@
                                     <th class="text-right">売上実績</th>
                                     <th class="text-right">売上目標</th>
                                     <th class="text-center">達成率</th>
-                                    <th class="text-right">写メ日記</th>
-                                    <th class="text-right">口コミ</th>
-                                    <th class="text-right">アクセス</th>
+                                    <th class="text-right">1日平均写メ日記</th>
+                                    <th class="text-right">1日平均口コミ</th>
+                                    <th class="text-right">1日平均アクセス</th>
                                     <th class="text-center">ブランド</th>
                                 </tr>
                             </thead>
@@ -866,10 +866,11 @@
                                 <li>A列: 店舗名</li>
                                 <li>C列: 売上実績</li>
                                 <li>D列: 売上目標</li>
-                                <li>F列: 写メ日記数</li>
-                                <li>J列: 口コミ数</li>
-                                <li>Q列: アクセス数</li>
+                                <li>F列: 写メ日記数（累計）</li>
+                                <li>J列: 口コミ数（累計）</li>
+                                <li>Q列: アクセス数（累計）</li>
                             </ul>
+                            <p style="margin-top: 15px; font-size: 14px; color: #666;"><strong>📅 計算期間:</strong> 月初からの経過日数で自動計算（現在: ${elapsedDays}日経過）</p>
                         </div>
                     </div>
                 </div>
@@ -905,7 +906,7 @@
                         </div>
                         
                         <div class="chart-section">
-                            <h3>📸 写メ日記投稿数</h3>
+                            <h3>📸 1日平均写メ日記投稿数</h3>
                             <div class="chart-container">
                                 <canvas id="photosChart"></canvas>
                             </div>
@@ -919,7 +920,7 @@
                         </div>
                         
                         <div class="chart-section">
-                            <h3>💬 口コミ・アクセス分析</h3>
+                            <h3>💬 1日平均口コミ・アクセス分析</h3>
                             <div class="chart-container">
                                 <canvas id="engagementChart"></canvas>
                             </div>
@@ -949,7 +950,7 @@
                         </div>
                         
                         <div class="section">
-                            <h3>📸 写メ日記ランキング</h3>
+                            <h3>📸 1日平均写メ日記ランキング</h3>
                             <div id="photoRanking">
                                 <!-- 動的に生成されます -->
                             </div>
@@ -1042,6 +1043,16 @@
         let currentSort = 'sales';
         let currentPage = 'dashboard';
         let charts = {};
+        let elapsedDays = 18; // デフォルト経過日数（7月18日なので月初から18日）
+        
+        // 経過日数計算関数
+        function calculateElapsedDays() {
+            const now = new Date();
+            const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+            const diffTime = Math.abs(now - monthStart);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            return diffDays;
+        }
         
         // ブランドマッピング
         const BRAND_MAPPING = {
@@ -1083,6 +1094,9 @@
             }
             
             try {
+                // 経過日数を計算
+                elapsedDays = calculateElapsedDays();
+                
                 // 時刻更新開始
                 updateTime();
                 setInterval(updateTime, 60000);
@@ -1567,15 +1581,15 @@
         }
         
         function createPhotosChart() {
-            const sortedData = [...storeData].sort((a, b) => b.photos - a.photos);
+            const sortedData = [...storeData].sort((a, b) => (b.photos/elapsedDays) - (a.photos/elapsedDays));
             
             const config = {
                 type: 'bar',
                 data: {
                     labels: sortedData.map(store => store.name),
                     datasets: [{
-                        label: '写メ日記投稿数',
-                        data: sortedData.map(store => store.photos),
+                        label: '1日平均写メ日記投稿数',
+                        data: sortedData.map(store => (store.photos / elapsedDays).toFixed(1)),
                         backgroundColor: '#8b5cf6',
                         borderColor: '#7c3aed',
                         borderWidth: 2
@@ -1643,10 +1657,10 @@
                 type: 'scatter',
                 data: {
                     datasets: [{
-                        label: '口コミ vs アクセス',
+                        label: '1日平均: 口コミ vs アクセス',
                         data: storeData.map(store => ({
-                            x: store.access / 1000,
-                            y: store.reviews
+                            x: (store.access / elapsedDays / 1000).toFixed(1),
+                            y: (store.reviews / elapsedDays).toFixed(1)
                         })),
                         backgroundColor: storeData.map(store => BRAND_COLORS[store.brand] + '80'),
                         borderColor: storeData.map(store => BRAND_COLORS[store.brand]),
@@ -1666,7 +1680,7 @@
                                 label: function(context) {
                                     const index = context.dataIndex;
                                     const store = storeData[index];
-                                    return `${store.name}: アクセス ${context.parsed.x}k, 口コミ ${context.parsed.y}件`;
+                                    return `${store.name}: 平均アクセス ${context.parsed.x}k/日, 平均口コミ ${context.parsed.y}件/日`;
                                 }
                             }
                         }
@@ -1675,13 +1689,13 @@
                         x: {
                             title: {
                                 display: true,
-                                text: 'アクセス数 (千件)'
+                                text: '1日平均アクセス数 (千件)'
                             }
                         },
                         y: {
                             title: {
                                 display: true,
-                                text: '口コミ数'
+                                text: '1日平均口コミ数'
                             },
                             beginAtZero: true
                         }
@@ -1700,9 +1714,9 @@
             
             const maxValues = {
                 sales: Math.max(...storeData.map(s => s.sales)),
-                photos: Math.max(...storeData.map(s => s.photos)),
-                reviews: Math.max(...storeData.map(s => s.reviews)),
-                access: Math.max(...storeData.map(s => s.access)),
+                photos: Math.max(...storeData.map(s => s.photos / elapsedDays)),
+                reviews: Math.max(...storeData.map(s => s.reviews / elapsedDays)),
+                access: Math.max(...storeData.map(s => s.access / elapsedDays)),
                 achievement: Math.max(...storeData.map(s => s.target > 0 ? s.sales / s.target * 100 : 0))
             };
             
@@ -1712,9 +1726,9 @@
                     label: store.name,
                     data: [
                         (store.sales / maxValues.sales) * 100,
-                        (store.photos / maxValues.photos) * 100,
-                        (store.reviews / maxValues.reviews) * 100,
-                        (store.access / maxValues.access) * 100,
+                        ((store.photos / elapsedDays) / maxValues.photos) * 100,
+                        ((store.reviews / elapsedDays) / maxValues.reviews) * 100,
+                        ((store.access / elapsedDays) / maxValues.access) * 100,
                         (achievement / maxValues.achievement) * 100
                     ],
                     backgroundColor: BRAND_COLORS[store.brand] + '20',
@@ -1727,7 +1741,7 @@
             const config = {
                 type: 'radar',
                 data: {
-                    labels: ['売上', '写メ日記', '口コミ', 'アクセス', '達成率'],
+                    labels: ['売上', '1日平均写メ日記', '1日平均口コミ', '1日平均アクセス', '達成率'],
                     datasets: datasets
                 },
                 options: {
@@ -1887,13 +1901,13 @@ CL四日市,,850000,8500000,,165,,,,15,,,,,,52000`;
                 const totalSales = storeData.reduce((sum, store) => sum + store.sales, 0);
                 const totalTarget = storeData.reduce((sum, store) => sum + store.target, 0);
                 const totalPhotos = storeData.reduce((sum, store) => sum + store.photos, 0);
-                const avgPhotos = storeData.length > 0 ? Math.round(totalPhotos / storeData.length) : 0;
+                const avgPhotosPerDay = storeData.length > 0 ? Math.round((totalPhotos / storeData.length) / elapsedDays * 10) / 10 : 0;
                 const avgAchievement = calculateAverageAchievement();
                 
                 updateElement('totalSales', formatCurrency(totalSales));
                 updateElement('totalTarget', formatCurrency(totalTarget));
                 updateElement('totalAchievement', avgAchievement.toFixed(1) + '%');
-                updateElement('totalPhotos', avgPhotos.toString());
+                updateElement('totalPhotos', avgPhotosPerDay.toString());
             } catch (error) {
                 console.error('メトリクス更新エラー:', error);
             }
@@ -1908,6 +1922,9 @@ CL四日市,,850000,8500000,,165,,,,15,,,,,,52000`;
                 
                 const html = sortedData.map(store => {
                     const achievement = store.target > 0 ? (store.sales / store.target * 100) : 0;
+                    const avgPhotosPerDay = (store.photos / elapsedDays).toFixed(1);
+                    const avgReviewsPerDay = (store.reviews / elapsedDays).toFixed(1);
+                    const avgAccessPerDay = Math.round(store.access / elapsedDays);
                     
                     return `
                         <tr>
@@ -1925,13 +1942,13 @@ CL四日市,,850000,8500000,,165,,,,15,,,,,,52000`;
                                 ${getAchievementBadge(achievement)}
                             </td>
                             <td class="text-right">
-                                <div class="font-bold text-purple">${formatNumber(store.photos)}</div>
+                                <div class="font-bold text-purple">${avgPhotosPerDay}</div>
                             </td>
                             <td class="text-right">
-                                <div class="font-bold text-green">${formatNumber(store.reviews)}</div>
+                                <div class="font-bold text-green">${avgReviewsPerDay}</div>
                             </td>
                             <td class="text-right">
-                                <div class="font-bold text-orange">${formatNumber(store.access)}</div>
+                                <div class="font-bold text-orange">${formatNumber(avgAccessPerDay)}</div>
                             </td>
                             <td class="text-center">
                                 ${getBrandBadge(store.brand)}
@@ -1991,10 +2008,11 @@ CL四日市,,850000,8500000,,165,,,,15,,,,,,52000`;
                 const container = document.getElementById('photoRanking');
                 if (!container) return;
                 
-                const sorted = [...storeData].sort((a, b) => b.photos - a.photos);
+                const sorted = [...storeData].sort((a, b) => (b.photos/elapsedDays) - (a.photos/elapsedDays));
                 
                 container.innerHTML = sorted.slice(0, 5).map((store, index) => {
                     const medals = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣'];
+                    const avgPhotosPerDay = (store.photos / elapsedDays).toFixed(1);
                     return `
                         <div class="ranking-item">
                             <div style="display: flex; align-items: center;">
@@ -2005,7 +2023,7 @@ CL四日市,,850000,8500000,,165,,,,15,,,,,,52000`;
                                 </div>
                             </div>
                             <div style="text-align: right;">
-                                <div style="font-weight: 700; color: #805ad5;">${formatNumber(store.photos)}件</div>
+                                <div style="font-weight: 700; color: #805ad5;">${avgPhotosPerDay}件/日</div>
                             </div>
                         </div>
                     `;
@@ -2140,7 +2158,7 @@ CL四日市,,850000,8500000,,165,,,,15,,,,,,52000`;
                         return bAchievement - aAchievement;
                     });
                 case 'photos':
-                    return sortedData.sort((a, b) => b.photos - a.photos);
+                    return sortedData.sort((a, b) => (b.photos/elapsedDays) - (a.photos/elapsedDays));
                 default:
                     return sortedData;
             }
@@ -2296,7 +2314,7 @@ CL四日市,,850000,8500000,,165,,,,15,,,,,,52000`;
                 const sortNames = {
                     'sales': '売上順',
                     'achievement': '達成率順',
-                    'photos': '写メ日記順'
+                    'photos': '1日平均写メ日記順'
                 };
                 
                 showNotification(`📊 ${sortNames[type]}でソートしました`, 'info');
